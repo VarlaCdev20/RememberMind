@@ -10,7 +10,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RevisarValoracionExperta;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\CapturasInstrumentalesResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarActividadCognitiva;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarContinuidadAsistencialExperta;
-use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarExploracionOrion;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarGrafoExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarHallazgosObservacionales;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarObservacionesConservadas;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPerfilInstrumental;
@@ -323,7 +323,7 @@ class ResultadosExpertoResidente extends Component
         $residente = $this->autorizar();
         abort_unless(in_array($tipo, ['inferencia', 'semantico'], true), 422);
         $lectura = app(LecturaResultadosExperto::class)->consultar(auth()->user(), $residente, $this->evaluacion, $this->criterio);
-        $grafos = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $lectura, $this->criterio);
+        $grafos = app(ConsultarGrafoExperto::class)->consultar(auth()->user(), $residente, $lectura, $this->criterio);
         abort_unless(collect($grafos[$tipo]['nodos'])->contains('id', $id), 404);
         $this->abrirConsulta('reglas');
         $this->tipoGrafo = $tipo;
@@ -360,9 +360,9 @@ class ResultadosExpertoResidente extends Component
     public function irASeccion(string $seccion): void
     {
         $this->autorizar();
-        abort_unless(in_array($seccion, ['orion-desglose', 'orion-evolucion', 'hallazgos-observacionales', 'fuentes-disponibles', 'aplicaciones-instrumentales', 'orion-petersen-criterios', 'orion-petersen-detalle', 'orion-revision-profesional'], true), 422);
+        abort_unless(in_array($seccion, ['decision-desglose', 'decision-evolucion', 'hallazgos-observacionales', 'fuentes-disponibles', 'aplicaciones-instrumentales', 'decision-petersen-criterios', 'decision-petersen-detalle', 'decision-revision-profesional'], true), 422);
         $this->cerrarVentanasConsulta();
-        $this->dispatch('orion-navigate', seccion: $seccion);
+        $this->dispatch('decision-navigate', seccion: $seccion);
     }
 
     public function abrirConsulta(string $pestana = 'interpretacion'): void
@@ -695,7 +695,7 @@ class ResultadosExpertoResidente extends Component
             }
             $estadoRevision = $presentador->resumirRevision($revisiones, $datos['evaluacion'] !== null);
             if ($puedeAuditar && ! $datos['prueba_tecnica']) {
-                $exploracion = app(ConsultarExploracionOrion::class)->consultar(auth()->user(), $residente, $datos, $this->criterio);
+                $exploracion = app(ConsultarGrafoExperto::class)->consultar(auth()->user(), $residente, $datos, $this->criterio);
             }
             if ($this->evidencia && isset($datos['detalle']['evidencias'][$this->evidencia])) {
                 $fuente = app(LecturaFuenteEvidencia::class)->consultar(auth()->user(), $residente, $datos['evaluacion']['id'], $this->evidencia);

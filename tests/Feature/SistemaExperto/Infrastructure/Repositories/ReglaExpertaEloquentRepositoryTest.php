@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\ReglaExpertaEloquentRepository;
 use DomainException;
@@ -99,9 +99,9 @@ final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
     /** @throws RuntimeException El fallo real de lectura no se transforma en una lista vacía. */
     public function test_propaga_fallo_de_lectura_sin_simular_ausencia(): void
     {
-        config(['database.connections.orion_vacia' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']]);
+        config(['database.connections.experto_vacia' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']]);
         $repo = new ReglaExpertaEloquentRepository(
-            new MapeadorReglas('RESULTADO'), 'orion_vacia');
+            new MapeadorReglas('RESULTADO'), 'experto_vacia');
 
         $this->expectException(RuntimeException::class);
         $repo->porVersion('SIM-V1');

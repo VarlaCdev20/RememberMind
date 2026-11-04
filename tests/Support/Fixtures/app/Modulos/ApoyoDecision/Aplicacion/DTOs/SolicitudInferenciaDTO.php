@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
 use DateTimeImmutable;
 use DomainException;
 

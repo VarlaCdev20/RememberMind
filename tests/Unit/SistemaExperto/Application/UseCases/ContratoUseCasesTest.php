@@ -14,8 +14,8 @@ use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\EjecutarInferenciaUseCase;
 use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
 use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\GenerarInformeUseCase;
 use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\PrepararMemoriaTrabajoUseCase;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -64,7 +64,7 @@ final class ContratoUseCasesTest extends TestCase
             foreach (token_get_all(file_get_contents((new ReflectionClass($clase))->getFileName())) as $token) {
                 if (is_array($token) && in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED], true)) {
                     $nombre = ltrim($token[1], '\\');
-                    self::assertTrue(str_starts_with($nombre, 'MotorExperto\\dominio\\orion\\')
+                    self::assertTrue(str_starts_with($nombre, 'MotorExperto\\dominio\\')
                         || $nombre === 'App\\Modulos\\ApoyoDecision\\Aplicacion\\CasosDeUso'
                         || str_starts_with($nombre, 'App\\Modulos\\ApoyoDecision\\Aplicacion\\CasosDeUso\\')
                         || str_starts_with($nombre, 'App\\Modulos\\ApoyoDecision\\Aplicacion\\DTOs\\'), $nombre);

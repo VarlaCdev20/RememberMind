@@ -46,7 +46,7 @@ La consulta pasiva sigue siendo una lectura actual. Comparte la captura instrume
 | `app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto-residente.blade.php` | Confirmación accesible con fecha humana del análisis. |
 | `app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/petersen-institucional.blade.php` | Cabecera y orientación fieles al resultado. |
 | `tests/Feature/EjecucionConsultaCognitivaTest.php` | Adquisición única, proyección sin consultas, errores, reintentos, permisos, falta de versión y nueva petición. |
-| `tests/Feature/SistemaExpertoOrionNivel1Test.php` | Recorrido de los cuatro perfiles y abstenciones, con transacción propia y textos actuales. |
+| `tests/Feature/SistemaExpertoNivel1Test.php` | Recorrido de los cuatro perfiles y abstenciones, con transacción propia y textos actuales. |
 | `tests/Unit/ResumenPetersenVisibleTest.php` | Distingue requisitos negativos, faltantes, contradicción, diferencial y reglas no disponibles. |
 
 ## Verificación
@@ -55,7 +55,7 @@ La batería inicial de captura, conocimiento, originales Petersen, preparación 
 
 | Comando | Entorno | Resultado |
 | --- | --- | --- |
-| `php artisan test --filter='EjecucionConsultaCognitivaTest\|ResumenPetersenVisibleTest\|MotivoPetersenVisibleTest\|SistemaExpertoOrionNivel1Test' --compact --stop-on-failure` | SQLite desechable y unitarias | 26 pruebas, 136 aserciones; satisfactorio sobre el código final. Incluye ocho casos nuevos de ejecución, los cuatro perfiles por la acción de Livewire, las abstenciones y la traducción de estados. |
+| `php artisan test --filter='EjecucionConsultaCognitivaTest\|ResumenPetersenVisibleTest\|MotivoPetersenVisibleTest\|SistemaExpertoNivel1Test' --compact --stop-on-failure` | SQLite desechable y unitarias | 26 pruebas, 136 aserciones; satisfactorio sobre el código final. Incluye ocho casos nuevos de ejecución, los cuatro perfiles por la acción de Livewire, las abstenciones y la traducción de estados. |
 | `php artisan test --filter='ConocimientoCognitivoInstitucionalTest\|CapturaInstrumentalInstitucionalTest\|InformeCognitivoTest\|RevisionValoracionExpertaTest' --compact --stop-on-failure` | SQLite desechable | 153 pruebas, 1603 aserciones; satisfactorio tras integrar la ejecución compuesta y compartir las medidas. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'EjecucionConsultaCognitivaTest\|PreparacionCompuestaCoherenteTest'` | Cluster PostgreSQL desechable | 11 pruebas, 75 aserciones; satisfactorio, incluidas las carreras reales. Incluyó seis pruebas de ejecución anteriores a los dos casos añadidos posteriormente. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro EjecucionConsultaCognitivaTest` | Nuevo cluster PostgreSQL desechable | 8 pruebas, 58 aserciones; satisfactorio con los dos casos adicionales de hidratación y falta de versión. |

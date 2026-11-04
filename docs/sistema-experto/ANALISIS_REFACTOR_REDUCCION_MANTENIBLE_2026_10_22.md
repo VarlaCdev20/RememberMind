@@ -27,7 +27,7 @@ Las cuatro consolidaciones históricas de 108 a 104 ya están instaladas; **no s
 | `variables_expertas` | Bloque de variable en `nodos_semanticos` | UNIQUE `se06_u1` sobre `cod_nodo_semantico` | 1 |
 | `clasificaciones_dcl_instantanea` | Bloque de clasificación en `evaluaciones_expertas` | UNIQUE sobre `cod_evaluacion_experta` | 1 |
 
-Las migraciones que respaldan estas afirmaciones son `2026_10_08_120019_create_resultados_criterio_table.php`, `2026_10_08_120020_create_trazas_inferencia_table.php`, `2026_10_08_120006_create_variables_expertas_table.php` y `2026_10_17_200000_incorporate_conservacion_experta_v2.php`. Se contrastó también el inventario migrado de `prototipos/orion-conservacion-110/inventario-120-tablas.csv`.
+Las migraciones que respaldan estas afirmaciones son `2026_10_08_120019_create_resultados_criterio_table.php`, `2026_10_08_120020_create_trazas_inferencia_table.php`, `2026_10_08_120006_create_variables_expertas_table.php` y `2026_10_17_200000_incorporate_conservacion_experta_v2.php`. Se contrastó también el inventario migrado de `prototipos/experto-conservacion-110/inventario-120-tablas.csv`.
 
 Una fila de propietario puede no tener resultado, traza, variable o clasificación. La consolidación debe conservar cada bloque de manera independiente, incluyendo su ausencia; no exigir simultaneidad ni generar campos predeterminados. Cada identidad antigua debe seguir disponible como clave alternativa UNIQUE. Las FK entrantes deben apuntar a esas identidades preservadas, con el mismo alcance de versión y evaluación.
 

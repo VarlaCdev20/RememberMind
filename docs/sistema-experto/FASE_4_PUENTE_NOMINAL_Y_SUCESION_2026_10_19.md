@@ -84,7 +84,7 @@ Build no aplica: backend y documentación, sin cambios de interfaz o assets. No 
 | --- | --- |
 | SQLite `:memory:`, selección relacionada | **178 pruebas / 5902 aserciones**, cero fallos, errores u omisiones; 3 min 31 s |
 | PostgreSQL desechable, misma selección más carreras de gobierno | **183 pruebas / 5961 aserciones**, cero fallos, errores u omisiones; 5 min 04 s. Incluye cinco carreras con procesos independientes; parada del servidor confirmada |
-| Independencia del motor y O.R.I.O.N. | Ambos ejecutables PASS, sin Laravel ni SQL |
+| Independencia del motor y sistema experto | Ambos ejecutables PASS, sin Laravel ni SQL |
 | Pint de los cinco PHP propios | PASS |
 | Correspondencia candidato / workspace | SHA-256 idéntico de los cinco PHP; reflexión del autoloader resuelve el archivo del candidato |
 | Documentación | 69 enlaces locales comprobados en los cuatro documentos del incremento; diff sin errores de espacios |
@@ -99,7 +99,7 @@ $filtro = 'ConocimientoCognitivoInstitucionalTest|ReproduccionFuenteNominalTest|
 php vendor/phpunit/phpunit/phpunit --filter $filtro --log-junit storage/app/private/fase4-nominal-final-sqlite.xml
 ./scripts/probar-postgres.ps1 -Filtro ($filtro + '|GobiernoReglasConcurrenciaPostgresTest') -Informe storage/app/private/fase4-nominal-final-postgres.xml -Log storage/app/private/fase4-nominal-final-postgres.log
 php motor-experto/tests/independencia.php
-php motor-experto/tests/orion_independencia.php
+php motor-experto/tests/dominio_independencia.php
 ```
 
 ## 7. Checklist y siguiente dependencia

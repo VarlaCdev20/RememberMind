@@ -16,7 +16,7 @@
         <label for="gob-version" class="block font-semibold mb-2">Versión que desea consultar</label>
         <select id="gob-version" wire:model.live="versionSeleccionada" class="rm-select w-full !leading-normal !min-h-11">
             <option value="">Seleccione una versión</option>
-            @foreach($versiones as $v)<option value="{{ $v->getKey() }}">{{ $v->codigo_version }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach
+            @foreach($versiones as $v)<option value="{{ $v->getKey() }}">{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($v->codigo_version) }} · {{ $v->fecha_hora_retiro ? 'Retirada' : $v->estado }}</option>@endforeach
         </select>
         @if($seleccionada)<p class="text-sm mt-3">{{ $seleccionada->motivo_cambio }} · Autor: {{ $seleccionada->cod_usuario_creacion }} · {{ $seleccionada->fecha_hora_creacion }}</p>@endif
         <p class="text-sm text-rm-secondary mt-3">Una regla pendiente puede probarse cuando sus entradas y método estén definidos. La revisión del conocimiento se registra por separado de la revisión del resultado de un residente.</p>
@@ -119,7 +119,7 @@
         <x-ui.section-card title="Crear versión sucesora" subtitle="La versión anterior se retirará de nuevas ejecuciones y conservará su historia.">
             <form wire:submit="crearSucesora" class="space-y-4">
                 @if($reglaArchivo)<p role="status">Regla seleccionada para archivo: {{ $reglaArchivo }}. {{ $contratoPetersen ? 'Su definición se conservará en la historia.' : 'Puede incorporar su sustituta en esta misma revisión.' }}</p><button type="button" wire:click="cancelarSeleccion" class="rm-btn rm-btn-secondary">Cancelar selección</button>@endif
-                <div><label for="gob-codigo" class="block font-semibold">Código de nueva versión</label><input id="gob-codigo" wire:model="codigoVersion" class="rm-input w-full" maxlength="30" placeholder="ORION-REVISION-2" required>@error('codigoVersion')<p role="alert">{{ $message }}</p>@enderror</div>
+                <div><label for="gob-codigo" class="block font-semibold">Código de nueva versión</label><input id="gob-codigo" wire:model="codigoVersion" class="rm-input w-full" maxlength="30" placeholder="EXPERTO-REVISION-2" required>@error('codigoVersion')<p role="alert">{{ $message }}</p>@enderror</div>
                 <div><label for="gob-motivo" class="block font-semibold">Motivo de cambio o archivo</label><textarea id="gob-motivo" wire:model="motivoCambio" class="rm-textarea w-full" rows="3" minlength="10" maxlength="5000" required></textarea>@error('motivoCambio')<p role="alert">{{ $message }}</p>@enderror</div>
                 @if($contratoPetersen)<p class="text-sm">Esta familia conserva las cuatro definiciones del contrato Petersen adoptado. Puede probarlas, revisarlas, crear una sucesora o archivarlas. Cambiar los criterios requiere una decisión institucional.</p>@else<label class="flex items-center gap-2"><input type="checkbox" wire:model.live="agregarRegla">Incorporar una regla nueva o sustituta</label>@endif
                 @if($agregarRegla && !$contratoPetersen)

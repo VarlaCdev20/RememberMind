@@ -162,7 +162,7 @@ final class CodecInstantanea
             return 'E'.self::identidadContractual($v::class).self::canonico($v->value);
         }
         if (is_object($v)) {
-            if (! str_starts_with($v::class, 'MotorExperto\\dominio\\orion\\')) {
+            if (! str_starts_with($v::class, 'MotorExperto\\dominio\\')) {
                 throw new DomainException('Solo se firman objetos de Domain.');
             }
 
@@ -192,7 +192,7 @@ final class CodecInstantanea
     /** Identidad del formato histórico, independiente de la ubicación PHP; no carga ni declara clases antiguas. */
     private static function identidadContractual(string $clase): string
     {
-        $prefijo = 'MotorExperto\\dominio\\orion\\';
+        $prefijo = 'MotorExperto\\dominio\\';
 
         return str_starts_with($clase, $prefijo) ? 'App\\SistemaExperto\\Domain\\'.substr($clase, strlen($prefijo)) : $clase;
     }

@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Contrato y ejecución del puente G08 → A/P/U/I/X → Petersen
+# sistema experto — Contrato y ejecución del puente G08 → A/P/U/I/X → Petersen
 
 **Versión:** `PTE-DCL-G08-TEST-01`
 **Fecha:** 17/10/2026
@@ -43,10 +43,10 @@ Los requisitos **C01–C05 se documentan por separado**: C01 cambio longitudinal
 php motor-experto/tests/dcl_puente_referencias_experimental.php
 php motor-experto/tests/dcl_puente_integracion_cinco_dominios.php
 php motor-experto/tests/dcl_petersen_experimental.php
-php motor-experto/tests/orion_cinco_dominios_experimental.php
+php motor-experto/tests/cinco_dominios_experimental.php
 ```
 
-Estas pruebas forman parte de `.github/workflows/orion-g09-experimental.yml`, con PHP 8.3 y extensión PDO SQLite. No crean ni consultan residentes reales ni alteran migraciones del esquema operacional.
+Estas pruebas forman parte de `.github/workflows/decision-g09-experimental.yml`, con PHP 8.3 y extensión PDO SQLite. No crean ni consultan residentes reales ni alteran migraciones del esquema operacional.
 
 ## Límites y trabajo pendiente
 

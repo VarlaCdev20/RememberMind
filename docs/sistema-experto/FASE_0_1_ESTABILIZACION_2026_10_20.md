@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Fase 0.1: estabilización
+# sistema experto — Fase 0.1: estabilización
 
 Fecha: 20/10/2026. Repositorio: `C:/Users/CARLAENCINAS/Desktop/RememberMind`. Rama: `feature/apoyo-decision-informe-neurocognitivo`.
 
@@ -31,7 +31,7 @@ Se respetaron las Policies, los permisos y los roles existentes. No se añadiero
 | PostgreSQL, auditoría original | 132 | 47 | 0 | 85 | 0 | 282 |
 | PostgreSQL, cierre ampliado | 191 | 191 | 0 | 0 | 0 | 1572 |
 
-SQLite: 134 archivos únicos, los 124 originales y diez adicionales, repartidos sin casos repetidos en cuatro procesos con bases en memoria y almacenamiento aislado. Los motivos exactos de omisión y los casos PostgreSQL están en [la evidencia](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-pruebas.json). PostgreSQL utiliza un clúster/base/runner propios con puerto aleatorio, detenido y eliminado al finalizar. Se ampliaron las selecciones; no se suman ejecuciones intermedias ni se afirma haber ejecutado toda la suite global de RememberMind.
+SQLite: 134 archivos únicos, los 124 originales y diez adicionales, repartidos sin casos repetidos en cuatro procesos con bases en memoria y almacenamiento aislado. Los motivos exactos de omisión y los casos PostgreSQL están en [la evidencia](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-pruebas.json). PostgreSQL utiliza un clúster/base/runner propios con puerto aleatorio, detenido y eliminado al finalizar. Se ampliaron las selecciones; no se suman ejecuciones intermedias ni se afirma haber ejecutado toda la suite global de RememberMind.
 
 Comparación por identidad de caso: los 2144 originales de SQLite siguen presentes (2129 aprobados y 15 omitidos por PostgreSQL); los 132 originales de PostgreSQL aprobaron. Los 19 casos omitidos en el cierre SQLite aprobaron en PostgreSQL, comprobados uno a uno.
 
@@ -41,7 +41,7 @@ Controles adicionales: 22 archivos PHP sin errores de sintaxis; Pint `--test` ap
 
 ## Las 29 tablas y sus relaciones
 
-Se consultaron exclusivamente catálogos PostgreSQL con transacción READ ONLY, sin filas clínicas: 120 tablas físicas, 104 de negocio (75 operativas y 29 expertas), más 16 técnicas. Las 29 expertas están presentes: 23 D-137, cinco de conservación reducida y una de revisión profesional. Modelo, tabla y PK coinciden en las 29; se revisaron relaciones explícitas con claves string. El [inventario verificado](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-inventario-verificado.csv) detalla columnas, FK e índices por tabla. No se modificaron modelos ni migraciones. La metadata comparada con la auditoría no muestra cambios de columnas ni restricciones.
+Se consultaron exclusivamente catálogos PostgreSQL con transacción READ ONLY, sin filas clínicas: 120 tablas físicas, 104 de negocio (75 operativas y 29 expertas), más 16 técnicas. Las 29 expertas están presentes: 23 D-137, cinco de conservación reducida y una de revisión profesional. Modelo, tabla y PK coinciden en las 29; se revisaron relaciones explícitas con claves string. El [inventario verificado](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-inventario-verificado.csv) detalla columnas, FK e índices por tabla. No se modificaron modelos ni migraciones. La metadata comparada con la auditoría no muestra cambios de columnas ni restricciones.
 
 La referencia histórica a 69 operativas no se utilizó para autorizar cambios: se preservó todo el esquema operativo instalado, incluidas sus extensiones aprobadas. Una FK existente prueba referencia válida; no prueba por sí misma igualdad de evaluación/versión en todo el grafo.
 
@@ -84,7 +84,7 @@ Rutas relativas al repositorio indicado arriba; varios archivos ya contenían ca
 - [tests/Support/RestablecerEsquemaPostgres.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Support/RestablecerEsquemaPostgres.php)
 - [tests/TestCase.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/TestCase.php)
 - [tests/Feature/ResumenCognitivoResidenteTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/ResumenCognitivoResidenteTest.php)
-- [tests/Feature/EstabilizacionOrionContinuidadTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/EstabilizacionOrionContinuidadTest.php)
+- [tests/Feature/EstabilizacionExpertoContinuidadTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/EstabilizacionExpertoContinuidadTest.php)
 - [tests/Feature/RedisenoEnfermeriaIntegralTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/RedisenoEnfermeriaIntegralTest.php)
 - [tests/Feature/ConocimientoCognitivoInstitucionalTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/ConocimientoCognitivoInstitucionalTest.php)
 - [tests/Feature/PreparacionPostgresRepetidaTest.php](C:/Users/CARLAENCINAS/Desktop/RememberMind/tests/Feature/PreparacionPostgresRepetidaTest.php)
@@ -98,8 +98,8 @@ Rutas relativas al repositorio indicado arriba; varios archivos ya contenían ca
 
 ## Evidencia adjunta
 
-- [Resultados y comandos ejecutados](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-pruebas.txt).
-- [Resultados por caso, omisiones y hashes JUnit](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-pruebas.json).
-- [Inventario físico de 29 tablas](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-inventario-verificado.csv).
-- [Comprobación de estructura](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/ORION-FASE-0-1-integridad-esquema.json).
+- [Resultados y comandos ejecutados](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-pruebas.txt).
+- [Resultados por caso, omisiones y hashes JUnit](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-pruebas.json).
+- [Inventario físico de 29 tablas](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-inventario-verificado.csv).
+- [Comprobación de estructura](C:/Users/CARLAENCINAS/Documents/Codex/2026-10-20/df/outputs/EXPERTO-FASE-0-1-integridad-esquema.json).
 - [Dependencia estructural de conservación](FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md).

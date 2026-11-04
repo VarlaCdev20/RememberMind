@@ -1,4 +1,4 @@
-# Integración local de O.R.I.O.N. — 17/10/2026
+# Integración local de sistema experto — 17/10/2026
 
 Alcance autorizado por la propietaria: completar el recorrido técnico de los
 cinco residentes ficticios de `remembermind_dev`, conservar las salidas y
@@ -9,7 +9,7 @@ la orden «procede y termina todo de forma correcta» corresponden a esta tarea.
 
 - Esquema: decisiones aprobadas IADL y conservación V2 de nueve tablas;
   no se incorpora la propuesta histórica de dieciséis.
-- Conocimiento nuevo: `SIM-ORION-LOCAL-1`, separado de las dos versiones
+- Conocimiento nuevo: `SIM-EXPERTO-LOCAL-1`, separado de las dos versiones
   documentales anteriores. Las anteriores conservan su estado y seis mapeos
   pendientes; esta integración no los aprueba ni activa.
 - Antecedentes: lote `SIM-SE-20261017-V1`, incluidos sus sucesores trazables.
@@ -156,9 +156,9 @@ Evidencia privada: `storage/app/private/dev-backups/verificacion-simulacion-loca
 | Lectura local y reintento sobre datos cargados | PASS |
 | Revisión visual de navegador | No ejecutada: uso del navegador deshabilitado en Work |
 
-Informes JUnit y logs: TEMP `orion-integracion.sqlite.*`,
-`orion-integracion.pg.*`, `orion-fecha.pg.*` y
-`orion-cierre.sqlite.*`, `orion-integracion.build.log`. Los dos servidores PostgreSQL de las pruebas
+Informes JUnit y logs: TEMP `decision-integracion.sqlite.*`,
+`decision-integracion.pg.*`, `decision-fecha.pg.*` y
+`decision-cierre.sqlite.*`, `decision-integracion.build.log`. Los dos servidores PostgreSQL de las pruebas
 terminadas se detuvieron y sus runners retiraron sus propios clusters.
 Un intento anterior de arranque quedó detenido; su carpeta temporal se
 conserva porque el control automático rechazó su eliminación por política.

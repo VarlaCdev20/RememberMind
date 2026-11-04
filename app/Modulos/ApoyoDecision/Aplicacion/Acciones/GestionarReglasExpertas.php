@@ -81,9 +81,9 @@ final class GestionarReglasExpertas
 
     public function crearRevision(User $actor, string $anterior, string $codigo, string $motivo, array $nueva = [], array $retiradas = [], ?string $sustituye = null): string
     {
-        if (! preg_match('/^ORION-[A-Z0-9-]{1,24}$/D', $codigo) || mb_strlen(trim($motivo)) < 10 || mb_strlen($motivo) > 5000
+        if (! preg_match('/^EXPERTO-[A-Z0-9-]{1,22}$/D', $codigo) || mb_strlen(trim($motivo)) < 10 || mb_strlen($motivo) > 5000
             || ! array_is_list($retiradas) || count($retiradas) !== count(array_unique($retiradas))) {
-            throw new DomainException('Indique código ORION, motivo de al menos diez caracteres y retiros no duplicados.');
+            throw new DomainException('Indique código EXPERTO, motivo de al menos diez caracteres y retiros no duplicados.');
         }
 
         return app(CodigosEntidad::class)->serializar('versiones_modelo_experto', function () use ($actor, $anterior, $codigo, $motivo, $nueva, $retiradas, $sustituye): string {

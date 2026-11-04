@@ -59,11 +59,11 @@ Rutas relativas a `C:/Users/CARLAENCINAS/Desktop/RememberMind`:
 | `resources/frontend/styles/design-system/tokens/{colors,chart-colors}.css` | Paleta compartida solicitada y variante cognitiva contrastada |
 | `resources/frontend/styles/design-system/patterns/palette-consistency.css` | Cabecera diferenciada y tinta de hover/active legible |
 | `resources/frontend/styles/design-system/charts/chart-theme.js` | Variante `cognitive/strong` del contrato RMCharts |
-| `resources/frontend/scripts/modules/orion-explorador.js` | Ciclo de evolución RMCharts, tema, destrucción y selección de punto |
-| `tests/Feature/{EstabilizacionOrionContinuidadTest,ExploradorOrionTest}.php` | Ventanas, procedencia, permisos, comparación y errores |
+| `resources/frontend/scripts/modules/expert-graph.js` | Ciclo de evolución RMCharts, tema, destrucción y selección de punto |
+| `tests/Feature/{EstabilizacionExpertoContinuidadTest,ExploradorExpertoTest}.php` | Ventanas, procedencia, permisos, comparación y errores |
 | `tests/Unit/ConsultaCognitivaEnfermeriaTest.php` | Comparabilidad, ausencia, cero real y procedencia |
 | `tests/Feature/{CapturaInstrumentalInstitucionalTest,SimulacionLocalExpertoTest}.php` | Lectura instrumental sin inferencia y regresión de la demostración en las pestañas nuevas |
-| `tests/Frontend/{orion-explorador,chart-design-system,shell-visual-consistency,sidebar-responsive}.test.js` | Ciclo del chart, tokens, paleta, composición y contraste compartido |
+| `tests/Frontend/{expert-graph,chart-design-system,shell-visual-consistency,sidebar-responsive}.test.js` | Ciclo del chart, tokens, paleta, composición y contraste compartido |
 
 Los cambios anteriores de grafos, lectores y continuidad figuran también en el árbol local. La sección Git muestra todo el WIP; no atribuye todos sus archivos a este incremento.
 
@@ -127,8 +127,8 @@ La instantánea de `git status --short` y `git diff --stat` se agrega al cierre.
 
 | Comando / alcance | Resultado |
 |---|---|
-| `php artisan test --filter='ConsultaCognitivaEnfermeriaTest\|ExploradorOrionTest\|EstabilizacionOrionContinuidadTest\|InformeCognitivoTest\|test_consulta_de_mediciones_sin_inferencia_conserva_captura_y_fuente_por_componente' --compact` | **64 passed, 368 assertions**, SQLite en memoria |
-| `./scripts/probar-postgres.ps1 -Filtro 'ConsultaCognitivaEnfermeriaTest\|ExploradorOrionTest\|EstabilizacionOrionContinuidadTest\|InformeCognitivoTest'` | **62 tests, 352 assertions**, PostgreSQL efímero |
+| `php artisan test --filter='ConsultaCognitivaEnfermeriaTest\|ExploradorExpertoTest\|EstabilizacionExpertoContinuidadTest\|InformeCognitivoTest\|test_consulta_de_mediciones_sin_inferencia_conserva_captura_y_fuente_por_componente' --compact` | **64 passed, 368 assertions**, SQLite en memoria |
+| `./scripts/probar-postgres.ps1 -Filtro 'ConsultaCognitivaEnfermeriaTest\|ExploradorExpertoTest\|EstabilizacionExpertoContinuidadTest\|InformeCognitivoTest'` | **62 tests, 352 assertions**, PostgreSQL efímero |
 | PostgreSQL final: DTO + identidad de evidencia/área + ventanas sin inferencia + mediciones por componente | **6 tests, 51 assertions**, servidor efímero detenido y cluster limpiado por el runner |
 | `php artisan test --filter='SimulacionLocalExpertoTest' --compact` | **24 pasadas y 2 expectativas pendientes** en esa ejecución; las dos se corrigieron y verificaron por separado, sin cambiar código funcional entre ambas comprobaciones |
 | `php artisan test --filter='test_referencias_de_memoria_explicitas_conservan_datos_y_fechas_originales\|test_vista_previa_corrupta_muestra_error_seguro_sin_patron' --compact` | **2 passed, 28 assertions**; quedan verificados los 26 casos de esa suite, en ejecuciones separadas |
@@ -192,7 +192,7 @@ Los logs de ejecución están en la carpeta temporal del sistema con prefijo `co
  M tests/Unit/InstantaneaInstrumentalCompletaTest.php
 ?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarActividadCognitiva.php
 ?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarContinuidadAsistencialExperta.php
-?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarExploracionOrion.php
+?? app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarGrafoExperto.php
 ?? app/Modulos/ApoyoDecision/Aplicacion/DTOs/ConsultaCognitivaEnfermeria.php
 ?? app/Modulos/ApoyoDecision/Aplicacion/DTOs/GrafoInferenciaHistorica.php
 ?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/consulta.blade.php
@@ -204,21 +204,21 @@ Los logs de ejecución están en la carpeta temporal del sistema con prefijo `co
 ?? app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/reglas-tabla.blade.php
 ?? app/Modulos/Cuidados/Aplicacion/Consultas/OcurrenciasCuidado.php
 ?? docs/frontend/EVALUACION_COGNITIVA_ENFERMERIA_ENTREGA_2026_10_20.md
-?? docs/frontend/ORION_EXPLICABILIDAD_ENTREGA_2026_10_20.md
-?? docs/sistema-experto/ENTREGA_INTEGRAL_ORION_2026_10_20.md
+?? docs/frontend/EXPERTO_EXPLICABILIDAD_ENTREGA_2026_10_20.md
+?? docs/sistema-experto/ENTREGA_INTEGRAL_EXPERTO_2026_10_20.md
 ?? docs/sistema-experto/FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md
 ?? docs/sistema-experto/FASE_0_1_ESTABILIZACION_2026_10_20.md
 ?? motor-experto/instrumentos/CorteDocumentoInstrumental.php
-?? prototipos/orion-conservacion-0_2/
-?? prototipos/orion-conservacion-100/
-?? resources/frontend/scripts/modules/orion-explorador.js
-?? tests/Feature/EstabilizacionOrionContinuidadTest.php
-?? tests/Feature/ExploradorOrionTest.php
+?? prototipos/experto-conservacion-0_2/
+?? prototipos/experto-conservacion-100/
+?? resources/frontend/scripts/modules/expert-graph.js
+?? tests/Feature/EstabilizacionExpertoContinuidadTest.php
+?? tests/Feature/ExploradorExpertoTest.php
 ?? tests/Feature/GuardasPreparacionBaseTest.php
 ?? tests/Feature/PreparacionCompuestaCoherenteTest.php
 ?? tests/Feature/PreparacionPostgresRepetidaTest.php
 ?? tests/Feature/RedisenoEnfermeriaIntegralTest.php
-?? tests/Frontend/orion-explorador.test.js
+?? tests/Frontend/expert-graph.test.js
 ?? tests/Support/EsquemaSinTransaccion.php
 ?? tests/Support/RestablecerEsquemaPostgres.php
 ?? tests/Unit/ConsultaCognitivaEnfermeriaTest.php

@@ -130,7 +130,7 @@ final class RevisionValoracionExpertaTest extends TestCase
             self::assertStringContainsString('contrato operativo', $e->getMessage());
         }
         config(['sistema_experto.lectura_clinica.VER_TEST.revision_profesional' => true]);
-        DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->update(['codigo_version' => 'SIM-ORION-LOCAL-1']);
+        DB::table('versiones_modelo_experto')->where('cod_version_modelo', 'VER_TEST')->update(['codigo_version' => 'SIM-EXPERTO-LOCAL-1']);
         $this->expectException(\DomainException::class);
         try {
             app(RevisarValoracionExperta::class)->ejecutar($this->medico, 'E_REV', D::MEDICINA, 'CONFIRMADA', 'No puede cambiar su origen.');

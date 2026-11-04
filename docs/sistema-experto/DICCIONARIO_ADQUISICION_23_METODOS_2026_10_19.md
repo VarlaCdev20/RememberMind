@@ -1,4 +1,4 @@
-# Diccionario de adquisición instrumental O.R.I.O.N.
+# Diccionario de adquisición instrumental sistema experto
 
 Corte: 19/10/2026. Catálogo `CAPTURA-COGNITIVA-8-20261019`. Extraído del registro ejecutable: 23 métodos y 19 componentes; una aplicación requiere vinculación explícita, no el conjunto de alternativas de un componente. Este diccionario describe requisitos de cálculo, no instrumentos administrados a residentes ni adopción institucional.
 

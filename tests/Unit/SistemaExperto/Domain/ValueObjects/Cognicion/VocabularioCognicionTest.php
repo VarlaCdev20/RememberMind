@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Cognicion;
 
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeError;
 use ValueError;

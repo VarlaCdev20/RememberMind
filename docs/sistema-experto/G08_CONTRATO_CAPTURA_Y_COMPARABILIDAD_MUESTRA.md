@@ -1,4 +1,4 @@
-# O.R.I.O.N. — G08: especificación de captura cruda y comparabilidad de muestra
+# sistema experto — G08: especificación de captura cruda y comparabilidad de muestra
 
 > Documento de investigación importado selectivamente del worktree `pr15-ci-utf8`, HEAD `8085ec0e`, el 18/10/2026. Se incorporó su programa `g08_captura_y_muestras.php` y se verificó localmente; las menciones de CI y cotejos previos pertenecen al expediente de origen. Evidencia actual en [auditoría Fase 01](FASE01_AUDITORIA_Y_EVIDENCIA_2026_10_18.md).
 

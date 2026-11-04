@@ -6,8 +6,8 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios;
 
 use App\Models\ReglaExperta as ReglaModelo;
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
 use DomainException;
 use Illuminate\Container\Container;

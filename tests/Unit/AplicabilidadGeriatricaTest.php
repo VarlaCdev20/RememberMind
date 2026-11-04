@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\instrumentos\AplicabilidadGeriatrica;
 use MotorExperto\instrumentos\NormalizadorHvltBolivia2015;
@@ -41,7 +41,7 @@ final class AplicabilidadGeriatricaTest extends TestCase
 
     public function test_metrica_cuenta_componentes_una_vez_y_no_incluye_aplicaciones_menores_60(): void
     {
-        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
+        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoCognitivo)->leer());
         $app = ['cod_aplicacion' => 'SIM-A', 'fecha_hora' => '2026-10-18', 'cod_personal' => 'SIM-P', 'edad_en_aplicacion' => 70,
             'extraccion' => ['perfil' => 'SIM-PERFIL', 'metodo' => NormalizadorHvltBolivia2015::METODO, 'fuentes_entradas' => [], 'captura' => [],
                 'normalizacion' => ['referencia' => 'SIM-REFERENCIA', 'componentes' => ['MEM-S01' => ['estado' => 'NORMALIZADO'], 'MEM-S02' => ['estado' => 'NORMALIZADO']]]]];

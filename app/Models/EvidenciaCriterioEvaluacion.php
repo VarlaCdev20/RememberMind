@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// O.R.I.O.N. 4.16.14; restricciones físicas D-137.
+// sistema experto 4.16.14; restricciones físicas D-137.
 class EvidenciaCriterioEvaluacion extends ModeloExperto
 {
     protected $table = 'evidencias_criterio_evaluacion';

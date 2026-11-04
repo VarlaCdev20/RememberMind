@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-// O.R.I.O.N. 4.16.13; restricciones físicas D-137.
+// sistema experto 4.16.13; restricciones físicas D-137.
 class EvaluacionCriterio extends ModeloExperto
 {
     protected $table = 'evaluacion_criterios';

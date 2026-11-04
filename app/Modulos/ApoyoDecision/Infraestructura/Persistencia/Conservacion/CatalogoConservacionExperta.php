@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
 use DomainException;
 
 /** Prepara los catálogos del contrato de conservación autorizado. */
 final class CatalogoConservacionExperta
 {
-    public const VERSION = 'ORION-SNAP-2';
+    public const VERSION = IdentificadoresHistoricos::CONSERVACION;
 
     /**
      * Instala el vocabulario explícitamente, nunca como fallback de guardar().

@@ -7,7 +7,7 @@ import './modules/alertas-signos.js';
 import './modules/alertas-trazabilidad.js';
 import './modules/medicacion-registro.js';
 import './modules/medicacion-agenda-graficas.js';
-import './modules/orion-explorador.js';
+import './modules/expert-graph.js';
 import './modules/expert-resident-workspace.js';
 
 // Alpine lo proporciona Livewire; no iniciar una segunda instancia.

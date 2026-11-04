@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;

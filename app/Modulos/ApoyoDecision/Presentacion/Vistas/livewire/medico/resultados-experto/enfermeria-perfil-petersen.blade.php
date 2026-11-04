@@ -28,7 +28,7 @@
             </div>
         </section>
     @endunless
-    <p class="rm-orion-note">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}. Este cálculo aún no está conservado como evaluación histórica completa.</p>
+    <p class="rm-decision-note">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}. Este cálculo aún no está conservado como evaluación histórica completa.</p>
     <div class="rm-psychology-dashboard {{ $vistaMultidominio ? 'rm-psychology-dashboard--multidomain' : 'rm-psychology-dashboard--compact' }} {{ $hayPatron ? 'has-pattern' : '' }}">
         <div class="rm-psychology-dashboard__main">
             <section class="rm-psychology-panel" aria-labelledby="expert-nursing-domains-title"><header><div><h2 id="expert-nursing-domains-title">{{ $vistaMultidominio ? 'Perfil cognitivo por dominios' : 'Cinco áreas cognitivas' }}</h2><p>Cinco áreas cognitivas con estados documentados; no son puntuaciones ni porcentajes de deterioro.</p></div><i class="ph ph-chart-bar" aria-hidden="true"></i></header>

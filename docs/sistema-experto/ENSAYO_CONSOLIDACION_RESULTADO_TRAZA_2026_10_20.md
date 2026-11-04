@@ -1,6 +1,6 @@
 # Ensayo de consolidación de resultado y traza por criterio
 
-> El máximo posterior de **104** tablas sustituye el límite de 100 citado en este análisis. Un [ensayo físico posterior en SQLite desechable](../../prototipos/orion-consolidacion-104/ensayar-criterio-sqlite.php) comprobó esta unión con historia sintética, FK redirigida, checks, reconstrucción y rollback. Sigue sin autorización de DDL ni prueba PostgreSQL de esta transición.
+> El máximo posterior de **104** tablas sustituye el límite de 100 citado en este análisis. Un [ensayo físico posterior en SQLite desechable](../../prototipos/experto-consolidacion-104/ensayar-criterio-sqlite.php) comprobó esta unión con historia sintética, FK redirigida, checks, reconstrucción y rollback. Sigue sin autorización de DDL ni prueba PostgreSQL de esta transición.
 
 Fecha: 20/10/2026. Estado: **propuesta técnica parcial; no autoriza DDL**.
 El límite vigente al redactar este ensayo era 100 tablas de negocio; la instalación contenía
@@ -16,7 +16,7 @@ ausencia, nunca una fila inventada con valores NULL. Las fechas de resultado,
 traza y criterio son distintas y deben permanecer distintas.
 
 El ensayo de solo lectura
-[`ensayar-uno-a-uno.php`](../../prototipos/orion-reduccion-100/ensayar-uno-a-uno.php)
+[`ensayar-uno-a-uno.php`](../../prototipos/experto-reduccion-100/ensayar-uno-a-uno.php)
 proyecta ambas hijas a columnas nominales en memoria y reconstruye las tres
 relaciones, con comparación estricta de todas las columnas actuales. La base
 local de desarrollo produjo **PASS: 148 criterios, 147 resultados y 18 trazas**.

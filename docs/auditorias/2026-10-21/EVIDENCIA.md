@@ -52,7 +52,7 @@ afirma; no prueba que ya esté corregido.
 
 ```powershell
 php vendor/phpunit/phpunit/phpunit --do-not-cache-result --colors=never --log-junit RUTA_PRIVADA/suite-sqlite.xml
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'RolesBaselineCongeladoTest|RolesVistasPermisosMatrixTest|AccesoDashboardPorRolTest|RolesClinicosV2Test|ContratoSeguridadCuentaTest|Fase3AdmisionAtomicidadTest|OcupacionCamaIntegrityTest|RevisionValoracionExpertaTest|PermisosLecturaIadlPetersenTest|CapturaInstrumentalFormularioTest|CapturaInstrumentalInstitucionalTest|PreparacionCompuestaCoherenteTest|ExploradorOrionTest'
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'RolesBaselineCongeladoTest|RolesVistasPermisosMatrixTest|AccesoDashboardPorRolTest|RolesClinicosV2Test|ContratoSeguridadCuentaTest|Fase3AdmisionAtomicidadTest|OcupacionCamaIntegrityTest|RevisionValoracionExpertaTest|PermisosLecturaIadlPetersenTest|CapturaInstrumentalFormularioTest|CapturaInstrumentalInstitucionalTest|PreparacionCompuestaCoherenteTest|ExploradorExpertoTest'
 npm test
 npm run build
 php vendor/phpunit/phpunit/phpunit --do-not-cache-result --colors=never tests/Feature/Architecture

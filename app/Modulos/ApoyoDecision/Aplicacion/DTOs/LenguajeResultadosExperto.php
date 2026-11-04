@@ -2,9 +2,35 @@
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 /** Traduce códigos conservados; las etiquetas nunca autorizan publicación ni ejecutan reglas. */
 final class LenguajeResultadosExperto
 {
+    /** Presenta versiones antiguas sin cambiar sus identificadores guardados. */
+    public static function version(?string $codigo): string
+    {
+        if ($codigo === null || $codigo === '') {
+            return 'No disponible';
+        }
+        $prefijo = explode('-', IdentificadoresHistoricos::PERFIL_COGNITIVO, 2)[0].'-';
+
+        return match ($codigo) {
+            IdentificadoresHistoricos::PERFIL_COGNITIVO => 'Perfil cognitivo inicial',
+            IdentificadoresHistoricos::PETERSEN => 'Patrones de Petersen',
+            IdentificadoresHistoricos::DOCUMENTAL_INICIAL => 'Base documental anterior',
+            IdentificadoresHistoricos::CONSERVACION => 'Formato de conservación',
+            default => str_starts_with($codigo, $prefijo) ? 'EXPERTO-'.substr($codigo, strlen($prefijo)) : $codigo,
+        };
+    }
+
+    /** Actualiza la etiqueta de conceptos antiguos; conserva el registro original. */
+    public static function referenciaDocumental(string $texto): string
+    {
+        return preg_match('/^Concepto de la red documental .+; su pertenencia no acredita un hallazgo\.$/u', $texto)
+            ? 'Concepto de la base cognitiva; su pertenencia no acredita un hallazgo.' : $texto;
+    }
+
     /** Explica faltantes del cálculo sin adjudicar valores ni significado clínico. */
     public static function condicionInstrumental(string $codigo): string
     {

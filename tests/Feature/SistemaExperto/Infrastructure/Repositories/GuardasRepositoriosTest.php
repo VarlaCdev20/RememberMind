@@ -45,9 +45,9 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
     /** Rechaza una base SQLite física sin abrirla ni crearla */
     public function test_rechaza_bases_no_desechables_sin_abrir_su_pdo(): void
     {
-        $ruta = sys_get_temp_dir().'/orion-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
-        config(['database.connections.orion_rechazada' => ['driver' => 'sqlite', 'database' => $ruta, 'prefix' => '']]);
-        foreach ($this->lecturas('orion_rechazada') as $leer) {
+        $ruta = sys_get_temp_dir().'/decision-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
+        config(['database.connections.experto_rechazada' => ['driver' => 'sqlite', 'database' => $ruta, 'prefix' => '']]);
+        foreach ($this->lecturas('experto_rechazada') as $leer) {
             try {
                 $leer();
                 self::fail('Una base física no está autorizada.');
@@ -63,8 +63,8 @@ final class GuardasRepositoriosTest extends RepositoriosTestCase
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
         $conexion = $this->conexionPruebas();
-        config(['database.connections.orion_otra' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']]);
-        DB::setDefaultConnection('orion_otra');
+        config(['database.connections.experto_otra' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']]);
+        DB::setDefaultConnection('experto_otra');
         try {
             $repo = new ReglaExpertaEloquentRepository(new MapeadorReglas('RESULTADO'), $conexion);
             self::assertSame('SIM-R', $repo->obtener('SIM-R', 'SIM-V1')->id);

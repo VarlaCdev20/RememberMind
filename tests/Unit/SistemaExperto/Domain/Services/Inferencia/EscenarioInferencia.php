@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Inferencia;
 
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorConfusoresService;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Services\Compuertas\EvaluadorConfusoresService;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
 /** Preparar originales compartidos entre servicios y casos de uso. */

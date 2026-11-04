@@ -1,4 +1,4 @@
-# Auditoría integral de O.R.I.O.N. — 21/10/2026
+# Auditoría integral de sistema experto — 21/10/2026
 
 Estado: **revisión estática; conservación institucional y evaluación posterior en uso real completas pendientes**. Árbol compartido con cambios intencionales sin commit, referencia HEAD `8eee364ed32c079703b95c0eb63204dcb5512cbe` más WIP. La coordinación conserva el manifiesto técnico del corte en `storage/app/private/auditoria-corte-20261021.json`; este informe no sustituye ese manifiesto ni atribuye al HEAD los cambios no confirmados. No se consultaron datos de residentes, no se mutó SQL, no se aplicó DDL ni se ejecutaron suites en este encargo. Las cifras documentadas de pruebas anteriores pertenecen a sus cortes, no son pruebas nuevas del auditor. Único archivo escrito: este informe.
 
@@ -13,7 +13,7 @@ Skills: `remembermind-source-of-truth` y `remembermind-expert-validation`. Las c
 | `docs/sistema-experto/PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md:3` | A–D adoptado; adopción distinta de evaluación posterior en uso real. |
 | `docs/sistema-experto/FASE_2_MATRIZ_MAESTRA_INFERENCIA_2026_10_20.md:3` | Matriz A–D y Petersen E–H vigente para el comportamiento existente. |
 | `docs/sistema-experto/PUNTO_1_EVIDENCIA_COGNITIVA_ORIGINAL_2026_10_21.md:3` | Captura técnica disponible; adquisición clínica original pendiente. Fuente más reciente del punto instrumental. |
-| `docs/sistema-experto/ENTREGA_INTEGRAL_ORION_2026_10_20.md:6` | Expediente en curso, sin cierre institucional completo. |
+| `docs/sistema-experto/ENTREGA_INTEGRAL_EXPERTO_2026_10_20.md:6` | Expediente en curso, sin cierre institucional completo. |
 | `docs/sistema-experto/FASE_0_1_CONSERVACION_PENDIENTE_2026_10_20.md:12` | Brecha de conservación compuesta explícita. |
 | `docs/sistema-experto/DICTAMEN_LIMITE_100_TABLAS_2026_10_20.md:3` | Propuesta de factibilidad, no autorización DDL. Candidatos previos de 25 y 15 tablas adicionales rechazados. |
 
@@ -235,7 +235,7 @@ Fuente: `APP/Presentacion/Rutas/web.php:14`; los prefijos se agregan en el regis
 | Revisión posterior | Su disciplina y contrato recuperable | Su disciplina y contrato recuperable | No firma por Medicina/Psicología |
 | Cuidados | Consulta según permisos propios | Consulta según permisos propios | Agenda/pendientes; inferencia no ejecuta cuidados |
 
-**H11 — Frontera adicional de explicación:** `EvaluacionExpertaPolicy::consultarTrazabilidad` exige `VersionModeloExpertoPolicy::consultar`, reservado a SUPERADMINISTRADOR+auditoria.ver (`EvaluacionExpertaPolicy.php:33`; `VersionModeloExpertoPolicy.php:11`). El gobierno sí admite Medicina/Psicología, pero no concede esa ability. `ConsultarExploracionOrion.php:21` y `ResultadosExpertoResidente.php:613`, `:657` la consumen. No afirmar que el explorador profundo está habilitado a los profesionales ordinarios solo porque existe la vista. Si se pretende habilitarlo, revisar permiso mínimo y contenido por rol; no ampliar automáticamente una frontera sensible desde la auditoría.
+**H11 — Frontera adicional de explicación:** `EvaluacionExpertaPolicy::consultarTrazabilidad` exige `VersionModeloExpertoPolicy::consultar`, reservado a SUPERADMINISTRADOR+auditoria.ver (`EvaluacionExpertaPolicy.php:33`; `VersionModeloExpertoPolicy.php:11`). El gobierno sí admite Medicina/Psicología, pero no concede esa ability. `ConsultarGrafoExperto.php:21` y `ResultadosExpertoResidente.php:613`, `:657` la consumen. No afirmar que el explorador profundo está habilitado a los profesionales ordinarios solo porque existe la vista. Si se pretende habilitarlo, revisar permiso mínimo y contenido por rol; no ampliar automáticamente una frontera sensible desde la auditoría.
 
 En Enfermería las pestañas son interpretación/registro/cuidados (`ResultadosExpertoResidente.php:303`). El gráfico de actividad cuenta controles y declara que no mide mejoría/deterioro (`Aplicacion/Consultas/ConsultarActividadCognitiva.php:23`). Las series instrumentales agrupan medidas de igual procedencia/referencia, sin mezclar baremos (`Aplicacion/DTOs/ConsultaCognitivaEnfermeria.php:58`). La presente lectura no demuestra navegación ni revocación runtime.
 

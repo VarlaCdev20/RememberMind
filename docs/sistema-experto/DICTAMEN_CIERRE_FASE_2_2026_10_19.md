@@ -137,7 +137,7 @@ Revisión posterior del mismo revisor: **PASS estático acotado, P2 cerrado**, s
 | PostgreSQL desechable, misma selección | **228 pruebas / 6884 aserciones PASS**, 2 min 34 s; parada del servidor confirmada |
 | Lector local autorizado del lote, transacción READ ONLY | **286/286 observaciones recuperadas**, sin normalización ni escrituras |
 | Fuentes → plan → fila → auditoría → destino | **648/648 filas conciliadas** |
-| Independencia del motor y dominio O.R.I.O.N. | **PASS** en ambos scripts |
+| Independencia del motor y dominio sistema experto | **PASS** en ambos scripts |
 | Pint de los ocho archivos PHP propios | **PASS** |
 
 Las selecciones finales incluyen captura, permisos, comprobación, límites de edad, perfil, atribución instrumental, red integrada, gobierno experimental y conservación/release. XML/logs: `storage/app/private/fase2-cierre-final-{sqlite,postgres}.junit.xml` y `.log`. Candidato sin `.env`, con código de `c375b5b8` más los ocho archivos propios y storage separado por motor; se preservan cambios ajenos. La suite preliminar de 186 casos precede a la corrección del P2 y no sustituye ni se suma a este resultado final. No se ejecutó la suite global.

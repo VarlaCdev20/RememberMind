@@ -25,9 +25,9 @@ Se aplicó la diferencia de presentación `f855ccdf → c512e760` sobre quince a
 - `app/Modulos/ApoyoDecision/Presentacion/Livewire/Paginas/ConocimientoPanel.php`.
 - Vistas `livewire/experto/residentes.blade.php`, `livewire/medico/resultados-experto-residente.blade.php`, parciales `consulta.blade.php` y `dominios.blade.php` del módulo ApoyoDecision.
 - Vistas `conocimiento-panel.blade.php`, `explorador.blade.php`, `gobierno.blade.php` y `red-semantica.blade.php` de `livewire/superadministrador/sistema-experto`.
-- `resources/frontend/scripts/modules/orion-explorador.js`.
+- `resources/frontend/scripts/modules/expert-graph.js`.
 - `resources/frontend/styles/design-system/patterns/expert-laboratory.css`.
-- Pruebas `ProyectarRedConocimientoTest.php`, `LaboratorioExpertoFrontendTest.php` y `orion-explorador.test.js`.
+- Pruebas `ProyectarRedConocimientoTest.php`, `LaboratorioExpertoFrontendTest.php` y `expert-graph.test.js`.
 
 Se ajustaron además los textos de aceptación de `InformeCognitivoTest` a las etiquetas publicadas y se comprobó el encabezado nuevo del listado en `NavegacionSistemaExpertoTest`.
 
@@ -44,7 +44,7 @@ Comandos:
 ```text
 php vendor/phpunit/phpunit/phpunit --do-not-cache-result --colors=never --filter '<filtro anterior>'
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro '<filtro anterior>'
-node --test tests/Frontend/orion-explorador.test.js tests/Frontend/cognitive-responsive.test.js tests/Frontend/psychology-results-responsive.test.js
+node --test tests/Frontend/expert-graph.test.js tests/Frontend/cognitive-responsive.test.js tests/Frontend/psychology-results-responsive.test.js
 npm run build
 php artisan view:clear
 ```

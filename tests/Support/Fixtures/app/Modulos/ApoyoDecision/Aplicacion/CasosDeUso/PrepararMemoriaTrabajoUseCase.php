@@ -7,7 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
 
 /** Prepara la instantánea que recibirá el motor conservando la identidad de los hechos y evidencias recuperados para una única solicitud experimental. */
 final readonly class PrepararMemoriaTrabajoUseCase

@@ -63,7 +63,7 @@ valor utilizado, su tipo y su procedencia. La fuente operativa IADL sigue siendo
 evaluabilidad obligatoria y carece de contrato/padre nuevos. DOMINIO tiene
 evaluabilidad y no padre; SUBCOMPONENTE tiene padre dominio de la misma
 evaluación y evaluabilidad NULL; DCL no tiene padre ni evaluabilidad. Los tipos
-nuevos exigen `ORION-SNAP-2` y orden explícito. CHECK PostgreSQL / triggers
+nuevos exigen `conservación de instantáneas v2` y orden explícito. CHECK PostgreSQL / triggers
 SQLite rechazan también expresiones indeterminadas por NULL. La pertenencia y
 semántica padre/hijo se validan al escribir y reconstruir.
 

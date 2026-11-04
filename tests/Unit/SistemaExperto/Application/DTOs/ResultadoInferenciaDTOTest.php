@@ -6,11 +6,11 @@ namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum as E;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum as O;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum as E;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum as O;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

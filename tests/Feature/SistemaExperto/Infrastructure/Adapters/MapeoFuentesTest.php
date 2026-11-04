@@ -132,8 +132,8 @@ final class MapeoFuentesTest extends AdaptadoresTestCase
     /** @throws RuntimeException Una conexión física no autorizada se rechaza antes de abrir el archivo. */
     public function test_no_se_abre_una_base_fisica_para_fuentes(): void
     {
-        config(['database.connections.orion_fuente_insegura' => ['driver' => 'sqlite', 'database' => 'SIM-NO-ABRIR.sqlite', 'prefix' => '']]);
+        config(['database.connections.experto_fuente_insegura' => ['driver' => 'sqlite', 'database' => 'SIM-NO-ABRIR.sqlite', 'prefix' => '']]);
         $this->expectException(RuntimeException::class);
-        ExtractorVariableMapeada::conexionSegura('orion_fuente_insegura');
+        ExtractorVariableMapeada::conexionSegura('experto_fuente_insegura');
     }
 }

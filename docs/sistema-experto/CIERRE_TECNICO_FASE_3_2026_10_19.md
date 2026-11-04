@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Cierre técnico de los 19 componentes instrumentales
+# sistema experto — Cierre técnico de los 19 componentes instrumentales
 
 Fecha: **19/10/2026**, America/La_Paz. Catálogo ejecutable:
 **CAPTURA-COGNITIVA-8-20261019**. Alcance solicitado: verificar ocho componentes
@@ -10,7 +10,7 @@ implementado y probado bajo sus condiciones expresas. Se cierra el alcance
 técnico de cálculo y documentación de fase 3.** No se declara evaluación posterior en uso real,
 adopción institucional de baremos extranjeros ni disponibilidad de mediciones
 originales para todos los residentes. La entrega no acredita el cierre integral
-de O.R.I.O.N., la fase de fuentes originales ni las etapas de inferencia.
+de sistema experto, la fase de fuentes originales ni las etapas de inferencia.
 
 ## 1. Fuentes de verdad y significado del contador
 

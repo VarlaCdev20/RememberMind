@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Clasificación Petersen experimental DCL
+# sistema experto — Clasificación Petersen experimental DCL
 
 **Versión del contrato:** `DCL-PET-20261017-v0.1`
 **Estado:** implementado y probado **únicamente con casos sintéticos**. No habilitado para uso asistencial, no evaluado posteriormente en uso real, no fusionado en producción.
@@ -20,7 +20,7 @@
 - Abstenciones: `ABSTENCION_CONTRADICCION`, `ABSTENCION_EVALUACION_DIFERENCIAL`, `ABSTENCION_INFORMACION_INSUFICIENTE`, `SIN_PATRON_CLASIFICABLE_POR_REQUISITO`, `REQUIERE_ADJUDICACION_CONTRATO`. No son diagnósticos.
 - `ConstructorInformePetersenExperimental.php`: texto explicable por patrón o abstención y trazabilidad, con aviso visible de simulación.
 - `dcl_petersen_experimental.php`: lee **directamente los valores importados** de dos archivos JSON derivados de Matriz 03A: `dcl_03a_30_casos.json` y `dcl_03a_32_configuraciones.json`.
-- El flujo de CI `orion-g09-experimental.yml` comprueba sintaxis, ejecuta las suites G09 y la suite DCL de Petersen sobre PHP 8.3.
+- El flujo de CI `decision-g09-experimental.yml` comprueba sintaxis, ejecuta las suites G09 y la suite DCL de Petersen sobre PHP 8.3.
 
 ## Ejecutar la prueba
 

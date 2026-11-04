@@ -1,4 +1,4 @@
-# Informe neurocognitivo de O.R.I.O.N.
+# Informe neurocognitivo de sistema experto
 
 Implementación del documento solicitado por la propietaria el 17/10/2026. Sustituye la jerarquía visual de Fase 4; mantiene el aislamiento de simulaciones y las restricciones de inferencia clínica. No modifica el esquema, los datos locales, los instrumentos ni las reglas del motor.
 
@@ -91,14 +91,14 @@ Evidencia de verificación, conservada en `%TEMP%`:
 
 | Comprobación | Resultado | Evidencia |
 |---|---|---|
-| Regresión SQLite anterior a las últimas adiciones concurrentes | 117 pruebas, 661 aserciones, sin errores ni fallos | `orion-rediseno-entrega.sqlite.xml` y `.log` |
-| Cierre de narrativa y sus casos Feature, SQLite | 31 pruebas, 221 aserciones, sin errores ni fallos | `orion-explicacion-cierre.sqlite.xml` y `.log` |
-| Mismo cierre, PostgreSQL 18 desechable | 31 pruebas, 221 aserciones, sin errores ni fallos | `orion-explicacion-cierre.pg.xml` y `.log` |
-| Integración concurrente, SQLite | 36 pruebas, 185 aserciones; 35 aprobadas y una expectativa de acceso desactualizada | `orion-integracion-concurrente.sqlite.xml` y `.log` |
-| Integración concurrente, PostgreSQL 18 desechable | 67 pruebas, 379 aserciones; 66 aprobadas y la misma expectativa desactualizada | `orion-integracion-concurrente.pg.xml` y `.log` |
-| Reejecución de la expectativa corregida, SQLite y PostgreSQL | 1 prueba, 4 aserciones, aprobada en cada motor | `orion-cuenta-inactiva-cierre.sqlite.log`; `orion-cuenta-inactiva-cierre.pg.xml` y `.log` |
+| Regresión SQLite anterior a las últimas adiciones concurrentes | 117 pruebas, 661 aserciones, sin errores ni fallos | `decision-rediseno-entrega.sqlite.xml` y `.log` |
+| Cierre de narrativa y sus casos Feature, SQLite | 31 pruebas, 221 aserciones, sin errores ni fallos | `decision-explicacion-cierre.sqlite.xml` y `.log` |
+| Mismo cierre, PostgreSQL 18 desechable | 31 pruebas, 221 aserciones, sin errores ni fallos | `decision-explicacion-cierre.pg.xml` y `.log` |
+| Integración concurrente, SQLite | 36 pruebas, 185 aserciones; 35 aprobadas y una expectativa de acceso desactualizada | `decision-integracion-concurrente.sqlite.xml` y `.log` |
+| Integración concurrente, PostgreSQL 18 desechable | 67 pruebas, 379 aserciones; 66 aprobadas y la misma expectativa desactualizada | `decision-integracion-concurrente.pg.xml` y `.log` |
+| Reejecución de la expectativa corregida, SQLite y PostgreSQL | 1 prueba, 4 aserciones, aprobada en cada motor | `decision-cuenta-inactiva-cierre.sqlite.log`; `decision-cuenta-inactiva-cierre.pg.xml` y `.log` |
 | Formato PHP y espacios del diff de esta entrega | Pint y `git diff --check` aprobados | Comprobación dirigida a los archivos enumerados, sin formateo global |
-| Frontend | Build aprobado, Vite 3,77 s | `orion-rediseno-entrega.build.log` |
+| Frontend | Build aprobado, Vite 3,77 s | `decision-rediseno-entrega.build.log` |
 | Lectura local ordinaria y renderizado de Blade | Tres expedientes ficticios comprobados, cero escrituras SQL; sin evaluación publicable ni etiquetas SIM en la lectura normal | Script temporal `verificar-valoracion-operativa-local.php`; comprobación de Gloria, Mercedes y Elena |
 | Revisión independiente del contrato experto | PASS técnico acotado; 11 pruebas unitarias y 87 aserciones aprobadas | Revisión de motivos de abstención, contradicción funcional y razones I/X; no acredita aprobación clínica |
 | Revisión independiente de aislamiento y autorización | PASS estático, sin P1/P2 pendientes en el alcance revisado | Modo explícito, revocación, instantánea íntegra, firmas y auditoría |
@@ -114,9 +114,9 @@ La revisión visual de los cinco viewports requiere navegador; en esta sesión s
 
 La solicitud posterior elimina la vista previa y corrige el error de la URL de Mercedes con `?simulacion=0`. Las regresiones verifican ausencia/estructura parcial de revisiones, los parámetros antiguos, los cinco requisitos visibles, conservación de las cinco funciones, prioridad operativa, permisos, revocación y corrupción. No se modificaron contratos clínicos, permisos, esquema ni datos de residentes.
 
-Comprobación local adicional: `orion-verificar-sin-preview-local.php` renderizó las vistas de `COD_RES_000030`, `COD_RES_000028` y `COD_RES_000010` con el parámetro antiguo en cero, dentro de una transacción PostgreSQL `READ ONLY` revertida al terminar. Los tres devolvieron resultado guardado, cinco funciones, cinco requisitos, estado «Resultado conservado», procedencia visible y ausencia del selector, sin error de lectura.
+Comprobación local adicional: `decision-verificar-sin-preview-local.php` renderizó las vistas de `COD_RES_000030`, `COD_RES_000028` y `COD_RES_000010` con el parámetro antiguo en cero, dentro de una transacción PostgreSQL `READ ONLY` revertida al terminar. Los tres devolvieron resultado guardado, cinco funciones, cinco requisitos, estado «Resultado conservado», procedencia visible y ausencia del selector, sin error de lectura.
 
-El build posterior se conserva en `%TEMP%/orion-resultado-sin-preview.build.log`: aprobado en 8,52 s. Pint y comprobación de espacios aprobados sobre los archivos de la corrección. La revisión independiente estática no encontró P1/P2 en acceso por ID, revocación, procedencia y revisión opcional. Las suites dirigidas de esta corrección se conservan en `%TEMP%/orion-resultado-sin-preview.sqlite.*` y `%TEMP%/orion-resultado-sin-preview.pg.*`.
+El build posterior se conserva en `%TEMP%/decision-resultado-sin-preview.build.log`: aprobado en 8,52 s. Pint y comprobación de espacios aprobados sobre los archivos de la corrección. La revisión independiente estática no encontró P1/P2 en acceso por ID, revocación, procedencia y revisión opcional. Las suites dirigidas de esta corrección se conservan en `%TEMP%/decision-resultado-sin-preview.sqlite.*` y `%TEMP%/decision-resultado-sin-preview.pg.*`.
 
 Resultado final de la corrección: **102 pruebas y 645 aserciones aprobadas en SQLite y, por separado, 102 pruebas y 645 aserciones aprobadas en PostgreSQL 18 desechable**, sin errores ni fallos. Incluye `SimulacionLocalExpertoTest`, `InformeCognitivoTest`, `InformeNeurocognitivoTest`, `RevisionValoracionExpertaTest` y `PresentacionNeurocognitivaTest`. El clúster PostgreSQL temporal fue detenido y retirado por el script. La comprobación visual en navegador sigue pendiente.
 

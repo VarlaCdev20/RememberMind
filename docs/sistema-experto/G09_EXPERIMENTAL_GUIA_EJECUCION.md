@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Guía de ejecución del prototipo experimental G08/G09
+# sistema experto — Guía de ejecución del prototipo experimental G08/G09
 
 Versión inicial: 2026-10-17. **No autorizado para atención clínica.**
 
@@ -24,7 +24,7 @@ php motor-experto/tests/g09_experimental.php
 php motor-experto/tests/g08_g09_puente.php
 ```
 
-El flujo `.github/workflows/orion-g09-experimental.yml` realiza análisis sintáctico de las clases y ejecuta ambos programas de prueba en cada PR que modifique este módulo.
+El flujo `.github/workflows/decision-g09-experimental.yml` realiza análisis sintáctico de las clases y ejecuta ambos programas de prueba en cada PR que modifique este módulo.
 
 ## Ejemplo de funcionamiento (conceptual, no clínico)
 

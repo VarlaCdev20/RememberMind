@@ -94,7 +94,7 @@
         </div>
         @endif
     @else
-        <p class="rm-orion-empty">No hay áreas disponibles para representar.</p>
+        <p class="rm-decision-empty">No hay áreas disponibles para representar.</p>
     @endif
     <p class="rm-cognitive-status-chart__note">{{ $modoRadial ? 'Este mapa muestra estados cualitativos; no representa puntuaciones ni magnitud de deterioro.' : 'La gráfica cuenta las cinco áreas del informe según su estado disponible; no representa puntuaciones ni magnitud de deterioro.' }}</p>
 </section>

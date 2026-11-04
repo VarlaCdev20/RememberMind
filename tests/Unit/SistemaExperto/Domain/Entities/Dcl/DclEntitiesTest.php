@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Dcl;
 
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum as M;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum as P;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum as M;
+use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum as P;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;

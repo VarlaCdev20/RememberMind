@@ -8,11 +8,11 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
-use MotorExperto\dominio\orion\Entities\Funcionalidad\VectorFuncionalidad;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\Entities\Funcionalidad\VectorFuncionalidad;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 
 /** Solicita un patrón candidato o abstención a Domain. */
 final readonly class ClasificarDclUseCase

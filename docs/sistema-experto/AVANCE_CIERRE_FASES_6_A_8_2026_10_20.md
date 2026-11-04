@@ -141,7 +141,7 @@ verde no demuestra sensibilidad, especificidad ni validez diagnóstica.
   `InstantaneaInstrumentalCompletaTest`: PASS en PHPUnit sin base de datos,
   con artefactos sintéticos.
 - `motor-experto/tests/independencia.php` y
-  `motor-experto/tests/orion_independencia.php`: PASS.
+  `motor-experto/tests/dominio_independencia.php`: PASS.
 - Regresión relacionada de instantáneas, Petersen, conocimiento y revisiones:
   `php artisan test --filter='InstantaneaEvaluacionInstitucionalTest|PetersenInstitucionalTest|CapturaPetersenOriginalTest|GobiernoPetersenInstitucionalTest|ConocimientoCognitivoInstitucionalTest|InstantaneaInstrumentalCompletaTest|ReleaseMotorInstrumentalTest|AlmacenReleasesMotorTest|RevisionValoracionExpertaTest|RevisionObservacionalExpertaTest' --quiet`: PASS.
 - `vendor/bin/pint --test` para los cuatro PHP modificados y `git diff --check`:

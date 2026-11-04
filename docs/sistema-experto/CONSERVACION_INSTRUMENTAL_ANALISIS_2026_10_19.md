@@ -110,7 +110,7 @@ estudiarse; no se convierte en un depósito universal campo/valor.
 
 Antes de DDL falta fijar el contrato compuesto V3 + Petersen y su igualdad
 exacta, el diccionario físico mínimo, las garantías de sellado y la política de
-retención. El almacén sintético `ORION-SNAP-2` no recibe el nuevo contrato por
+retención. El almacén sintético `conservación de instantáneas v2` no recibe el nuevo contrato por
 cambiar un string ni retirar sus guardas. Este mapa es preparación técnica de
 fase 6, no una ampliación estructural aprobada.
 

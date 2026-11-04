@@ -6,8 +6,8 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios;
 
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Dominio\Reglas\BaseTecnicaDesechable;
-use MotorExperto\dominio\orion\Entities\Conocimiento\RedSemantica;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Entities\Conocimiento\RedSemantica;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorRedSemantica;
 use DomainException;
 use Illuminate\Container\Container;

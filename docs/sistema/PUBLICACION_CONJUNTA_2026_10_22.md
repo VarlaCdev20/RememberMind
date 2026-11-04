@@ -27,7 +27,7 @@ no transforma las comprobaciones pendientes en aceptación visual o clínica.
 - `git fetch origin --prune`: ejecutado; se comprobó la relación de ancestros
   con la rama destino antes de moverla. No se usa force push.
 - `git diff --check`: correcto.
-- `node --test tests/Frontend/alertas-trazabilidad.test.js tests/Frontend/orion-explorador.test.js tests/Frontend/valoraciones-explorador.test.js tests/Frontend/controles-institucionales.test.js`:
+- `node --test tests/Frontend/alertas-trazabilidad.test.js tests/Frontend/expert-graph.test.js tests/Frontend/valoraciones-explorador.test.js tests/Frontend/controles-institucionales.test.js`:
   30 pruebas correctas, ninguna fallida ni omitida.
 - `npm run build`: correcto, 38,48 s; aviso de tamaño de chunks superior a
   500 kB sin fallo de compilación.

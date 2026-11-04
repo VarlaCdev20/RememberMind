@@ -2,34 +2,34 @@
 @php($resumenPetersenActual = $petersenActual ? \App\Modulos\ApoyoDecision\Presentacion\Soporte\ResumenPetersenVisible::presentar($petersenActual, false) : null)
 <x-ui.modal-livewire wire:model="significadoAbierto" title="¿Qué significa este resultado?" subtitle="Explicación de la evaluación cognitiva" icon="ph-book-open" maxWidth="md" surface="reading" closeMethod="cerrarSignificado" :showValidation="false">
     @if($petersenActual)
-    <div class="rm-orion-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p>Es un cálculo orientativo con las fuentes disponibles en esta consulta. No constituye un diagnóstico ni una evaluación histórica guardada.</p></div>
+    <div class="rm-decision-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p>Es un cálculo orientativo con las fuentes disponibles en esta consulta. No constituye un diagnóstico ni una evaluación histórica guardada.</p></div>
     @else
-    <p class="rm-orion-note">{{ $residente->nombre_completo }} · Resultado disponible de {{ mb_strtolower($consultaEnfermeria['area_principal']) }}</p>
-    <div class="rm-orion-reading"><section class="rm-orion-reading-summary"><h3>En palabras sencillas</h3><p>{{ $consultaEnfermeria['titulo'] }}</p><p>{{ $consultaEnfermeria['resumen'] }}</p></section>
-        <section class="rm-orion-reading-support"><h3>Qué información lo respalda</h3>
+    <p class="rm-decision-note">{{ $residente->nombre_completo }} · Resultado disponible de {{ mb_strtolower($consultaEnfermeria['area_principal']) }}</p>
+    <div class="rm-decision-reading"><section class="rm-decision-reading-summary"><h3>En palabras sencillas</h3><p>{{ $consultaEnfermeria['titulo'] }}</p><p>{{ $consultaEnfermeria['resumen'] }}</p></section>
+        <section class="rm-decision-reading-support"><h3>Qué información lo respalda</h3>
             @forelse(array_slice($fuentesResultado, 0, 3) as $f)<article><strong>{{ $f['nombre'] }}</strong><p>{{ $f['fuente'] }} · {{ $f['fecha'] ?? 'Fecha no conservada' }}</p><p>{{ $texto($f['uso']) }}</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirRegistro(@js($f['id']), @js($f['area']))">Ver evidencia</button></article>
             @empty<p>No se encontraron evidencias conservadas para esta área.</p>@endforelse
         </section>
-        <section class="rm-orion-reading-limits"><h3>Qué no puede concluirse</h3><p>{{ $texto($informe['limite_global']) }}</p><ul>@foreach($informe['areas']['COG-MEM']['limites'] as $limite)<li>{{ $texto($limite) }}</li>@endforeach</ul></section>
-        <section><h3>Información de la evaluación</h3><dl class="rm-cognitive-meta"><div><dt>Área cognitiva</dt><dd>{{ $consultaEnfermeria['area_principal'] }}</dd></div><div><dt>Fecha</dt><dd>{{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación' }}</dd></div><div><dt>Versión</dt><dd>{{ $datos['evaluacion']['version'] ?? 'No disponible' }}</dd></div><div><dt>Estado</dt><dd>{{ $consultaEnfermeria['estado_principal'] }}</dd></div><div><dt>Cobertura</dt><dd>{{ count($fuentesResultado) }} fuentes conservadas en el área</dd></div></dl></section>
+        <section class="rm-decision-reading-limits"><h3>Qué no puede concluirse</h3><p>{{ $texto($informe['limite_global']) }}</p><ul>@foreach($informe['areas']['COG-MEM']['limites'] as $limite)<li>{{ $texto($limite) }}</li>@endforeach</ul></section>
+        <section><h3>Información de la evaluación</h3><dl class="rm-cognitive-meta"><div><dt>Área cognitiva</dt><dd>{{ $consultaEnfermeria['area_principal'] }}</dd></div><div><dt>Fecha</dt><dd>{{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación' }}</dd></div><div><dt>Versión</dt><dd>{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($datos['evaluacion']['version'] ?? 'No disponible') }}</dd></div><div><dt>Estado</dt><dd>{{ $consultaEnfermeria['estado_principal'] }}</dd></div><div><dt>Cobertura</dt><dd>{{ count($fuentesResultado) }} fuentes conservadas en el área</dd></div></dl></section>
     </div>
     @endif
     <x-slot:footer><button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsultaResultado('registro')">Ver evidencias</button><button type="button" class="rm-btn rm-btn-primary" wire:click="cerrarSignificado">Entendido</button></x-slot:footer>
 </x-ui.modal-livewire>
 
 <x-ui.modal-livewire wire:model="detalleAreaAbierto" :title="'Detalle de '.$informe['actual']['nombre']" subtitle="Subcomponentes y resultados disponibles" maxWidth="lg" surface="reading" closeMethod="cerrarDetalleArea" :showValidation="false">
-    <p class="rm-orion-note">{{ $residente->nombre_completo }} · {{ $informe['actual']['estado'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica' }}</p>
+    <p class="rm-decision-note">{{ $residente->nombre_completo }} · {{ $informe['actual']['estado'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica' }}</p>
     <p>Los subcomponentes y mediciones consultados al corte actual no completan ni sustituyen los valores originales de una evaluación histórica.</p>
     @if($errorInstrumental)<p role="alert">No fue posible verificar el desglose instrumental. Cierra esta ventana y vuelve a intentarlo.</p>@else
     @forelse($consultaEnfermeria['componentes'][$criterio] ?? [] as $c)
         <div class="rm-cognitive-accordion" x-data="{ expanded: false }" wire:key="area-component-{{ $criterio }}-{{ $c['id'] }}"><h3><button type="button" :aria-expanded="expanded" aria-controls="component-{{ $c['id'] }}" @click="expanded = !expanded"><span>{{ $c['nombre'] }}</span><small>{{ $c['estado'] }}</small><i class="ph ph-caret-down" :class="{ 'is-expanded': expanded }" aria-hidden="true"></i></button></h3>
-            <div id="component-{{ $c['id'] }}" x-show="expanded" x-collapse x-cloak><div class="rm-orion-reading"><p>{{ $c['definicion'] }}</p>
+            <div id="component-{{ $c['id'] }}" x-show="expanded" x-collapse x-cloak><div class="rm-decision-reading"><p>{{ $c['definicion'] }}</p>
                 @forelse($c['mediciones'] as $m)<dl class="rm-cognitive-meta"><div><dt>Fuente</dt><dd>Aplicación instrumental actual</dd></div><div><dt>Fecha</dt><dd>{{ $m['fecha'] }}</dd></div><div><dt>Resultado</dt><dd>{{ $m['valor'] !== null ? round($m['valor'], 3).' · '.$m['unidad'] : 'Sin valor normalizado disponible' }}</dd></div><div><dt>Método</dt><dd>{{ $m['metodo'] }}</dd></div><div><dt>Referencia aplicada</dt><dd>{{ is_string($m['referencia']) ? $m['referencia'] : 'Referencia estructurada del instrumento' }}</dd></div></dl>@empty<p>Sin medición instrumental disponible para este componente.</p>@endforelse
                 @foreach($c['observaciones'] as $o)<p>{{ $o['texto'] }} · {{ $o['fecha'] }} · {{ $o['autor'] }}</p>@endforeach
-                <p class="rm-orion-note">{{ $c['limite'] }}</p>@if($c['mediciones'])<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirRegistroComponente(@js($c['id']))">Ver registro asociado</button>@endif
+                <p class="rm-decision-note">{{ $c['limite'] }}</p>@if($c['mediciones'])<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirRegistroComponente(@js($c['id']))">Ver registro asociado</button>@endif
             </div></div>
         </div>
-    @empty<p class="rm-orion-empty">No hay un desglose de subcomponentes autorizado disponible para esta área. La ausencia de mediciones no equivale a un resultado conservado.</p>@endforelse
+    @empty<p class="rm-decision-empty">No hay un desglose de subcomponentes autorizado disponible para esta área. La ausencia de mediciones no equivale a un resultado conservado.</p>@endforelse
     @endif
     <x-slot:footer><button type="button" class="rm-btn rm-btn-primary" wire:click="cerrarDetalleArea">Volver al informe</button></x-slot:footer>
 </x-ui.modal-livewire>
@@ -37,17 +37,17 @@
 @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-evolucion')
 
 <x-ui.drawer-livewire wire:model="consultaAbierta" title="Registros y evidencias" subtitle="Información disponible para el área seleccionada" :badge="false" icon="ph-notebook" size="lg" surface="reading" closeMethod="cerrarConsulta">
-    <p class="rm-orion-note">{{ $residente->nombre_completo }} · {{ $petersenActual ? 'Consulta cognitiva actual' : $informe['actual']['nombre'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica guardada' }}</p>
-    <div class="rm-orion-tabs" role="group" aria-label="Secciones de consulta">@foreach(['interpretacion' => 'Interpretación', 'registro' => 'Registros', 'cuidados' => 'Cuidados'] as $clave => $label)<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta(@js($clave))" aria-pressed="{{ $pestanaConsulta === $clave ? 'true' : 'false' }}">{{ $label }}</button>@endforeach</div>
+    <p class="rm-decision-note">{{ $residente->nombre_completo }} · {{ $petersenActual ? 'Consulta cognitiva actual' : $informe['actual']['nombre'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica guardada' }}</p>
+    <div class="rm-decision-tabs" role="group" aria-label="Secciones de consulta">@foreach(['interpretacion' => 'Interpretación', 'registro' => 'Registros', 'cuidados' => 'Cuidados'] as $clave => $label)<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta(@js($clave))" aria-pressed="{{ $pestanaConsulta === $clave ? 'true' : 'false' }}">{{ $label }}</button>@endforeach</div>
     @if($pestanaConsulta === 'interpretacion')
-        @if($petersenActual)<div class="rm-orion-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p class="rm-orion-note">Resultado orientativo de la consulta actual. No es un diagnóstico ni una evaluación histórica guardada.</p></div>
-        @else<div class="rm-orion-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $texto($informe['actual']['significado']) }}</p><p>{{ $texto($informe['actual']['por_que']) }}</p><p class="rm-orion-note">{{ $texto($informe['limite_global']) }}</p></div>@endif
+        @if($petersenActual)<div class="rm-decision-reading"><h3>{{ $resumenPetersenActual['titulo'] }}</h3><p>{{ $resumenPetersenActual['explicacion'] }}</p><p class="rm-decision-note">Resultado orientativo de la consulta actual. No es un diagnóstico ni una evaluación histórica guardada.</p></div>
+        @else<div class="rm-decision-reading"><h3>{{ $informe['actual']['estado'] }}</h3><p>{{ $texto($informe['actual']['significado']) }}</p><p>{{ $texto($informe['actual']['por_que']) }}</p><p class="rm-decision-note">{{ $texto($informe['limite_global']) }}</p></div>@endif
     @elseif($pestanaConsulta === 'registro')
         @if($errorInstrumental)<p role="alert">No fue posible consultar las mediciones instrumentales. No se confirma su ausencia.</p>
         @elseif($registroComponente)<section class="rm-expert-source"><h3 class="rm-expert-section-title">{{ $registroComponente['nombre'] }}</h3><p>Dato fuente actual. No sustituye el valor original de una inferencia histórica.</p>
             @foreach($registroComponente['mediciones'] as $medicion)<dl class="rm-cognitive-meta">@foreach(['Instrumento' => $medicion['instrumento'], 'Versión' => $medicion['version'], 'Fecha' => $medicion['fecha'], 'Profesional' => $medicion['autor'], 'Resultado normalizado' => $medicion['valor'] !== null ? round($medicion['valor'], 3).' · '.$medicion['unidad'] : 'No disponible', 'Valor bruto documentado' => $medicion['valor_bruto'], 'Referencia' => is_string($medicion['referencia']) ? $medicion['referencia'] : 'Referencia estructurada del instrumento'] as $nombre => $valor)<div><dt>{{ $nombre }}</dt><dd>{{ $valor ?? 'No registrado' }}</dd></div>@endforeach</dl>@endforeach
         </section>@endif
-        @if($petersenActual)<p class="rm-orion-note">Las valoraciones originales de esta consulta se resumen en «Fundamento de las áreas y criterios». La consulta actual todavía no está guardada como resultado histórico.</p>
+        @if($petersenActual)<p class="rm-decision-note">Las valoraciones originales de esta consulta se resumen en «Fundamento de las áreas y criterios». La consulta actual todavía no está guardada como resultado histórico.</p>
         @else @include('apoyodecision::livewire.medico.resultados-experto.evidencias') @endif
         <section class="rm-expert-source mt-4"><h3 class="rm-expert-section-title">Diagnóstico médico registrado</h3><p>Se presenta separado del resultado de la evaluación.</p>
             @if($puedeVerDiagnosticos)@forelse($diagnosticosMedicos as $diagnostico)<article><strong>{{ $diagnostico->nombre }}</strong><p>{{ $diagnostico->fecha_hora?->format('d/m/Y H:i') }} · {{ trim(($diagnostico->personal?->nombres ?? '').' '.($diagnostico->personal?->apellido_paterno ?? '')) }}</p></article>@empty<p>No hay diagnósticos médicos registrados.</p>@endforelse @else<p>No dispone de permiso para consultar diagnósticos médicos.</p>@endif
@@ -62,10 +62,10 @@
         @if($puedeVerCuidados)
             @php($todosCuidados = $cuidadosPendientesHoy->concat($otrosCuidadosVigentes))
             @forelse($todosCuidados->groupBy('estado') as $estado => $items)
-                <section class="rm-orion-care-group" data-state="{{ $estado }}"><h4>{{ ['PENDIENTE' => 'Pendientes de hoy', 'REALIZADA' => 'Realizados hoy', 'NO_REALIZADA' => 'No realizados hoy', 'CANCELADA' => 'Cancelados hoy', 'SIN_OCURRENCIA_HOY' => 'Otros cuidados vigentes'][$estado] }}<span>{{ $items->count() }}</span></h4>
-                    @foreach($items as $item)<article class="rm-orion-care-row"><div><strong>{{ $item['intervencion']->nombre }}</strong><p>{{ $item['intervencion']->descripcion }}</p><small>{{ $item['plan']->nombre }} · {{ $item['hora'] ?? 'Sin tarea programada hoy' }}</small>@if($estado === 'NO_REALIZADA')<p>Motivo: {{ $item['ejecucion']?->motivo_omision ?? 'No registrado' }}</p>@endif<button type="button" class="rm-btn rm-btn-secondary" wire:click="verCuidado(@js($item['clave']))">Ver detalle del cuidado</button></div></article>@endforeach
+                <section class="rm-decision-care-group" data-state="{{ $estado }}"><h4>{{ ['PENDIENTE' => 'Pendientes de hoy', 'REALIZADA' => 'Realizados hoy', 'NO_REALIZADA' => 'No realizados hoy', 'CANCELADA' => 'Cancelados hoy', 'SIN_OCURRENCIA_HOY' => 'Otros cuidados vigentes'][$estado] }}<span>{{ $items->count() }}</span></h4>
+                    @foreach($items as $item)<article class="rm-decision-care-row"><div><strong>{{ $item['intervencion']->nombre }}</strong><p>{{ $item['intervencion']->descripcion }}</p><small>{{ $item['plan']->nombre }} · {{ $item['hora'] ?? 'Sin tarea programada hoy' }}</small>@if($estado === 'NO_REALIZADA')<p>Motivo: {{ $item['ejecucion']?->motivo_omision ?? 'No registrado' }}</p>@endif<button type="button" class="rm-btn rm-btn-secondary" wire:click="verCuidado(@js($item['clave']))">Ver detalle del cuidado</button></div></article>@endforeach
                 </section>
-            @empty<p class="rm-orion-empty">Este residente no tiene intervenciones activas disponibles para esta consulta.</p>@endforelse
+            @empty<p class="rm-decision-empty">Este residente no tiene intervenciones activas disponibles para esta consulta.</p>@endforelse
             <a href="{{ route('admin.enfermeria.agenda', ['residente' => $codResidente]) }}" class="rm-btn rm-btn-primary rm-cognitive-agenda"><i class="ph ph-calendar" aria-hidden="true"></i>Ir a mi agenda de turno</a>
         @else<p>No dispone de autorización para consultar los cuidados.</p>@endif
     @endif
@@ -73,8 +73,8 @@
 
 @if($cuidadoDetalle)
 <x-ui.drawer-livewire wire:model="cuidadoSeleccionado" title="Detalle del cuidado" :subtitle="$residente->nombre_completo" :badge="false" size="lg" surface="reading" closeMethod="cerrarCuidado">
-    <div class="rm-orion-reading"><h3>{{ $cuidadoDetalle['intervencion']->nombre }}</h3><dl class="rm-orion-definition">
+    <div class="rm-decision-reading"><h3>{{ $cuidadoDetalle['intervencion']->nombre }}</h3><dl class="rm-decision-definition">
         @foreach(['Descripción' => $cuidadoDetalle['intervencion']->descripcion, 'Objetivo documentado' => $cuidadoDetalle['intervencion']->objetivo_especifico, 'Plan de origen' => $cuidadoDetalle['plan']->nombre, 'Estado' => ['PENDIENTE' => 'Pendiente', 'REALIZADA' => 'Realizado', 'NO_REALIZADA' => 'No realizado', 'CANCELADA' => 'Cancelado', 'SIN_OCURRENCIA_HOY' => 'Sin tarea programada hoy'][$cuidadoDetalle['estado']], 'Horario' => $cuidadoDetalle['hora'], 'Periodicidad' => $cuidadoDetalle['programacion']?->frecuencia, 'Observaciones' => $cuidadoDetalle['ejecucion']?->observacion, 'Ejecución' => $cuidadoDetalle['ejecucion']?->fecha_hora_ejecucion?->format('d/m/Y H:i'), 'Motivo de omisión' => $cuidadoDetalle['ejecucion']?->motivo_omision] as $etiqueta => $valor)<div><dt>{{ $etiqueta }}</dt><dd>{{ $valor ?: 'No registrado' }}</dd></div>@endforeach
-    </dl><p class="rm-orion-note">Esta información es de consulta. Para registrar la ejecución de un cuidado utiliza la agenda de tu turno.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="cerrarCuidado">Volver a cuidados</button></div>
+    </dl><p class="rm-decision-note">Esta información es de consulta. Para registrar la ejecución de un cuidado utiliza la agenda de tu turno.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="cerrarCuidado">Volver a cuidados</button></div>
 </x-ui.drawer-livewire>
 @endif

@@ -19,7 +19,7 @@ membresías Petersen. No constituye un esquema completo pendiente solo de cupo.
 
 ### Ensayo aislado de representación, 20/10/2026
 
-`prototipos/orion-conservacion-0_2` contiene una proyección tipada del DTO
+`prototipos/experto-conservacion-0_2` contiene una proyección tipada del DTO
 compuesto en un esquema PostgreSQL **desechable**. Sus tablas de ensayo son un banco
 deliberadamente exhaustivo, no el diccionario institucional de quince
 relaciones ni una alternativa aprobada. No se instala en Laravel ni en la BDD

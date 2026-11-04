@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace MotorExperto\conocimiento;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
 
 /** Define las 17 reglas cognitivas iniciales; las versiones vigentes se cargan de la BDD. */
 final class ReglasCognitivas
 {
-    public const CODIGO = 'ORION-COGNITIVO-1';
+    public const CODIGO = IdentificadoresHistoricos::PERFIL_COGNITIVO;
 
     public const FUNDAMENTO = 'Contrato institucional A–D adoptado el 19/10/2026. C1: interpretación específica versionada; C2: atribución de tarea; C3: contexto suficiente. Sin umbral universal ni equivalencia observación/instrumento. Revisión profesional posterior pendiente.';
 
@@ -118,7 +120,7 @@ final class ReglasCognitivas
         foreach ($red['nodos'] as $n) {
             $t['nodos_semanticos'][] = $sello + ['cod_nodo_semantico' => self::id('N', $n['codigo_semantico']),
                 'cod_version_modelo' => $version, 'codigo_semantico' => $n['codigo_semantico'], 'nombre' => $n['nombre'],
-                'tipo_nodo' => $n['tipo_nodo'], 'definicion' => 'Concepto de la red documental O.R.I.O.N.; su pertenencia no acredita un hallazgo.'];
+                'tipo_nodo' => $n['tipo_nodo'], 'definicion' => 'Concepto de la base cognitiva; su pertenencia no acredita un hallazgo.'];
         }
         foreach ($red['relaciones'] as $r) {
             $t['relaciones_semanticas'][] = $sello + ['cod_relacion_semantica' => self::id('R', $r['cod_nodo_origen']),

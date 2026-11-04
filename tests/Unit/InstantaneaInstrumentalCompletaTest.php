@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use DateTimeImmutable;
 use DomainException;
 use MotorExperto\conocimiento\PaqueteConocimiento;
@@ -54,7 +54,7 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
         $d['capturas']['capturas'][] = $cambiar === null ? $a : array_replace($a, $cambiar);
 
         return InstantaneaInstrumental::crear($p, $c, $d['capturas'], $d['vinculos'], 'USUARIO-TEST', $d['cabecera_conocimiento'],
-            'INSTRUMENTAL-DECLARATIVO-3', (new ArchivoConocimientoOrion)->leer());
+            'INSTRUMENTAL-DECLARATIVO-3', (new ArchivoConocimientoCognitivo)->leer());
     }
 
     public function test_recalcula_brutos_normalizacion_red_y_cinco_dominios_desde_un_solo_dto(): void
@@ -131,7 +131,7 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
     public function test_replay_completo_se_ejecuta_en_otro_proceso_usando_solo_el_codigo_del_zip(): void
     {
         $dto = $this->crear();
-        $directorio = sys_get_temp_dir().'/orion-release-replay-'.bin2hex(random_bytes(8));
+        $directorio = sys_get_temp_dir().'/decision-release-replay-'.bin2hex(random_bytes(8));
         self::assertTrue(mkdir($directorio));
         try {
             $archivo = $directorio.'/motor.zip';
@@ -173,7 +173,7 @@ final class InstantaneaInstrumentalCompletaTest extends TestCase
         } finally {
             // Solo el directorio temporal creado en esta prueba, comprobado antes de recorrerlo.
             $raiz = realpath($directorio);
-            if ($raiz !== false && str_starts_with(basename($raiz), 'orion-release-replay-')
+            if ($raiz !== false && str_starts_with(basename($raiz), 'decision-release-replay-')
                 && realpath(dirname($raiz)) === realpath(sys_get_temp_dir())) {
                 foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($raiz, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $f) {
                     $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());

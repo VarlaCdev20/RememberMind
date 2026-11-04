@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Funcionalidad;
 
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use PHPUnit\Framework\TestCase;
 
 /** Comprobar los límites semánticos del vocabulario aislado de esta fase. */

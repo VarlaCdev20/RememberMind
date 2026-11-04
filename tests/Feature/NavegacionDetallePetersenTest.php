@@ -37,12 +37,12 @@ class NavegacionDetallePetersenTest extends TestCase
     public function test_botones_de_detalle_abren_la_seccion_real_y_cierran_la_ventana_anterior(): void
     {
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('id="orion-petersen-detalle"', false)
+            ->assertSee('id="decision-petersen-detalle"', false)
             ->assertSee('Ver qué falta')
             ->call('abrirSignificado')->assertSet('significadoAbierto', true)
-            ->call('irASeccion', 'orion-petersen-detalle')
+            ->call('irASeccion', 'decision-petersen-detalle')
             ->assertOk()->assertSet('significadoAbierto', false)
-            ->assertDispatched('orion-navigate', seccion: 'orion-petersen-detalle');
+            ->assertDispatched('decision-navigate', seccion: 'decision-petersen-detalle');
 
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
         $this->assertDatabaseCount('diagnosticos', 0);
@@ -52,15 +52,15 @@ class NavegacionDetallePetersenTest extends TestCase
     {
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->call('irASeccion', 'destino-no-permitido')
-            ->assertStatus(422)->assertNotDispatched('orion-navigate');
+            ->assertStatus(422)->assertNotDispatched('decision-navigate');
     }
 
     public function test_cuenta_desactivada_no_puede_navegar_desde_una_pantalla_abierta(): void
     {
         $pantalla = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
         $this->psicologa->update(['estado' => 'INACTIVO']);
-        $pantalla->call('irASeccion', 'orion-petersen-detalle')
-            ->assertStatus(404)->assertNotDispatched('orion-navigate');
+        $pantalla->call('irASeccion', 'decision-petersen-detalle')
+            ->assertStatus(404)->assertNotDispatched('decision-navigate');
     }
 
     public function test_permiso_revocado_impide_navegar_desde_una_pantalla_abierta(): void
@@ -68,7 +68,7 @@ class NavegacionDetallePetersenTest extends TestCase
         $pantalla = Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente]);
         $this->psicologa->roles->each(fn ($rol) => $rol->revokePermissionTo('residentes.ver'));
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-        $pantalla->call('irASeccion', 'orion-petersen-detalle')
-            ->assertStatus(404)->assertNotDispatched('orion-navigate');
+        $pantalla->call('irASeccion', 'decision-petersen-detalle')
+            ->assertStatus(404)->assertNotDispatched('decision-navigate');
     }
 }

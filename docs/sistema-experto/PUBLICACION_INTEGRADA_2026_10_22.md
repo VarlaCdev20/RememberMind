@@ -34,7 +34,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 
 Reejecuciones focalizadas: navegación, menú y dashboard; unitarias de instantánea institucional/instrumental, membresías, fecha visible y presentación; repetición de los dos casos de menú corregidos. Los nombres de las ejecuciones y el último resultado de cada caso están en el consolidado y sus JUnit.
 
 ```text
-node --test tests/Frontend/orion-explorador.test.js tests/Frontend/cognitive-radial.test.js tests/Frontend/cognitive-responsive.test.js tests/Frontend/psychology-dashboard-responsive.test.js tests/Frontend/psychology-results-responsive.test.js
+node --test tests/Frontend/expert-graph.test.js tests/Frontend/cognitive-radial.test.js tests/Frontend/cognitive-responsive.test.js tests/Frontend/psychology-dashboard-responsive.test.js tests/Frontend/psychology-results-responsive.test.js
 npm run build
 ```
 

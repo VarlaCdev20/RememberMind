@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DateTimeImmutable;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use MotorExperto\conservacion\CodecInstantanea;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;

@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +85,7 @@ final class ConsultarConocimientoCognitivo
             $id = 'LECTURA-'.substr(hash('sha256', serialize([$usuario->getKey(), $residente->getKey(), $version, $corte->format('Y-m-d\TH:i:s.uP')])), 0, 12);
             $contexto = new ContextoEjecucion($id, $residente->getKey(), $version, $corte->toDateTimeImmutable());
             $instantanea = InstantaneaInstrumental::crear($p, $contexto, $capturas, $vinculos, $usuario->getKey(), $v->getAttributes(),
-                'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoOrion::class)->leer());
+                'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoCognitivo::class)->leer());
             $salida = $instantanea->contenido['salida'];
 
             return ['_instantanea' => $instantanea, 'disponible' => true, 'resultado' => $salida['resultado'], 'fuentes_excluidas' => $salida['fuentes_excluidas'],

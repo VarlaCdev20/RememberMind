@@ -3,7 +3,7 @@
                         <summary><i class="ph ph-folder-open" aria-hidden="true"></i> Información complementaria del expediente <span class="text-xs text-rm-secondary">Conocimiento y registros previos</span></summary>
                         <div class="space-y-3 mt-3">
                             @if($datos['conocimiento_documental'])
-                                <x-ui.section-card title="Conocimiento disponible" subtitle="{{ $datos['conocimiento_documental']['version'] }} · definición documental" icon="ph-books">
+                                <x-ui.section-card title="Conocimiento disponible" subtitle="{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($datos['conocimiento_documental']['version']) }} · definición documental" icon="ph-books">
                                     <h3 class="font-semibold">{{ $datos['conocimiento_documental']['nombre'] }}</h3>
                                     <p class="text-sm leading-relaxed mt-2">{{ $datos['conocimiento_documental']['definicion'] }}</p>
                                     <p class="text-sm text-rm-secondary mt-3">{{ $informe['complemento_textos']['documental'] }}</p>

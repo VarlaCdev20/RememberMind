@@ -12,12 +12,12 @@
 .rm-knowledge-metric__action { display: flex; align-items: center; gap: var(--rm-space-2); margin-top: var(--rm-space-3); font-weight: 700; font-size: var(--rm-font-size-label); color: var(--rm-primary-ink); }
 .rm-knowledge-metric__action i { transition: transform var(--rm-duration-fast); }
 .rm-knowledge-metric:hover .rm-knowledge-metric__action i { transform: translateX(2px); }
-.rm-knowledge-canvas .rm-orion-node rect { transition: fill var(--rm-duration-fast), stroke var(--rm-duration-fast); }
-.rm-knowledge-canvas .rm-orion-node.is-muted rect { fill: var(--rm-surface-soft); stroke: var(--rm-border); }
+.rm-knowledge-canvas .rm-decision-node rect { transition: fill var(--rm-duration-fast), stroke var(--rm-duration-fast); }
+.rm-knowledge-canvas .rm-decision-node.is-muted rect { fill: var(--rm-surface-soft); stroke: var(--rm-border); }
 .rm-knowledge-selection { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-2); padding: var(--rm-space-3); background: var(--rm-primary-soft); border-radius: var(--rm-radius-sm); color: var(--rm-text-primary); }
 .rm-knowledge-surface { animation: rm-knowledge-reveal var(--rm-duration-normal) var(--rm-ease-standard); }
 @keyframes rm-knowledge-reveal { from { opacity: .6; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .rm-knowledge-surface { animation: none; } .rm-knowledge-metric__action i, .rm-knowledge-canvas .rm-orion-node { transition: none; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rm-knowledge-surface { animation: none; } .rm-knowledge-metric__action i, .rm-knowledge-canvas .rm-decision-node { transition: none; transform: none; } }
 .rm-knowledge-overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, .8fr); gap: var(--rm-space-4); align-items: start; }
 .rm-knowledge-overview > *, .rm-knowledge-graph-layout > *, .rm-knowledge-filters > * { min-width: 0; }
 .rm-knowledge-steps { display: grid; gap: var(--rm-space-5); }
@@ -34,12 +34,12 @@
 .rm-knowledge-graph-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--rm-space-4); }
 .rm-knowledge-canvas { min-width: 0; height: 520px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface-soft); }
 .rm-knowledge-canvas svg { width: 100%; height: 100%; touch-action: none; }
-.rm-knowledge-canvas .rm-orion-node { cursor: grab; }
-.rm-knowledge-canvas .rm-orion-node[data-type="CRITERIO"] rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary); }
-.rm-knowledge-canvas .rm-orion-node[data-type="SUBCOMPONENTE"] rect { fill: color-mix(in srgb, var(--rm-info) 8%, var(--rm-surface)); stroke: var(--rm-info); }
-.rm-knowledge-canvas .rm-orion-node[data-type="VARIABLE"] rect { fill: color-mix(in srgb, var(--rm-chart-cognitive-500) 8%, var(--rm-surface)); stroke: var(--rm-chart-cognitive-500); }
+.rm-knowledge-canvas .rm-decision-node { cursor: grab; }
+.rm-knowledge-canvas .rm-decision-node[data-type="CRITERIO"] rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary); }
+.rm-knowledge-canvas .rm-decision-node[data-type="SUBCOMPONENTE"] rect { fill: color-mix(in srgb, var(--rm-info) 8%, var(--rm-surface)); stroke: var(--rm-info); }
+.rm-knowledge-canvas .rm-decision-node[data-type="VARIABLE"] rect { fill: color-mix(in srgb, var(--rm-chart-cognitive-500) 8%, var(--rm-surface)); stroke: var(--rm-chart-cognitive-500); }
 .rm-knowledge-workspace select:is(.rm-input, .rm-select) { height: auto; min-height: 44px; padding-block: var(--rm-space-2); line-height: 1.5; }
-.rm-knowledge-canvas .rm-orion-node:focus-visible rect { stroke: var(--rm-primary-ink); stroke-width: 4px; }
+.rm-knowledge-canvas .rm-decision-node:focus-visible rect { stroke: var(--rm-primary-ink); stroke-width: 4px; }
 .rm-knowledge-edge-label { fill: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: var(--rm-surface-soft); stroke-width: 4px; stroke-linejoin: round; }
 .rm-knowledge-edge-label.is-connected { fill: var(--rm-primary-ink); font-weight: 700; }
 .rm-knowledge-inspector { padding: var(--rm-space-4); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface); max-height: 520px; overflow-y: auto; overflow-wrap: anywhere; }
@@ -99,12 +99,12 @@
 .rm-expert-graph-stage { position: absolute; top: 0; left: 0; width: 1px; height: 1px; transform-origin: 0 0; }
 .rm-expert-graph-canvas svg.rm-expert-graph-edge-svg { position: absolute; top: 0; left: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
 .rm-expert-graph-canvas svg.rm-expert-graph-node-svg { position: absolute; width: 190px; height: 86px; overflow: visible; }
-.rm-expert-graph-canvas .rm-orion-node rect { fill: var(--rm-surface); stroke: var(--rm-border-strong); stroke-width: 1.5; }
-.rm-expert-graph-canvas .rm-orion-node text { fill: var(--rm-text-primary); font-family: var(--rm-font-body); font-size: 12px; }
-.rm-expert-graph-canvas .rm-orion-node .rm-orion-node-type, .rm-expert-graph-canvas .rm-orion-node .rm-orion-node-state { font-size: 10px; fill: var(--rm-text-secondary); }
-.rm-expert-graph-canvas .rm-orion-node:is(.is-selected, :focus-visible) rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary-ink); stroke-width: 3; }
-.rm-expert-graph-canvas .rm-orion-node:focus-visible { outline: none; }
-.rm-expert-graph-canvas .rm-orion-edge { fill: none; stroke: var(--rm-border-strong); stroke-width: 1.5; }
-.rm-expert-graph-canvas .rm-orion-edge.is-connected { stroke: var(--rm-primary-ink); stroke-width: 2; }
-.rm-expert-graph-canvas .rm-orion-arrow { fill: var(--rm-primary-ink); }
+.rm-expert-graph-canvas .rm-decision-node rect { fill: var(--rm-surface); stroke: var(--rm-border-strong); stroke-width: 1.5; }
+.rm-expert-graph-canvas .rm-decision-node text { fill: var(--rm-text-primary); font-family: var(--rm-font-body); font-size: 12px; }
+.rm-expert-graph-canvas .rm-decision-node .rm-decision-node-type, .rm-expert-graph-canvas .rm-decision-node .rm-decision-node-state { font-size: 10px; fill: var(--rm-text-secondary); }
+.rm-expert-graph-canvas .rm-decision-node:is(.is-selected, :focus-visible) rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary-ink); stroke-width: 3; }
+.rm-expert-graph-canvas .rm-decision-node:focus-visible { outline: none; }
+.rm-expert-graph-canvas .rm-decision-edge { fill: none; stroke: var(--rm-border-strong); stroke-width: 1.5; }
+.rm-expert-graph-canvas .rm-decision-edge.is-connected { stroke: var(--rm-primary-ink); stroke-width: 2; }
+.rm-expert-graph-canvas .rm-decision-arrow { fill: var(--rm-primary-ink); }
 .rm-expert-graph-canvas .rm-knowledge-edge-label { font-size: 10px; }

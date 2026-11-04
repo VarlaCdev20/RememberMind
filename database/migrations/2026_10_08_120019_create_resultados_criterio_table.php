@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// O.R.I.O.N. D-123 / D-137: 4.16, 4.19. Orden físico 19 de 23.
+// sistema experto D-123 / D-137: 4.16, 4.19. Orden físico 19 de 23.
 return new class extends Migration
 {
     public function up(): void

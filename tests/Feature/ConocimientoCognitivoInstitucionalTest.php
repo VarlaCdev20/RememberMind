@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -24,7 +26,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPetersenInstituciona
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\GobiernoReglasPanel;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -106,7 +108,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
             $vinculos[$mapa] = ['cod_instrumento' => $instrumento->getKey(), 'codigo_instrumento' => $instrumento->codigo,
                 'version_instrumento' => $instrumento->version, 'cod_pregunta' => $q->getKey(), 'campo' => 'valor_logico'];
         }
-        $header = ['cod_version_modelo' => $p->version, 'codigo_version' => 'ORION-COG-ORIGINALES', 'estado' => 'ACTIVO',
+        $header = ['cod_version_modelo' => $p->version, 'codigo_version' => 'EXPERTO-COG-ORIGINALES', 'estado' => 'ACTIVO',
             'fecha_hora_creacion' => '2026-10-17 08:00:00', 'fecha_hora_vigencia' => '2026-10-17 08:00:00',
             'cod_usuario_creacion' => $this->usuario->getKey()];
         $traducidas = app(IdentidadesConocimiento::class)->traducir(['versiones_modelo_experto' => [$header]] + $t, $p->version, $this->version, false);
@@ -339,7 +341,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $original = app(ConocimientoVersionado::class)->instantanea($this->version);
         $vinculosOriginales = config('sistema_experto.contratos_conocimiento.'.$this->version.'.vinculos_instrumentales');
         $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
-            'ORION-NOMINAL-1', 'Revisar el conocimiento conservando las fuentes nominales originales.');
+            'EXPERTO-NOMINAL-1', 'Revisar el conocimiento conservando las fuentes nominales originales.');
         config(['sistema_experto.version_cognitiva' => $sucesora]);
         $r = $this->consultar();
         self::assertCount(1, $r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
@@ -350,7 +352,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertSame($original, app(ConocimientoVersionado::class)->instantanea($this->version));
         $regla = array_values($r['resultado']['perfil']['COG-ATE']['conclusiones_candidatas'])[0]['reglas'][0];
         $archivo = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $sucesora,
-            'ORION-NOMINAL-2', 'Archivar la regla sin modificar sus evidencias ni resultados previos.', retiradas: [$regla]);
+            'EXPERTO-NOMINAL-2', 'Archivar la regla sin modificar sus evidencias ni resultados previos.', retiradas: [$regla]);
         config(['sistema_experto.version_cognitiva' => $archivo]);
         self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
         self::assertSame($dto->contenido, InstantaneaInstrumental::verificar($dto->contenido, $dto->huella)->contenido);
@@ -361,7 +363,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     public function test_sucesora_no_hereda_un_vinculo_cuya_identidad_semantica_cambio(): void
     {
         $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
-            'ORION-VINCULO-INVALIDO', 'Negativo de extracción alterada entre revisiones de conocimiento.');
+            'EXPERTO-VINCULO-INVALIDO', 'Negativo de extracción alterada entre revisiones de conocimiento.');
         DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $sucesora)
             ->where('clave_selector', $this->primeraPregunta)->update(['clave_selector' => 'OTRA-PREGUNTA']);
         $this->expectException(DomainException::class);
@@ -372,7 +374,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
     public function test_sucesora_con_dos_mapeos_equivalentes_no_elige_uno_por_su_estado(): void
     {
         $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $this->version,
-            'ORION-VINCULO-AMBIGUO', 'Negativo de identidad semántica duplicada en una sucesora.');
+            'EXPERTO-VINCULO-AMBIGUO', 'Negativo de identidad semántica duplicada en una sucesora.');
         $duplicado = (array) DB::table('mapeos_variables_fuente')->where('cod_version_modelo', $sucesora)
             ->where('clave_selector', $this->primeraPregunta)->sole();
         $duplicado['cod_mapeo_variable_fuente'] = 'MAPEO-AMBIGUO';
@@ -452,10 +454,10 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
 
     public function test_perfil_e_inferencia_usan_una_sola_captura_aunque_el_original_se_rectifique_despues(): void
     {
-        $original = app(FuenteConocimientoOrion::class);
-        app()->instance(FuenteConocimientoOrion::class, new class($original, $this->aplicacion, $this->primeraPregunta) implements FuenteConocimientoOrion
+        $original = app(FuenteConocimientoCognitivo::class);
+        app()->instance(FuenteConocimientoCognitivo::class, new class($original, $this->aplicacion, $this->primeraPregunta) implements FuenteConocimientoCognitivo
         {
-            public function __construct(private FuenteConocimientoOrion $original, private string $aplicacion, private string $pregunta) {}
+            public function __construct(private FuenteConocimientoCognitivo $original, private string $aplicacion, private string $pregunta) {}
 
             public function leer(): array
             {
@@ -579,7 +581,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $cabecera = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $this->version)->sole();
 
         return InstantaneaInstrumental::crear($p, $c, $r['capturas'], $contrato['vinculos_instrumentales'], $this->usuario->getKey(), $cabecera,
-            'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoOrion::class)->leer());
+            'INSTRUMENTAL-DECLARATIVO-3', app(FuenteConocimientoCognitivo::class)->leer());
     }
 
     public function test_memoria_usa_literal_textual_original_y_su_admisibilidad_especifica(): void
@@ -731,7 +733,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertSame(1, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
         $r = $this->consultar();
         self::assertTrue($r['disponible']);
-        self::assertSame('ORION-AD-20261019', $r['resultado']['contrato_institucional']);
+        self::assertSame(IdentificadoresHistoricos::CONTRATO_INSTITUCIONAL, $r['resultado']['contrato_institucional']);
         self::assertCount(5, $r['resultado']['perfil']);
         self::assertCount(19, $r['resultado']['red']['componentes']);
         foreach ($r['resultado']['perfil'] as $dominio) {
@@ -901,7 +903,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         self::assertSame([], $this->consultar()['resultado']['perfil']['COG-ATE']['conclusiones_candidatas']);
         DB::table('preguntas_instrumento')->where('cod_pregunta', $qMedida->getKey())->update(['tipo_respuesta' => 'NUMERO']);
         $regla = DB::table('reglas_expertas')->where('cod_version_modelo', $id)->where('codigo_regla', 'R-ATE-S01-P01')->value('cod_regla_experta');
-        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $id, 'ORION-AD-ARCHIVO',
+        $sucesora = app(GestionarReglasExpertas::class)->crearRevision($this->usuario, $id, 'EXPERTO-AD-ARCHIVO',
             'Archivo de la regla de atención para regresión sintética de su historia.', retiradas: [$regla]);
         config(['sistema_experto.version_cognitiva' => null]);
         self::assertSame($sucesora, $this->consultar()['resultado']['version']);

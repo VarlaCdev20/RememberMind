@@ -44,7 +44,7 @@ final class PaqueteInvestigadoCOGMEM
             'VAR-MEM-OBS-02' => ['Memoria remota observada', 'VARIABLE']] as $codigo => [$nombre, $tipo]) {
             $t['nodos_semanticos'][] = $sello + $version + ['cod_nodo_semantico' => $this->codigo('NS', $codigo),
                 'codigo_semantico' => $codigo, 'nombre' => $nombre, 'tipo_nodo' => $tipo,
-                'definicion' => $tipo === 'CRITERIO' ? 'Criterio COG-MEM de O.R.I.O.N.; observación distinta de resultado integrado.'
+                'definicion' => $tipo === 'CRITERIO' ? 'Criterio COG-MEM de sistema experto; observación distinta de resultado integrado.'
                     : 'Representación observacional de un control concreto, sin diagnóstico, severidad ni puntuación.'];
         }
         foreach (['DOM-MEM-OBS' => 'OBSERVACIONAL', 'DOM-RESULTADO-COG-MEM' => 'RESULTADO'] as $codigo => $tipo) {

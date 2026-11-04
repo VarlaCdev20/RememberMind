@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Repositories;
 
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvidenciaEloquentRepository;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\RedSemanticaEloquentRepository;

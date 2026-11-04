@@ -1,4 +1,4 @@
-# Aporte interdisciplinario general para O.R.I.O.N.
+# Aporte interdisciplinario general para sistema experto
 
 Fecha: 20/10/2026. Alcance: revisión general solicitada por la propietaria para Psicología, Medicina, Enfermería y funcionalidad. **Es una propuesta técnica fundamentada, no una aplicación de prueba, informe médico, firma profesional ni aprobación institucional nueva.** No se crean respuestas, resultados, normas o diagnósticos de residentes. Las revisiones profesionales del resultado corresponden a Medicina y Psicología por separado y después de la evaluación, conforme al contrato vigente.
 
@@ -44,7 +44,7 @@ Esta selección es un inventario de adquisición posible, no una orden de aplica
 
 ## Medicina: historia y revisión diferencial
 
-La revisión médica debe conservar **qué cambió, desde cuándo, cómo evolucionó y quién lo informó**, con fecha del hecho distinta de fecha de registro. Para C01 se documentan fuentes y episodios independientes, no un rótulo genérico de «olvidos». Para C04 se revisan medicamentos y cambios recientes, enfermedades neurológicas/vasculares/metabólicas, estado afectivo, sueño, dolor, visión/audición y cambios agudos o fluctuantes; cada factor queda *presente, ausente evaluado o pendiente*, con soporte. La coexistencia de un factor no demuestra causalidad. La [guía NICE NG97](https://www.nice.org.uk/guidance/ng97/chapter/Recommendations) recomienda investigar causas reversibles e historia de informante; [CG103](https://www.nice.org.uk/guidance/cg103/chapter/Recommendations) exige valorar cambios de horas o días que sugieran delirium. Una señal aguda se deriva por el protocolo asistencial vigente, sin que O.R.I.O.N. invente un diagnóstico o tratamiento.
+La revisión médica debe conservar **qué cambió, desde cuándo, cómo evolucionó y quién lo informó**, con fecha del hecho distinta de fecha de registro. Para C01 se documentan fuentes y episodios independientes, no un rótulo genérico de «olvidos». Para C04 se revisan medicamentos y cambios recientes, enfermedades neurológicas/vasculares/metabólicas, estado afectivo, sueño, dolor, visión/audición y cambios agudos o fluctuantes; cada factor queda *presente, ausente evaluado o pendiente*, con soporte. La coexistencia de un factor no demuestra causalidad. La [guía NICE NG97](https://www.nice.org.uk/guidance/ng97/chapter/Recommendations) recomienda investigar causas reversibles e historia de informante; [CG103](https://www.nice.org.uk/guidance/cg103/chapter/Recommendations) exige valorar cambios de horas o días que sugieran delirium. Una señal aguda se deriva por el protocolo asistencial vigente, sin que sistema experto invente un diagnóstico o tratamiento.
 
 Producto propuesto de Medicina: cronología sustentada, lista de diferenciales revisados y pendientes, y juicio profesional propio sobre la suficiencia de C01/C04. No se atribuye ese juicio a Carolina ni a otro médico por existir registros previos.
 
@@ -62,7 +62,7 @@ Producto propuesto de funcionalidad: tabla por actividad con desempeño previo/a
 
 ## Salida permitida y trabajo pendiente
 
-Con los datos actuales O.R.I.O.N. puede exponer observaciones, fuentes funcionales, procedencia, conflictos y **por qué se abstiene** una regla que exija C1 instrumental. No se deriva DCL confirmado, porcentaje de riesgo ni puntuación de dominio desde Barthel o las observaciones. El perfil Petersen requiere además los cinco juicios originales de dominio, C01/C03/C04/C05 y C02 derivado de evidencia objetiva conforme al [contrato E–H](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md). La tabla local de esos juicios estaba vacía en este corte.
+Con los datos actuales sistema experto puede exponer observaciones, fuentes funcionales, procedencia, conflictos y **por qué se abstiene** una regla que exija C1 instrumental. No se deriva DCL confirmado, porcentaje de riesgo ni puntuación de dominio desde Barthel o las observaciones. El perfil Petersen requiere además los cinco juicios originales de dominio, C01/C03/C04/C05 y C02 derivado de evidencia objetiva conforme al [contrato E–H](FASE_5_CAPTURA_PETERSEN_Y_REPRODUCCION_2026_10_19.md). La tabla local de esos juicios estaba vacía en este corte.
 
 La contribución de este documento es la selección metodológica y el contrato de revisión general. Para pasar de propuesta a una inferencia instrumental institucional se requieren aplicación original identificable, derecho de uso y profesional competente para el nivel de interpretación, mapeo exacto a componente, contexto y método/población de referencia aplicables. La programación, pruebas sintéticas y enlace técnico pueden prepararse sin fingir que esos actos clínicos ocurrieron. Ninguna regla, permiso, tabla o registro de residente se activa o modifica por este documento.
 

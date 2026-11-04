@@ -5,7 +5,6 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\Consultas;
 use App\Models\ControlCognitivo;
 use App\Models\EvaluacionCriterio;
 use App\Models\EvaluacionExperta;
-use App\Models\NodoSemantico;
 use App\Models\Residente;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto as L;
@@ -106,20 +105,10 @@ final class LecturaResultadosExperto
                 : (new ConsultarAutonomiaDescriptiva)->consultar($usuario, $residente),
             'prueba_tecnica' => false,
             'informe_tecnico' => null,
-            'conocimiento_documental' => ! $evaluacion ? $this->conocimientoDocumental($criterio) : null,
+            'conocimiento_documental' => null,
             'preparacion_memoria' => null,
             'registros_cognitivos' => ! $evaluacion
                 ? $this->registrosCognitivos($residente) : []];
-    }
-
-    /** Describe conocimiento documental cargado; no lo presenta como evaluación del residente. */
-    private function conocimientoDocumental(string $criterio): ?array
-    {
-        $nodo = NodoSemantico::query()->with('version')
-            ->whereHas('version', fn ($q) => $q->where('codigo_version', 'ORION-V1-20261008'))->where('codigo_semantico', $criterio)->first();
-
-        return $nodo ? ['version' => $nodo->version->codigo_version, 'nombre' => $nodo->nombre,
-            'definicion' => $nodo->definicion, 'procedencia' => $nodo->observacion] : null;
     }
 
     /** Datos guardados de la fuente operativa; nunca equivalen a una inferencia. */

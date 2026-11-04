@@ -6,15 +6,15 @@ namespace Tests\Feature\SistemaExperto\Infrastructure\Configuracion;
 
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorControlesCognitivos;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorInstrumentos;
 use App\Modulos\ApoyoDecision\Infraestructura\Configuracion\VinculadorRepositorios;
@@ -60,7 +60,7 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
         }
         $vinculador->registrar($this->app);
         self::assertSame([], DB::connection()->getQueryLog());
-        foreach ([ConocimientoVersionado::class, ExtraccionFuentesCOGMEM::class, FuenteConocimientoOrion::class] as $contrato) {
+        foreach ([ConocimientoVersionado::class, ExtraccionFuentesCOGMEM::class, FuenteConocimientoCognitivo::class] as $contrato) {
             self::assertArrayHasKey($contrato, $previos);
             self::assertSame($previos[$contrato], $this->app->getBindings()[$contrato]);
         }
@@ -180,9 +180,9 @@ final class VinculadorRepositoriosFeatureTest extends AdaptadoresTestCase
     /** Rechaza un destino SQLite físico sin crearlo ni abrirlo */
     public function test_conexion_no_desechable_no_abre_archivo_ni_registra_servicios(): void
     {
-        $ruta = sys_get_temp_dir().'/orion-vinculador-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
-        config(['database.connections.orion_insegura' => ['driver' => 'sqlite', 'database' => $ruta, 'prefix' => '']]);
-        $vinculador = new VinculadorRepositorios('orion_insegura', new DateTimeZone('America/La_Paz'), 'RESULTADO', [], [], static fn () => null);
+        $ruta = sys_get_temp_dir().'/decision-vinculador-rechazada-'.bin2hex(random_bytes(8)).'.sqlite';
+        config(['database.connections.experto_insegura' => ['driver' => 'sqlite', 'database' => $ruta, 'prefix' => '']]);
+        $vinculador = new VinculadorRepositorios('experto_insegura', new DateTimeZone('America/La_Paz'), 'RESULTADO', [], [], static fn () => null);
         $antes = $this->app->getBindings();
         try {
             $vinculador->registrar($this->app);

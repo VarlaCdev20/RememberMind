@@ -80,7 +80,7 @@ La reversión no demuestra retirar tablas institucionales pobladas ni autoriza h
 
 ## Presupuesto e integridad: por qué no se instala
 
-El [diccionario físico generado](../../prototipos/orion-conservacion-nominal/referencia-completa/diccionario.csv), [FK](../../prototipos/orion-conservacion-nominal/referencia-completa/fk.csv), [ubicaciones](../../prototipos/orion-conservacion-nominal/referencia-completa/ubicaciones.csv), [ER](../../prototipos/orion-conservacion-nominal/referencia-completa/modelo-er.mmd) y [resumen](../../prototipos/orion-conservacion-nominal/referencia-completa/resumen.json) describen exactamente la referencia ejecutada.
+El [diccionario físico generado](../../prototipos/experto-conservacion-nominal/referencia-completa/diccionario.csv), [FK](../../prototipos/experto-conservacion-nominal/referencia-completa/fk.csv), [ubicaciones](../../prototipos/experto-conservacion-nominal/referencia-completa/ubicaciones.csv), [ER](../../prototipos/experto-conservacion-nominal/referencia-completa/modelo-er.mmd) y [resumen](../../prototipos/experto-conservacion-nominal/referencia-completa/resumen.json) describen exactamente la referencia ejecutada.
 
 | Medida de la referencia completa | Valor |
 |---|---:|
@@ -92,7 +92,7 @@ El [diccionario físico generado](../../prototipos/orion-conservacion-nominal/re
 | Columnas físicas de la referencia | 4.411 |
 | Anchura máxima | **412 columnas**, tampoco aceptada como diseño mantenible |
 
-Las dos relaciones de metadatos son específicas de la conservación experta: **no se esconden como tablas técnicas de Laravel para reducir el conteo**. La DDL [SQLite](../../prototipos/orion-conservacion-nominal/referencia-completa/referencia-sqlite.sql) y [PostgreSQL](../../prototipos/orion-conservacion-nominal/referencia-completa/referencia-postgres.sql) se entrega como evidencia reproducible, no como migración candidata.
+Las dos relaciones de metadatos son específicas de la conservación experta: **no se esconden como tablas técnicas de Laravel para reducir el conteo**. La DDL [SQLite](../../prototipos/experto-conservacion-nominal/referencia-completa/referencia-sqlite.sql) y [PostgreSQL](../../prototipos/experto-conservacion-nominal/referencia-completa/referencia-postgres.sql) se entrega como evidencia reproducible, no como migración candidata.
 
 Además:
 
@@ -107,7 +107,7 @@ Por tanto, **el bloqueo del modelo institucional sigue abierto**. La referencia 
 
 | Archivo | Responsabilidad |
 |---|---|
-| `prototipos/orion-conservacion-nominal/ContenidoCompleto.php` | Factorización reversible de repeticiones y preparación pura de entradas para replay |
+| `prototipos/experto-conservacion-nominal/ContenidoCompleto.php` | Factorización reversible de repeticiones y preparación pura de entradas para replay |
 | `.../RepositorioNominal.php` | Guardado atómico compartido, lectura completa sin inferencia y replay separado |
 | `.../ContratoNominal.php`, `ProyeccionNominal.php`, `EsquemaNominal.php` | Columnas/tipos nominales explícitos, FLOAT nativo y signo de cero, contrato cerrado y restricciones |
 | `.../CasosCompletos.php` | Trece casos sintéticos, sin modificar la suite F02 histórica de diez |
@@ -117,8 +117,8 @@ Por tanto, **el bloqueo del modelo institucional sigue abierto**. La referencia 
 | `tests/Feature/ConservacionCompletaSQLTest.php` | DTO íntegro, huellas, replay, fallo parcial, cierre, idempotencia, concurrencia y reversión |
 
 ```powershell
-php prototipos/orion-conservacion-nominal/compilar-contenido-completo.php --check
-php prototipos/orion-conservacion-nominal/generar-referencia-completa.php --check
+php prototipos/experto-conservacion-nominal/compilar-contenido-completo.php --check
+php prototipos/experto-conservacion-nominal/generar-referencia-completa.php --check
 php artisan test --filter='ConservacionCompletaSQLTest|ContratoNominalTest' --compact --log-junit=work/conservacion-sql-completa-final-sqlite.xml
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'ConservacionCompletaSQLTest|ContratoNominalTest'
 ```

@@ -30,7 +30,7 @@ function listaMatriz(array $elementos): string
 
 function anexoTrazabilidad(string $raiz): string
 {
-    $fuente = json_decode(file_get_contents($raiz.'/app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'), true, flags: JSON_THROW_ON_ERROR);
+    $fuente = json_decode(file_get_contents($raiz.'/app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/conceptos-cognitivos.json'), true, flags: JSON_THROW_ON_ERROR);
     $red = (new PerfilConceptualCognitivo)->construir($fuente);
     $metodos = (new RegistroMetodosInstrumentales)->metodos();
     $reglas = ReglasCognitivas::reglasG09();

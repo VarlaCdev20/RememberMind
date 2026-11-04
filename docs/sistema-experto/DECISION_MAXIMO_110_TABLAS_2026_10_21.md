@@ -1,4 +1,4 @@
-# Decisión de capacidad para la conservación de O.R.I.O.N.
+# Decisión de capacidad para la conservación de sistema experto
 
 **Fecha:** 21/10/2026. **Estado:** decisión explícita de la propietaria sobre el límite máximo, no aprobación de DDL.
 

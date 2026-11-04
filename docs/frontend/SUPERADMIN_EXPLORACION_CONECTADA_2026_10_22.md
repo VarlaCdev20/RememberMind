@@ -128,7 +128,7 @@ en cada proceso de pruebas; no se editó `php.ini` ni `.env`:
 
 ```powershell
 php -d extension=pdo_sqlite -d extension=sqlite3 vendor/phpunit/phpunit/phpunit <archivo>
-node --test tests/Frontend/expert-resident-workspace.test.js tests/Frontend/orion-explorador.test.js
+node --test tests/Frontend/expert-resident-workspace.test.js tests/Frontend/expert-graph.test.js
 npm run build
 ```
 

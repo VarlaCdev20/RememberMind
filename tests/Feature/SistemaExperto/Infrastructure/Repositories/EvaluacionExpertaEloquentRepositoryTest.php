@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
 use Closure;

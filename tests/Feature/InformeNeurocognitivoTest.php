@@ -23,9 +23,9 @@ use Tests\Support\EsquemaSinTransaccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\Support\InformeCognitivoFixture as F;
@@ -85,7 +85,7 @@ final class InformeNeurocognitivoTest extends TestCase
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSeeInOrder(['Resultado principal', 'Valoración de las funciones cognitivas', '¿Por qué llegamos a este resultado?',
                 '¿Qué información nos falta?', '¿Qué significa el resultado?', '¿Qué corresponde revisar?'])
-            ->assertDontSee('función normal')->assertDontSee('PET-')->assertDontSee('SIM-ORION');
+            ->assertDontSee('función normal')->assertDontSee('PET-')->assertDontSee('SIM-EXPERTO');
         Livewire::withQueryParams(['simulacion' => '0'])
             ->test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertNotFound();

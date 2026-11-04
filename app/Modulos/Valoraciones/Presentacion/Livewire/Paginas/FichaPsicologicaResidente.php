@@ -27,7 +27,7 @@ use Livewire\Component;
 /**
  * Ficha psicológica unificada del residente:
  * Centraliza la historia psicológica, instrumentos aplicados, valoraciones afectivas,
- * funcionalidad IADL, entorno familiar, sesiones y continuidad con O.R.I.O.N.
+ * funcionalidad IADL, entorno familiar, sesiones y continuidad con sistema experto
  */
 final class FichaPsicologicaResidente extends Component
 {
@@ -90,7 +90,7 @@ final class FichaPsicologicaResidente extends Component
     {
         $this->residente = $residente;
         $this->autorizar();
-        $validTabs = ['resumen', 'cognitiva', 'afectiva', 'funcionamiento', 'entorno', 'seguimiento', 'sesiones', 'informes', 'orion'];
+        $validTabs = ['resumen', 'cognitiva', 'afectiva', 'funcionamiento', 'entorno', 'seguimiento', 'sesiones', 'informes', 'experto'];
         if (! in_array($this->tab, $validTabs, true)) {
             $this->tab = 'resumen';
         }
@@ -101,7 +101,7 @@ final class FichaPsicologicaResidente extends Component
 
     public function cambiarTab(string $tab): void
     {
-        $validTabs = ['resumen', 'cognitiva', 'afectiva', 'funcionamiento', 'entorno', 'seguimiento', 'sesiones', 'informes', 'orion'];
+        $validTabs = ['resumen', 'cognitiva', 'afectiva', 'funcionamiento', 'entorno', 'seguimiento', 'sesiones', 'informes', 'experto'];
         if (in_array($tab, $validTabs, true)) {
             $this->tab = ($tab === 'sesiones') ? 'seguimiento' : $tab;
             $this->mensajeExito = null;
@@ -305,7 +305,7 @@ final class FichaPsicologicaResidente extends Component
         $sesionesPsicologia = collect();
         $informesPsicologicos = collect();
         $juiciosPetersen = collect();
-        $instrumentosCognitivosOrion = collect();
+        $instrumentosCognitivosExperto = collect();
 
         if ($this->tab === 'cognitiva') {
             $evaluacionesCognitivas = AplicacionInstrumento::where('cod_residente', $codResidente)
@@ -358,7 +358,7 @@ final class FichaPsicologicaResidente extends Component
                 ->with('personal')
                 ->orderByDesc('fecha_hora')
                 ->get();
-        } elseif ($this->tab === 'orion') {
+        } elseif ($this->tab === 'experto') {
             $juiciosPetersen = ValoracionPetersenOriginal::query()
                 ->when(! $usuario->checkPermissionTo('valoraciones_petersen.ver', 'web'), fn ($q) => $q->whereRaw('1 = 0'))
                 ->where('cod_residente', $codResidente)
@@ -368,7 +368,7 @@ final class FichaPsicologicaResidente extends Component
                 ->orderByDesc('fecha_hora')
                 ->get();
 
-            $instrumentosCognitivosOrion = AplicacionInstrumento::where('cod_residente', $codResidente)
+            $instrumentosCognitivosExperto = AplicacionInstrumento::where('cod_residente', $codResidente)
                 ->whereHas('instrumento', fn ($q) => $q->whereIn('tipo', ['COGNITIVO', 'NEUROPSICOLOGICO', 'OBSERVACIONAL']))
                 ->with('instrumento', 'evaluador.usuario')
                 ->orderByDesc('fecha_hora')
@@ -453,7 +453,7 @@ final class FichaPsicologicaResidente extends Component
             'sesionesPsicologia',
             'informesPsicologicos',
             'juiciosPetersen',
-            'instrumentosCognitivosOrion',
+            'instrumentosCognitivosExperto',
             'puedeValorarPetersen',
             'datosTendencia',
             'chartCognitiva',

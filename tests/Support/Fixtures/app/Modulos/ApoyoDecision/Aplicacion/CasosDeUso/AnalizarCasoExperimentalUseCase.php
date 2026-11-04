@@ -7,8 +7,8 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\InformeExpertoDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
 
 /** Ejecuta los cinco casos individuales sobre la misma petición. */
 final readonly class AnalizarCasoExperimentalUseCase

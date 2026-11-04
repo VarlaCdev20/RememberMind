@@ -39,7 +39,7 @@ Las rutas de pruebas anteriores son relativas a `tests/Feature/` o `tests/Unit/`
 | 9 | Confusores | Controles por tarea → invalidante, advertencia, desconocido y dominio incompatible |
 | 10 | Contradicciones | Resolvedores y puente → `PerfilExperimentalTest`, `ResultadoPerfilExperimentalTest`, programas G09/Petersen |
 | 11 | Doble conteo | Identidad/aplicación/episodio → perfil y adquisición; `ContratoG09ExperimentalTest` VT11 para quince reglas: originales conservados y soporte efectivo agrupado |
-| 12 | Cinco dominios | Orquestador → `orion_cinco_dominios_experimental.php`, pruebas de perfil/resultado |
+| 12 | Cinco dominios | Orquestador → `cinco_dominios_experimental.php`, pruebas de perfil/resultado |
 | 13 | PET-01–04 | Clasificador y puente → `dcl_petersen_experimental.php`, `dcl_puente_integracion_cinco_dominios.php`, consola |
 | 14 | Abstenciones | C01–C05/A/P/U/I/X → programas Petersen/puente y escenarios incompleto/contradictorio/diferencial/IADL |
 | 15 | Longitudinalidad | Comparador → `ComparadorLongitudinalExperimentalTest`; exige contexto/protocolo/versiones/oportunidad compatibles |

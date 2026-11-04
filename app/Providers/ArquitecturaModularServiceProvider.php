@@ -43,9 +43,9 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConservacionObservacional;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ExtraccionFuentesCOGMEM;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\AdaptadorFuentesCOGMEM;
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ConservarObservaciones;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\PaqueteObservacional;
@@ -156,8 +156,8 @@ final class ArquitecturaModularServiceProvider extends ServiceProvider
         $this->app->bind(ExtraccionFuentesCOGMEM::class, AdaptadorFuentesCOGMEM::class);
         $this->app->bind(ContextoEjecucion::class, ContextoEjecucionLaravel::class);
         $this->app->bind(EstadoPrevisualizacion::class, PrevisualizacionEnSesion::class);
-        $this->app->bind(FuenteConocimientoOrion::class,
-            ArchivoConocimientoOrion::class);
+        $this->app->bind(FuenteConocimientoCognitivo::class,
+            ArchivoConocimientoCognitivo::class);
         $this->app->extend('view.finder', function ($previous) {
             $finder = new VistaModularFinder(
                 $this->app->make('files'), $previous->getPaths(),

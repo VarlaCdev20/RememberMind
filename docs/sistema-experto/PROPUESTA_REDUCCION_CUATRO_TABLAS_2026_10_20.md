@@ -194,7 +194,7 @@ su contrato y orden nullable, sin imponerles nueva unicidad por conveniencia.
    columnas y reconstrucción inversa, sin cambiar el significado de una fila.
 4. Cambiar Models/relaciones, escritor/lector del almacén y consumidores de
    observaciones, simulación y trazas pertinentes. Conservar contratos
-   `ORION-SNAP-2` y `OBS-SNAP-1/2`, guardas, permisos y huellas históricas.
+   `conservación de instantáneas v2` y `OBS-SNAP-1/2`, guardas, permisos y huellas históricas.
    Catálogo de códigos/secuencias conserva las identidades alternativas;
    no reiniciar contadores ni fabricar cuentas, residentes o conocimiento.
 5. Ejecutar la aceptación de recuperación/replay antes y después con nuevas

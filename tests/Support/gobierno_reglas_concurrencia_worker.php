@@ -44,12 +44,12 @@ try {
         } elseif ($datos['operacion'] === 'ejecucion_rechazo') {
             $gestor->revisar($usuario, $datos['regla'], 'RECHAZADA', 'Decisión concurrente posterior o anterior al cálculo.');
         } else {
-            $gestor->crearRevision($usuario, $datos['version'], 'ORION-RACE-OBS', 'Archivar en concurrencia conservando todas las historias.', retiradas: [$datos['regla']]);
+            $gestor->crearRevision($usuario, $datos['version'], 'EXPERTO-RACE-OBS', 'Archivar en concurrencia conservando todas las historias.', retiradas: [$datos['regla']]);
         }
     } elseif ($datos['operacion'] === 'revision' || ($datos['operacion'] === 'mixta' && $indice === 1)) {
         $gestor->revisar($usuario, 'RULE_A', $indice === 1 ? 'APROBADA' : 'RECHAZADA', 'Decisión concurrente '.$indice);
     } else {
-        $gestor->crearRevision($usuario, 'VER_TEST', 'ORION-RACE-'.$indice, 'Revisión concurrente de conocimiento '.$indice);
+        $gestor->crearRevision($usuario, 'VER_TEST', 'EXPERTO-RACE-'.$indice, 'Revisión concurrente de conocimiento '.$indice);
     }
     echo json_encode(['estado' => 'guardado'], JSON_THROW_ON_ERROR);
 } catch (DomainException $e) {

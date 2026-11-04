@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
+use MotorExperto\dominio\Entities\Conocimiento\RelacionSemantica;
 use DomainException;
 
 /** Transporta los tres niveles del informe: resumen, interpretación y fundamento, junto con los resultados originales que permiten revisar su trazabilidad. */

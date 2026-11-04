@@ -1,5 +1,7 @@
 # Sistema experto: empieza aquí
 
+La documentación base de investigación no da nombre al producto. La lectura usa `ArchivoConocimientoCognitivo`; el importador documental anterior está retirado. Los identificadores ya guardados se concentran en [IdentificadoresHistoricos.php](conservacion/IdentificadoresHistoricos.php) para conservar versiones, restricciones y huellas. Las pantallas muestran etiquetas neutras y los manifiestos originales mantienen sus bytes.
+
 El código principal está directamente en **seis carpetas por componente dentro de `motor-experto/`**. No hay carpetas intermedias `src/motor_experto/`. `src` era una convención para separar código fuente, no un requisito de PHP o Composer.
 
 ```text
@@ -34,7 +36,7 @@ Las reglas registradas y sus versiones vigentes están en la BDD; los tres archi
 
 La entrada del caso completo es [PrepararEvaluacionInstitucional.php](../app/Modulos/ApoyoDecision/Aplicacion/Consultas/PrepararEvaluacionInstitucional.php). Autorización, lectura SQL, pantallas y persistencia permanecen en `app/Modulos/ApoyoDecision/`. Los formularios originales continúan en sus módulos institucionales. No se necesita abrirlos para localizar las reglas.
 
-`dominio/orion/` conserva tipos y contratos con consumidores e identidad histórica; no es una segunda entrada al motor institucional. `aplicacion/puertos/` contiene el contrato técnico anterior usado por las regresiones aisladas. `tests/fixtures/` conserva exclusivamente pruebas retiradas del producto. No se trasladan ni mezclan con las seis carpetas principales.
+`dominio/` conserva tipos y contratos con consumidores e identidad histórica; no es una segunda entrada al motor institucional. `aplicacion/puertos/` contiene el contrato técnico anterior usado por las regresiones aisladas. `tests/fixtures/` conserva exclusivamente pruebas retiradas del producto. No se trasladan ni mezclan con las seis carpetas principales.
 
 ## Verificación de la reorganización del 04/11/2026
 
@@ -44,11 +46,11 @@ Primero se agruparon 62 archivos del recorrido principal en seis componentes; de
 
 ## Consolidación del 18/10/2026
 
-Los tipos y contratos anteriores permanecen en `dominio/orion/`. Aplicación e infraestructura Laravel residen en `app/Modulos/ApoyoDecision`. No existen alias de clases antiguas.
+Los tipos y contratos anteriores permanecen en `dominio/`. Aplicación e infraestructura Laravel residen en `app/Modulos/ApoyoDecision`. No existen alias de clases antiguas.
 
 `soporte/conservacion/CodecInstantanea` mantiene la identidad contractual original al calcular huellas de objetos y enums del dominio trasladado. Es una identidad del formato histórico, no una dependencia ejecutable de `App`. Se conservaron el orden, tipos y contenido de los objetos; no se reescribieron instantáneas ni reglas.
 
-Verificación adicional independiente: `php motor-experto/tests/orion_independencia.php`. Las pruebas `CodecIdentidadHistoricaTest` comparan siete huellas originales: enum/fecha/NULL/cero, memoria, requisitos, vector, clasificaciones positiva/abstención y regla con AST anidado. El cambio de ubicación no modifica los contratos experimentales ni los activa clínicamente.
+Verificación adicional independiente: `php motor-experto/tests/dominio_independencia.php`. Las pruebas `CodecIdentidadHistoricaTest` comparan siete huellas originales: enum/fecha/NULL/cero, memoria, requisitos, vector, clasificaciones positiva/abstención y regla con AST anidado. El cambio de ubicación no modifica los contratos experimentales ni los activa clínicamente.
 
 El producto contiene los evaluadores institucionales, conocimiento versionado, red semántica, memoria de trabajo y explicación. El piloto COG-MEM y los algoritmos exclusivos del laboratorio fueron retirados de `src/` y aislados bajo `tests/fixtures/` el 27/10/2026.
 

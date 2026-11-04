@@ -46,7 +46,7 @@ aprobarse aparte, sin convertir un cache en fuente histórica.
 - [Diccionario operativo](../base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md),
   secciones 19, 21, 22, 34 y 57–62: fuentes originales, tipos y relaciones.
 - [Conservación aprobada del 17/10](../base-de-datos/DECISION_CONSERVACION_EXPERTA_V2_2026_10_17.md):
-  `ORION-SNAP-2`, nueve relaciones, tipos escalares y fechas exactas.
+  `conservación de instantáneas v2`, nueve relaciones, tipos escalares y fechas exactas.
 - [Revisiones aprobadas del 17/10](../base-de-datos/DECISION_REVISIONES_EXPERTAS_2026_10_17.md):
   cadenas independientes de Medicina y Psicología.
 - [Observaciones, 18/10](PROPUESTA_CONSERVACION_OBSERVACIONAL_V1.md): dos FK
@@ -79,7 +79,7 @@ local ni datos clínicos para redactar esta propuesta; no se ejecutaron pruebas.
 | Definición histórica | PK/FK y contenido existente de esas 12 tablas | Hoy Model/Builder prohíben escritura ordinaria, pero no hay sello SQL general que impida INSERT tardío o SQL directo. Proponer sello opt-in completo y guardar aparte los estados observados. |
 | Primera revisión de cada regla | Cinco columnas aprobadas de `reglas_expertas` | Copiar su estado y firma **observados** por evaluación; una firma posterior no debe alterar el replay. |
 | Juicios Petersen y soportes originales | `valoraciones_petersen_originales` y `soportes_valoracion_petersen` por FK | No copiar juicio, justificación ni comprobaciones; fijar membresía y soportes exactos de esta ejecución. Prohibir UPDATE/DELETE no cierra por sí solo futuras incorporaciones a la colección. |
-| Evidencias y trazas D-137 compatibles | Tablas existentes de criterios, resultados, evaluaciones de reglas, condiciones y soportes | Mantienen sus consumidores. No hacer pasar el DTO compuesto por `ORION-SNAP-2`, ni poblar evaluabilidad ficticia para usar una columna. En esta alternativa las trazas nuevas se regeneran; no se escribe una segunda copia de las antiguas. |
+| Evidencias y trazas D-137 compatibles | Tablas existentes de criterios, resultados, evaluaciones de reglas, condiciones y soportes | Mantienen sus consumidores. No hacer pasar el DTO compuesto por `conservación de instantáneas v2`, ni poblar evaluabilidad ficticia para usar una columna. En esta alternativa las trazas nuevas se regeneran; no se escribe una segunda copia de las antiguas. |
 | Revisión de la evaluación | `revisiones_evaluacion_experta` | Reutilizar sus dos cadenas después de guardar y verificar íntegramente el contrato nuevo. No requiere otra tabla de firmas. |
 | Hechos/simulación V2 | Nueve relaciones aprobadas y `AlmacenInstantaneas` | Conservan su contrato y guardas. No usarlas como repositorio campo/valor de atributos SQL ni quitar restricciones SIM para aparentar conservación institucional. |
 | Instrumentos y respuestas | FK de las tablas operativas | Hace falta conservar atributos observados, incluidos rechazados, NULL, cero, false y preguntas seleccionadas sin respuesta. |

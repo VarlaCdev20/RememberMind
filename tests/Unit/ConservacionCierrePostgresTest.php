@@ -33,7 +33,7 @@ final class ConservacionCierrePostgresTest extends TestCase
         self::assertSame($username, $identidad['usuario']);
         self::assertSame($username, $identidad['propietario']);
 
-        $esquema = 'orion_cierre_'.bin2hex(random_bytes(6));
+        $esquema = 'experto_cierre_'.bin2hex(random_bytes(6));
         $cierre->exec('CREATE SCHEMA '.$esquema);
         try {
             $cierre->exec(str_replace('ESQUEMA', $esquema, <<<'SQL'

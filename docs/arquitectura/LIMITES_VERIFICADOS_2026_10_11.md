@@ -11,7 +11,7 @@ El motor experto conserva sus fronteras:
 - MotorExperto y EvaluadorExperto permanecen independientes de Laravel.
 - DemostracionCOGMEM vive en adaptadores/entrada: compone fixtures/adaptadores y consume Aplicación. No hay wrapper interior hacia el adaptador.
 - Consulta administrativa Laravel delega persistencia a Aplicación y reautoriza consultar mediante la Policy existente.
-- FuenteConocimientoOrion es puerto del módulo, ArchivoConocimientoOrion su adaptador JSON; el provider compone la dependencia y el caso de uso no conoce rutas físicas.
+- FuenteConocimientoCognitivo es puerto del módulo, ArchivoConocimientoCognitivo su adaptador JSON; el provider compone la dependencia y el caso de uso no conoce rutas físicas.
 
 Controles automáticos: relaciones Eloquent tipadas detectadas desde los modelos no pueden invocarse como métodos en Blade; núcleo experto no importa adaptadores/Laravel/Models; se mantienen los gates previos de namespaces/dirección/transacciones. La demostración ejecuta cinco casos técnicos sin bootstrap de Laravel.
 

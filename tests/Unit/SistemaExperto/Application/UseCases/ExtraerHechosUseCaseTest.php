@@ -6,9 +6,9 @@ namespace Tests\Unit\SistemaExperto\Application\UseCases;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso\ExtraerHechosUseCase;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DateTimeImmutable;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;

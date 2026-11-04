@@ -16,7 +16,7 @@
     </x-ui.section-card>
     <x-ui.section-card title="Versiones y procedencia" subtitle="Elija el contenido que desea inspeccionar." icon="ph-stack">
         @forelse($versiones as $v)
-            <article class="rm-knowledge-version"><div><strong>{{ $v->nombre ?: $v->codigo_version }}</strong><p>{{ $v->estado }} · {{ $v->fecha_hora_creacion }}</p><small>Antecesora: {{ $v->cod_version_anterior ?? 'No declarada' }}</small></div><button type="button" class="rm-btn rm-btn-secondary" wire:click="seleccionarVersion(@js($v->cod_version_modelo))" aria-pressed="{{ $version === $v->cod_version_modelo ? 'true' : 'false' }}">Consultar<span class="sr-only"> {{ $v->codigo_version }}</span></button></article>
+            <article class="rm-knowledge-version"><div><strong>{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($v->nombre ?: $v->codigo_version) }}</strong><p>{{ $v->estado }} · {{ $v->fecha_hora_creacion }}</p><small>Antecesora: {{ $v->cod_version_anterior ?? 'No declarada' }}</small></div><button type="button" class="rm-btn rm-btn-secondary" wire:click="seleccionarVersion(@js($v->cod_version_modelo))" aria-pressed="{{ $version === $v->cod_version_modelo ? 'true' : 'false' }}">Consultar<span class="sr-only"> {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($v->codigo_version) }}</span></button></article>
         @empty
             <x-ui.empty-state compact title="No hay versiones cargadas" description="No hay conocimiento institucional disponible para consultar. Solicite su registro al profesional autorizado." icon="ph-stack" />
         @endforelse

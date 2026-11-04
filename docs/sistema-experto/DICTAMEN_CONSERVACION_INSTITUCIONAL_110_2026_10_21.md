@@ -1,16 +1,16 @@
-# O.R.I.O.N. — gate relacional de conservación institucional bajo 110 tablas
+# sistema experto — gate relacional de conservación institucional bajo 110 tablas
 
 **Fecha:** 21/10/2026. **Resultado:** diseño de máximo 110 **no demostrado**. Este dictamen no es propuesta DDL apta para instalación ni solicitud de aprobación estructural. No se tocó `remembermind_dev`.
 
 ## Alcance y autoridad
 
-Se aplicaron el [informe de aceptación](ACEPTACION_INTEGRAL_ORION_2026_10_21.md), la [decisión de máximo 110](DECISION_MAXIMO_110_TABLAS_2026_10_21.md), [Fase 6](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md), [B01–B03](ENSAYO_CINCO_RELACIONES_104_2026_10_21.md), el [contrato Petersen](CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md), el baseline congelado y `database/AGENTS.md`. La decisión 110 sustituye el techo anterior, sin aprobar tablas, columnas, FK ni retiros concretos. Las 286 aplicaciones observacionales no se transformaron en mediciones.
+Se aplicaron el [informe de aceptación](ACEPTACION_INTEGRAL_EXPERTO_2026_10_21.md), la [decisión de máximo 110](DECISION_MAXIMO_110_TABLAS_2026_10_21.md), [Fase 6](FASE_6_PREPARACION_COMPUESTA_2026_10_20.md), [B01–B03](ENSAYO_CINCO_RELACIONES_104_2026_10_21.md), el [contrato Petersen](CONTRATO_FUNCIONAL_PETERSEN_C01_C05_2026_10_21.md), el baseline congelado y `database/AGENTS.md`. La decisión 110 sustituye el techo anterior, sin aprobar tablas, columnas, FK ni retiros concretos. Las 286 aplicaciones observacionales no se transformaron en mediciones.
 
 ## Inventario y matriz reproducibles
 
-`auditar-esquema.php` forzó `sqlite::memory:` **antes de iniciar Laravel**, comprobó la conexión y ejecutó allí todas las migraciones existentes. Produjo [inventario de columnas, índices, FK salientes y entrantes](../../prototipos/orion-conservacion-110/inventario-esquema-sqlite.json) y [clasificación de las 120 tablas](../../prototipos/orion-conservacion-110/inventario-120-tablas.csv). Resultado: **75 operativas + 29 expertas = 104 de negocio**, más 16 técnicas; **299 FK** y 130 índices declarados en el esquema desechable. Esto reproduce el conteo instalado documentado, pero no verifica el contenido de filas de la base institucional.
+`auditar-esquema.php` forzó `sqlite::memory:` **antes de iniciar Laravel**, comprobó la conexión y ejecutó allí todas las migraciones existentes. Produjo [inventario de columnas, índices, FK salientes y entrantes](../../prototipos/experto-conservacion-110/inventario-esquema-sqlite.json) y [clasificación de las 120 tablas](../../prototipos/experto-conservacion-110/inventario-120-tablas.csv). Resultado: **75 operativas + 29 expertas = 104 de negocio**, más 16 técnicas; **299 FK** y 130 índices declarados en el esquema desechable. Esto reproduce el conteo instalado documentado, pero no verifica el contenido de filas de la base institucional.
 
-`auditar-mapas.php` cotejó la [matriz completa de 51 rutas](../../prototipos/orion-conservacion-110/matriz-auditoria-rutas.csv) y las 783 rutas de campo del candidato anterior. Hay **39 modelos distintos**, 640 rutas escalares, 93 de objeto y 50 de colección. Nueve rutas apuntan a tablas candidatas inexistentes. Cuarenta y seis rutas requieren resolver una brecha física o de conservación; esto no afirma que las otras cinco sean por sí solas instalables. El [resumen reproducible](../../prototipos/orion-conservacion-110/resumen-auditoria.json) distingue los siete B01–B03 declarados (4, 2 y 1) de otros contratos aún no probados. El [índice léxico de consumidores](../../prototipos/orion-conservacion-110/consumidores-codigo.csv) recoge 4716 pares tabla/archivo en aplicación, motor, rutas, configuración, seeders, vistas y pruebas; complementa las FK físicas, pero requiere revisión manual para SQL dinámico y alias.
+`auditar-mapas.php` cotejó la [matriz completa de 51 rutas](../../prototipos/experto-conservacion-110/matriz-auditoria-rutas.csv) y las 783 rutas de campo del candidato anterior. Hay **39 modelos distintos**, 640 rutas escalares, 93 de objeto y 50 de colección. Nueve rutas apuntan a tablas candidatas inexistentes. Cuarenta y seis rutas requieren resolver una brecha física o de conservación; esto no afirma que las otras cinco sean por sí solas instalables. El [resumen reproducible](../../prototipos/experto-conservacion-110/resumen-auditoria.json) distingue los siete B01–B03 declarados (4, 2 y 1) de otros contratos aún no probados. El [índice léxico de consumidores](../../prototipos/experto-conservacion-110/consumidores-codigo.csv) recoge 4716 pares tabla/archivo en aplicación, motor, rutas, configuración, seeders, vistas y pruebas; complementa las FK físicas, pero requiere revisión manual para SQL dinámico y alias.
 
 ## Granos incompatibles del candidato actual
 
@@ -18,12 +18,12 @@ Se aplicaron el [informe de aceptación](ACEPTACION_INTEGRAL_ORION_2026_10_21.md
 | --- | ---: | --- | --- |
 | Contrato y modalidad **adquiridos** de ambas ramas | 4 | `relaciones_semanticas` | Esa tabla define red versionada por nodos/modelo; la adquisición depende de evaluación, rama, contrato y orden. B01 necesita una relación propia o una transición equivalente probada, sin alterar la definición. |
 | Captura, constancia documental, juicio, procedencia y soporte **adquiridos** | 6 | `evidencias_evaluacion` | La evidencia extraída exige `cod_mapeo_variable_fuente` y `cod_registro_fuente` no presentes en esos granos. Relajar ambos para alojarlos cambiaría su unicidad y significado. |
-| Respuesta instrumental original tipada en ambas ramas | 2 | `hechos_instantanea_experta` | La tabla actual conserva hechos de `ORION-SNAP-2`; la respuesta bruta requiere aplicación, pregunta, forma escalar, presencia y proyección específica de cada rama. El ensayo de 96 respuestas demuestra esa diferencia, no un destino físico aprobado. |
+| Respuesta instrumental original tipada en ambas ramas | 2 | `hechos_instantanea_experta` | La tabla actual conserva hechos de `conservación de instantáneas v2`; la respuesta bruta requiere aplicación, pregunta, forma escalar, presencia y proyección específica de cada rama. El ensayo de 96 respuestas demuestra esa diferencia, no un destino físico aprobado. |
 | Selector, medición requerida, pregunta sin respuesta y vínculo declarativo | 9 | Tres tablas candidatas todavía inexistentes | B02 exige identidad de aplicación/pregunta compartida, incluso con respuesta ausente; perfiles, predicados y vínculos tienen propietarios y cardinalidades distintos. |
-| Membresía entre juicio Petersen y soporte original | 1 | `evidencias_criterio_evaluacion` | B03 exige FK del juicio/soporte de la **misma evaluación**, orden y cierre. El subtipo cerrado se probó aislado, no junto a todos los consumidores D-137 y `ORION-SNAP-2`. |
+| Membresía entre juicio Petersen y soporte original | 1 | `evidencias_criterio_evaluacion` | B03 exige FK del juicio/soporte de la **misma evaluación**, orden y cierre. El subtipo cerrado se probó aislado, no junto a todos los consumidores D-137 y `conservación de instantáneas v2`. |
 | Definiciones de conocimiento observadas en dos ramas | 24 | Tablas de definición vigentes | Hace falta fijar membresía, versión y estado observado, e impedir adiciones/mutaciones que cambien el replay. Apuntar a la versión vigente no demuestra la copia histórica. |
 
-La [matriz de 783 campos original](../../prototipos/orion-conservacion-100/mapa-campos-candidato.csv) es **candidata**, no diccionario físico nominal aprobado. Sus 640 rutas escalares utilizan nombres lógicos que aún no corresponden a columnas instaladas. La proyección literal con el codec de seis columnas por escalar presionaría, según el dictamen anterior, aproximadamente 445 columnas nuevas en `evaluaciones_expertas`, 1144 en `evidencias_evaluacion` y 189 en `hechos_instantanea_experta`. Esas son estimaciones de ese codec, no el número mínimo para un diseño distinto. Aceptarlas solo para cumplir un conteo de tablas perjudicaría mantenibilidad y checks por subtipo.
+La [matriz de 783 campos original](../../prototipos/experto-conservacion-100/mapa-campos-candidato.csv) es **candidata**, no diccionario físico nominal aprobado. Sus 640 rutas escalares utilizan nombres lógicos que aún no corresponden a columnas instaladas. La proyección literal con el codec de seis columnas por escalar presionaría, según el dictamen anterior, aproximadamente 445 columnas nuevas en `evaluaciones_expertas`, 1144 en `evidencias_evaluacion` y 189 en `hechos_instantanea_experta`. Esas son estimaciones de ese codec, no el número mínimo para un diseño distinto. Aceptarlas solo para cumplir un conteo de tablas perjudicaría mantenibilidad y checks por subtipo.
 
 ## B01–B03 y referencia de replay
 
@@ -33,7 +33,7 @@ Los tres ensayos SQLite ya disponibles se ejecutaron de nuevo:
 - B02: cinco aplicaciones y preguntas sin respuesta compartidas entre ramas, con FK, tipo de clave, NULL/ausencia y cierre; **PASS acotado**.
 - Respuestas de las dos ramas: 96 filas tipadas; **PASS acotado**.
 
-PostgreSQL desechable pasó tres pruebas B02, cierre y criterio: **3 pruebas, 53 aserciones**. La referencia F02 de [42 tablas de ensayo](../../prototipos/orion-conservacion-0_2/esquema.up.sql) pasó `guardar → recuperar → reconstruir → replay` del DTO completo y huellas en otro PostgreSQL desechable: **1 prueba envolvente, 5 aserciones**, que exige cero fallos del ensayo interno, igualdad estricta y rollback parcial. Se corrigió únicamente el lanzamiento del PHP retenido bajo rutas Windows 8.3; no se cambió el contrato clínico. **Esta referencia amplia no cumple ni propone el presupuesto físico de 110** y su proyección tipada no es un diccionario nominal institucional.
+PostgreSQL desechable pasó tres pruebas B02, cierre y criterio: **3 pruebas, 53 aserciones**. La referencia F02 de [42 tablas de ensayo](../../prototipos/experto-conservacion-0_2/esquema.up.sql) pasó `guardar → recuperar → reconstruir → replay` del DTO completo y huellas en otro PostgreSQL desechable: **1 prueba envolvente, 5 aserciones**, que exige cero fallos del ensayo interno, igualdad estricta y rollback parcial. Se corrigió únicamente el lanzamiento del PHP retenido bajo rutas Windows 8.3; no se cambió el contrato clínico. **Esta referencia amplia no cumple ni propone el presupuesto físico de 110** y su proyección tipada no es un diccionario nominal institucional.
 
 Los cuatro ensayos SQLite de retiro (`criterio`, `vínculos`, `clasificación` y `variable/nodo`) pasaron por separado con filas sintéticas, FK, comparación inversa y rollback. No prueban la transición **conjunta** de las cinco tablas existentes, sus filas pobladas, todos los consumidores o su reversión bajo el DTO compuesto.
 
@@ -86,16 +86,16 @@ El diagrama expresa **granos**, no once tablas aprobadas: algunas relaciones pue
 ## Reproducción y decisión pendiente
 
 ```powershell
-php prototipos/orion-conservacion-110/auditar-esquema.php > prototipos/orion-conservacion-110/inventario-esquema-sqlite.json
-php prototipos/orion-conservacion-110/auditar-mapas.php
-php prototipos/orion-conservacion-110/auditar-consumidores.php
-php prototipos/orion-consolidacion-104/ensayar-dto-compuesto-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-identidad-preguntas-compuestas-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-respuestas-dos-ramas-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-criterio-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-vinculos-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-clasificacion-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-variable-nodo-sqlite.php
+php prototipos/experto-conservacion-110/auditar-esquema.php > prototipos/experto-conservacion-110/inventario-esquema-sqlite.json
+php prototipos/experto-conservacion-110/auditar-mapas.php
+php prototipos/experto-conservacion-110/auditar-consumidores.php
+php prototipos/experto-consolidacion-104/ensayar-dto-compuesto-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-identidad-preguntas-compuestas-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-respuestas-dos-ramas-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-criterio-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-vinculos-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-clasificacion-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-variable-nodo-sqlite.php
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'ConservacionB02PostgresTest|ConservacionCierrePostgresTest|ConservacionCriterioPostgresTest'
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro ReferenciaF02PostgresDesechableTest
 ```

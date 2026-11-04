@@ -1,5 +1,5 @@
 ---
-title: "O.R.I.O.N. — Fuentes verificadas, trazabilidad y reproducción"
+title: "sistema experto — Fuentes verificadas, trazabilidad y reproducción"
 status: CURRENT
 last_reviewed: 2026-10-19
 source_of_truth: false
@@ -57,13 +57,13 @@ La consulta devuelve únicamente el resultado, la captura autorizada y metadatos
 
 ## 4. Artefacto recuperable del motor
 
-`ReleaseMotorInstrumental` y `scripts/preparar-release-orion.php` crean un ZIP nuevo de software. Incluye únicamente PHP del motor, su `composer.json`, `composer.lock` y ejecutables de independencia. Excluye `.env`, configuración local, almacenamiento, bases de datos, documentos clínicos y capturas. No lee Laravel ni SQL.
+`ReleaseMotorInstrumental` y `scripts/preparar-release-experto.php` crean un ZIP nuevo de software. Incluye únicamente PHP del motor, su `composer.json`, `composer.lock` y ejecutables de independencia. Excluye `.env`, configuración local, almacenamiento, bases de datos, documentos clínicos y capturas. No lee Laravel ni SQL.
 
 El manifiesto incluye revisión Git **base**, conjunto exacto de archivos y SHA-256 por archivo; los bytes empaquetados determinan la identidad. Una base Git no significa que un árbol con modificaciones sea idéntico a ese commit. El verificador comprueba el conjunto y los bytes sin extraer ni ejecutar el ZIP. Rechaza alteración, archivo ausente y reemplazo de un release existente. El manifiesto JSON es metadato de software, no un depósito de historias.
 
 ```powershell
 $revision = git rev-parse HEAD
-php scripts/preparar-release-orion.php storage/app/private/orion-motor-NUEVO.zip $revision
+php scripts/preparar-release-experto.php storage/app/private/decision-motor-NUEVO.zip $revision
 ```
 
 La distribución/retención institucional y el enlace inmutable evaluación → release pertenecen al cierre de persistencia. Por ello la consulta todavía no declara `release_recuperable=true`: crear un ZIP local no equivale a vincularlo a una evaluación guardada ni garantiza retención futura. Las dependencias de Composer se identifican por su lock; el ZIP no contiene los binarios del runtime ni un entorno ejecutable completo.
@@ -103,7 +103,7 @@ Verificación final en candidato aislado de `8d53d673` con únicamente los archi
 | SQLite `:memory:`, selección relacionada | **109 pruebas / 5751 aserciones**, sin fallos, errores ni omisiones |
 | PostgreSQL desechable, misma selección | **109 pruebas / 5750 aserciones**, sin fallos, errores ni omisiones; clúster detenido y eliminado por el script guardado |
 | Revisión independiente | PASS estático acotado de seguridad/trazabilidad y cierre de los dos P2; no es evaluación clínica ni ejecución dinámica |
-| Independencia del motor y O.R.I.O.N. | Ambos ejecutables PASS sin Laravel ni SQL |
+| Independencia del motor y sistema experto | Ambos ejecutables PASS sin Laravel ni SQL |
 | Pint, sintaxis PHP, diff y enlaces locales | PASS; sin legacy ejecutable, TODO/FIXME o sustituto de depuración en los archivos PHP propios |
 | Build del candidato | PASS, **3,63 s**; no se modificó interfaz ni se acredita QA visual |
 | CLI de artefacto, candidato con revisión base real `8d53d673` | ZIP nuevo verificado con **130 archivos** de software; incluye los bytes del incremento, aún no un árbol idéntico a la base |
@@ -115,7 +115,7 @@ $filtro = 'ConocimientoCognitivoInstitucionalTest|PerfilInstrumentalInstituciona
 php vendor/phpunit/phpunit/phpunit --filter $filtro --log-junit storage/app/private/cierre-pendientes-final-sqlite.xml
 ./scripts/probar-postgres.ps1 -Filtro $filtro -Informe storage/app/private/cierre-pendientes-final-pg.xml -Log storage/app/private/cierre-pendientes-final-pg.log
 php motor-experto/tests/independencia.php
-php motor-experto/tests/orion_independencia.php
+php motor-experto/tests/dominio_independencia.php
 npm run build
 ```
 

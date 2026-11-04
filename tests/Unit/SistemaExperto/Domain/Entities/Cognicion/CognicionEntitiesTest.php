@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Cognicion;
 
-use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
-use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoSubcomponente;
-use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum as E;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
+use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\Entities\Cognicion\ResultadoSubcomponente;
+use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum as E;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;

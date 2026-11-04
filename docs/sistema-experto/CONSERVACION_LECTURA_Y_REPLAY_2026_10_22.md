@@ -138,7 +138,7 @@ Comandos ejecutados:
 
 ```powershell
 php artisan test --filter='InstantaneaEvaluacionInstitucionalTest|InstantaneaInstrumentalCompletaTest|ReproduccionFuenteNominalTest' --compact --log-junit=work/conservacion-lectura-integridad-unit.xml
-php artisan test --filter='PreparacionCompuestaCoherenteTest|EjecucionConsultaCognitivaTest|SistemaExpertoOrionNivel1Test' --compact --log-junit=work/conservacion-lectura-integridad-sqlite.xml
+php artisan test --filter='PreparacionCompuestaCoherenteTest|EjecucionConsultaCognitivaTest|SistemaExpertoNivel1Test' --compact --log-junit=work/conservacion-lectura-integridad-sqlite.xml
 & scripts/probar-postgres.ps1 -Filtro 'PreparacionCompuestaCoherenteTest|InstantaneaEvaluacionInstitucionalTest|InstantaneaInstrumentalCompletaTest|ReproduccionFuenteNominalTest'
 php scripts/inventariar-salidas-institucionales.php --check
 php scripts/verificar-consolidacion-experta.php

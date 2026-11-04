@@ -63,7 +63,7 @@ competentes; el sistema conservará la versión exacta que aprueben.
 | C04 | Revisión diferencial explícita; no se considera completada por ausencia de notas |
 | C05 | Interpretabilidad y calidad del soporte para la tarea concreta |
 
-C05 es un control de ingeniería de O.R.I.O.N., no un criterio clínico universal.
+C05 es un control de ingeniería de sistema experto, no un criterio clínico universal.
 La asignación concreta de responsabilidades sobre estas entradas se valida
 entre Psicología y Medicina; las dos firmas finales no sustituyen soportes
 que falten durante la inferencia.

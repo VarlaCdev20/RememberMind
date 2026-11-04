@@ -22,7 +22,7 @@ runtime_verified: false
 | [instrumentos/CATALOGO_CANDIDATOS.md](instrumentos/CATALOGO_CANDIDATOS.md) | 45 candidatos de investigación por finalidad; no es batería adoptada ni catálogo instalado |
 | [inventarios/README.md](inventarios/README.md) | Metadatos comprobados en PostgreSQL, alcance de lectura y reproducción; no certifica casos clínicos |
 | [MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md](MATRIZ_DATOS_DETECCION_DCL_2026_10_27.md) | Antecedente histórico del27–29/10; sustituido como guía actual por MATRIZ_TRAZABILIDAD_DCL.md; contenido conservado |
-| [ACEPTACION_INTEGRAL_ORION_2026_10_21.md](ACEPTACION_INTEGRAL_ORION_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
+| [ACEPTACION_INTEGRAL_EXPERTO_2026_10_21.md](ACEPTACION_INTEGRAL_EXPERTO_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md](ANALISIS_REFACTOR_REDUCCION_MANTENIBLE_2026_10_22.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [APORTE_INTERDISCIPLINARIO_GENERAL_2026_10_20.md](APORTE_INTERDISCIPLINARIO_GENERAL_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [AVANCE_CIERRE_FASES_6_A_8_2026_10_20.md](AVANCE_CIERRE_FASES_6_A_8_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
@@ -58,10 +58,10 @@ runtime_verified: false
 | [ENSAYO_CONSOLIDACION_RESULTADO_TRAZA_2026_10_20.md](ENSAYO_CONSOLIDACION_RESULTADO_TRAZA_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ENSAYO_NOMINAL_CONSERVACION_2026_10_22.md](ENSAYO_NOMINAL_CONSERVACION_2026_10_22.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ENSAYO_UNION_VINCULOS_EVIDENCIA_2026_10_20.md](ENSAYO_UNION_VINCULOS_EVIDENCIA_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
-| [ENTREGA_INTEGRAL_ORION_2026_10_20.md](ENTREGA_INTEGRAL_ORION_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
+| [ENTREGA_INTEGRAL_EXPERTO_2026_10_20.md](ENTREGA_INTEGRAL_EXPERTO_2026_10_20.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ENTREGA_REVISION_PROFESIONAL_2026_10_17.md](ENTREGA_REVISION_PROFESIONAL_2026_10_17.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [ESCENARIOS_DESARROLLO_2026_10_17.md](ESCENARIOS_DESARROLLO_2026_10_17.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
-| [ESPECIFICACION_FORMULARIOS_ADQUISICION_ORION_2026_10_21.md](ESPECIFICACION_FORMULARIOS_ADQUISICION_ORION_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
+| [ESPECIFICACION_FORMULARIOS_ADQUISICION_EXPERTO_2026_10_21.md](ESPECIFICACION_FORMULARIOS_ADQUISICION_EXPERTO_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [EVIDENCIAS_COGNITIVAS.md](EVIDENCIAS_COGNITIVAS.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [EVIDENCIA_BIBLIOGRAFICA_Y_ACEPTACION_TECNICA_2026_10_22.md](EVIDENCIA_BIBLIOGRAFICA_Y_ACEPTACION_TECNICA_2026_10_22.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [FASE01_ACEPTACION_INTEGRAL_2026_10_18.md](FASE01_ACEPTACION_INTEGRAL_2026_10_18.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
@@ -104,7 +104,7 @@ runtime_verified: false
 | [MEMBRESIAS_HISTORICAS_SQL_2026_10_22.md](MEMBRESIAS_HISTORICAS_SQL_2026_10_22.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md](METODOS_Y_CAMPOS_INVESTIGADOS_V2_2026_10_18.md) | Investigación o referencia: no crea medición ni aprobación clínica |
 | [NORMALIZACIONES_REFERENCIA_2026_10_19.md](NORMALIZACIONES_REFERENCIA_2026_10_19.md) | Investigación o referencia: no crea medición ni aprobación clínica |
-| [ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md) | Investigación o referencia: no crea medición ni aprobación clínica |
+| [EXPERTO_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md](EXPERTO_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md) | Investigación o referencia: no crea medición ni aprobación clínica |
 | [PETERSEN_REVISION_Y_CONSERVACION_ESTADO_2026_10_21.md](PETERSEN_REVISION_Y_CONSERVACION_ESTADO_2026_10_21.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [PLAN_APOYO_INSTITUCIONAL_Y_VALIDACION_2026_10_18.md](PLAN_APOYO_INSTITUCIONAL_Y_VALIDACION_2026_10_18.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |
 | [PLAN_CIERRE_INTEGRAL_2026_10_19.md](PLAN_CIERRE_INTEGRAL_2026_10_19.md) | Corte, contrato especializado, propuesta o evidencia: comprobar estado y alcance internos |

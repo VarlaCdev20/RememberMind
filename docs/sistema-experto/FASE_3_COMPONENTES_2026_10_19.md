@@ -13,7 +13,7 @@ con efecto techo para LEN-S04/S05. **CERRADO el alcance técnico de cálculo y
 documentación**; adopción institucional y evaluación posterior en uso real pendientes.
 Los apartados siguientes conservan los cortes históricos de la investigación.
 
-El resultado final perseguido es O.R.I.O.N. integrado: mediciones originales,
+El resultado final perseguido es sistema experto integrado: mediciones originales,
 cinco dominios, reglas versionadas, patrón candidato o abstención sustentada,
 informe comprensible, conservación exacta y revisiones independientes de
 Medicina y Psicología. Esta fase se limita a los contratos instrumentales;

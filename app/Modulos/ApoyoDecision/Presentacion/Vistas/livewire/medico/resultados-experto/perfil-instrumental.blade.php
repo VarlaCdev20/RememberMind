@@ -23,7 +23,7 @@
                                             <p>Pregunta: {{ $ruta['procedencia_instrumental']['cod_pregunta'] }} · Respuesta: {{ $ruta['procedencia_instrumental']['cod_respuesta'] ?? 'Sin respuesta' }}.</p>
                                             <p>Literal original: {{ is_bool($ruta['valor_original']) ? ($ruta['valor_original'] ? 'true' : 'false') : ($ruta['valor_original'] ?? 'Sin dato') }}.</p>
                                             @if(is_array($ruta['procedencia_instrumental']['perfil_interpretativo'] ?? null))
-                                                <p>Método: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['metodo'] }} · Perfil: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['codigo'] }} · Versión: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['version'] }}.</p>
+                                                <p>Método: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['metodo'] }} · Perfil: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['codigo'] }} · Versión: {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($ruta['procedencia_instrumental']['perfil_interpretativo']['version']) }}.</p>
                                                 <p>Fuente del método: {{ $ruta['procedencia_instrumental']['perfil_interpretativo']['fuente'] }}.</p>
                                                 @foreach($ruta['procedencia_instrumental']['mediciones_interpretacion'] as $nombre => $medida)<p>Medida {{ $nombre }}: {{ $medida['valor_original'] }} · Pregunta {{ $medida['cod_pregunta'] }} · Respuesta {{ $medida['cod_respuesta'] }}.</p>@endforeach
                                             @endif
@@ -32,7 +32,7 @@
                                 @endforeach
                             </div>
                         @endforeach
-                        <p class="text-sm mt-3">Versión: {{ $perfilInstrumental['inferencia_declarativa']['resultado']['version'] }}. La revisión profesional se registra por separado.</p>
+                        <p class="text-sm mt-3">Versión: {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($perfilInstrumental['inferencia_declarativa']['resultado']['version']) }}. La revisión profesional se registra por separado.</p>
                     </details>
                 @else
                     <p class="text-sm text-rm-secondary mt-3">No hay una versión institucional vinculada para integrar este dominio.</p>

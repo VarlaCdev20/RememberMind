@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MotorExperto\inferencia;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\inferencia\EvaluadorEvaluabilidadCOGMEM;
 use MotorExperto\hechos\MemoriaTrabajo;
@@ -154,7 +156,7 @@ final class EvaluarPerfilInstitucional
             }
         }
         unset($dominio);
-        $salida['contrato_institucional'] = 'ORION-AD-20261019';
+        $salida['contrato_institucional'] = IdentificadoresHistoricos::CONTRATO_INSTITUCIONAL;
         $salida['observaciones_por_componente'] = $observaciones;
 
         return $salida;

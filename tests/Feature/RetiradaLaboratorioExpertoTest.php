@@ -15,6 +15,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
+use MotorExperto\conservacion\IdentificadoresHistoricos;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
@@ -88,6 +89,38 @@ final class RetiradaLaboratorioExpertoTest extends TestCase
             self::assertSame(404, $error->getStatusCode());
         }
         self::assertSame(3, VersionModeloExperto::count(), 'La retirada operativa no borra versiones históricas.');
+    }
+
+    public function test_la_base_documental_no_completa_el_caso_de_un_residente_sin_evaluacion(): void
+    {
+        $actor = auth()->user();
+        VersionModeloExperto::unguarded(fn () => VersionModeloExperto::create([
+            'cod_version_modelo' => 'V_BASE_ANTERIOR', 'codigo_version' => IdentificadoresHistoricos::DOCUMENTAL_INICIAL,
+            'nombre' => 'Base documental anterior', 'estado' => 'INACTIVO', 'fecha_hora_creacion' => now(),
+            'cod_usuario_creacion' => $actor->getKey(),
+        ]));
+        $nodo = \App\Models\NodoSemantico::unguarded(fn () => \App\Models\NodoSemantico::create(['cod_nodo_semantico' => 'N_BASE_ANTERIOR',
+            'cod_version_modelo' => 'V_BASE_ANTERIOR', 'codigo_semantico' => 'COG-MEM',
+            'nombre' => 'Concepto documental anterior', 'tipo_nodo' => 'CRITERIO', 'estado' => 'INACTIVO',
+            'definicion' => 'Concepto de investigación; no es un resultado del residente.',
+            'fecha_hora_creacion' => now(), 'cod_usuario_creacion' => $actor->getKey()]));
+        $original = $nodo->fresh()->getRawOriginal();
+        $residente = \App\Models\Residente::factory()->create();
+        $lectura = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\LecturaResultadosExperto::class)
+            ->consultar($actor, $residente, null, 'COG-MEM');
+        self::assertNull($lectura['evaluacion']);
+        self::assertNull($lectura['conocimiento_documental']);
+        $grafo = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarGrafoExperto::class)
+            ->consultar($actor, $residente, $lectura, 'COG-MEM');
+        self::assertSame([], $grafo['semantico']['nodos']);
+        self::assertSame([], $grafo['semantico']['aristas']);
+        self::assertSame($original, $nodo->fresh()->getRawOriginal());
+        self::assertSame(0, \App\Models\EvaluacionExperta::count());
+        self::assertFalse(app(ConsultarConocimientoAdministrativo::class)->existeVersion('V_BASE_ANTERIOR'));
+        $denominacionAnterior = strtolower(explode('-', IdentificadoresHistoricos::PERFIL_COGNITIVO, 2)[0]);
+        foreach (array_keys(Artisan::all()) as $comando) {
+            self::assertStringNotContainsString($denominacionAnterior, $comando);
+        }
     }
 
     public function test_los_instrumentos_tecnicos_se_excluyen_sin_borrar_el_catalogo(): void

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Configuracion;
 
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorControlesCognitivos;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorInstrumentos;

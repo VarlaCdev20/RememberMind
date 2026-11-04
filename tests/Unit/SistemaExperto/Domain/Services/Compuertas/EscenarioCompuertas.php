@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
-use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades;
 
 /** Verificar contratos explícitos con fuentes artificiales y objetos reales. */

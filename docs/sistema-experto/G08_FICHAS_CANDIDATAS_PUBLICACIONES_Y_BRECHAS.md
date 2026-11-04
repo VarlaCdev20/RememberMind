@@ -1,4 +1,4 @@
-# O.R.I.O.N. — G08: fichas bibliográficas, pertinencia y controles de aplicabilidad
+# sistema experto — G08: fichas bibliográficas, pertinencia y controles de aplicabilidad
 
 > Documento de investigación importado selectivamente del worktree `pr15-ci-utf8`, HEAD `8085ec0e`, el 18/10/2026. Su fecha de cotejo bibliográfico es histórica; esta incorporación no revalida instrumentos ni acredita CI remoto. Véase [evidencia actual de Fase 01](FASE01_AUDITORIA_Y_EVIDENCIA_2026_10_18.md).
 

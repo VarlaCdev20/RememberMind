@@ -90,7 +90,7 @@ final class ProyectarRedConocimiento
         foreach ($visibles as $id => $n) {
             $salida[] = ['id' => $id, 'nombre' => $n['nombre'], 'tipo' => $n['tipo_nodo'], 'estado' => $n['estado'],
                 'version' => $versionReal, 'columna' => (int) array_search($n['tipo_nodo'], $tipos, true),
-                'datos' => ['Código' => $n['codigo_semantico'], 'Descripción' => $n['definicion'] ?? 'No declarada',
+                'datos' => ['Código' => $n['codigo_semantico'], 'Descripción' => LenguajeResultadosExperto::referenciaDocumental($n['definicion'] ?? 'No declarada'),
                     'Versión' => $versionReal, 'Procedencia' => $conocimiento['experimental'] ? 'Paquete experimental del motor' : 'Versión almacenada seleccionada']];
         }
 

@@ -1,6 +1,6 @@
 @if(isset($perfilInstrumental['plan_captura']))
     @php($planCaptura = $perfilInstrumental['plan_captura'])
-    <details class="rm-orion-petersen-detail-panel my-4" data-dcl-capture-plan>
+    <details class="rm-decision-petersen-detail-panel my-4" data-dcl-capture-plan>
         <summary class="min-h-11 cursor-pointer font-semibold">Qué información conviene completar o revisar</summary>
         <p class="mt-2 text-sm text-[var(--rm-text-secondary)]">{{ $planCaptura['aviso'] }}</p>
         @forelse($planCaptura['pendientes'] as $pendiente)

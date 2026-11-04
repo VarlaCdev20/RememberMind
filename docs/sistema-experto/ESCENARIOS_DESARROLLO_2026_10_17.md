@@ -90,7 +90,7 @@ Estado consultado directamente en la base después de cargar los datos:
 | Resumen descriptivo de controles | Disponible para el alcance de Enfermería | Lee respuestas originales; repetición/olvido produce «Señal preliminar», sin diagnóstico |
 | Detección de respuestas distintas del mismo indicador y momento | Disponible | Conserva discordancia; no elige arbitrariamente una respuesta |
 | Reglas clínicas expertas publicadas | **0** | `reglas_expertas` está vacía; no existe una regla concreta habilitada que enumerar |
-| ORION-V1-20261008 | INACTIVO | Carga documental de conceptos/relaciones, sin activación ni reglas completas |
+| base documental anterior | INACTIVO | Carga documental de conceptos/relaciones, sin activación ni reglas completas |
 | MEM-INV-20261008 | INACTIVO | Propuesta observacional; mapeos pendientes de validación y sin integración instrumental autorizada |
 | Mapeos de valores fuente | 6 INACTIVOS, aprobación PENDIENTE | No convierten automáticamente las observaciones en conocimiento aceptado |
 | Relaciones semánticas / nodos | 29 / 58 INACTIVOS | Su existencia documental no autoriza inferencia ni participación |

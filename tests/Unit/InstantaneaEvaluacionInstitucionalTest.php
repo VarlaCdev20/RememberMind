@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use DomainException;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\conocimiento\ReglasCognitivas;
@@ -67,7 +67,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
         if ($sinC03) {
             $v = array_values(array_filter($v, fn ($j) => $j->elemento !== 'C03'));
         }
-        $fuente = (new ArchivoConocimientoOrion)->leer();
+        $fuente = (new ArchivoConocimientoCognitivo)->leer();
         $p = (new ReglasCognitivas)->construir((new PerfilConceptualCognitivo)->construir($fuente), $c->version, 'AUTOR-TEST', '2026-10-19 10:00:00');
         $i = InstantaneaInstrumental::crear($p, $c, ['disponible' => true, 'fecha_corte' => $c->fechaCorte->format('Y-m-d\TH:i:s.uP'),
             'capturas' => $capturas], [], 'USUARIO-TEST', ['cod_version_modelo' => $c->version], 'INSTRUMENTAL-DECLARATIVO-3', $fuente);
@@ -312,7 +312,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
     public function test_manifiesto_v1_no_se_acepta_en_compuesto_aunque_huellas_y_codigo_coincidan(): void
     {
         $d = $this->crear()->contenido;
-        $archivo = sys_get_temp_dir().'/orion-compuesto-v1-'.bin2hex(random_bytes(8)).'.zip';
+        $archivo = sys_get_temp_dir().'/decision-compuesto-v1-'.bin2hex(random_bytes(8)).'.zip';
         try {
             $m = (new ReleaseMotorInstrumental)->crear(dirname(__DIR__, 2), $archivo, str_repeat('a', 40));
             $m['contrato'] = 'ARTEFACTO-MOTOR-1';
@@ -332,7 +332,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
     public function test_release_vinculado_reproduce_ambas_ramas_en_otro_proceso_sin_laravel(): void
     {
         $dto = $this->crear();
-        $directorio = sys_get_temp_dir().'/orion-compuesto-replay-'.bin2hex(random_bytes(8));
+        $directorio = sys_get_temp_dir().'/decision-compuesto-replay-'.bin2hex(random_bytes(8));
         self::assertTrue(mkdir($directorio));
         try {
             $archivo = $directorio.'/motor.zip';
@@ -392,7 +392,7 @@ final class InstantaneaEvaluacionInstitucionalTest extends TestCase
             $dto->vincularRelease($archivo, $m['huella']);
         } finally {
             $raiz = realpath($directorio);
-            if ($raiz !== false && str_starts_with(basename($raiz), 'orion-compuesto-replay-')
+            if ($raiz !== false && str_starts_with(basename($raiz), 'decision-compuesto-replay-')
                 && realpath(dirname($raiz)) === realpath(sys_get_temp_dir())) {
                 foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($raiz, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $f) {
                     $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());

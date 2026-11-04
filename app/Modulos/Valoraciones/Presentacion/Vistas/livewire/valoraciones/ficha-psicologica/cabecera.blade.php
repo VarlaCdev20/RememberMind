@@ -59,7 +59,7 @@
         ['id' => 'entorno', 'label' => 'Entorno y red social', 'icono' => 'ph-users-four'],
         ['id' => 'seguimiento', 'label' => 'Sesiones y seguimiento', 'icono' => 'ph-calendar-check'],
         ['id' => 'informes', 'label' => 'Informes y resultados', 'icono' => 'ph-file-text'],
-        ['id' => 'orion', 'label' => 'Resultados cognitivos', 'icono' => 'ph-sparkle'],
+        ['id' => 'experto', 'label' => 'Resultados cognitivos', 'icono' => 'ph-sparkle'],
     ];
 @endphp
 <nav class="rm-tabs rm-resident-file__navigation" aria-label="Secciones de la ficha psicológica">

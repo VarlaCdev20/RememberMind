@@ -33,7 +33,7 @@ No se modificaron reglas clínicas, migraciones, PK/FK ni datos institucionales.
 | `CicloObservacionalConservadoTest` | PASS, ambas secuencias de revisión profesional |
 | `NavegacionSistemaExpertoTest` | PASS, 5 pruebas |
 | `InformeCognitivoTest` + `FuentesSinConflictosIntegracionTest` | PASS, 33 pruebas / 288 aserciones |
-| `ExploradorOrionTest`, `PersonalInstitucionalResponsiveTest`, `SidebarServiceTest` | PASS, 26 pruebas / 203 aserciones |
+| `ExploradorExpertoTest`, `PersonalInstitucionalResponsiveTest`, `SidebarServiceTest` | PASS, 26 pruebas / 203 aserciones |
 | `ConsolaPerfilExperimentalTest`, `GestionConocimientoExperimentalTest`, `GobiernoReglasExpertasTest` | PASS, 38 pruebas / 177 aserciones |
 | Pruebas frontend seleccionadas | PASS, 18 pruebas: mapa, recorridos, paginación, dashboard, resultados responsive, avatar y guías |
 | `npm run build` | PASS; advertencia de tamaño de bundle preexistente |

@@ -7,6 +7,7 @@ use App\Modulos\ApoyoDecision\Aplicacion\Contratos\ConocimientoVersionado;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Builder;
+use MotorExperto\conservacion\IdentificadoresHistoricos;
 
 /** Proyección administrativa; no interpreta, activa ni modifica conocimiento. */
 final class ConsultarConocimientoAdministrativo
@@ -17,7 +18,8 @@ final class ConsultarConocimientoAdministrativo
         $tecnicas = VersionModeloExperto::query()->get(['cod_version_modelo', 'codigo_version', 'cod_version_anterior']);
         $excluidas = [];
         foreach ($tecnicas as $version) {
-            if (preg_match('/SIM|TEST|EXPERIMENTAL|^MEM-INV-|^ORION-V1-/i', $version->codigo_version)) {
+            if (str_starts_with(strtoupper($version->codigo_version), IdentificadoresHistoricos::PREFIJO_DOCUMENTAL)
+                || preg_match('/SIM|TEST|EXPERIMENTAL|^MEM-INV-/i', $version->codigo_version)) {
                 $excluidas[$version->getKey()] = true;
             }
         }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use DomainException;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\instrumentos\PerfilInstrumentalCognitivo;
@@ -14,7 +14,7 @@ final class PerfilInstrumentalInstitucionalTest extends TestCase
 {
     public function test_reutiliza_red_documental_con_19_pertenencias_primarias_sin_reglas_sinteticas(): void
     {
-        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
+        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoCognitivo)->leer());
         self::assertCount(24, $red['nodos']);
         self::assertCount(19, $red['relaciones']);
         self::assertSame(['COG-MEM', 'COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS'], array_keys($red['dominios']));
@@ -31,7 +31,7 @@ final class PerfilInstrumentalInstitucionalTest extends TestCase
 
     public function test_componente_ausente_o_segundo_propietario_no_se_aceptan(): void
     {
-        $fuente = (new ArchivoConocimientoOrion)->leer();
+        $fuente = (new ArchivoConocimientoCognitivo)->leer();
         $fuente['relaciones'][] = ['codigo' => 'SEGUNDA', 'origen' => 'EJE-S03', 'destino' => 'COG-MEM', 'relacion' => 'SUBCOMPONENTE_DE'];
         $this->expectException(DomainException::class);
         (new PerfilConceptualCognitivo)->construir($fuente);
@@ -39,7 +39,7 @@ final class PerfilInstrumentalInstitucionalTest extends TestCase
 
     public function test_perfil_vacio_conserva_19_desconocidos_sin_declarar_normalidad_ni_guardado(): void
     {
-        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
+        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoCognitivo)->leer());
         $r = (new PerfilInstrumentalCognitivo)->construir($red, ['disponible' => true, 'capturas' => []]);
         self::assertFalse($r['persistido']);
         self::assertNull($r['diagnostico']);

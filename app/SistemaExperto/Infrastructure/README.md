@@ -1,4 +1,4 @@
-# Infrastructure de O.R.I.O.N.
+# Infrastructure de sistema experto
 
 > Ubicación histórica de documentación. Las clases fueron trasladadas a `app/Modulos/ApoyoDecision/Infraestructura` el 18/10/2026 y no quedan clases ni alias aquí. El codec puro reside en `motor-experto/src/motor_experto/soporte/conservacion`. Las restricciones y contratos que se describen abajo conservan su alcance experimental; el traslado no activa uso clínico.
 
@@ -10,7 +10,7 @@ IADL y la conservación V2 de nueve tablas fueron aprobadas explícitamente el
 
 Excepción local autorizada posteriormente: la capacidad optativa
 `ContextoSimulacionLocal` conecta exclusivamente el paquete
-`SIM-ORION-LOCAL-1` y cinco residentes ficticios en `remembermind_dev`.
+`SIM-EXPERTO-LOCAL-1` y cinco residentes ficticios en `remembermind_dev`.
 Los adaptadores generales y repositorios sin esa capacidad mantienen su
 restricción a testing. Véase el [contrato de simulación local](../../../docs/sistema-experto/SIMULACION_LOCAL_2026_10_17.md).
 No modifica `lectura_clinica` ni activa versiones documentales pendientes.
@@ -80,7 +80,7 @@ contexto completo en cada lectura de evaluación.
 Repetir `registrar` con la misma instancia es idempotente. Una configuración
 distinta, binding, alias o instancia ajenos producen `LogicException` sin
 sobrescribirlos ni ejecutar sus factories. No se registran nuevamente
-`ConocimientoVersionado`, `ExtraccionFuentesCOGMEM` o `FuenteConocimientoOrion`
+`ConocimientoVersionado`, `ExtraccionFuentesCOGMEM` o `FuenteConocimientoCognitivo`
 de `ApoyoDecision`.
 
 No se añade el vinculador a `bootstrap/providers.php` ni se modifican providers
@@ -121,7 +121,7 @@ Se restringe a testing/base desechable; sus valores son EXPERIMENTAL, separados
 de G09. El escritor nunca crea conocimiento o referencias como fallback.
 
 `EvaluacionExpertaEloquentRepository` acepta null como recuperador de memoria.
-Para ORION-SNAP-2 delega en `AlmacenInstantaneas`; el recuperador anterior solo
+Para conservación de instantáneas v2 delega en `AlmacenInstantaneas`; el recuperador anterior solo
 se usa con cabeceras D-137 anteriores. `VinculadorRepositorios` lo conecta sin
 un provider global y configura el extractor original para fuentes institucionales.
 

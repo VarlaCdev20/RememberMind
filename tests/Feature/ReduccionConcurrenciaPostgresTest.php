@@ -10,7 +10,7 @@ use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\Proyecci
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Feature\SistemaExperto\Infrastructure\Repositories\EscenarioRepositorios;

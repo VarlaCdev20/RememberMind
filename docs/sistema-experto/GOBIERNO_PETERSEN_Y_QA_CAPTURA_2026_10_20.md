@@ -20,7 +20,7 @@ El inventario aprobado permanece en 75 operativas + 33 expertas = 108.
 
 ## Gobierno conectado al cálculo
 
-- `PaquetePetersenInstitucional` define la familia `ORION-PETERSEN-1`, separada
+- `PaquetePetersenInstitucional` define la familia `patrones de Petersen`, separada
   de las 17 reglas cognitivas A–D. Conserva exactamente PET-01…PET-04.
 - Cada regla exige ocho antecedentes: C01…C05 acreditados, cinco dominios
   interpretables, estado de Memoria y uno o varios dominios alterados. Esos
@@ -52,7 +52,7 @@ una cuenta elegida arbitrariamente por un script.
 
 Tras superar las verificaciones se pulsó ese botón en la instalación local,
 desde su sesión activa de Psicología. La interfaz confirmó los cuatro patrones
-y seleccionó `ORION-PETERSEN-1 · ACTIVO`; `ORION-COGNITIVO-1` siguió disponible
+y seleccionó `patrones de Petersen · ACTIVO`; `perfil cognitivo inicial` siguió disponible
 por separado. Las revisiones permanecen pendientes. No se registraron
 valoraciones originales ni evaluaciones de residentes como parte de esta
 instalación. La evidencia visual del registro muestra solo el encabezado,
@@ -102,7 +102,7 @@ permisos y regresiones de las 17 reglas existentes.
 | PostgreSQL desechable: núcleo, captura, gobierno, A–D, permisos y concurrencia | 158 pruebas / 858 aserciones, PASS |
 | Comprobación posterior de precisión, panel y frontera temporal, en cada motor | 4 pruebas / 34 aserciones, PASS |
 | Regresión de instantánea instrumental y release recuperable | 11 pruebas / 179 aserciones, PASS |
-| Independencia del motor y O.R.I.O.N. | Ambos ejecutables PASS |
+| Independencia del motor y sistema experto | Ambos ejecutables PASS |
 | `npm run build` | PASS, 107 módulos |
 | Sintaxis de los 14 PHP propios, Pint y `git diff --check` | PASS |
 | Revisiones independientes de seguridad y contrato experto/BDD | PASS estáticos acotados, incluido el hallazgo temporal corregido |
@@ -118,7 +118,7 @@ Comandos principales:
 php vendor/phpunit/phpunit/phpunit --filter 'PetersenInstitucionalTest|CapturaPetersenOriginalTest|GobiernoPetersenInstitucionalTest|GobiernoReglasExpertasTest|ConocimientoCognitivoInstitucionalTest|InformeNeurocognitivoTest'
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'GobiernoPetersenInstitucionalTest|CapturaPetersenOriginalTest|PetersenOriginalConcurrenciaPostgresTest|GobiernoReglasExpertasTest|GobiernoReglasConcurrenciaPostgresTest|PetersenInstitucionalTest|ConocimientoCognitivoInstitucionalTest|PermisosLecturaIadlPetersenTest|PermisosPetersenOriginalTest'
 php motor-experto/tests/independencia.php
-php motor-experto/tests/orion_independencia.php
+php motor-experto/tests/dominio_independencia.php
 npm run build
 ```
 

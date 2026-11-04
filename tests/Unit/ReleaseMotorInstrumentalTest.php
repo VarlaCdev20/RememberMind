@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use DomainException;
 use MotorExperto\conservacion\CapturaInstrumentalCanonica;
 use MotorExperto\conservacion\CodecInstantanea;
+use MotorExperto\conservacion\IdentificadoresHistoricos;
 use MotorExperto\conservacion\ReleaseMotorInstrumental;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +19,7 @@ final class ReleaseMotorInstrumentalTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->archivo = sys_get_temp_dir().'/orion-release-unit-'.bin2hex(random_bytes(8)).'.zip';
+        $this->archivo = sys_get_temp_dir().'/decision-release-unit-'.bin2hex(random_bytes(8)).'.zip';
     }
 
     protected function tearDown(): void
@@ -39,7 +40,7 @@ final class ReleaseMotorInstrumentalTest extends TestCase
         self::assertSame($m, (new ReleaseMotorInstrumental)->verificar($this->archivo, $m['huella']));
         self::assertFalse($m['incluye_datos_clinicos']);
         self::assertSame('ARTEFACTO-MOTOR-2', $m['contrato']);
-        self::assertArrayHasKey('app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json', $m['archivos']);
+        self::assertArrayHasKey('app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/conceptos-cognitivos.json', $m['archivos']);
         self::assertArrayHasKey('motor-experto/conservacion/InstantaneaInstrumental.php', $m['archivos']);
         foreach (array_keys($m['archivos']) as $nombre) {
             self::assertDoesNotMatchRegularExpression('~(^|/)(\.env|storage|work|attachments|config)(/|$)~', $nombre);
@@ -109,7 +110,34 @@ final class ReleaseMotorInstrumentalTest extends TestCase
 
     public static function rutasAjenas(): array
     {
-        return [['datos-clinicos.txt'], ['motor-experto/tests/fixtures/ajeno.php']];
+        return [['datos-clinicos.txt'], ['motor-experto/tests/fixtures/ajeno.php'], [IdentificadoresHistoricos::ARCHIVOS_RELEASE[0]]];
+    }
+
+    public function test_release_anterior_conserva_nombres_originales_y_sigue_verificable(): void
+    {
+        $manifiesto = $this->crear();
+        $zip = new ZipArchive;
+        self::assertTrue($zip->open($this->archivo));
+        foreach (array_combine([
+            'motor-experto/tests/dominio_independencia.php',
+            'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/conceptos-cognitivos.json',
+        ], IdentificadoresHistoricos::ARCHIVOS_RELEASE) as $actual => $anterior) {
+            $bytes = $zip->getFromName($actual);
+            self::assertIsString($bytes);
+            self::assertTrue($zip->deleteName($actual));
+            self::assertTrue($zip->addFromString($anterior, $bytes));
+            $manifiesto['archivos'][$anterior] = $manifiesto['archivos'][$actual];
+            unset($manifiesto['archivos'][$actual]);
+        }
+        unset($manifiesto['huella']);
+        $manifiesto['huella'] = CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($manifiesto));
+        self::assertTrue($zip->addFromString('MANIFIESTO-MOTOR.json', json_encode($manifiesto, JSON_THROW_ON_ERROR)));
+        self::assertTrue($zip->close());
+        $lector = new ReleaseMotorInstrumental;
+        self::assertSame($manifiesto, $lector->verificar($this->archivo, $manifiesto['huella']));
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('mismo ejecutor completo');
+        $lector->verificarEjecutorActual($this->archivo, $manifiesto['huella']);
     }
 
     public function test_release_con_rutas_anteriores_sigue_legible_sin_confundirse_con_el_ejecutor_actual(): void

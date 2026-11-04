@@ -1,4 +1,4 @@
-import { knowledgeGraph } from './orion-explorador.js';
+import { knowledgeGraph } from './expert-graph.js';
 
 /** Local navigation only: all relationships and clinical states arrive from PHP. */
 export function residentWorkspace(elementos) {

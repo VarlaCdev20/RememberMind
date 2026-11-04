@@ -60,7 +60,7 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
             if (width !== 1440) await page.screenshot({ path: evidence(`${role}-${width}.png`), fullPage: true });
         }
         if (phase !== 'antes') {
-            assert.doesNotMatch(await page.$eval('body', el => el.innerText), /O\.R\.I\.O\.N\.|\bORION\b(?!-)|\bNaN\b|\bundefined\b|\[object Object\]/);
+            assert.doesNotMatch(await page.$eval('body', el => el.innerText), /O\.R\.I\.O\.N\.?|\bORION\b|\bNaN\b|\bundefined\b|\[object Object\]/i);
             await page.setViewport({ width: 640, height: 500 });
             assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${role} zoom/reflow`);
         }

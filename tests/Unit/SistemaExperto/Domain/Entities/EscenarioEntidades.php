@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities;
 
-use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
-use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
-use MotorExperto\dominio\orion\Entities\Dcl\PerfilRequisitosDcl;
-use MotorExperto\dominio\orion\Entities\Funcionalidad\EvidenciaIadl;
-use MotorExperto\dominio\orion\Entities\Funcionalidad\VectorFuncionalidad;
-use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
-use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\Entities\Dcl\PerfilRequisitosDcl;
+use MotorExperto\dominio\Entities\Funcionalidad\EvidenciaIadl;
+use MotorExperto\dominio\Entities\Funcionalidad\VectorFuncionalidad;
+use MotorExperto\dominio\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use DateTimeImmutable;
 
 /** Construir referencias manuales para verificar invariantes, sin interpretar datos. */

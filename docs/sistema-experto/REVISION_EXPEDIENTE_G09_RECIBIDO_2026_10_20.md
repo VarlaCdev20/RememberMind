@@ -6,8 +6,8 @@ Fecha: 20/10/2026. Alcance: lectura técnica de los archivos entregados, sin imp
 
 | Archivo recibido | Huella SHA-256 | Contenido verificable |
 | --- | --- | --- |
-| `ORION_G09_Expediente_Tecnico_Propuesta_Expertos.docx` | `BFA9911CDD29E3FF3C9AC9F3E200DF0B107738908F40DF907D9CCA5F5FE1784B` | 93 párrafos y 12 tablas: instrumentos candidatos, formularios, correspondencias, abstenciones y rúbrica de revisión. Declara expresamente estado **PROPUESTA FUNDAMENTADA**, sin firma, licencia o evaluación de residente. |
-| `ORION_G09_Matriz_Clinica_y_Registros.xlsx` | `797B66AFA8E11F9487C949F55B9EEFD8257F85542BE14037A0E27FA2E15732A5` | Diez hojas; 19 filas candidatas en `Matriz_G09`; hojas PSI/MED/ENF/FUN con `DEM-001` y ejemplos explícitamente ficticios. La matriz marca Psicología/Medicina `PENDIENTE` y habilitación `NO HABILITADA` en sus 19 filas. |
+| `EXPERTO_G09_Expediente_Tecnico_Propuesta_Expertos.docx` | `BFA9911CDD29E3FF3C9AC9F3E200DF0B107738908F40DF907D9CCA5F5FE1784B` | 93 párrafos y 12 tablas: instrumentos candidatos, formularios, correspondencias, abstenciones y rúbrica de revisión. Declara expresamente estado **PROPUESTA FUNDAMENTADA**, sin firma, licencia o evaluación de residente. |
+| `EXPERTO_G09_Matriz_Clinica_y_Registros.xlsx` | `797B66AFA8E11F9487C949F55B9EEFD8257F85542BE14037A0E27FA2E15732A5` | Diez hojas; 19 filas candidatas en `Matriz_G09`; hojas PSI/MED/ENF/FUN con `DEM-001` y ejemplos explícitamente ficticios. La matriz marca Psicología/Medicina `PENDIENTE` y habilitación `NO HABILITADA` en sus 19 filas. |
 
 Los ejemplos `DEM-001` no son aplicaciones originales ni historia clínica de los residentes; no se importan. Los documentos no prueban que Lorena, Carolina, Rosa, Marcos u otro profesional hayan revisado o firmado su contenido.
 

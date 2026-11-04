@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Entities\Hechos;
 
-use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
 use DateTimeImmutable;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;

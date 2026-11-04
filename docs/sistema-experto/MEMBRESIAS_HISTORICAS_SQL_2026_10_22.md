@@ -65,7 +65,7 @@ El orden global de soportes no necesita otra columna: V2 exige que sea la concat
 
 ## Escritura y lectura
 
-`MembresiasSQL` está en `prototipos/orion-conservacion-nominal/`. **No** está registrado en el contenedor Laravel, rutas ni migraciones institucionales. Su constructor rechaza destinos distintos de SQLite en memoria o el runner PostgreSQL efímero propio verificado.
+`MembresiasSQL` está en `prototipos/experto-conservacion-nominal/`. **No** está registrado en el contenedor Laravel, rutas ni migraciones institucionales. Su constructor rechaza destinos distintos de SQLite en memoria o el runner PostgreSQL efímero propio verificado.
 
 La escritura:
 
@@ -107,7 +107,7 @@ La prueba lanza dos workers sobre una escritura no confirmada: inserción tardí
 
 ## Diseño, scripts y diccionario reproducibles
 
-[Carpeta del candidato](../../prototipos/orion-conservacion-nominal/membresias-v2/):
+[Carpeta del candidato](../../prototipos/experto-conservacion-nominal/membresias-v2/):
 
 - `candidato-sqlite.sql` y `candidato-postgres.sql`: DDL exacto del **submodelo desechable**, sin autorización de instalación.
 - `diccionario.csv`: las 12 columnas de las nuevas relaciones y las cuatro de cabecera.
@@ -117,8 +117,8 @@ La prueba lanza dos workers sobre una escritura no confirmada: inserción tardí
 - `resumen.json`: inventario hipotético, huellas de DDL y límites expresos; sólo metadata estructural.
 
 ```powershell
-php prototipos/orion-conservacion-nominal/generar-membresias.php
-php prototipos/orion-conservacion-nominal/generar-membresias.php --check
+php prototipos/experto-conservacion-nominal/generar-membresias.php
+php prototipos/experto-conservacion-nominal/generar-membresias.php --check
 ```
 
 El generador usa únicamente SQLite en memoria y definiciones mínimas para introspección. No carga Laravel, `.env`, originales ni datos institucionales. Su introspección no sustituye las pruebas contra las migraciones reales; éstas se realizan mediante `CapturaPetersenOriginalTest` en bases desechables pobladas.
@@ -142,7 +142,7 @@ Comandos:
 ```powershell
 php artisan test --filter='MembresiasOriginalesPetersenTest|CapturaPetersenOriginalTest|InstantaneaEvaluacionInstitucionalTest|PreparacionCompuestaCoherenteTest' --compact --log-junit=work/membresias-v2-integracion-sqlite.xml
 php artisan test --filter='CapturaPetersenOriginalTest::test_sqlite_membresias_vacias' --compact --log-junit=work/membresias-v2-replace-sqlite.xml
-.\scripts\probar-postgres.ps1 -Filtro 'MembresiasOriginalesPetersenTest|CapturaPetersenOriginalTest|PreparacionCompuestaCoherenteTest' -Informe (Join-Path $env:TEMP 'orion-membresias-v2-final-pg.xml')
+.\scripts\probar-postgres.ps1 -Filtro 'MembresiasOriginalesPetersenTest|CapturaPetersenOriginalTest|PreparacionCompuestaCoherenteTest' -Informe (Join-Path $env:TEMP 'decision-membresias-v2-final-pg.xml')
 php scripts/verificar-consolidacion-experta.php
 ```
 

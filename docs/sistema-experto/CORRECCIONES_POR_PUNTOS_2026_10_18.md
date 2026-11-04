@@ -5,7 +5,7 @@ Solicitud: corregir los seis puntos y entregar un resumen al cerrar cada uno. Es
 | Punto | Corrección de este incremento | Estado verificable |
 | --- | --- | --- |
 | 1. Captura instrumental | Fecha original obligatoriamente completa cuando se aporta; normalización del instante a la zona institucional; precisión SQL validada; tipos de pregunta y pertenencia; autor derivado de sesión; NULL distinto de cero; transacción y rollback; lectura autorizada con originales y perfiles exactos | Implementado. Primera verificación conjunta con punto 2: 26 pruebas / 187 aserciones en SQLite y PostgreSQL desechable. Sin cambios de BDD ni carga clínica |
-| 2. Cinco dominios / 19 componentes | Proyección de la fuente documental O.R.I.O.N., 24 nodos y 19 pertenencias primarias; perfil institucional sin generadores sintéticos; mediciones HVLT-R por aplicación y método; desconocidos explícitos | Implementada la red y consulta instrumental. Pendiente interpretación clínica completa de los 19 componentes. No se ha implementado ni declarado un ejecutor clínico completo |
+| 2. Cinco dominios / 19 componentes | Proyección de la fuente documental sistema experto, 24 nodos y 19 pertenencias primarias; perfil institucional sin generadores sintéticos; mediciones HVLT-R por aplicación y método; desconocidos explícitos | Implementada la red y consulta instrumental. Pendiente interpretación clínica completa de los 19 componentes. No se ha implementado ni declarado un ejecutor clínico completo |
 | 3. Conservación integral | Auditoría independiente del contrato físico, de las fuentes y de las limitaciones de la RFC previa | Abierto: las instantáneas observacionales se conservan íntegramente; el nuevo perfil instrumental se consulta sin guardado. No se ha presentado un archivo técnico como persistencia institucional |
 | 4. Petersen institucional | Cotejo de requisitos y soportes independientes; las cuatro salidas siguen probadas en el circuito experimental | Abierto: no se derivan C02, C03 o C05 de observaciones, z, Barthel, ausencia de diagnóstico ni atestaciones de laboratorio |
 | 5. Revisión final separada | Contrato común de revisión; integración de OBS-SNAP-1/2 con la tabla de revisiones existente; lectura íntegra antes de firma; confirmación/rechazo y rectificación MED/PSI independientes | Implementado. Regresión SQLite 139 pruebas / 829 aserciones; PostgreSQL 89 pruebas / 326 aserciones, incluida carrera de firmas. El alcance cerrado es la revisión de resultados representables, no del perfil nuevo sin conservar |
@@ -58,13 +58,13 @@ Cada disciplina mantiene su cadena: profesional y cuenta reales, fecha, decisió
 
 Ubicaciones canónicas actuales:
 
-- `motor-experto/dominio/orion`: 43 clases puras originales, sin cambios en su comportamiento.
+- `motor-experto/dominio`: 43 clases puras originales, sin cambios en su comportamiento.
 - `motor-experto/conservacion/CodecInstantanea.php`: codec puro de escalares, fechas y huellas.
 - `app/Modulos/ApoyoDecision/Aplicacion/CasosDeUso` y `DTOs`: seis casos de uso y cinco DTOs trasladados.
 - `app/Modulos/ApoyoDecision/Infraestructura`: adaptadores, configuración, mapeadores, repositorios y conservación Laravel.
 - `app/SistemaExperto`: antecedentes documentales, sin PHP ejecutable ni alias de clases.
 
-El codec conserva el nombre contractual anterior al firmar objetos y enums del prefijo exacto trasladado. La cadena antigua es parte del formato histórico, no una clase cargable. Siete huellas previas permanecen idénticas: escalar/enum/fecha, memoria, perfil DCL, vector, clasificación, abstención y regla con AST anidado. Esta última se obtuvo en un proceso separado cargando las tres clases originales desde Git, sin Composer. Se conservan también los órdenes originales y la comprobación de corrupción. Pruebas aisladas: `php motor-experto/tests/independencia.php` y `php motor-experto/tests/orion_independencia.php`, ambas PASS sin Laravel ni SQL.
+El codec conserva el nombre contractual anterior al firmar objetos y enums del prefijo exacto trasladado. La cadena antigua es parte del formato histórico, no una clase cargable. Siete huellas previas permanecen idénticas: escalar/enum/fecha, memoria, perfil DCL, vector, clasificación, abstención y regla con AST anidado. Esta última se obtuvo en un proceso separado cargando las tres clases originales desde Git, sin Composer. Se conservan también los órdenes originales y la comprobación de corrupción. Pruebas aisladas: `php motor-experto/tests/independencia.php` y `php motor-experto/tests/dominio_independencia.php`, ambas PASS sin Laravel ni SQL.
 
 La prueba combinada PostgreSQL detectó dos funciones de triggers ya existentes después de `migrate:fresh`. Se corrigió la reinstalación técnica con `CREATE OR REPLACE FUNCTION`, sin alterar firma, cuerpo, permisos ni tablas. Se verificó nuevamente la carrera de firmas y las restricciones vigentes en una base desechable. No se ejecutó una migración en la base operativa.
 

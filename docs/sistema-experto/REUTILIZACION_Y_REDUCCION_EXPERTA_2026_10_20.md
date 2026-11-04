@@ -78,7 +78,7 @@ consumidores de aplicación y contratos históricos.
 
 La reutilización de tablas experimentales requiere contrato institucional
 separado, columnas/checks explícitos y lectores anteriores conservados. Nunca
-quitar las guardas de `ORION-SNAP-2` ni convertir una atribución simulada en
+quitar las guardas de `conservación de instantáneas v2` ni convertir una atribución simulada en
 criterio clínico. Tampoco utilizar hechos como pares de atributos SQL.
 
 ## Reducción por originales protegidos

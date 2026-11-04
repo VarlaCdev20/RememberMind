@@ -27,7 +27,7 @@ La [FAQ oficial de MoCA](https://mocacognition.com/faq) indica que interpretar t
 
 ## Condición de cierre clínico del punto
 
-Por cada método que se quiera activar, Psicología debe aportar una aplicación realmente realizada y verificable: protocolo y edición/forma/idioma exactos, profesional, fecha/hora, respuestas originales con unidades, escolaridad y condiciones exigidas por la referencia. La institución debe adoptar el catálogo y el vínculo de preguntas/entradas después de comprobar derechos y pertinencia poblacional. Entonces se prueba con un original cotejado el recorrido `aplicación → respuesta → selector → variable → condición → regla → consecuencia`, además de ausencia, contradicción y fuera de rango. Hasta entonces el punto no está cerrado clínicamente y O.R.I.O.N. debe abstenerse donde falte evidencia.
+Por cada método que se quiera activar, Psicología debe aportar una aplicación realmente realizada y verificable: protocolo y edición/forma/idioma exactos, profesional, fecha/hora, respuestas originales con unidades, escolaridad y condiciones exigidas por la referencia. La institución debe adoptar el catálogo y el vínculo de preguntas/entradas después de comprobar derechos y pertinencia poblacional. Entonces se prueba con un original cotejado el recorrido `aplicación → respuesta → selector → variable → condición → regla → consecuencia`, además de ausencia, contradicción y fuera de rango. Hasta entonces el punto no está cerrado clínicamente y sistema experto debe abstenerse donde falte evidencia.
 
 ## Verificación de este incremento
 

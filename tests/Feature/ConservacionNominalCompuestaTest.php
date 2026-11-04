@@ -14,13 +14,13 @@ use Illuminate\Support\Str;
 use MotorExperto\conservacion\CapturaInstrumentalCanonica as C;
 use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use MotorExperto\conservacion\ReleaseMotorInstrumental;
-use OrionFase02\Artefactos;
-use OrionFase02\EntradasCompuestas;
-use OrionFase02\VariantesCanonicas;
-use OrionNominal\ContratoNominal;
-use OrionNominal\EsquemaNominal;
-use OrionNominal\ProyeccionNominal;
-use OrionNominal\RepositorioNominal;
+use ConservacionFase02\Artefactos;
+use ConservacionFase02\EntradasCompuestas;
+use ConservacionFase02\VariantesCanonicas;
+use ExpertoNominal\ContratoNominal;
+use ExpertoNominal\EsquemaNominal;
+use ExpertoNominal\ProyeccionNominal;
+use ExpertoNominal\RepositorioNominal;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -42,10 +42,10 @@ final class ConservacionNominalCompuestaTest extends TestCase
         parent::setUp();
         $base = base_path('prototipos');
         foreach (['ContratoNominal', 'EsquemaNominal', 'ProyeccionNominal', 'RepositorioNominal'] as $clase) {
-            require_once $base.'/orion-conservacion-nominal/'.$clase.'.php';
+            require_once $base.'/experto-conservacion-nominal/'.$clase.'.php';
         }
         foreach (['GuardiaDesechable', 'CasoCanonico', 'EntradasCompuestas', 'VariantesCanonicas', 'Artefactos', 'RuntimeRetenido'] as $clase) {
-            require_once $base.'/orion-conservacion-0_2/'.$clase.'.php';
+            require_once $base.'/experto-conservacion-0_2/'.$clase.'.php';
         }
         $usuario = User::factory()->create(['cod_usuario' => 'USUARIO-TEST', 'estado' => 'ACTIVO']);
         Personal::create(['cod_personal' => 'AUTOR-TEST', 'cod_usuario' => $usuario->getKey(), 'nombres' => 'Profesional',
@@ -82,7 +82,7 @@ final class ConservacionNominalCompuestaTest extends TestCase
         $registro = $artefactos->retener($this->temporal.'/motor.zip', $release['huella']);
         $repo = new RepositorioNominal($this->db);
         $repo->registrarRelease($registro);
-        $fuente = json_decode(file_get_contents(base_path('app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json')),
+        $fuente = json_decode(file_get_contents(base_path('app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/conceptos-cognitivos.json')),
             true, flags: JSON_THROW_ON_ERROR);
 
         return [$repo, $release, $artefactos, $fuente];
@@ -166,7 +166,7 @@ final class ConservacionNominalCompuestaTest extends TestCase
                 $propietario = $q->fetchColumn();
                 $pids = [];
                 foreach (['INSERTAR_HIJA', 'REINTENTAR'] as $modo) {
-                    $p = new Process([PHP_BINARY, base_path('prototipos/orion-conservacion-nominal/worker-concurrencia.php'),
+                    $p = new Process([PHP_BINARY, base_path('prototipos/experto-conservacion-nominal/worker-concurrencia.php'),
                         stream_socket_get_name($servidor, false), $modo, $archivo, $solicitud, $origenId, $propietario], base_path(), timeout: 25);
                     $p->start();
                     $procesos[] = $p;

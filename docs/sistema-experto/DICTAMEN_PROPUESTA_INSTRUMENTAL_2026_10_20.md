@@ -1,4 +1,4 @@
-# Dictamen de la propuesta instrumental para O.R.I.O.N.
+# Dictamen de la propuesta instrumental para sistema experto
 
 Fecha de revisión: 20/10/2026. Estado: **propuesta contrastada; no constituye adopción institucional ni acreditación de uso de instrumentos**.
 
@@ -19,7 +19,7 @@ La propuesta recibida distingue correctamente observaciones clínicas, cribado y
 
 ## Fuentes primarias y condiciones verificadas
 
-- [MoCA, aplicación en papel](https://www.mocacognition.com/paper): la política actual permite usar el puntaje total para cribado/derivación sin certificación; **exige certificación para interpretar tareas, subpuntuaciones o dominios**. Este último es el uso que necesitaría un mapeo detallado de O.R.I.O.N. Confirmar en el portal oficial la forma e idioma disponibles al momento de aplicar.
+- [MoCA, aplicación en papel](https://www.mocacognition.com/paper): la política actual permite usar el puntaje total para cribado/derivación sin certificación; **exige certificación para interpretar tareas, subpuntuaciones o dominios**. Este último es el uso que necesitaría un mapeo detallado de sistema experto Confirmar en el portal oficial la forma e idioma disponibles al momento de aplicar.
 - [MoCA, permisos](https://www.mocacognition.com/permission) y [términos de uso](https://mocacognition.com/terms-of-use): diferencian uso sanitario ordinario de incorporación en otro producto/servicio. Reproducir reactivos o desarrollar una versión electrónica propia requiere autorización específica. No incorporar contenido protegido a formularios, seeders ni pruebas mientras no conste el derecho aplicable.
 - [Mini-Cog, desarrollo](https://mini-cog.com/instrument-development/): sus responsables indican evidencia insuficiente para recomendarlo específicamente como prueba de cribado de deterioro cognitivo leve. Puede ser una fuente breve complementaria, no fundamento único de Petersen ni de cinco dominios.
 - [Mini-Cog, idiomas](https://mini-cog.com/mini-cog-in-other-languages/) y [condiciones de uso](https://mini-cog.com/contact/): hay formulario estandarizado en español; las condiciones distinguen atención clínica, actividad comercial e investigación. Determinar el encuadre institucional antes de reproducirlo o integrarlo electrónicamente.
@@ -30,7 +30,7 @@ La información oficial actual de MoCA sobre certificación para el puntaje tota
 
 1. Identificar el instrumento realmente aplicado, forma/edición, idioma, condiciones de uso, profesional y su capacitación para el nivel de interpretación solicitado.
 2. Guardar fecha clínica, residente, fuente documental, respuesta y puntuación originales por tarea, incluyendo omisiones y motivos. No reconstruir mediciones desde observaciones anteriores.
-3. Publicar una matriz *tarea oficial → variable semántica → componente O.R.I.O.N. → método/versión → condiciones y exclusiones*, con fuente y población de referencia mayores de 60 años, idioma y escolaridad pertinentes. No inferir que cubrir un dominio equivale a cubrir todos sus subcomponentes.
+3. Publicar una matriz *tarea oficial → variable semántica → componente sistema experto → método/versión → condiciones y exclusiones*, con fuente y población de referencia mayores de 60 años, idioma y escolaridad pertinentes. No inferir que cubrir un dominio equivale a cubrir todos sus subcomponentes.
 4. Probar cada mapeo con aplicaciones sintéticas completas, incompletas y contradictorias, manteniendo separadas las aplicaciones. Sólo luego habilitar el perfil correspondiente; las reglas sin soporte siguen no ejecutables para esa evidencia.
 5. Documentar por separado cambio cognitivo, autonomía IADL, causas alternativas y revisión de Medicina/Psicología posterior al resultado. La asignación propuesta de formularios a profesiones requiere decisión institucional explícita antes de cambiar permisos o competencias.
 

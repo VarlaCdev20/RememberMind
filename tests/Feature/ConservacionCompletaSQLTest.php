@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use MotorExperto\conservacion\ReleaseMotorInstrumental;
-use OrionFase02\Artefactos;
-use OrionFase02\VariantesCanonicas;
-use OrionNominal\CasosCompletos;
-use OrionNominal\EsquemaNominal;
-use OrionNominal\RepositorioNominal;
+use ConservacionFase02\Artefactos;
+use ConservacionFase02\VariantesCanonicas;
+use ExpertoNominal\CasosCompletos;
+use ExpertoNominal\EsquemaNominal;
+use ExpertoNominal\RepositorioNominal;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -40,10 +40,10 @@ final class ConservacionCompletaSQLTest extends TestCase
     {
         parent::setUp();
         foreach (['ContratoNominal', 'EsquemaNominal', 'ProyeccionNominal', 'ContenidoCompleto', 'CasosCompletos', 'RepositorioNominal'] as $clase) {
-            require_once base_path('prototipos/orion-conservacion-nominal/'.$clase.'.php');
+            require_once base_path('prototipos/experto-conservacion-nominal/'.$clase.'.php');
         }
         foreach (['GuardiaDesechable', 'CasoCanonico', 'VariantesCanonicas', 'Artefactos', 'RuntimeRetenido'] as $clase) {
-            require_once base_path('prototipos/orion-conservacion-0_2/'.$clase.'.php');
+            require_once base_path('prototipos/experto-conservacion-0_2/'.$clase.'.php');
         }
         User::factory()->create(['cod_usuario' => 'USUARIO-TEST', 'estado' => 'ACTIVO']);
         Personal::create(['cod_personal' => 'AUTOR-TEST', 'cod_usuario' => 'USUARIO-TEST', 'nombres' => 'Profesional',
@@ -51,7 +51,7 @@ final class ConservacionCompletaSQLTest extends TestCase
         Residente::factory()->create(['cod_residente' => 'RES-TEST', 'estado' => 'ADMITIDO']);
         $this->db = DB::connection()->getPdo();
         RepositorioNominal::verificarDestino($this->db);
-        $this->mapa = require base_path('prototipos/orion-conservacion-nominal/mapa-completo.php');
+        $this->mapa = require base_path('prototipos/experto-conservacion-nominal/mapa-completo.php');
         $this->db->exec(EsquemaNominal::ddl($this->mapa, $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)));
         $baseTemporal = PHP_OS_FAMILY === 'Windows' ? getenv('LOCALAPPDATA').'/Temp' : sys_get_temp_dir();
         $this->temporal = $baseTemporal.'/remembermind-nominal-'.bin2hex(random_bytes(10));
@@ -158,7 +158,7 @@ final class ConservacionCompletaSQLTest extends TestCase
         $dto = VariantesCanonicas::casos()['PET01']->vincularRelease($this->temporal.'/motor.zip', $release['huella']);
         $id = $dto->contenido['instrumental']['contenido']['contexto']['evaluacion'];
         $repo->guardar($id, (string) Str::uuid(), $dto, []);
-        $proceso = new Process([PHP_BINARY, base_path('prototipos/orion-conservacion-nominal/worker-lectura-completa.php'), $id], base_path(), timeout: 25);
+        $proceso = new Process([PHP_BINARY, base_path('prototipos/experto-conservacion-nominal/worker-lectura-completa.php'), $id], base_path(), timeout: 25);
         $proceso->mustRun();
         $lectura = json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR);
         self::assertSame([], $lectura['intentos_inferencia']);
@@ -220,7 +220,7 @@ final class ConservacionCompletaSQLTest extends TestCase
                 $propietario = $q->fetchColumn();
                 $pids = [];
                 foreach (['INSERTAR_HIJA', 'REINTENTAR'] as $modo) {
-                    $p = new Process([PHP_BINARY, base_path('prototipos/orion-conservacion-nominal/worker-concurrencia.php'),
+                    $p = new Process([PHP_BINARY, base_path('prototipos/experto-conservacion-nominal/worker-concurrencia.php'),
                         stream_socket_get_name($servidor, false), $modo, $archivo, $solicitud, $origenId, $propietario, 'COMPLETO'], base_path(), timeout: 30);
                     $p->start();
                     $procesos[] = $p;

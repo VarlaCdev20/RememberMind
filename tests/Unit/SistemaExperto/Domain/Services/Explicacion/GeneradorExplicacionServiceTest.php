@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Explicacion;
 
-use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
-use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
-use MotorExperto\dominio\orion\Services\Explicacion\GeneradorExplicacionService;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum as S;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\Services\Explicacion\GeneradorExplicacionService;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum as S;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum as V;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;

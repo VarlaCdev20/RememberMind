@@ -34,11 +34,11 @@ POST /admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones/co
 POST /admin/instrumentos/{instrumento}/residentes/{residente}/transcripciones
 ```
 
-La API y el modal permiten aportar puntuaciones y observaciones originales por respuesta, así como atención, clasificación e interpretación consignadas en el original. El modal muestra estos campos adicionales solo en transcripción, conserva NULL/cero y exige revisar de nuevo si cambian después de confirmar. Una puntuación incompatible con el catálogo no se sustituye: se informa el conflicto sin guardar. La clasificación transcrita se identifica como texto del original, no como una conclusión nueva de O.R.I.O.N. No se cargaron nuevos registros de residentes en esta entrega.
+La API y el modal permiten aportar puntuaciones y observaciones originales por respuesta, así como atención, clasificación e interpretación consignadas en el original. El modal muestra estos campos adicionales solo en transcripción, conserva NULL/cero y exige revisar de nuevo si cambian después de confirmar. Una puntuación incompatible con el catálogo no se sustituye: se informa el conflicto sin guardar. La clasificación transcrita se identifica como texto del original, no como una conclusión nueva de sistema experto No se cargaron nuevos registros de residentes en esta entrega.
 
 ## Investigación y límites del dato
 
-El [informe de fuentes originales](ORION_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md) documenta siete métodos normativos con publicaciones primarias, entradas, unidades, condiciones y material que debe identificarse. Distingue identidad del método investigado e identidad realmente acreditada para una aplicación. HL7 R4 sirve como referencia de procedencia; no añade infraestructura ni obligaciones legales.
+El [informe de fuentes originales](EXPERTO_FUENTES_ORIGINALES_E_INVESTIGACION_2026_10_19.md) documenta siete métodos normativos con publicaciones primarias, entradas, unidades, condiciones y material que debe identificarse. Distingue identidad del método investigado e identidad realmente acreditada para una aplicación. HL7 R4 sirve como referencia de procedencia; no añade infraestructura ni obligaciones legales.
 
 El catálogo local tiene 29 preguntas de opción y carece de los ensayos/tiempos/condiciones tipados de esos métodos. No hay una vinculación comprobada que permita deducirlos desde categorías nominales. `perfiles_instrumentales` sigue vacío: habilitar referencias por parecido de nombres atribuiría un instrumento no acreditado. El trabajo de interpretación adicional de fase 3 mantiene su expediente separado.
 

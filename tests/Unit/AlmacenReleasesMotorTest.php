@@ -16,7 +16,7 @@ final class AlmacenReleasesMotorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->raiz = sys_get_temp_dir().'/orion-retencion-'.bin2hex(random_bytes(8));
+        $this->raiz = sys_get_temp_dir().'/decision-retencion-'.bin2hex(random_bytes(8));
         self::assertTrue(mkdir($this->raiz, 0700));
     }
 

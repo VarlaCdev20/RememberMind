@@ -4,7 +4,7 @@ Estado: **diseño pendiente de decisión estructural; no aprobado ni aplicado**.
 
 ## Problema comprobado
 
-El perfil ejecuta Memoria, G09, Petersen y su puente con versiones diferentes. `evaluaciones_expertas.cod_version_modelo` admite una sola FK; `id_evaluacion_dominio` es único. Las lecturas de `AlmacenInstantaneas` y `EvaluacionExpertaEloquentRepository` contrastan criterios, fuentes y mapeos contra esa misma versión. El contrato `ORION-SNAP-2` tiene una memoria con una versión, no el manifiesto compuesto del perfil nuevo.
+El perfil ejecuta Memoria, G09, Petersen y su puente con versiones diferentes. `evaluaciones_expertas.cod_version_modelo` admite una sola FK; `id_evaluacion_dominio` es único. Las lecturas de `AlmacenInstantaneas` y `EvaluacionExpertaEloquentRepository` contrastan criterios, fuentes y mapeos contra esa misma versión. El contrato `conservación de instantáneas v2` tiene una memoria con una versión, no el manifiesto compuesto del perfil nuevo.
 
 No basta con quitar esas comprobaciones: permitiría mezclar reglas y evidencias ajenas. Tampoco sirve guardar varias cabeceras bajo el mismo `id_evaluacion_dominio`, escribir el manifiesto en observaciones o crear una versión común ficticia. El inventario vigente es 73 tablas operativas + 33 expertas; esta RFC no lo cambia.
 
@@ -38,7 +38,7 @@ Este diccionario **no es una migración lista para aplicar**: falta cerrar, por 
 ## Contrato que debe cerrar el adaptador antes de escribir
 
 1. Registrar revisiones reales de conocimiento y contratos técnicos, conservando sus códigos y contenidos inmutables. Una FK existente no demuestra por sí sola que la revisión sea elegible.
-2. Aislar memoria y reglas de cada componente; validar las referencias contra la versión del componente y la cabecera/caso/corte común. El camino histórico `ORION-SNAP-2` conserva sus invariantes.
+2. Aislar memoria y reglas de cada componente; validar las referencias contra la versión del componente y la cabecera/caso/corte común. El camino histórico `conservación de instantáneas v2` conserva sus invariantes.
 3. Mapear cada dato de entrada a una copia escalar tipada, FK original o relación normalizada aprobada. La matriz debe incluir captura bruta de respuestas admitidas y rechazadas, contexto de Memoria/G09 y referencias independientes DCL, con sus fechas, autor/procedencia y estado originales.
 4. No exigir que un autor histórico identificable siga activo hoy; sí revalidar la cuenta y autorización del ejecutor actual. No inventar un autor ausente.
 5. Guardar cabecera, hechos, soportes, condiciones, resultados, causas de no emisión y manifiesto en una sola transacción. Error en cualquier paso revierte el conjunto.

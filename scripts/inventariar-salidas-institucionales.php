@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 // Auditoría estructural del corpus sintético existente. No inicia Laravel ni abre conexiones SQL.
 require dirname(__DIR__).'/vendor/autoload.php';
-require dirname(__DIR__).'/prototipos/orion-conservacion-0_2/CasoCanonico.php';
-require dirname(__DIR__).'/prototipos/orion-conservacion-0_2/VariantesCanonicas.php';
+require dirname(__DIR__).'/prototipos/experto-conservacion-0_2/CasoCanonico.php';
+require dirname(__DIR__).'/prototipos/experto-conservacion-0_2/VariantesCanonicas.php';
 
 use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
-use OrionFase02\VariantesCanonicas;
+use ConservacionFase02\VariantesCanonicas;
 
 $comprobar = ($argv[1] ?? null) === '--check';
 if (count($argv) > 2 || (isset($argv[1]) && ! $comprobar)) {

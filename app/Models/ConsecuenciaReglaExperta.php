@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// O.R.I.O.N. 4.16.19; restricciones físicas D-137.
+// sistema experto 4.16.19; restricciones físicas D-137.
 class ConsecuenciaReglaExperta extends ModeloExperto
 {
     protected $table = 'consecuencias_regla_experta';

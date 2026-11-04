@@ -1,6 +1,6 @@
 # Ensayo de unión tipada de vínculos de evidencia
 
-> El máximo vigente posterior es **104** tablas de negocio. Un [ensayo físico en SQLite desechable](../../prototipos/orion-consolidacion-104/ensayar-vinculos-sqlite.php) añadió evidencia sintética de transición, reconstrucción, FK/checks y rollback. No acredita migración poblada PostgreSQL ni autoriza alterar la BDD.
+> El máximo vigente posterior es **104** tablas de negocio. Un [ensayo físico en SQLite desechable](../../prototipos/experto-consolidacion-104/ensayar-vinculos-sqlite.php) añadió evidencia sintética de transición, reconstrucción, FK/checks y rollback. No acredita migración poblada PostgreSQL ni autoriza alterar la BDD.
 
 Fecha: 20/10/2026. Estado: **candidato de solo lectura; no aprobado para DDL**.
 
@@ -16,7 +16,7 @@ exclusivos. No convierte esos soportes en columnas repetidas ni en JSON/EAV.
 Inventario de solo lectura en `remembermind_dev`: 225 participaciones (150
 por `cod_evidencia_evaluacion` y 75 por `cod_hecho_instantanea`) y 150 soportes
 de condición. Ninguna de las dos tablas tiene FK entrantes. El
-[`ensayo reproducible`](../../prototipos/orion-reduccion-100/ensayar-vinculos-evidencia.php)
+[`ensayo reproducible`](../../prototipos/experto-reduccion-100/ensayar-vinculos-evidencia.php)
 proyecta las 375 filas en dos variantes nominales y reconstruye exactamente
 todas las columnas y NULL actuales; rechaza referencias ausentes. También
 rechaza ejecutarse fuera de una base local de desarrollo o desechable.

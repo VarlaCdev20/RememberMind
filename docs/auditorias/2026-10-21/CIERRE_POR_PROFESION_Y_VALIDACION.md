@@ -1,4 +1,4 @@
-# Cierre por profesión y validación de O.R.I.O.N.
+# Cierre por profesión y validación de sistema experto
 
 Fecha: 21/10/2026. **Propuesta derivada de auditoría, no protocolo clínico
 adoptado ni autorización para ampliar permisos.** Describe cómo alcanzar el
@@ -230,7 +230,7 @@ sin probabilidades. Kappa por sí solo tampoco demuestra utilidad clínica.
 TRIPOD distingue desarrollo, validación y actualización de modelos predictivos;
 evaluar sobre los mismos casos de ajuste puede ser optimista. Se toma ese
 principio como orientación metodológica para separar etapas; no se afirma que
-O.R.I.O.N. sea un modelo entrenado ni que este documento satisfaga TRIPOD.
+sistema experto sea un modelo entrenado ni que este documento satisfaga TRIPOD.
 [Alcance TRIPOD](https://www.tripod-statement.org/scope/),
 [TRIPOD, validación y sobreajuste](https://www.tripod-statement.org/wp-content/uploads/2023/02/TRIPOD-Cluster-EE.pdf).
 

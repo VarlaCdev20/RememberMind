@@ -19,12 +19,12 @@ final class ReferenciaF02PostgresDesechableTest extends TestCase
         }
 
         $raiz = dirname(__DIR__, 2);
-        $nombre = 'remembermind-orion-f02-'.bin2hex(random_bytes(8));
+        $nombre = 'remembermind-decision-f02-'.bin2hex(random_bytes(8));
         // sys_get_temp_dir() puede devolver la ruta corta 8.3 de Windows y romper el aislamiento textual del replay.
         $temporal = rtrim((string) getenv('LOCALAPPDATA'), '/\\').DIRECTORY_SEPARATOR.'Temp';
         self::assertDirectoryExists($temporal);
         $salida = $temporal.DIRECTORY_SEPARATOR.$nombre;
-        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/orion-conservacion-0_2/ensayo.php', $salida], $raiz);
+        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/experto-conservacion-0_2/ensayo.php', $salida], $raiz);
         $proceso->setTimeout(180);
 
         try {

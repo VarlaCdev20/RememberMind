@@ -35,7 +35,7 @@ final class CargarPaqueteInvestigadoCOGMEM
                 'fecha_hora_retiro' => null, 'motivo_cambio' => 'Investigación e implementación solicitadas por la propietaria el 08/10/2026.',
                 'cod_usuario_creacion' => $creador, 'cod_version_anterior' => null,
                 'observacion' => 'Fuentes consultadas el 08/10/2026: '.implode(' ; ', P::FUENTES)
-                    .'. Sin dictamen profesional de este contenido nuevo; no reemplaza ORION-V1.'];
+                    .'. Sin dictamen profesional de este contenido nuevo; no reemplaza EXPERTO-V1.'];
             $convertidas = app(\App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento::class)->traducir(['versiones_modelo_experto'=>[$version]] + $tablas, P::VERSION, $versionReal, $guardada !== null);
             $version = $convertidas['versiones_modelo_experto'][0];
             unset($convertidas['versiones_modelo_experto']);

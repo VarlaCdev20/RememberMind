@@ -10,7 +10,8 @@ final class GrafoInferenciaHistorica
     public function presentar(array $lectura, bool $permisoInstrumental): array
     {
         $grafo = ['nodos' => [], 'aristas' => [], 'reglas' => [], 'aviso' => null,
-            'evaluacion' => $lectura['evaluacion']['id'] ?? null, 'version' => $lectura['evaluacion']['version'] ?? null];
+            'evaluacion' => $lectura['evaluacion']['id'] ?? null,
+            'version' => isset($lectura['evaluacion']['version']) ? LenguajeResultadosExperto::version($lectura['evaluacion']['version']) : null];
         $detalle = $lectura['detalle'];
         if (($lectura['prueba_tecnica'] ?? false) || isset($lectura['simulacion_local'])) {
             $grafo['aviso'] = 'Esta ejecución utiliza otro contrato de conservación. No se presenta como traza clínica D-137.';
@@ -27,7 +28,7 @@ final class GrafoInferenciaHistorica
         $agregar = function (string $id, string $tipo, string $nombre, int $columna, array $datos = [], string $estado = '') use (&$nodos, $grafo): void {
             $estado = $estado ?: 'Referencia conservada';
             $nodos[$id] = compact('id', 'tipo', 'nombre', 'columna', 'datos', 'estado')
-                + ['version' => $grafo['version'], 'evaluacion' => $grafo['evaluacion']];
+                + ['version' => LenguajeResultadosExperto::version($grafo['version']), 'evaluacion' => $grafo['evaluacion']];
         };
         $aristas = [];
         $conectar = function (string $origen, string $destino, string $relacion) use (&$aristas): void {

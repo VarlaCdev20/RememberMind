@@ -138,7 +138,7 @@ El test de recorrido pasa porque comprueba ausencia de destinos inexistentes/mé
 | 403 | Cuenta/rol/permiso no autoriza la operación. Se reprodujo con Familiar entrando a Usuarios. | Ocupación de Gerencia: el sidebar permite la entrada, un redirect lleva a `admin.administracion.habitaciones` y el middleware de esa agrupación exige `admisiones.ver_dashboard`. |
 | 404 | Ruta/recurso inexistente; también `denyAsNotFound()` oculta recursos fuera de alcance para evitar enumeración. | Enfermería fuera de la asignación puede recibirlo deliberadamente. Forzar traza experta sin capacidad también lo produce; eso no demuestra ruta rota. |
 | 405 | La ruta existe, pero el método HTTP no es el admitido. Se reprodujo haciendo GET a Logout, que requiere POST. | El escaneo de enlaces literales no encontró enlaces normales dirigidos a rutas exclusivamente no-GET. No equivale a demostrar ausencia de fallos JS/formulario en todas las pantallas. |
-| 422 | Validación o argumento no admitido. | El anterior incidente de destino `orion-petersen-detalle` era un rechazo de navegación, no un diagnóstico fallido. Su regresión se incluye en la selección experta actual. |
+| 422 | Validación o argumento no admitido. | El anterior incidente de destino `decision-petersen-detalle` era un rechazo de navegación, no un diagnóstico fallido. Su regresión se incluye en la selección experta actual. |
 | 409 | Conflicto de estado/operación no permitida. | La restauración instrumental tiene un 409 explícito porque no tiene contrato de rectificación habilitado; no debe confundirse con un 405. |
 | 500 | Error inesperado del servidor. | La muestra de 89 entradas no lo produjo. Eso no demuestra que todas las acciones internas estén libres de errores. |
 
@@ -240,7 +240,7 @@ El DTO se construye y verifica como `persistido=false` y `release_retenido=false
 
 ### H08 — Alta de alcance: el prototipo no es una solución SQL institucional instalable
 
-`tests/Feature/ConservacionCompletaSQLTest.php:35–45` carga clases de `prototipos/orion-conservacion-nominal`, no un repositorio institucional integrado.
+`tests/Feature/ConservacionCompletaSQLTest.php:35–45` carga clases de `prototipos/experto-conservacion-nominal`, no un repositorio institucional integrado.
 
 El informe `RECUPERACION_SQL_COMPLETA_REFERENCIA_2026_10_22.md:87–104` reconoce 129 relaciones adicionales, 229 tablas hipotéticas en total, 4.411 columnas y un máximo de 412 columnas por relación. También reconoce FK semánticas históricas incompletas y que copiar el DTO no demuestra 4FN.
 
@@ -270,7 +270,7 @@ La traza se delega a auditoría técnica de Superadministración. Medicina/Psico
 
 ### H13 — Media de aceptación: manifiesto de «104 escenarios» no localizado
 
-`FASE_2_MATRIZ_MAESTRA_INFERENCIA_2026_10_20.md:7` y `ACEPTACION_INTEGRAL_ORION_2026_10_21.md:23` reconocen la ausencia. Existen VT01–VT15 y 225 cruces de matriz; no son 225 pacientes ni sustituyen el manifiesto solicitado.
+`FASE_2_MATRIZ_MAESTRA_INFERENCIA_2026_10_20.md:7` y `ACEPTACION_INTEGRAL_EXPERTO_2026_10_21.md:23` reconocen la ausencia. Existen VT01–VT15 y 225 cruces de matriz; no son 225 pacientes ni sustituyen el manifiesto solicitado.
 
 **Cierre:** identificar archivo versionado con entradas, fuentes, reglas, salida esperada y comando reproducible, o retirar la cifra como criterio de aceptación no respaldado.
 
@@ -377,7 +377,7 @@ El número de líneas o botones no demuestra por sí solo saturación visual. S�
 
 ### H26 — Media: ensayo F02 desactualizado respecto de la base consolidada
 
-`prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php:68–69`, `:313` exige 120 tablas físicas. `tests/Unit/ReferenciaF02SqliteDesechableTest.php:32` espera un texto sobre 104 tablas de negocio y 157 físicas. La base actual es 100 + 16.
+`prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php:68–69`, `:313` exige 120 tablas físicas. `tests/Unit/ReferenciaF02SqliteDesechableTest.php:32` espera un texto sobre 104 tablas de negocio y 157 físicas. La base actual es 100 + 16.
 
 El fallo fue reproducido por la suite unitaria completa. **Cierre:** actualizar inventario, transición y cálculos del ensayo conservando las garantías; no borrar la comprobación para obtener PASS.
 

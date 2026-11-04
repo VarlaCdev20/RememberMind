@@ -113,16 +113,16 @@ class InformeCognitivoTest extends TestCase
             ->assertSee('¿Qué significa el resultado?')->assertSee('¿Por qué llegamos a este resultado?')->assertSee('Historial de valoraciones')
             ->assertSee(LenguajeResultadosExperto::conclusionMemoria($codigo))
             ->assertSee('¿Cómo se obtuvo este resultado?')
-            ->assertDontSee('¿Cómo razonó O.R.I.O.N.?')->assertDontSee('Fecha y versión')
+            ->assertDontSee('¿Cómo razonó sistema experto?')->assertDontSee('Fecha y versión')
             ->assertDontSee('Nueva evaluación')->assertDontSee('Exportar reporte')->assertDontSee('Confirmar concordancia')
             ->call('irASeccion', 'fuentes-disponibles')
-            ->assertDispatched('orion-navigate', seccion: 'fuentes-disponibles')
+            ->assertDispatched('decision-navigate', seccion: 'fuentes-disponibles')
             ->call('irASeccion', 'hallazgos-observacionales')
-            ->assertDispatched('orion-navigate', seccion: 'hallazgos-observacionales')
+            ->assertDispatched('decision-navigate', seccion: 'hallazgos-observacionales')
             ->call('irASeccion', 'aplicaciones-instrumentales')
-            ->assertDispatched('orion-navigate', seccion: 'aplicaciones-instrumentales')
-            ->call('irASeccion', 'orion-desglose')
-            ->assertDispatched('orion-navigate', seccion: 'orion-desglose');
+            ->assertDispatched('decision-navigate', seccion: 'aplicaciones-instrumentales')
+            ->call('irASeccion', 'decision-desglose')
+            ->assertDispatched('decision-navigate', seccion: 'decision-desglose');
         $this->assertSame($antes, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
         $this->assertDatabaseCount('diagnosticos', 0);
         $this->assertDatabaseCount('alertas', 0);
@@ -413,7 +413,7 @@ class InformeCognitivoTest extends TestCase
             ['evaluaciones_expertas', 'origen_activacion', 'SIMULACION_LOCAL'],
             ['evaluaciones_expertas', 'estado_ejecucion', 'PRUEBA_FINALIZADA'],
             ['evaluaciones_expertas', 'id_evaluacion_dominio', 'sim-cas-10'],
-            ['versiones_modelo_experto', 'codigo_version', 'SIM-ORION-LOCAL-1'],
+            ['versiones_modelo_experto', 'codigo_version', 'SIM-EXPERTO-LOCAL-1'],
             ['versiones_modelo_experto', 'codigo_version', 'ARTIFICIAL_INFORME'],
             ['versiones_modelo_experto', 'codigo_version', 'G09-EXP-20261017'],
         ];

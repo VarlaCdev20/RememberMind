@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorConfusoresService;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\Services\Compuertas\EvaluadorConfusoresService;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
 use DomainException;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;

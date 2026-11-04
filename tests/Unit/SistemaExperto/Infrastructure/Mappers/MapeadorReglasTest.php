@@ -7,7 +7,7 @@ namespace Tests\Unit\SistemaExperto\Infrastructure\Mappers;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorReglas;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

@@ -57,7 +57,7 @@ final class GobiernoReglasExpertasTest extends TestCase
 
     private function revision(): string
     {
-        return app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-GOB-1', 'Revisión explícita del conocimiento para ensayo de ingeniería.');
+        return app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-GOB-1', 'Revisión explícita del conocimiento para ensayo de ingeniería.');
     }
 
     public function test_gobierno_admite_condicion_de_subcomponente_con_vinculo_explicito(): void
@@ -67,7 +67,7 @@ final class GobiernoReglasExpertasTest extends TestCase
         $nueva = ['codigo' => 'MEM-S01-REV', 'nombre' => 'Conjunción de componente', 'descripcion' => 'Condición estructural de ingeniería.',
             'fundamento' => 'Caso sintético de pertenencia explícita.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
             'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'];
-        $id = app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-SUBCOMPONENTE',
+        $id = app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-SUBCOMPONENTE',
             'Sustitución con variable de un subcomponente explícito.', $nueva, sustituye: 'RULE_A');
         $r = ReglaExperta::query()->where('cod_version_modelo', $id)->where('codigo_regla', 'MEM-S01-REV')->sole();
         self::assertSame('RULE_A', $r->cod_regla_anterior);
@@ -87,7 +87,7 @@ final class GobiernoReglasExpertasTest extends TestCase
             'fundamento' => 'Negativo sintético de pertenencia.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
             'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'];
         try {
-            app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-SUB-INVALIDA', 'Debe conservar la revisión original.', $nueva);
+            app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-SUB-INVALIDA', 'Debe conservar la revisión original.', $nueva);
             self::fail('La pertenencia activó una participación implícita.');
         } catch (DomainException) {
             self::assertSame(1, DB::table('versiones_modelo_experto')->count());
@@ -107,7 +107,7 @@ final class GobiernoReglasExpertasTest extends TestCase
         foreach ([$contratos, null] as $contrato) {
             config(['sistema_experto.contratos_conocimiento.VER_TEST' => $contrato]);
             try {
-                app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-DECORATIVA', 'No publicar una participación decorativa.', $nueva);
+                app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-DECORATIVA', 'No publicar una participación decorativa.', $nueva);
                 self::fail('Se publicó conocimiento sin contrato inferencial.');
             } catch (DomainException) {
                 self::assertSame(1, DB::table('versiones_modelo_experto')->count());
@@ -119,7 +119,7 @@ final class GobiernoReglasExpertasTest extends TestCase
     public function test_archivo_crea_sucesora_con_autor_y_pendientes_sin_cambiar_el_original(): void
     {
         $original = app(ConocimientoVersionado::class)->instantanea('VER_TEST');
-        $id = app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-ARCHIVO-1', 'Archivar esta regla manteniendo su contenido original.', retiradas: ['RULE_A']);
+        $id = app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-ARCHIVO-1', 'Archivar esta regla manteniendo su contenido original.', retiradas: ['RULE_A']);
         $new = ReglaExperta::query()->where('cod_version_modelo', $id)->where('cod_regla_anterior', 'RULE_A')->sole();
         self::assertSame('INACTIVO', $new->estado);
         self::assertSame('PENDIENTE', $new->estado_revision);
@@ -163,7 +163,7 @@ final class GobiernoReglasExpertasTest extends TestCase
         $u->givePermissionTo('reglas_expertas.gestionar');
         $before = DB::table('versiones_modelo_experto')->count();
         try {
-            app(Gestor::class)->crearRevision($u, 'VER_TEST', 'ORION-DENEGADA', 'No autorizar escritura por un permiso aislado.');
+            app(Gestor::class)->crearRevision($u, 'VER_TEST', 'EXPERTO-DENEGADA', 'No autorizar escritura por un permiso aislado.');
             self::fail('Se concedió escritura a una cuenta de consulta.');
         } catch (AuthorizationException) {
             self::assertSame($before, DB::table('versiones_modelo_experto')->count());
@@ -215,7 +215,7 @@ final class GobiernoReglasExpertasTest extends TestCase
     {
         $panel = Livewire::test(GobiernoReglasPanel::class)
             ->set('versionSeleccionada', 'VER_TEST')->assertSee('Crear versión sucesora')
-            ->call('prepararArchivo', 'RULE_A')->set('codigoVersion', 'ORION-UI-1')
+            ->call('prepararArchivo', 'RULE_A')->set('codigoVersion', 'EXPERTO-UI-1')
             ->set('motivoCambio', 'Retiro explícito desde el gestor de reglas.')->call('crearSucesora')
             ->assertHasNoErrors();
         $version = $panel->get('versionSeleccionada');
@@ -233,7 +233,7 @@ final class GobiernoReglasExpertasTest extends TestCase
             ->set('nueva', ['codigo' => 'MEM-REV-3', 'nombre' => 'Regla sustituta', 'descripcion' => 'Conjunción explícita.',
                 'fundamento' => 'Definición de ingeniería para prueba.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
                 'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_D'])
-            ->set('codigoVersion', 'ORION-SUSTITUCION')->set('motivoCambio', 'Sustitución conservando la definición original.')
+            ->set('codigoVersion', 'EXPERTO-SUSTITUCION')->set('motivoCambio', 'Sustitución conservando la definición original.')
             ->call('crearSucesora')->assertHasNoErrors();
         $new = ReglaExperta::query()->where('codigo_regla', 'MEM-REV-3')->sole();
         self::assertSame('RULE_A', $new->cod_regla_anterior);
@@ -299,7 +299,7 @@ final class GobiernoReglasExpertasTest extends TestCase
         $panel = Livewire::test(GobiernoReglasPanel::class)->set('versionSeleccionada', $id);
         DB::table('usuarios')->where('cod_usuario', $this->medico->getKey())->update(['estado' => 'INACTIVO']);
         $panel->call('crearSucesora')->assertForbidden();
-        self::assertFalse(DB::table('versiones_modelo_experto')->where('codigo_version', 'ORION-DENEGADA')->exists());
+        self::assertFalse(DB::table('versiones_modelo_experto')->where('codigo_version', 'EXPERTO-DENEGADA')->exists());
     }
 
     public function test_una_sucesora_no_rehabilita_la_definicion_rechazada(): void
@@ -317,7 +317,7 @@ final class GobiernoReglasExpertasTest extends TestCase
             'fundamento' => 'Definición negativa para prueba.', 'condiciones' => [['variable' => 'VAR_INS', 'valor' => 'VAL_A']],
             'criterio_dominio' => 'CR_DOM', 'valor_consecuencia' => 'RES_M'];
         try {
-            app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-INVALIDA', 'No publicar consecuencias del resolvedor.', $definition);
+            app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-INVALIDA', 'No publicar consecuencias del resolvedor.', $definition);
             self::fail('Se publicó una consecuencia reservada.');
         } catch (DomainException) {
             self::assertSame(1, DB::table('versiones_modelo_experto')->count());
@@ -346,7 +346,7 @@ final class GobiernoReglasExpertasTest extends TestCase
     public function test_codigo_de_version_demasiado_largo_falla_antes_de_insertar(): void
     {
         $this->expectException(DomainException::class);
-        app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-'.str_repeat('A', 25), 'Código fuera de la longitud física aprobada.');
+        app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-'.str_repeat('A', 25), 'Código fuera de la longitud física aprobada.');
     }
 
     public function test_rol_ajeno_personal_inactivo_o_ausente_y_preview_no_crean_conocimiento(): void
@@ -365,7 +365,7 @@ final class GobiernoReglasExpertasTest extends TestCase
         $actors[] = $inactivo;
         foreach ($actors as $u) {
             try {
-                app(Gestor::class)->crearRevision($u, 'VER_TEST', 'ORION-DENEGADA', 'No conceder gestión por permiso sin competencia.');
+                app(Gestor::class)->crearRevision($u, 'VER_TEST', 'EXPERTO-DENEGADA', 'No conceder gestión por permiso sin competencia.');
                 self::fail('Se autorizó una cuenta incompatible.');
             } catch (AuthorizationException) {
                 self::assertSame(1, DB::table('versiones_modelo_experto')->count());
@@ -401,7 +401,7 @@ final class GobiernoReglasExpertasTest extends TestCase
     {
         foreach (['cod_usuario_creacion', 'cod_usuario_revision'] as $campo) {
             try {
-                app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'ORION-ATRIBUCION', 'No atribuir conocimiento desde una entrada manipulada.', [$campo => 'USUARIO-AJENO']);
+                app(Gestor::class)->crearRevision($this->medico, 'VER_TEST', 'EXPERTO-ATRIBUCION', 'No atribuir conocimiento desde una entrada manipulada.', [$campo => 'USUARIO-AJENO']);
                 self::fail('Se aceptó un actor enviado por el cliente.');
             } catch (DomainException) {
                 self::assertSame(1, DB::table('versiones_modelo_experto')->count());

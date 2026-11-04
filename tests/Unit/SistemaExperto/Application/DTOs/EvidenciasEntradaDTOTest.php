@@ -6,8 +6,8 @@ namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

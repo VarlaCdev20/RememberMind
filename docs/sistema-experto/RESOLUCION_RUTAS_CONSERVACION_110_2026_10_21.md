@@ -1,12 +1,12 @@
-# O.R.I.O.N. — resolución verificable de rutas de conservación
+# sistema experto — resolución verificable de rutas de conservación
 
 **Corte:** 21/10/2026. **Estado:** ningún candidato de máximo 110 tablas ha superado todavía el gate de ida y vuelta integral. No es un diccionario DDL aprobable. No se modificó la BDD institucional.
 
 ## Resultado ruta por ruta
 
-La [matriz de 51 rutas](../../prototipos/orion-conservacion-110/matriz-resolucion-51-rutas.csv) se genera con [`verificar-rutas.php`](../../prototipos/orion-conservacion-110/verificar-rutas.php). Para cada ruta indica modelo, rama, grano, propietario lógico y del oráculo, cardinalidad, identidad del oráculo, número de campos del contrato, destino candidato, **todas las columnas y FK físicas** del destino instalado, estado, ensayo parcial pertinente, incompatibilidad individual y prueba de cierre pendiente. Se coteja con los inventarios de 120 tablas físicas migradas en SQLite `:memory:`, 39 modelos, 51 colecciones y 783 rutas de campo. El [resumen generado](../../prototipos/orion-conservacion-110/resumen-resolucion-rutas.json) informa **51 rutas con bloqueo individual, 9 con ensayo parcial y 9 cuyo destino candidato no está instalado**. Ninguna figura como resuelta en un candidato de 110 porque aún no existe un escritor/lector integral de ese candidato. Una prueba parcial no se cuenta como conservación institucional.
+La [matriz de 51 rutas](../../prototipos/experto-conservacion-110/matriz-resolucion-51-rutas.csv) se genera con [`verificar-rutas.php`](../../prototipos/experto-conservacion-110/verificar-rutas.php). Para cada ruta indica modelo, rama, grano, propietario lógico y del oráculo, cardinalidad, identidad del oráculo, número de campos del contrato, destino candidato, **todas las columnas y FK físicas** del destino instalado, estado, ensayo parcial pertinente, incompatibilidad individual y prueba de cierre pendiente. Se coteja con los inventarios de 120 tablas físicas migradas en SQLite `:memory:`, 39 modelos, 51 colecciones y 783 rutas de campo. El [resumen generado](../../prototipos/experto-conservacion-110/resumen-resolucion-rutas.json) informa **51 rutas con bloqueo individual, 9 con ensayo parcial y 9 cuyo destino candidato no está instalado**. Ninguna figura como resuelta en un candidato de 110 porque aún no existe un escritor/lector integral de ese candidato. Una prueba parcial no se cuenta como conservación institucional.
 
-La primera [matriz de auditoría](../../prototipos/orion-conservacion-110/matriz-auditoria-rutas.csv) marcaba 46 rutas con brechas iniciales. Este segundo gate conserva esas 46 y especifica también por qué las cinco restantes (`m001`, `m003`, `m013`, `m021`, `m023`) no acreditan conservación exacta: cabecera incompleta, motivo con propietario de clasificación distinto y vínculo de dominios que exige dos evidencias extraídas. Esta reclasificación **no demuestra que cada ruta requiera una tabla nueva**; impide contar una coincidencia nominal como ida y vuelta probada.
+La primera [matriz de auditoría](../../prototipos/experto-conservacion-110/matriz-auditoria-rutas.csv) marcaba 46 rutas con brechas iniciales. Este segundo gate conserva esas 46 y especifica también por qué las cinco restantes (`m001`, `m003`, `m013`, `m021`, `m023`) no acreditan conservación exacta: cabecera incompleta, motivo con propietario de clasificación distinto y vínculo de dominios que exige dos evidencias extraídas. Esta reclasificación **no demuestra que cada ruta requiera una tabla nueva**; impide contar una coincidencia nominal como ida y vuelta probada.
 
 ### Bloqueos físicos por grano
 
@@ -14,9 +14,9 @@ La primera [matriz de auditoría](../../prototipos/orion-conservacion-110/matriz
 | --- | --- | --- |
 | `m008`, `m009`, `m015`, `m016` | `relaciones_semanticas` almacena definiciones de la red; contrato/modalidad adquiridos tienen evaluación, rama, propietario, clave y orden. B01 ensayado parcialmente en SQLite. | Sin destino institucional compatible probado. |
 | `m005`, `m025` | Pregunta declarada puede carecer de respuesta y ser compartida por dos ramas. La tabla candidata `entradas_perfil_instrumental` aún no está instalada. B02 ensayado en SQLite y PostgreSQL. | Sin instalación ni composición integral. |
-| `m018` | Membresía requiere juicio y soporte original de la **misma evaluación**, orden y multiplicidad. `evidencias_criterio_evaluacion` no tiene esas FK compuestas instaladas. B03 ensayado parcialmente en SQLite. | Sin integración con D-137 y ORION-SNAP-2. |
+| `m018` | Membresía requiere juicio y soporte original de la **misma evaluación**, orden y multiplicidad. `evidencias_criterio_evaluacion` no tiene esas FK compuestas instaladas. B03 ensayado parcialmente en SQLite. | Sin integración con D-137 y conservación de instantáneas v2. |
 | `m002`, `m014`, `m017`, `m019`, `m020`, `m022` | `evidencias_evaluacion` exige `cod_mapeo_variable_fuente` y `cod_registro_fuente` no propios de captura, constancia, grupo de membresías, procedencia, juicio o soporte original. | Reutilización incompatible. |
-| `m006`, `m026` | `hechos_instantanea_experta` conserva hechos ORION-SNAP-2, no respuesta bruta vinculada a aplicación/pregunta/opción. Ensayo de 96 respuestas tipadas pasó en SQLite aislado. | Falta destino relacional institucional. |
+| `m006`, `m026` | `hechos_instantanea_experta` conserva hechos conservación de instantáneas v2, no respuesta bruta vinculada a aplicación/pregunta/opción. Ensayo de 96 respuestas tipadas pasó en SQLite aislado. | Falta destino relacional institucional. |
 | `m003`, `m013`, `m023` | `motivos_dcl_instantanea` exige FK `cod_clasificacion_dcl_instantanea`; el motivo de captura/adquisición pertenece a otro propietario. | No se puede usar la tabla sin cambiar grano/FK. |
 | `m021` | `relaciones_evidencias_evaluacion` exige dos FK a evidencias extraídas; un dominio revisado pertenece a un juicio Petersen original. | Destino semánticamente incompatible. |
 | 24 rutas `k_*` | La definición vigente no fija qué filas, valores y estados observó **cada rama** al corte; `k_criterios_dominios_resultado` y `k_variables_expertas` además usan alias de `nodos_semanticos`. | Faltan membresía, sello, protección histórica y replay desde lo retenido. |
@@ -38,10 +38,10 @@ El crecimiento de columnas, índices y FK institucionales para A/B **no puede da
 ## Ensayos ejecutados en bases desechables
 
 ```powershell
-php prototipos/orion-conservacion-110/verificar-rutas.php
-php prototipos/orion-consolidacion-104/ensayar-dto-compuesto-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-identidad-preguntas-compuestas-sqlite.php
-php prototipos/orion-consolidacion-104/ensayar-respuestas-dos-ramas-sqlite.php
+php prototipos/experto-conservacion-110/verificar-rutas.php
+php prototipos/experto-consolidacion-104/ensayar-dto-compuesto-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-identidad-preguntas-compuestas-sqlite.php
+php prototipos/experto-consolidacion-104/ensayar-respuestas-dos-ramas-sqlite.php
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'ReferenciaF02PostgresDesechableTest|ConservacionB02PostgresTest|ConservacionCierrePostgresTest|ConservacionCriterioPostgresTest'
 ```
 
@@ -53,7 +53,7 @@ No se presenta DDL para aprobación: el candidato A no representa las rutas señ
 
 ## Incremento ejecutable posterior a este dictamen
 
-Se añadió [`ensayar-sqlite-completo.php`](../../prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php), que reutiliza el **escritor y lector SQL completo** `ProyeccionTipada` sobre SQLite `:memory:`. Se parametrizó solo el prefijo de esquema de esa clase, sin alterar el repositorio Laravel. En este oráculo, B01 comparte una tabla física para contratos adquiridos de ambas ramas y otra para sus modalidades; cada fila conserva propietario, rol de colección y orden. Son **38 tablas de ensayo** para 39 modelos y 51 rutas, frente a 40 tablas SQLite sin esa fusión y 42 tablas de la referencia PostgreSQL original. No se trata de una migración ni de una solución bajo 110: añadir 38 relaciones al inventario instalado daría 142 tablas de negocio, sin contar aún todos los controles de release y anclaje de la referencia PostgreSQL.
+Se añadió [`ensayar-sqlite-completo.php`](../../prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php), que reutiliza el **escritor y lector SQL completo** `ProyeccionTipada` sobre SQLite `:memory:`. Se parametrizó solo el prefijo de esquema de esa clase, sin alterar el repositorio Laravel. En este oráculo, B01 comparte una tabla física para contratos adquiridos de ambas ramas y otra para sus modalidades; cada fila conserva propietario, rol de colección y orden. Son **38 tablas de ensayo** para 39 modelos y 51 rutas, frente a 40 tablas SQLite sin esa fusión y 42 tablas de la referencia PostgreSQL original. No se trata de una migración ni de una solución bajo 110: añadir 38 relaciones al inventario instalado daría 142 tablas de negocio, sin contar aún todos los controles de release y anclaje de la referencia PostgreSQL.
 
 El script ejecuta seis variantes sintéticas: patrón amnésico, falta de C03, ausencia de gobierno, ausencias/NULL/orden, varias fuentes documentales y vínculo interpretativo. En cada una guarda filas SQL, recupera entradas, compara forma canónica, reconstruye las dos ramas y compara DTO/huella originales con el replay. También rechaza escritura posterior al cierre, edición de la cabecera cerrada y una hija de propietario ajeno; comprueba rollback sin fila parcial. La nueva [prueba PHPUnit](../../tests/Unit/ReferenciaF02SqliteDesechableTest.php) ejecuta el script: **1 prueba, 3 aserciones, PASS**. La referencia PostgreSQL original se volvió a ejecutar sin regresión: **1 prueba, 5 aserciones, PASS** en cluster desechable.
 

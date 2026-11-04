@@ -7,10 +7,10 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Services\Inferencia\MotorInferenciaService;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Services\Inferencia\MotorInferenciaService;
 
 /** Coordina conocimiento versionado y el motor puro. */
 final readonly class EjecutarInferenciaUseCase

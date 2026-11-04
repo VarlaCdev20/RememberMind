@@ -1,4 +1,4 @@
-# O.R.I.O.N. — G08: localizadores exactos de anexos normativos para Bolivia
+# sistema experto — G08: localizadores exactos de anexos normativos para Bolivia
 
 > Documento de investigación importado selectivamente del worktree `pr15-ci-utf8`, HEAD `8085ec0e`, el 18/10/2026. Las referencias conservan su cotejo original; esta entrega no realiza aprobación normativa ni clínica. Véase [evidencia actual de Fase 01](FASE01_AUDITORIA_Y_EVIDENCIA_2026_10_18.md).
 

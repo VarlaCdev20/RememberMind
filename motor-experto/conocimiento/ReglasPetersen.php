@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MotorExperto\conocimiento;
 
+use MotorExperto\conservacion\IdentificadoresHistoricos;
+
 use DomainException;
 use MotorExperto\conocimiento\PaqueteConocimiento;
 use MotorExperto\inferencia\EvaluadorReglas;
@@ -11,7 +13,7 @@ use MotorExperto\inferencia\EvaluadorReglas;
 /** Define cuatro patrones orientativos según requisitos, memoria y dominios alterados. */
 final class ReglasPetersen
 {
-    public const CODIGO = 'ORION-PETERSEN-1';
+    public const CODIGO = IdentificadoresHistoricos::PETERSEN;
 
     public const FUNDAMENTO = 'Gobierno del contrato PETERSEN-INSTITUCIONAL-1, E–H adoptado el 19/10/2026. Cuatro patrones orientativos desde originales admisibles; sin equivalencia observación/dominio ni acreditación automática de C03. Revisión profesional posterior pendiente.';
 

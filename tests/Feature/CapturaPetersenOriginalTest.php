@@ -39,7 +39,7 @@ use Livewire\Livewire;
 use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use MotorExperto\conservacion\InstantaneaPetersen;
-use OrionNominal\MembresiasSQL;
+use ExpertoNominal\MembresiasSQL;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -155,9 +155,9 @@ final class CapturaPetersenOriginalTest extends TestCase
     /** Dos relaciones de ensayo; ningún cambio se registra como migración instalable. */
     private function prepararMembresiasSQL(bool $dosSoportes = false): array
     {
-        require_once base_path('prototipos/orion-conservacion-0_2/GuardiaDesechable.php');
-        require_once base_path('prototipos/orion-conservacion-nominal/RepositorioNominal.php');
-        require_once base_path('prototipos/orion-conservacion-nominal/MembresiasSQL.php');
+        require_once base_path('prototipos/experto-conservacion-0_2/GuardiaDesechable.php');
+        require_once base_path('prototipos/experto-conservacion-nominal/RepositorioNominal.php');
+        require_once base_path('prototipos/experto-conservacion-nominal/MembresiasSQL.php');
         $control = ControlCognitivo::create(['cod_residente' => $this->residente->getKey(),
             'cod_personal' => $this->usuario->personal->getKey(), 'fecha_hora' => '2026-10-17 09:00:00',
             'estado' => 'VIGENTE', 'observacion' => 'Fuente efímera para ensayo de membresías.']);
@@ -410,7 +410,7 @@ final class CapturaPetersenOriginalTest extends TestCase
             self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $dto, function (PDO $db) use ($dto, $original, $tardio, $servidor, &$procesos, &$sockets): void {
                 $pids = [];
                 foreach (['INSERTAR', 'REINTENTAR'] as $modo) {
-                    $p = new Process([PHP_BINARY, base_path('prototipos/orion-conservacion-nominal/worker-membresias.php'),
+                    $p = new Process([PHP_BINARY, base_path('prototipos/experto-conservacion-nominal/worker-membresias.php'),
                         stream_socket_get_name($servidor, false), $modo], base_path(), timeout: 30);
                     $p->start();
                     $procesos[] = $p;

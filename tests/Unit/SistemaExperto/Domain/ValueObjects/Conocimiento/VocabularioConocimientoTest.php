@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Conocimiento;
 
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\EstadoReglaEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
 use PHPUnit\Framework\TestCase;
 
 /** Comprobar los límites semánticos del vocabulario aislado de esta fase. */

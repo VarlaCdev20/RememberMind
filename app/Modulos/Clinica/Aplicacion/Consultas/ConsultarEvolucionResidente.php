@@ -9,7 +9,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
-/** Compara hechos guardados en ventanas equivalentes sin inferencia diagnóstica ni O.R.I.O.N. */
+/** Compara hechos guardados en ventanas equivalentes sin inferencia diagnóstica ni sistema experto */
 final class ConsultarEvolucionResidente
 {
     public const CAMPOS_FUNCIONALES = [

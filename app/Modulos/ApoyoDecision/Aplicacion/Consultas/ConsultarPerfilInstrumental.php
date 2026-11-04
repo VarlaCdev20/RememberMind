@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\PlanCapturaDcl;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratosConocimiento;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Gate;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
@@ -54,7 +54,7 @@ final readonly class ConsultarPerfilInstrumental
                 if (! $capturas['disponible']) {
                     return null;
                 }
-                $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoOrion::class)->leer());
+                $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoCognitivo::class)->leer());
 
                 return (new PerfilInstrumentalCognitivo)->construir($red, $capturas);
             });
@@ -87,7 +87,7 @@ final readonly class ConsultarPerfilInstrumental
         if (isset($consulta['perfil_instrumental'])) {
             $perfil = $consulta['perfil_instrumental'];
         } else {
-            $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoOrion::class)->leer());
+            $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoCognitivo::class)->leer());
             $perfil = (new PerfilInstrumentalCognitivo)->construir($red, $captura);
         }
         unset($consulta['capturas'], $consulta['perfil_instrumental']);

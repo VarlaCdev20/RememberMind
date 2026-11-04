@@ -82,7 +82,7 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
         $antes = $this->paquete($id);
         $regla = ReglaExperta::query()->where('cod_version_modelo', $id)->where('codigo_regla', 'PET-01')->sole();
         self::assertSame('PET-01', (new P)->evaluar($antes, $this->estados())['patron']);
-        $sucesora = app(Gestor::class)->crearRevision($this->actor, $id, 'ORION-PET-ARCHIVO-2', 'Archivo de patrón conservando sus condiciones originales.', retiradas: [$regla->getKey()]);
+        $sucesora = app(Gestor::class)->crearRevision($this->actor, $id, 'EXPERTO-PET-ARCHIVO-2', 'Archivo de patrón conservando sus condiciones originales.', retiradas: [$regla->getKey()]);
         self::assertSame($sucesora, app(ContratosConocimiento::class)->versionPetersenVigente(CarbonImmutable::now()));
         self::assertNull((new P)->evaluar($this->paquete($sucesora), $this->estados())['patron']);
         self::assertSame('PET-01', (new P)->evaluar($antes, $this->estados())['patron']);
@@ -101,7 +101,7 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
             'criterio_dominio' => $p->tabla('criterios_dominios_resultado')[0]['cod_criterio_dominio_resultado'],
             'valor_consecuencia' => $p->tabla('consecuencias_regla_experta')[0]['cod_valor_semantico']];
         try {
-            app(Gestor::class)->crearRevision($this->actor, $id, 'ORION-PET-INSEGURO', 'No debe omitir los antecedentes originales de Petersen.', $definicion);
+            app(Gestor::class)->crearRevision($this->actor, $id, 'EXPERTO-PET-INSEGURO', 'No debe omitir los antecedentes originales de Petersen.', $definicion);
             self::fail('El editor publicó otra semántica clínica.');
         } catch (DomainException $e) {
             self::assertStringContainsString('cuatro definiciones', $e->getMessage());
@@ -109,7 +109,7 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
         self::assertDatabaseCount('versiones_modelo_experto', 1);
         self::assertNull(VersionModeloExperto::findOrFail($id)->fecha_hora_retiro);
         Livewire::test(GobiernoReglasPanel::class)->set('versionSeleccionada', $id)->assertDontSee('Incorporar una regla nueva o sustituta')
-            ->set('agregarRegla', true)->set('nueva', $definicion)->set('codigoVersion', 'ORION-PET-INSEGURO')
+            ->set('agregarRegla', true)->set('nueva', $definicion)->set('codigoVersion', 'EXPERTO-PET-INSEGURO')
             ->set('motivoCambio', 'No debe omitir los antecedentes originales de Petersen.')->call('crearSucesora')->assertHasErrors('gobierno');
         self::assertDatabaseCount('versiones_modelo_experto', 1);
     }
@@ -130,10 +130,10 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
     public function test_dos_ramas_vigentes_no_se_resuelven_eligiendo_una_fila(): void
     {
         $id = app(RegistrarConocimientoPetersen::class)->ejecutar($this->actor);
-        $sucesora = app(Gestor::class)->crearRevision($this->actor, $id, 'ORION-PET-RAMA-2', 'Sucesión usada para comprobar ambigüedad de versiones.');
+        $sucesora = app(Gestor::class)->crearRevision($this->actor, $id, 'EXPERTO-PET-RAMA-2', 'Sucesión usada para comprobar ambigüedad de versiones.');
         $cabecera = VersionModeloExperto::findOrFail($sucesora)->getAttributes();
         $cabecera['cod_version_modelo'] = 'VER-PET-AMBIGUA';
-        $cabecera['codigo_version'] = 'ORION-PET-OTRA-RAMA';
+        $cabecera['codigo_version'] = 'EXPERTO-PET-OTRA-RAMA';
         DB::table('versiones_modelo_experto')->insert($cabecera);
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('varias revisiones institucionales vigentes');
@@ -146,8 +146,8 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
         $cognitivo = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->actor);
         $corte = CarbonImmutable::now();
         $this->travel(1)->minutes();
-        $p2 = app(Gestor::class)->crearRevision($this->actor, $petersen, 'ORION-PET-TEMPORAL-2', 'Comprobar la selección temporal independiente del gobierno.');
-        $c2 = app(Gestor::class)->crearRevision($this->actor, $cognitivo, 'ORION-COG-TEMPORAL-2', 'Comprobar la selección temporal independiente del conocimiento.');
+        $p2 = app(Gestor::class)->crearRevision($this->actor, $petersen, 'EXPERTO-PET-TEMPORAL-2', 'Comprobar la selección temporal independiente del gobierno.');
+        $c2 = app(Gestor::class)->crearRevision($this->actor, $cognitivo, 'EXPERTO-COG-TEMPORAL-2', 'Comprobar la selección temporal independiente del conocimiento.');
         $contratos = app(ContratosConocimiento::class);
         self::assertSame($petersen, $contratos->versionPetersenVigente($corte));
         self::assertSame($cognitivo, $contratos->versionInstitucionalVigente($corte));

@@ -86,7 +86,7 @@ procesos de prueba. La evidencia detallada local está en
 | Sintaxis de PHP cambiado y nuevo | 236 archivos correctos en el primer barrido |
 | Sintaxis del contenido exacto preparado para commit | 239 archivos PHP correctos |
 | Composer | `composer validate --strict --no-check-publish`: correcto |
-| Motores sin Laravel | `independencia.php` y `orion_independencia.php`: correctos |
+| Motores sin Laravel | `independencia.php` y `dominio_independencia.php`: correctos |
 | Build Vite | Correcto; continúa la advertencia de paquete mayor de 500 kB |
 | Frontend final | 280 casos: 276 correctos, 4 omitidos, cero fallos |
 | PostgreSQL ampliado | 193 pruebas; un fixture de Reportes falló por descripción obligatoria ausente |

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects\Dcl;
 
-use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum;
 use PHPUnit\Framework\TestCase;
 
 /** Comprobar los límites semánticos del vocabulario aislado de esta fase. */

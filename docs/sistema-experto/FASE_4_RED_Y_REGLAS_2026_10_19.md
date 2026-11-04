@@ -28,7 +28,7 @@ Esta entrega integra el conocimiento existente. No define nuevos umbrales, pesos
 - [x] Mantener las contradicciones en la traza y suspender las consecuencias que el contrato no permite resolver.
 - [x] Deduplicar por registro original; unir adicionalmente soportes con unidad/episodio explícitos, sin dividir un mismo original.
 - [x] Extender el gestor institucional existente a variables de subcomponentes; validar el contrato del servidor antes de publicar una definición nueva.
-- [x] Excluir reglas rechazadas también en el mapper ORION.
+- [x] Excluir reglas rechazadas también en el mapper EXPERTO.
 - [x] Archivar mediante sucesora, conservando las definiciones y los resultados originales.
 - [x] Reproducir la ejecución técnica anterior desde su instantánea de entrada después de archivar reglas de Memoria y G09.
 - [x] Mantener la ausencia de conservación institucional del perfil integral indicada por `persistido=false`.
@@ -91,7 +91,7 @@ Verificación del candidato aislado desde `3d7191f2`, con los archivos de esta f
 | PHPUnit SQLite, selección de motor, repositorios, gobierno, conservación, sucesión y presentación experimental | 1166 casos / 10086 aserciones; sin fallos ni errores. Cinco carreras PostgreSQL se omiten en SQLite |
 | PostgreSQL desechable: gobierno, cinco carreras, sucesión, conservación, repositorios, consola y panel | 68 pruebas / 347 aserciones; sin omisiones, fallos o errores; clúster detenido y eliminado por el script guardado |
 | Entrada declarativa añadida después de esa suite; mismo candidato, sin modificar los archivos anteriores | 4 pruebas / 15 aserciones, PASS |
-| Independencia del motor y ORION | Ambos ejecutables PASS sin Laravel ni SQL |
+| Independencia del motor y EXPERTO | Ambos ejecutables PASS sin Laravel ni SQL |
 | `npm run build` del candidato | PASS, 3,28 s |
 | Revisiones independientes de conocimiento/gobierno y de la entrada declarativa | PASS técnico por lectura, hallazgos corregidos y cierre estático sin P1/P2 pendientes |
 

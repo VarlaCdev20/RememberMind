@@ -38,7 +38,7 @@ test('guía DCL real: nueve faltantes, teclado y cinco anchos sin consultas SQL'
         await mkdir(path.join(root, 'output/dcl-guia-20261031'), { recursive: true });
         for (const width of [1440, 1280, 1024, 768, 390]) {
             await page.setViewport({ width, height: 900 });
-            await page.setContent(`<html lang="es"><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css}</style></head><body class="rm-shell"><main class="rm-expert-results" style="padding:16px"><div class="rm-orion-petersen-card">${html}</div></main></body></html>`);
+            await page.setContent(`<html lang="es"><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css}</style></head><body class="rm-shell"><main class="rm-expert-results" style="padding:16px"><div class="rm-decision-petersen-card">${html}</div></main></body></html>`);
             const main = '[data-dcl-capture-plan] > summary';
             await page.focus(main);
             await page.keyboard.press('Enter');

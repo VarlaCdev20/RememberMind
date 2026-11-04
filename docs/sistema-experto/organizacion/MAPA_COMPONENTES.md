@@ -30,7 +30,7 @@ Abrir primero [motor-experto/README.md](../../../motor-experto/README.md). El re
 
 Los tres archivos `Reglas*` concentran la entrada legible a las 24 definiciones iniciales. Se mantienen clases separadas por responsabilidad, sin concatenar todo en un archivo o duplicar implementaciones. Las versiones registradas siguen en la BDD y el cargador recibe la versión correspondiente. La reorganización no cambia reglas, umbrales, fuentes, permisos o estructura.
 
-Los tipos históricos en `dominio/orion/` y el contrato anterior de `aplicacion/puertos/` no son el punto de entrada al recorrido institucional y no se mezclan con las pruebas exclusivas de `tests/fixtures/`. Se conservaron sus identidades y los cambios locales previos.
+Los tipos históricos en `dominio/` y el contrato anterior de `aplicacion/puertos/` no son el punto de entrada al recorrido institucional y no se mezclan con las pruebas exclusivas de `tests/fixtures/`. Se conservaron sus identidades y los cambios locales previos.
 
 ### Comprobación del agrupamiento inicial
 
@@ -108,10 +108,10 @@ Centralizar consulta y gobierno no significa fusionar estas tablas, eliminar ver
 | Nombre / rama | Alcance comprobado |
 |---|---|
 | `motor-experto/tests/fixtures/aplicacion/casos_uso/MotorExperto.php` | Piloto retirado del producto; solo regresión automatizada. |
-| `motor-experto/tests/fixtures/dominio/orion/Services/Inferencia/MotorInferenciaService.php` | Recorrido técnico retirado del autoload operativo; solo regresión. |
+| `motor-experto/tests/fixtures/dominio/Services/Inferencia/MotorInferenciaService.php` | Recorrido técnico retirado del autoload operativo; solo regresión. |
 | `hechos/MemoriaTrabajo.php` | Memoria utilizada por el recorrido declarativo institucional. |
-| `dominio/orion/Entities/Hechos/MemoriaTrabajo.php` | Otra representación tipada usada por el recorrido experimental. No intercambiarlas por tener el mismo nombre. |
-| `dominio/orion/` | Código puro trasladado y contratos con consumidores. No se declara descartable ni se elimina por su denominación. |
+| `dominio/Entities/Hechos/MemoriaTrabajo.php` | Otra representación tipada usada por el recorrido experimental. No intercambiarlas por tener el mismo nombre. |
+| `dominio/` | Código puro trasladado y contratos con consumidores. No se declara descartable ni se elimina por su denominación. |
 | Fuente conceptual JSON del código | Conocimiento documental del producto; no usar su formato como autorización para almacenar historia clínica en JSON/EAV. |
 
 Las rutas y namespaces conservados son identificadores técnicos existentes. La denominación visible de esta organización es «Sistema experto para detección temprana de DCL».

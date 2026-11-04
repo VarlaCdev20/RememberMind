@@ -1,4 +1,4 @@
-# O.R.I.O.N.: límite de 100 tablas de negocio
+# sistema experto: límite de 100 tablas de negocio
 
 > **Histórico:** la propietaria fijó después un máximo de **104** tablas de negocio. Véase la [decisión vigente y el ensayo físico inicial](DECISION_MAXIMO_104_TABLAS_2026_10_20.md). Los cálculos de reducción a 100 que siguen documentan el análisis anterior; ya no son el límite aplicable ni autorizan DDL.
 
@@ -85,6 +85,6 @@ instalable ni una prueba de que el límite de 100 sea alcanzable. El candidato
 reducido de 15 fue rechazado antes de migrar. El camino técnico siguiente es
 encontrar y probar consolidaciones adicionales junto con una proyección
 relacional de los granos históricos, sin alterar la BDD ni rebajar el requisito
-de recálculo íntegro. Hasta entonces O.R.I.O.N. puede preparar y explicar
+de recálculo íntegro. Hasta entonces sistema experto puede preparar y explicar
 resultados, pero no se declara cerrado guardar→recuperar→reproducir el
 compuesto instrumental/Petersen.

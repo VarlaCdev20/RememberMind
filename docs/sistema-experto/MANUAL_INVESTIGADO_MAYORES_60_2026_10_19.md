@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Manual técnico investigado para población mayor de 60 años
+# sistema experto — Manual técnico investigado para población mayor de 60 años
 
 Fecha de consulta: **19/10/2026**, zona America/La_Paz. Versión 1.3.
 Población solicitada por la propietaria: **personas mayores de 60 años**, sin

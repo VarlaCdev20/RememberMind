@@ -6,7 +6,7 @@ Fecha: 19/10/2026, America/La_Paz. Código previo: `e7d2e3ff`. Alcance: registro
 
 - [x] Sesión de Psicología ya iniciada por la propietaria; navegación por la ruta existente `/admin/sistema-experto/reglas`.
 - [x] Registro desde **Registrar base institucional adoptada**, confirmado en su diálogo.
-- [x] Mensaje de éxito y selección `ORION-COGNITIVO-1 · ACTIVO` visibles.
+- [x] Mensaje de éxito y selección `perfil cognitivo inicial · ACTIVO` visibles.
 - [x] Comprobación SQL posterior de solo lectura: una versión, 17 reglas activas, 17 revisiones PENDIENTES, cero firmas profesionales y un evento `contrato_institucional_registrado`.
 - [x] Cinco dominios, 19 componentes, 68 variables y 19 mapeos observacionales conservados en las tablas existentes.
 - [x] Paginación de las 17 reglas; las dos visuoespaciales aparecen en la segunda página.

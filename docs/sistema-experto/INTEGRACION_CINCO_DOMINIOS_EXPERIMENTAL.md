@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Perfil experimental de cinco dominios y compuerta Petersen
+# sistema experto — Perfil experimental de cinco dominios y compuerta Petersen
 
 Fecha: 2026-10-17. **Estado:** verificación técnica sintética; no habilitado para uso asistencial ni evaluado posteriormente en uso real.
 
@@ -27,12 +27,12 @@ El conjunto conserva un manifiesto `versiones` por motor y `version_orquestacion
 ## Pruebas
 
 ```bash
-php motor-experto/tests/orion_cinco_dominios_experimental.php
+php motor-experto/tests/cinco_dominios_experimental.php
 ```
 
 Prueba escenarios `literal_A`, `literal_B` y `SIN_DATO` de Memoria, más las quince tareas instrumentales **ficticias** de G09. Verifica cinco claves de dominio, identidad y corte común, versiones independientes, conservación de los estados `U` en Petersen, ausencia de patrón, ausencia de residentes reales y rechazo de invocación asistencial.
 
-El flujo `.github/workflows/orion-g09-experimental.yml` ejecuta este test junto con las suites previas de G09 y los 30 casos más 32 configuraciones de DCL.
+El flujo `.github/workflows/decision-g09-experimental.yml` ejecuta este test junto con las suites previas de G09 y los 30 casos más 32 configuraciones de DCL.
 
 ## Siguiente contrato técnico a preparar
 

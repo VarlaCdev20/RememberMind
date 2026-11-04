@@ -13,7 +13,7 @@ final class ReferenciaF02SqliteDesechableTest extends TestCase
     public function test_las_dos_ramas_y_el_replay_completo_vuelven_de_sqlite_desechable(): void
     {
         $raiz = dirname(__DIR__, 2);
-        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php'], $raiz);
+        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php'], $raiz);
         $proceso->setTimeout(90);
         $proceso->mustRun();
 
@@ -25,7 +25,7 @@ final class ReferenciaF02SqliteDesechableTest extends TestCase
     public function test_ensayo_integrado_con_la_cabecera_institucional_en_base_desechable(): void
     {
         $raiz = dirname(__DIR__, 2);
-        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php', '--base-institucional'], $raiz);
+        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php', '--base-institucional'], $raiz);
         $proceso->setTimeout(120);
         $proceso->mustRun();
 

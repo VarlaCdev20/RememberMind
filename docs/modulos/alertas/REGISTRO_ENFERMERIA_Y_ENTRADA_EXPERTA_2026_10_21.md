@@ -4,7 +4,7 @@ Fecha de revisión: 21/10/2026. Estado: guía de captura implementada; ampliaci�
 
 ## Evidencia y alcance
 
-Se consultaron el baseline congelado y su diccionario, `AlertasService`, `AlertasPanel`, el catálogo de fuentes y hechos experto y el índice vigente de O.R.I.O.N. La documentación más reciente incluye ampliaciones y reducciones posteriores al inventario original; esta entrega no modifica ninguno de esos esquemas.
+Se consultaron el baseline congelado y su diccionario, `AlertasService`, `AlertasPanel`, el catálogo de fuentes y hechos experto y el índice vigente de sistema experto La documentación más reciente incluye ampliaciones y reducciones posteriores al inventario original; esta entrega no modifica ninguno de esos esquemas.
 
 La [Norma técnica para el manejo del expediente clínico, Ministerio de Salud de Bolivia, apartado 12.13](https://www.minsalud.gob.bo/images/Documentacion/redes_salud/NORMA%20TECNICA%20PARA%20EL%20MANEJO%20DEL%20EXPEDIENTE%20CLINICO.pdf) distingue evolución de Enfermería y registro de tratamientos. Describe el estado, la evolución y las intercurrencias del paciente, además de la identificación temporal y profesional. Es una publicación ministerial localizada; esta consulta no certifica su vigencia jurídica ni su aplicabilidad completa a la residencia.
 

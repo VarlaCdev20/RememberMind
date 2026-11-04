@@ -6,11 +6,11 @@ namespace Tests\Unit\SistemaExperto\Application\DTOs;
 
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum as M;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum as P;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum as C;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum as M;
+use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum as P;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum as D;
 use DomainException;
 use Error;
 use PHPUnit\Framework\Attributes\DataProvider;

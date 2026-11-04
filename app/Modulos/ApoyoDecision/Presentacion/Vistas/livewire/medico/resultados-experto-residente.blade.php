@@ -1,5 +1,5 @@
 <div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta'), vistaClinica: @js($psicologia ? 'resumen' : 'mapa') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
-    x-on:orion-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
+    x-on:decision-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
     @if($enfermeria)
@@ -17,16 +17,16 @@
         <div class="rm-expert-heading-actions">
             @if($psicologia)
                 <button type="button" wire:click="irASeccion('fuentes-disponibles')" wire:loading.attr="disabled" class="rm-btn rm-btn-primary"><i class="ph ph-folder-open" aria-hidden="true"></i>Ver registros y evidencias</button>
-                <button type="button" @if($datos['evaluacion'] ?? null) wire:click="irASeccion('orion-evolucion')" @else disabled title="Disponible cuando exista una evaluación guardada" @endif class="rm-btn rm-btn-secondary"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial</button>
-                <button type="button" @if(($datos['evaluacion'] ?? null) && isset($revisiones['PSICOLOGIA']['estado'], $revisiones['MEDICINA']['estado'])) wire:click="irASeccion('orion-revision-profesional')" @else disabled title="Disponible cuando exista una evaluación clínica completa y conservada" @endif class="rm-btn rm-btn-secondary"><i class="ph ph-users" aria-hidden="true"></i>Revisión profesional</button>
+                <button type="button" @if($datos['evaluacion'] ?? null) wire:click="irASeccion('decision-evolucion')" @else disabled title="Disponible cuando exista una evaluación guardada" @endif class="rm-btn rm-btn-secondary"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial</button>
+                <button type="button" @if(($datos['evaluacion'] ?? null) && isset($revisiones['PSICOLOGIA']['estado'], $revisiones['MEDICINA']['estado'])) wire:click="irASeccion('decision-revision-profesional')" @else disabled title="Disponible cuando exista una evaluación clínica completa y conservada" @endif class="rm-btn rm-btn-secondary"><i class="ph ph-users" aria-hidden="true"></i>Revisión profesional</button>
             @else
             @if($datos && $informe)
                 <button type="button" wire:click="abrirConsulta('registro')" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary"><i class="ph ph-files" aria-hidden="true"></i>Ver evidencias</button>
                 @if($datos['evaluacion'] ?? null)
-                    <button type="button" wire:click="irASeccion('orion-evolucion')" class="rm-btn rm-btn-secondary"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Ver historial</button>
+                    <button type="button" wire:click="irASeccion('decision-evolucion')" class="rm-btn rm-btn-secondary"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Ver historial</button>
                 @endif
                 @if(isset($revisiones['PSICOLOGIA']['estado'], $revisiones['MEDICINA']['estado']))
-                    <button type="button" wire:click="irASeccion('orion-revision-profesional')" class="rm-btn rm-btn-secondary"><i class="ph ph-users" aria-hidden="true"></i>Revisión profesional</button>
+                    <button type="button" wire:click="irASeccion('decision-revision-profesional')" class="rm-btn rm-btn-secondary"><i class="ph ph-users" aria-hidden="true"></i>Revisión profesional</button>
                 @endif
             @endif
             @can('consultarGobierno', \App\Models\VersionModeloExperto::class)
@@ -45,14 +45,14 @@
         <button type="button" @click="vistaClinica = 'mapa'" :aria-pressed="vistaClinica === 'mapa'"><i class="ph ph-graph" aria-hidden="true"></i>Conexiones</button>
         <button type="button" @click="vistaClinica = 'resumen'" :aria-pressed="vistaClinica === 'resumen'"><i class="ph ph-brain" aria-hidden="true"></i>Resumen y análisis</button>
         <button type="button" wire:click="irASeccion('fuentes-disponibles')"><i class="ph ph-files" aria-hidden="true"></i>Fuentes originales</button>
-        @if($datos['evaluacion'] ?? null)<button type="button" wire:click="irASeccion('orion-evolucion')"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial conservado</button>@endif
+        @if($datos['evaluacion'] ?? null)<button type="button" wire:click="irASeccion('decision-evolucion')"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial conservado</button>@endif
         @if(auth()->user()->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A']))<a href="{{ route('admin.sistema-experto.residentes') }}"><i class="ph ph-users-three" aria-hidden="true"></i>Cambiar residente</a>@endif
     </nav>
     <div x-show="vistaClinica === 'mapa'">
         @include('apoyodecision::livewire.medico.resultados-experto.conexiones-residente')
     </div>
     @endif
-    <div class="rm-orion-workspace mt-3" x-show="vistaClinica === 'resumen'" x-cloak>
+    <div class="rm-decision-workspace mt-3" x-show="vistaClinica === 'resumen'" x-cloak>
         {{-- Columna Principal: Informe Cognitivo --}}
         <div class="space-y-4 min-w-0">
             @if($psicologia && ! isset($perfilInstrumental['petersen_institucional']))
@@ -88,12 +88,12 @@
             @endif
 
             @if($resumenFuentes && ! $psicologia)
-                <section class="rm-card rm-orion-panel rm-expert-available-records" aria-labelledby="registros-disponibles-titulo">
+                <section class="rm-card rm-decision-panel rm-expert-available-records" aria-labelledby="registros-disponibles-titulo">
                     <div class="rm-expert-followup-heading">
                         <div><p class="rm-expert-eyebrow">Expediente consultado</p><h2 id="registros-disponibles-titulo" class="rm-expert-section-title">Seguimiento y registros disponibles</h2></div>
                         <button type="button" wire:click="irASeccion('fuentes-disponibles')" class="rm-btn rm-btn-primary"><i class="ph ph-files" aria-hidden="true"></i>Ver registros del seguimiento</button>
                     </div>
-                    <p class="rm-orion-note">Los controles y observaciones sirven para conocer cambios cotidianos, aunque todavía no permitan clasificar el perfil cognitivo. Cada registro conserva su fecha y autor.</p>
+                    <p class="rm-decision-note">Los controles y observaciones sirven para conocer cambios cotidianos, aunque todavía no permitan clasificar el perfil cognitivo. Cada registro conserva su fecha y autor.</p>
                     <dl class="rm-expert-source-summary__counts mt-3" aria-label="Registros disponibles por tipo">
                         <div><dt>Controles cognitivos</dt><dd>{{ $resumenFuentes['controles'] === null ? 'No consultados' : $resumenFuentes['controles'] }}</dd></div>
                         <div><dt>Observaciones por componente</dt><dd>{{ $resumenFuentes['observacionales'] }}</dd></div>
@@ -102,20 +102,20 @@
                     </dl>
                     @php($senalesDelSeguimiento = collect($hallazgosObservacionales['resumen'] ?? [])->filter(fn ($item) => ($item['estado'] ?? null) === 'CUMPLE'))
                     @if($senalesDelSeguimiento->isNotEmpty())
-                        <div class="rm-orion-petersen-observations" aria-labelledby="senales-seguimiento-titulo">
-                            <div class="rm-orion-petersen-observations__heading"><span class="rm-orion-petersen-observations__icon" aria-hidden="true"><i class="ph ph-clipboard-text"></i></span><div><h3 id="senales-seguimiento-titulo">Señales observadas en el seguimiento</h3><p>Revise cada hallazgo junto con su control original.</p></div></div>
-                            <ul class="rm-orion-petersen-observations__list">
+                        <div class="rm-decision-petersen-observations" aria-labelledby="senales-seguimiento-titulo">
+                            <div class="rm-decision-petersen-observations__heading"><span class="rm-decision-petersen-observations__icon" aria-hidden="true"><i class="ph ph-clipboard-text"></i></span><div><h3 id="senales-seguimiento-titulo">Señales observadas en el seguimiento</h3><p>Revise cada hallazgo junto con su control original.</p></div></div>
+                            <ul class="rm-decision-petersen-observations__list">
                                 @foreach($senalesDelSeguimiento as $codigoRegla => $senal)
-                                    <li><span class="rm-orion-petersen-observations__item-icon" aria-hidden="true"><i class="ph ph-note-pencil"></i></span><div><h4>{{ $senal['nombre'] ?? \MotorExperto\conocimiento\ReglasObservacionales::REGLAS[$codigoRegla]['nombre'] }}</h4>@if($senal['hallazgo'])<p>{{ $senal['hallazgo'] }}</p>@endif</div></li>
+                                    <li><span class="rm-decision-petersen-observations__item-icon" aria-hidden="true"><i class="ph ph-note-pencil"></i></span><div><h4>{{ $senal['nombre'] ?? \MotorExperto\conocimiento\ReglasObservacionales::REGLAS[$codigoRegla]['nombre'] }}</h4>@if($senal['hallazgo'])<p>{{ $senal['hallazgo'] }}</p>@endif</div></li>
                                 @endforeach
                             </ul>
-                            <div class="rm-orion-petersen-observations__footer"><p><i class="ph ph-info" aria-hidden="true"></i><span>Estos hechos observados no sustituyen mediciones instrumentales ni establecen un diagnóstico.</span></p><button type="button" wire:click="irASeccion('hallazgos-observacionales')" class="rm-btn rm-btn-secondary">Ver controles y reglas</button></div>
+                            <div class="rm-decision-petersen-observations__footer"><p><i class="ph ph-info" aria-hidden="true"></i><span>Estos hechos observados no sustituyen mediciones instrumentales ni establecen un diagnóstico.</span></p><button type="button" wire:click="irASeccion('hallazgos-observacionales')" class="rm-btn rm-btn-secondary">Ver controles y reglas</button></div>
                         </div>
                     @endif
                     @if(($datos['registros_cognitivos'] ?? []) !== [])
                         <details class="rm-expert-supplement mt-3">
                             <summary>Ver controles y cambios observados</summary>
-                            <p class="rm-orion-note mt-2">Estos son controles recientes; el apartado de fuentes permite consultar el seguimiento completo.</p>
+                            <p class="rm-decision-note mt-2">Estos son controles recientes; el apartado de fuentes permite consultar el seguimiento completo.</p>
                             <div class="space-y-3 mt-3">
                                 @foreach($datos['registros_cognitivos'] as $registro)
                                     <article class="rm-expert-source">
@@ -132,7 +132,7 @@
                             </div>
                         </details>
                     @else
-                        <p class="rm-orion-note mt-3">No hay controles cognitivos recientes disponibles para este resumen. Consulte las fuentes para revisar otros registros.</p>
+                        <p class="rm-decision-note mt-3">No hay controles cognitivos recientes disponibles para este resumen. Consulte las fuentes para revisar otros registros.</p>
                     @endif
                 </section>
             @endif
@@ -185,7 +185,7 @@
             @if(($datos['evaluacion'] ?? null) && $informe)
                 @include('apoyodecision::livewire.medico.resultados-experto.explorador')
             @endif
-            <details id="fuentes-disponibles" class="rm-card rm-orion-panel rm-expert-sources-section" aria-labelledby="fuentes-disponibles-title">
+            <details id="fuentes-disponibles" class="rm-card rm-decision-panel rm-expert-sources-section" aria-labelledby="fuentes-disponibles-title">
             <summary class="rm-expert-sources-section__heading">
                 <div>
                     <h2 id="fuentes-disponibles-title" tabindex="-1" class="rm-expert-section-title">Fuentes y mediciones disponibles</h2>
@@ -216,7 +216,7 @@
                 @include('apoyodecision::livewire.medico.resultados-experto.perfil-instrumental')
                 @include('apoyodecision::livewire.medico.resultados-experto.captura-instrumental')
             @else
-                <p class="rm-orion-note">No hay aplicaciones instrumentales con respuestas disponibles para consultar en este momento.</p>
+                <p class="rm-decision-note">No hay aplicaciones instrumentales con respuestas disponibles para consultar en este momento.</p>
             @endif
             </details>
             </details>
@@ -227,7 +227,7 @@
                 </x-ui.section-card>
             @elseif(($datos['evaluacion'] ?? null) && $informe)
                 @php($narrativa = $informe['narrativa'])
-                <section class="rm-card rm-orion-panel rm-expert-report-preview" aria-labelledby="informe-clinico-titulo">
+                <section class="rm-card rm-decision-panel rm-expert-report-preview" aria-labelledby="informe-clinico-titulo">
                     <div class="rm-expert-report-preview__heading">
                         <div>
                             <p class="rm-expert-eyebrow">Informe de la evaluación consultada</p>
@@ -259,7 +259,7 @@
 
     @if($puedeAuditar && $datos && $trazabilidadAbierta)
         <x-ui.drawer-livewire wire:model="trazabilidadAbierta" title="Auditoría técnica de la evaluación" size="xl" closeMethod="cerrarTrazabilidad">
-            <p class="text-sm break-words">Evaluación {{ $datos['evaluacion']['id'] ?? 'No disponible' }} · Versión {{ $datos['evaluacion']['version'] ?? 'No disponible' }}</p>
+            <p class="text-sm break-words">Evaluación {{ $datos['evaluacion']['id'] ?? 'No disponible' }} · Versión {{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::version($datos['evaluacion']['version'] ?? 'No disponible') }}</p>
             @php($detalle = $datos['detalle'])
                 @include('livewire.medico.resultados-experto.fundamento', ['abierto' => true])
 

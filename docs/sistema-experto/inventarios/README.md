@@ -41,10 +41,10 @@ No aparecen entradas formales identificadas como MoCA, ACE-III, RUDAS u otra bat
 | Versión registrada | Estado | Reglas y revisión observadas |
 |---|---|---|
 | `MEM-INV-20261008` | INACTIVO | Sin reglas en el agrupamiento de este corte. |
-| `ORION-V1-20261008` | INACTIVO | Sin reglas en el agrupamiento de este corte. |
-| `SIM-ORION-LOCAL-1` | ACTIVO | 8, revisión NULL; laboratorio. |
-| `ORION-COGNITIVO-1` | ACTIVO | 17, revisión PENDIENTE; contrato A–D registrado. |
-| `ORION-PETERSEN-1` | ACTIVO | 4, revisión PENDIENTE; contrato E–H registrado. |
+| `base documental anterior` | INACTIVO | Sin reglas en el agrupamiento de este corte. |
+| `SIM-EXPERTO-LOCAL-1` | ACTIVO | 8, revisión NULL; laboratorio. |
+| `perfil cognitivo inicial` | ACTIVO | 17, revisión PENDIENTE; contrato A–D registrado. |
+| `patrones de Petersen` | ACTIVO | 4, revisión PENDIENTE; contrato E–H registrado. |
 | `OBS-20261017-v1` | ACTIVO | 3, revisión NULL; alcance observacional. |
 
 Los nombres son identidades técnicas preservadas. `ACTIVO` no significa evaluado posteriormente en uso real; revisión NULL no es aprobación. Las adopciones institucionales permiten el desarrollo técnico en su alcance y no deben transformarse en un bloqueo general por una firma pendiente.

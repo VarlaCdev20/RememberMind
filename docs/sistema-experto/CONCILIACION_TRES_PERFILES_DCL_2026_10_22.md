@@ -4,7 +4,7 @@
 
 ## Resultado
 
-Los perfiles PET-01/PET-02 conservados para Elena Vargas Mamani, Hugo Romero Torrico y Mercedes Choque Rivera proceden de ejecuciones `PRUEBA_TECNICA` con versión `SIM-ORION-LOCAL-1`. `FuenteCasoSimulado` asigna los estados de dominio y C01–C05 desde la matriz `SIM-03A`; sus referencias se declaran sintéticas. Esas salidas históricas no se pueden transformar en valoraciones clínicas cambiando etiquetas o estados. La consulta institucional ordinaria las excluye mediante `AlcanceLecturaExperta`.
+Los perfiles PET-01/PET-02 conservados para Elena Vargas Mamani, Hugo Romero Torrico y Mercedes Choque Rivera proceden de ejecuciones `PRUEBA_TECNICA` con versión `SIM-EXPERTO-LOCAL-1`. `FuenteCasoSimulado` asigna los estados de dominio y C01–C05 desde la matriz `SIM-03A`; sus referencias se declaran sintéticas. Esas salidas históricas no se pueden transformar en valoraciones clínicas cambiando etiquetas o estados. La consulta institucional ordinaria las excluye mediante `AlcanceLecturaExperta`.
 
 | Residente | Perfil técnico conservado | Aplicaciones observacionales | Aplicaciones funcionales | Aplicaciones cognitivas instrumentales | Valoraciones Petersen originales |
 | --- | --- | ---: | ---: | ---: | ---: |

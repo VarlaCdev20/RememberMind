@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Inferencia;
 
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Services\Inferencia\EvaluadorReglasService;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum as R;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum as O;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Services\Inferencia\EvaluadorReglasService;
+use MotorExperto\dominio\ValueObjects\Conocimiento\EstadoReglaEnum as R;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum as O;
 use DomainException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use DomainException;
-use OrionNominal\ContratoNominal;
-use OrionNominal\EsquemaNominal;
-use OrionNominal\ProyeccionNominal;
+use ExpertoNominal\ContratoNominal;
+use ExpertoNominal\EsquemaNominal;
+use ExpertoNominal\ProyeccionNominal;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -19,20 +19,20 @@ final class ContratoNominalTest extends TestCase
     {
         parent::setUp();
         foreach (['ContratoNominal', 'EsquemaNominal', 'ProyeccionNominal'] as $clase) {
-            require_once dirname(__DIR__, 2).'/prototipos/orion-conservacion-nominal/'.$clase.'.php';
+            require_once dirname(__DIR__, 2).'/prototipos/experto-conservacion-nominal/'.$clase.'.php';
         }
     }
 
     public function test_el_ddl_y_la_cobertura_de_783_rutas_coinciden_con_el_codigo(): void
     {
         $raiz = dirname(__DIR__, 2);
-        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/orion-conservacion-nominal/generar-diccionario.php', '--check'], $raiz, timeout: 20);
+        $proceso = new Process([PHP_BINARY, $raiz.'/prototipos/experto-conservacion-nominal/generar-diccionario.php', '--check'], $raiz, timeout: 20);
         $proceso->mustRun();
         $resumen = json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR);
         self::assertTrue($resumen['check']);
         self::assertSame(34, $resumen['tablas']);
         self::assertSame(138, $resumen['total']);
-        $auditoria = json_decode(file_get_contents($raiz.'/prototipos/orion-conservacion-nominal/resumen.json'), true, flags: JSON_THROW_ON_ERROR);
+        $auditoria = json_decode(file_get_contents($raiz.'/prototipos/experto-conservacion-nominal/resumen.json'), true, flags: JSON_THROW_ON_ERROR);
         self::assertSame(783, $auditoria['rutas_originales_mapeadas']);
         self::assertFalse($auditoria['instalable']);
     }

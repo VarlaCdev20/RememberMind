@@ -8,7 +8,7 @@
         <button type="button" wire:click="volverDato" @disabled(count($recorridoDatos) < 2) class="rm-btn rm-btn-secondary"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver al dato anterior</button>
         <span>Paso {{ count($recorridoDatos) }} · {{ count($fichaDato['enlaces']) }} referencias documentadas</span>
     </nav>
-    <p class="rm-expert-record__description">{{ $fichaDato['campos']['definicion'] ?? $fichaDato['campos']['descripcion'] ?? $fichaDato['campos']['observacion'] ?? 'Explore sus referencias para conocer dónde se utiliza y de qué registros depende.' }}</p>
+    <p class="rm-expert-record__description">{{ \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::referenciaDocumental($fichaDato['campos']['definicion'] ?? $fichaDato['campos']['descripcion'] ?? $fichaDato['campos']['observacion'] ?? 'Explore sus referencias para conocer dónde se utiliza y de qué registros depende.') }}</p>
     <div class="rm-expert-local-tabs" role="group" aria-label="Contenido del registro">
         <button type="button" @click="pestana = 'relaciones'" :aria-pressed="pestana === 'relaciones'">Conexiones <span>{{ count($fichaDato['enlaces']) }}</span></button>
         <button type="button" @click="pestana = 'campos'" :aria-pressed="pestana === 'campos'">Todos los campos <span>{{ count($fichaDato['campos']) }}</span></button>

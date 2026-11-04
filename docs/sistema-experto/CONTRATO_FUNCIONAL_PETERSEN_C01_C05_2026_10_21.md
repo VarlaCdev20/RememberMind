@@ -1,6 +1,6 @@
 # Contrato funcional de Petersen institucional: C01–C05
 
-**Versión:** 1.0 · **Fecha:** 21/10/2026 · **Ámbito:** O.R.I.O.N. institucional, personas mayores de 60 años.
+**Versión:** 1.0 · **Fecha:** 21/10/2026 · **Ámbito:** sistema experto institucional, personas mayores de 60 años.
 
 Este documento concreta el contrato **E–H adoptado el 19/10/2026** y la captura original aprobada ese mismo día. Describe cómo acreditar requisitos y cuándo producir un **patrón orientativo compatible con posible DCL**. No constituye diagnóstico, no atribuye pruebas a residentes ni introduce umbrales, nuevas reglas clínicas, tablas o permisos. La interpretación original corresponde al profesional competente; el motor comprueba procedencia, coherencia y reglas. Medicina y Psicología revisan el resultado **después y por separado**.
 
@@ -135,7 +135,7 @@ La pantalla `CapturaPetersenPanel` ya ofrece nueve elementos: cinco dominios y C
 - [Contrato institucional E–H adoptado](PROPUESTA_PETERSEN_INSTITUCIONAL_FASE_5_2026_10_19.md) y [diccionario de captura original aprobado](PROPUESTA_CAPTURA_PETERSEN_ORIGINAL_2026_10_19.md): autoridad de las reglas locales aquí concretadas.
 - Petersen RC. *Mild cognitive impairment as a diagnostic entity*. Journal of Internal Medicine. 2004;256:183–194. [doi:10.1111/j.1365-2796.2004.01388.x](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2796.2004.01388.x): tipología amnésica/no amnésica, uno o varios dominios.
 - Winblad B et al. *Mild cognitive impairment—beyond controversies, towards a consensus*. Journal of Internal Medicine. 2004;256:240–246. [doi:10.1111/j.1365-2796.2004.01380.x](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2796.2004.01380.x): cambio cognitivo, objetivación y función cotidiana en la valoración clínica.
-- Albert MS et al. *The diagnosis of mild cognitive impairment due to Alzheimer's disease*. Alzheimer's & Dementia. 2011;7:270–279. [Texto original](https://pmc.ncbi.nlm.nih.gov/articles/PMC3312027/): preocupación/cambio, alteración en al menos un dominio, independencia funcional y revisión de otras causas. O.R.I.O.N. **no** infiere etiología Alzheimer.
+- Albert MS et al. *The diagnosis of mild cognitive impairment due to Alzheimer's disease*. Alzheimer's & Dementia. 2011;7:270–279. [Texto original](https://pmc.ncbi.nlm.nih.gov/articles/PMC3312027/): preocupación/cambio, alteración en al menos un dominio, independencia funcional y revisión de otras causas. sistema experto **no** infiere etiología Alzheimer.
 - Alzheimer's Association. *DETeCD-ADRD: executive summary for primary care* y *Validated clinical assessment instruments*. 2025. [Guía](https://pmc.ncbi.nlm.nih.gov/articles/PMC12173843/) · [Instrumentos](https://pmc.ncbi.nlm.nih.gov/articles/PMC11772712/): historia, contexto, funcionalidad e interpretación de pruebas; no proporcionan una equivalencia automática entre observación y medición por dominio.
 
 La bibliografía fundamenta las dimensiones clínicas generales. Los nombres de campos, la exigencia de cinco dominios y las compuertas exactas provienen de las decisiones institucionales E–H y de su implementación versionada, no son citas literales de esas publicaciones.

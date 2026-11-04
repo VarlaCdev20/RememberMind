@@ -1,6 +1,6 @@
-# O.R.I.O.N. — matriz maestra de conocimiento e inferencia
+# sistema experto — matriz maestra de conocimiento e inferencia
 
-Fecha de cotejo: 20/10/2026. Versión ejecutable: `ORION-COGNITIVO-1` (contrato A–D del 19/10/2026); Petersen: `PETERSEN-INSTITUCIONAL-1` (contrato E–H). Esta matriz describe lo que está implementado y sus condiciones de emisión. No acredita sensibilidad, especificidad ni diagnóstico.
+Fecha de cotejo: 20/10/2026. Versión ejecutable: `perfil cognitivo inicial` (contrato A–D del 19/10/2026); Petersen: `PETERSEN-INSTITUCIONAL-1` (contrato E–H). Esta matriz describe lo que está implementado y sus condiciones de emisión. No acredita sensibilidad, especificidad ni diagnóstico.
 
 ## Fuentes y alcance
 

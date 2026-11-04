@@ -692,14 +692,14 @@ final class FichaPsicologicaResidenteTest extends TestCase
             ->assertSee('Evolución favorable');
     }
 
-    public function test_psicologo_puede_navegar_a_pestana_orion_y_consultar_criterios_petersen(): void
+    public function test_psicologo_puede_navegar_a_pestana_experto_y_consultar_criterios_petersen(): void
     {
         $this->actingAs($this->psicologo);
 
         Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
             ->assertSee('Resultados Apoyo a la decisión')
-            ->call('cambiarTab', 'orion')
-            ->assertSet('tab', 'orion')
+            ->call('cambiarTab', 'experto')
+            ->assertSet('tab', 'experto')
             ->assertSee('Motor Experto Apoyo a la decisión')
             ->assertSee('Criterios diagnósticos Petersen')
             ->assertSee('C01 · Queja cognitiva confirmada')

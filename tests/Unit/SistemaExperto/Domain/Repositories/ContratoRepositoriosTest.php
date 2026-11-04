@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Repositories;
 
-use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
-use MotorExperto\dominio\orion\Entities\Conocimiento\RedSemantica;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\Entities\Conocimiento\RedSemantica;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -31,7 +31,7 @@ final class ContratoRepositoriosTest extends TestCase
         foreach ($interfaces as $interfaz) {
             $r = new ReflectionClass($interfaz);
             self::assertTrue($r->isInterface());
-            self::assertStringStartsWith('MotorExperto\\dominio\\orion\\Repositories\\', $r->getName());
+            self::assertStringStartsWith('MotorExperto\\dominio\\Repositories\\', $r->getName());
             $doc = $r->getDocComment();
             self::assertIsString($doc);
             self::assertMatchesRegularExpression('/\p{L}{3}/u', $doc);

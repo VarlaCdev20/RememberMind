@@ -12,7 +12,7 @@ final class ConsultaCognitivaEnfermeria
 {
     public static function texto(string $texto): string
     {
-        return str_replace(['O.R.I.O.N.', 'RememberMind'], ['el sistema', 'el centro'], $texto);
+        return str_replace(['sistema experto', 'RememberMind'], ['el sistema', 'el centro'], $texto);
     }
 
     public function presentar(array $datos, array $informe, ?array $perfil): array

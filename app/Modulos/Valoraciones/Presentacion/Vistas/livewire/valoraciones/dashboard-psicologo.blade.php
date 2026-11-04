@@ -18,8 +18,8 @@
     @else
         @if(auth()->user()->hasRole('PSICOLOGO/A') && session(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::SESSION_KEY) === null)
             @can('viewAny', \App\Models\Residente::class)
-                <section class="rm-card rm-orion-panel" aria-labelledby="psychology-expert-access-title">
-                    <div class="rm-orion-section-heading">
+                <section class="rm-card rm-decision-panel" aria-labelledby="psychology-expert-access-title">
+                    <div class="rm-decision-section-heading">
                         <div>
                             <h2 id="psychology-expert-access-title" class="rm-expert-section-title">Sistema experto</h2>
                             <p>Consulta los resultados cognitivos, sus evidencias y el historial de cada residente.</p>

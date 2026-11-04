@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\ValueObjects;
 
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\CriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\EstadoIadlEnum;
-use MotorExperto\dominio\orion\ValueObjects\Funcionalidad\OportunidadIadlEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\EstadoReglaEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\ValueObjects\Conocimiento\TipoRelacionSemanticaEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\CriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoIadlEnum;
+use MotorExperto\dominio\ValueObjects\Funcionalidad\OportunidadIadlEnum;
 use BackedEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionEnum;
@@ -79,7 +79,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_estructura_y_documentacion_completas(): void
     {
-        $root = dirname(__DIR__, 5).'/motor-experto/dominio/orion/ValueObjects';
+        $root = dirname(__DIR__, 5).'/motor-experto/dominio/ValueObjects';
         $actual = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if ($file->isFile() && $file->getExtension() === 'php') {
@@ -94,7 +94,7 @@ final class ContratoValueObjectsTest extends TestCase
             $expected[] = realpath($path);
             $relative = str_replace('\\', '/', substr($path, strlen(realpath($root)) + 1));
             self::assertSame(
-                'MotorExperto\\dominio\\orion\\ValueObjects\\'.str_replace('/', '\\', substr($relative, 0, -4)),
+                'MotorExperto\\dominio\\ValueObjects\\'.str_replace('/', '\\', substr($relative, 0, -4)),
                 $reflection->getName(),
             );
             self::assertStringStartsWith("<?php\n\ndeclare(strict_types=1);", file_get_contents($path));
@@ -125,7 +125,7 @@ final class ContratoValueObjectsTest extends TestCase
      */
     public function test_domain_no_depende_de_laravel(): void
     {
-        $root = dirname(__DIR__, 5).'/motor-experto/dominio/orion';
+        $root = dirname(__DIR__, 5).'/motor-experto/dominio';
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
             if (! $file->isFile() || $file->getExtension() !== 'php') {
                 continue;

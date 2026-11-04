@@ -39,16 +39,16 @@
 .rm-resident-expert__path ol, .rm-resident-expert__path li { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rm-space-2); min-width: 0; }
 .rm-resident-expert__path li button { min-height: 44px; text-align: start; color: var(--rm-primary-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
 .rm-resident-expert__path li button[aria-current="step"] { color: var(--rm-text-primary); text-decoration: none; }
-.rm-resident-expert__canvas .rm-orion-edge.is-path { stroke: var(--rm-primary-ink); stroke-width: 4; stroke-dasharray: 8 4; }
+.rm-resident-expert__canvas .rm-decision-edge.is-path { stroke: var(--rm-primary-ink); stroke-width: 4; stroke-dasharray: 8 4; }
 .rm-resident-expert__graph-main { min-width: 0; padding: var(--rm-space-3); }
 .rm-resident-expert__graph-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--rm-space-2); margin-bottom: var(--rm-space-2); }
 .rm-resident-expert__graph-tools > span { color: var(--rm-text-secondary); font-variant-numeric: tabular-nums; margin-inline-start: auto; }
 .rm-resident-expert__canvas { height: 380px; width: 100%; min-width: 0; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-card); background: var(--rm-surface); overflow: hidden; }
 .rm-resident-expert__canvas svg { display: block; width: 100%; height: 100%; touch-action: none; }
-.rm-resident-expert__canvas .rm-orion-node { cursor: pointer; }
-.rm-resident-expert__canvas .rm-orion-node rect { fill: var(--rm-surface); stroke: var(--rm-border); stroke-width: 1.5; transition: stroke var(--rm-motion-fast) var(--rm-ease-standard), fill var(--rm-motion-fast) var(--rm-ease-standard); }
-.rm-resident-expert__canvas .rm-orion-node text { fill: var(--rm-text-primary); }
-.rm-resident-expert__canvas .rm-orion-node:is(.is-selected, :focus-visible) rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary-ink); stroke-width: 3; }
+.rm-resident-expert__canvas .rm-decision-node { cursor: pointer; }
+.rm-resident-expert__canvas .rm-decision-node rect { fill: var(--rm-surface); stroke: var(--rm-border); stroke-width: 1.5; transition: stroke var(--rm-motion-fast) var(--rm-ease-standard), fill var(--rm-motion-fast) var(--rm-ease-standard); }
+.rm-resident-expert__canvas .rm-decision-node text { fill: var(--rm-text-primary); }
+.rm-resident-expert__canvas .rm-decision-node:is(.is-selected, :focus-visible) rect { fill: var(--rm-primary-soft); stroke: var(--rm-primary-ink); stroke-width: 3; }
 .rm-resident-expert__map-help, .rm-resident-expert__boundary { color: var(--rm-text-secondary); font-size: var(--rm-font-size-compact); line-height: 1.6; margin-top: var(--rm-space-3); }
 .rm-resident-expert__boundary { display: flex; align-items: flex-start; gap: var(--rm-space-2); }
 .rm-resident-expert__boundary > i { font-size: 1.2rem; flex: none; }

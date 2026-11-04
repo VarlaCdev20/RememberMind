@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\orion\Entities\Dcl\ResultadoClasificacionDcl;
-use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\EstadoCriterioDclEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\MotivoAbstencionEnum;
-use MotorExperto\dominio\orion\ValueObjects\Dcl\SubtipoDclEnum;
+use MotorExperto\dominio\Entities\Dcl\ResultadoClasificacionDcl;
+use MotorExperto\dominio\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\EstadoCriterioDclEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\MotivoAbstencionEnum;
+use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum;
 use DomainException;
 
 /** Transporta el resultado original de Domain, sea un patrón candidato sintético o una abstención, con sus requisitos y soportes. */

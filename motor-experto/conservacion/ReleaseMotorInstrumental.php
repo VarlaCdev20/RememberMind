@@ -16,8 +16,8 @@ final class ReleaseMotorInstrumental
         'instrumentos', 'conservacion', 'dominio', 'aplicacion'];
 
     private const ARCHIVOS_FIJOS = ['motor-experto/composer.json', 'composer.lock', 'motor-experto/tests/independencia.php',
-        'motor-experto/tests/orion_independencia.php',
-        'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/orion-v1-conceptos.json'];
+        'motor-experto/tests/dominio_independencia.php',
+        'app/Modulos/ApoyoDecision/Infraestructura/Persistencia/datos/conceptos-cognitivos.json'];
 
     public function crear(string $raiz, string $destino, string $revisionBase): array
     {
@@ -92,13 +92,9 @@ final class ReleaseMotorInstrumental
                 throw new DomainException('Huella o conjunto de archivos del release incompatible.');
             }
             if ($m['contrato'] === 'ARTEFACTO-MOTOR-2') {
-                foreach (self::ARCHIVOS_FIJOS as $nombre) {
-                    if (! array_key_exists($nombre, $m['archivos'])) {
-                        throw new DomainException('Falta un archivo obligatorio del release.');
-                    }
-                }
+                $fijos = self::archivosFijosDelRelease($m['archivos']);
                 foreach (array_keys($m['archivos']) as $nombre) {
-                    if (! in_array($nombre, self::ARCHIVOS_FIJOS, true)
+                    if (! in_array($nombre, $fijos, true)
                         && ! self::esRutaCodigo($nombre)) {
                         throw new DomainException('El release contiene una ruta fuera del contrato de software.');
                     }
@@ -168,7 +164,8 @@ final class ReleaseMotorInstrumental
     public static function identidadEjecutor(array $archivos): array
     {
         $fuentes = array_filter($archivos, static fn ($nombre) => self::esRutaCodigo($nombre), ARRAY_FILTER_USE_KEY);
-        $identidad = array_intersect_key($archivos, array_fill_keys(self::ARCHIVOS_FIJOS, true)) + $fuentes;
+        $fijos = array_merge(self::ARCHIVOS_FIJOS, IdentificadoresHistoricos::ARCHIVOS_RELEASE);
+        $identidad = array_intersect_key($archivos, array_fill_keys($fijos, true)) + $fuentes;
 
         // huella_src conserva el nombre del contrato V1; incluye también los archivos fijos del release.
         return ['cantidad_archivos' => count($fuentes), 'huella_src' => CodecInstantanea::huella(CapturaInstrumentalCanonica::ordenar($identidad))];
@@ -197,5 +194,18 @@ final class ReleaseMotorInstrumental
     {
         // Leer artefactos históricos conserva sus rutas y huellas originales.
         return (bool) preg_match('~^motor-experto/(?:src|'.implode('|', self::DIRECTORIOS_CODIGO).')/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+\.php$~D', $nombre);
+    }
+
+    /** Lee los nombres originales del manifiesto; nunca traduce sus claves ni sus huellas. */
+    private static function archivosFijosDelRelease(array $archivos): array
+    {
+        $anteriores = array_merge(array_slice(self::ARCHIVOS_FIJOS, 0, 3), IdentificadoresHistoricos::ARCHIVOS_RELEASE);
+        foreach ([self::ARCHIVOS_FIJOS, $anteriores] as $conjunto) {
+            if (array_diff($conjunto, array_keys($archivos)) === []) {
+                return $conjunto;
+            }
+        }
+
+        throw new DomainException('Falta un archivo obligatorio del release.');
     }
 }

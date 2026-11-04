@@ -127,7 +127,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 
   Dictamen final: PASS acotado de preparación/replay y diseño estático; no
   certifica persistencia, sellado concurrente o retención todavía inexistentes.
 - `php motor-experto/tests/independencia.php` y
-  `php motor-experto/tests/orion_independencia.php`: PASS tras el cambio final.
+  `php motor-experto/tests/dominio_independencia.php`: PASS tras el cambio final.
 - Pint sobre los doce archivos PHP propios: PASS; `git diff --check`: PASS.
 
 La primera ejecución amplia falló en un caso nuevo que intentaba insertar

@@ -12,7 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use MotorExperto\conservacion\CodecInstantanea as Codec;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CorromperConservacionParaPrueba;

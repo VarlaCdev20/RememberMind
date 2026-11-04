@@ -19,7 +19,7 @@ final class PaquetesCandidatosCognitivos
         ];
         $manifiestos = [];
         foreach ($criterios as $codigo => [$nombre, $fila, $subcomponentes]) {
-            $manifiestos[] = ['codigo' => $codigo, 'nombre' => $nombre, 'version_documental' => 'O.R.I.O.N. D-108/D-135 · 2026-10-08',
+            $manifiestos[] = ['codigo' => $codigo, 'nombre' => $nombre, 'version_documental' => 'sistema experto D-108/D-135 · 2026-10-08',
                 'estado_documental' => 'DEFINIDO/CONGELADO — V1', 'estado_tecnico' => 'INACTIVO',
                 'motivo' => 'Formalización específica pendiente: variables, mapeos, compuertas, dominios de resultado, reglas y resolvedor.',
                 'fuente' => '2_Conceptos · fila '.$fila, 'subcomponentes_candidatos' => $subcomponentes,

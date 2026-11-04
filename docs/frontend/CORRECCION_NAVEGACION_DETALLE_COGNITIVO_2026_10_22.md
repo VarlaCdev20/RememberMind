@@ -4,7 +4,7 @@
 
 En los resultados de Psicología, las acciones «Ver fundamento y límites»,
 «Ver el detalle de las áreas», «Ver cómo se obtuvo», «Ver qué falta» y
-«Ver criterios y soportes» envían `orion-petersen-detalle` a `irASeccion`.
+«Ver criterios y soportes» envían `decision-petersen-detalle` a `irASeccion`.
 Ese destino existe como un elemento `details` en `petersen-institucional.blade.php`,
 pero faltaba en la lista de destinos permitidos del componente Livewire.
 El backend abortaba con HTTP 422 antes de emitir el evento de navegación.

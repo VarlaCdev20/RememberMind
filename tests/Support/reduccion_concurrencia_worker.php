@@ -6,7 +6,7 @@ use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\AlmacenI
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use MotorExperto\dominio\orion\Services\Dcl\ClasificadorPetersenService;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use Tests\Support\EntornoPruebas;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 

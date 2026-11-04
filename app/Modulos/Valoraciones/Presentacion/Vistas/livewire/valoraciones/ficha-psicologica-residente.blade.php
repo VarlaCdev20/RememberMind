@@ -70,7 +70,7 @@
                 ['id' => 'entorno', 'label' => 'Entorno y red social', 'icono' => 'ph-users-four'],
                 ['id' => 'seguimiento', 'label' => 'Sesiones y seguimiento', 'icono' => 'ph-calendar-check'],
                 ['id' => 'informes', 'label' => 'Informes y resultados', 'icono' => 'ph-file-text'],
-                ['id' => 'orion', 'label' => 'Resultados Apoyo a la decisión', 'icono' => 'ph-sparkle'],
+                ['id' => 'experto', 'label' => 'Resultados Apoyo a la decisión', 'icono' => 'ph-sparkle'],
             ];
         @endphp
 
@@ -1006,7 +1006,7 @@
         {{-- ==========================================
              PESTAÑA 8: RESULTADOS Apoyo a la decisión
              ========================================== --}}
-        @elseif($tab === 'orion')
+        @elseif($tab === 'experto')
             <div class="space-y-4">
                 {{-- Banner Contextual Apoyo a la decisión --}}
                 <div class="p-5 rounded-2xl bg-gradient-to-r from-[var(--rm-action-primary-soft)] via-[var(--rm-surface)] to-[var(--rm-surface-soft)] border border-[var(--rm-action-primary)]/20 shadow-xs space-y-3">
@@ -1120,7 +1120,7 @@
 
                 {{-- Baterías instrumentales que alimentan Apoyo a la decisión --}}
                 <x-ui.section-card title="Baterías e instrumentos aportantes al perfil neurocognitivo" subtitle="Pruebas psicométricas recientes del expediente del residente" icon="ph-clipboard-text">
-                    @if($instrumentosCognitivosOrion->isEmpty())
+                    @if($instrumentosCognitivosExperto->isEmpty())
                         <div class="py-6 text-center text-xs text-[var(--rm-text-secondary)] italic">
                             <i class="ph ph-notepad text-2xl text-[var(--rm-text-secondary)]/50 mb-1 block"></i>
                             No hay baterías cognitivas registradas en este período.
@@ -1138,7 +1138,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[var(--rm-border)]">
-                                    @foreach($instrumentosCognitivosOrion as $app)
+                                    @foreach($instrumentosCognitivosExperto as $app)
                                         <tr class="hover:bg-[var(--rm-surface-soft)]/50 transition-colors">
                                             <td class="py-2 px-3 font-mono text-[11px] text-[var(--rm-text-secondary)]">
                                                 {{ $app->fecha_hora?->format('d/m/Y H:i') }}

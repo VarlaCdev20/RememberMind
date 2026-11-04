@@ -111,7 +111,7 @@ final class HallazgosObservacionalesTest extends TestCase
             ->assertSee('Perfil pendiente de valoración')
             ->assertDontSee('Patrón orientativo')
             ->call('irASeccion', 'hallazgos-observacionales')
-            ->assertDispatched('orion-navigate', seccion: 'hallazgos-observacionales');
+            ->assertDispatched('decision-navigate', seccion: 'hallazgos-observacionales');
 
         self::assertNull($pagina->viewData('perfilInstrumental')['petersen_institucional']['patron']);
         self::assertCount(5, $pagina->viewData('perfilInstrumental')['petersen_institucional']['dominios']);

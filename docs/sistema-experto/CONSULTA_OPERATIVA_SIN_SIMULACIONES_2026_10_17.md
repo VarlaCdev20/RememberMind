@@ -70,7 +70,7 @@ arrancado antes de corregir el test; la repetición posterior de los seis casos
 de vista previa pasó íntegra en ambos motores. No se repitió toda la corrida
 ampliada después de la corrección exclusiva de la expectativa.
 
-- La pantalla se titula «O.R.I.O.N. — Resultado de la evaluación neurocognitiva». Consulta resultados operativos y, en el laboratorio local autorizado, la instantánea conservada cuando no hay evaluación operativa.
+- La pantalla se titula «sistema experto — Resultado de la evaluación neurocognitiva». Consulta resultados operativos y, en el laboratorio local autorizado, la instantánea conservada cuando no hay evaluación operativa.
 - El lector operativo sigue excluyendo pruebas, simulaciones y experimentos. La excepción local utiliza exclusivamente `LectorSimulacionLocal`, verifica la instantánea y mantiene su advertencia de origen.
 - Las fuentes y sus cantidades excluyen los lotes `SIM-SE`, `COR-SIM-SE`, `SIM-IADL` y el instrumento reservado de QA `INST_COMPLETO/TECNICA_1`. Una observación NULL conserva su registro ordinario.
 - Se conservan las evaluaciones y antecedentes de laboratorio en la base. El lector explícito `LectorSimulacionLocal` permite verificar las instantáneas fuera de la pantalla operativa. No se renombran datos ficticios ni se convierten en valoraciones reales.

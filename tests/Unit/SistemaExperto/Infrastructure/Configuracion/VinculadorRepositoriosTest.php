@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Infrastructure\Configuracion;
 
-use MotorExperto\dominio\orion\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\RedSemanticaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Conocimiento\ReglaExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Evaluaciones\EvaluacionExpertaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorControlesCognitivos;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ExtractorVariableMapeada;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\MapeoFuentes\ResolutorFuenteExperta;
@@ -53,7 +53,7 @@ final class VinculadorRepositoriosTest extends TestCase
         $this->contenedor = new Container;
         $this->contenedor->instance('env', 'testing');
         Container::setInstance($this->contenedor);
-        $resolver = new ConnectionResolver(['orion_test' => self::conexionSinPdo(':memory:')]);
+        $resolver = new ConnectionResolver(['experto_test' => self::conexionSinPdo(':memory:')]);
         Model::setConnectionResolver($resolver);
     }
 
@@ -166,7 +166,7 @@ final class VinculadorRepositoriosTest extends TestCase
     /** Una base física se rechaza inspeccionando configuración, sin abrir su PDO */
     public function test_base_no_desechable_no_deja_bindings(): void
     {
-        Model::setConnectionResolver(new ConnectionResolver(['orion_test' => self::conexionSinPdo('BASE_INSTITUCIONAL.sqlite')]));
+        Model::setConnectionResolver(new ConnectionResolver(['experto_test' => self::conexionSinPdo('BASE_INSTITUCIONAL.sqlite')]));
         try {
             $this->vinculador()->registrar($this->contenedor);
             self::fail('Debe rechazarse un destino físico.');
@@ -180,7 +180,7 @@ final class VinculadorRepositoriosTest extends TestCase
     public function test_configuracion_invalida_falla_antes_de_registrar(): void
     {
         $this->expectException(DomainException::class);
-        new VinculadorRepositorios('orion_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', ['CONTEXTUAL'], [], static fn () => null);
+        new VinculadorRepositorios('experto_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', ['CONTEXTUAL'], [], static fn () => null);
     }
 
     /** Comprueba estrictos, inmutabilidad y PHPDoc exigido */
@@ -206,7 +206,7 @@ final class VinculadorRepositoriosTest extends TestCase
     /** @return VinculadorRepositorios */
     private function vinculador(): VinculadorRepositorios
     {
-        return new VinculadorRepositorios('orion_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', [],
+        return new VinculadorRepositorios('experto_test', new DateTimeZone('America/La_Paz'), 'RESULTADO', [],
             ['COG_MEM_CONTROL' => new AdaptadorControlesCognitivos], static function (): never {
                 throw new RuntimeException('La memoria original no está disponible en este escenario unitario.');
             });

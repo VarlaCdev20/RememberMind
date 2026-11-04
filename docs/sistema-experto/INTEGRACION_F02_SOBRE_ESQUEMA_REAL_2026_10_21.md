@@ -1,17 +1,17 @@
-# O.R.I.O.N. — integración F02 sobre las migraciones institucionales
+# sistema experto — integración F02 sobre las migraciones institucionales
 
 **Estado:** ensayo ejecutable en SQLite `:memory:`; **no es un diseño físico aprobable ni una migración institucional**. Corte 21/10/2026.
 
 ## Cambio comprobado
 
-El [ensayo F02](../../prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php) acepta `--base-institucional`. Fuerza SQLite en memoria antes de iniciar Laravel, rechaza una configuración en caché o una conexión distinta, instala las migraciones reales y confirma sus **120 tablas físicas**: 104 de negocio y 16 técnicas. Reutiliza la cabecera existente `evaluaciones_expertas`, con sus FK reales a `residentes`, `versiones_modelo_experto` y `personal`. Solo en esa base desechable agrega `huella_compuesta` y `estado_conservacion`, y crea las 37 relaciones F02 restantes. Los identificadores de residente, versión, usuario y evaluación de la cabecera coinciden con los dos contextos del DTO sintético. Ningún registro institucional se lee ni se modifica.
+El [ensayo F02](../../prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php) acepta `--base-institucional`. Fuerza SQLite en memoria antes de iniciar Laravel, rechaza una configuración en caché o una conexión distinta, instala las migraciones reales y confirma sus **120 tablas físicas**: 104 de negocio y 16 técnicas. Reutiliza la cabecera existente `evaluaciones_expertas`, con sus FK reales a `residentes`, `versiones_modelo_experto` y `personal`. Solo en esa base desechable agrega `huella_compuesta` y `estado_conservacion`, y crea las 37 relaciones F02 restantes. Los identificadores de residente, versión, usuario y evaluación de la cabecera coinciden con los dos contextos del DTO sintético. Ningún registro institucional se lee ni se modifica.
 
-La [matriz generada de integración](../../prototipos/orion-conservacion-0_2/matriz-integracion-38-relaciones.csv) identifica **los 39 modelos y sus 51 rutas**, las 37 tablas F02 que se crean, las dos fusiones B01 ya ensayadas y los destinos institucionales evaluados. Se regenera con `php prototipos/orion-conservacion-0_2/generar-matriz-integracion.php`. Cada fila indica expresamente que la prueba completa acredita la **referencia F02**, no una reutilización semántica de las tablas candidatas. `m001` conserva el contenido compuesto en `entradas_compuestas` y usa `evaluaciones_expertas` como cabecera; por ello reutilizar la cabecera no equivale a haber resuelto las otras 50 rutas.
+La [matriz generada de integración](../../prototipos/experto-conservacion-0_2/matriz-integracion-38-relaciones.csv) identifica **los 39 modelos y sus 51 rutas**, las 37 tablas F02 que se crean, las dos fusiones B01 ya ensayadas y los destinos institucionales evaluados. Se regenera con `php prototipos/experto-conservacion-0_2/generar-matriz-integracion.php`. Cada fila indica expresamente que la prueba completa acredita la **referencia F02**, no una reutilización semántica de las tablas candidatas. `m001` conserva el contenido compuesto en `entradas_compuestas` y usa `evaluaciones_expertas` como cabecera; por ello reutilizar la cabecera no equivale a haber resuelto las otras 50 rutas.
 
 ## Resultado reproducible
 
 ```powershell
-php prototipos/orion-conservacion-0_2/ensayar-sqlite-completo.php --base-institucional
+php prototipos/experto-conservacion-0_2/ensayar-sqlite-completo.php --base-institucional
 php artisan test tests/Unit/ReferenciaF02SqliteDesechableTest.php --compact
 ```
 
@@ -21,7 +21,7 @@ Seis casos sintéticos pasan guardar → leer entradas → comparar canónicamen
 
 Este candidato de referencia excede el máximo por **31 tablas de negocio**. No es una cota mínima matemática: cada modelo F02 tiene su propia tabla por prudencia de grano; una reutilización o consolidación podría reducir el número solo después de probar identidad, propietario, FK, cardinalidad, ausencia/NULL y reversión para cada relación. Hoy la única reutilización física completa probada en la copia real es la cabecera. B01 funde dos pares de modelos dentro de F02; todavía no prueba que `relaciones_semanticas` pueda conservar hechos adquiridos.
 
-Las 37 tablas F02 usan el códec de escalares tipados del oráculo (`*_tipo`, `*_texto`, `*_entero`, etc.). Ese códec permite comparar exhaustivamente los **783 campos**, pero **no constituye un diccionario clínico nominal mantenible** ni sustituye un modelo normalizado. Por eso no se presentan esas tablas como DDL institucional para aprobación. Persisten las brechas B01–B03 y las demás rutas detalladas en la [matriz de 51 rutas](../../prototipos/orion-conservacion-110/matriz-resolucion-51-rutas.csv). La necesidad de relaciones nuevas bajo 110 debe demostrarse con columnas nominales, PK/FK, checks por grano, escritor/lector integral y transición poblada.
+Las 37 tablas F02 usan el códec de escalares tipados del oráculo (`*_tipo`, `*_texto`, `*_entero`, etc.). Ese códec permite comparar exhaustivamente los **783 campos**, pero **no constituye un diccionario clínico nominal mantenible** ni sustituye un modelo normalizado. Por eso no se presentan esas tablas como DDL institucional para aprobación. Persisten las brechas B01–B03 y las demás rutas detalladas en la [matriz de 51 rutas](../../prototipos/experto-conservacion-110/matriz-resolucion-51-rutas.csv). La necesidad de relaciones nuevas bajo 110 debe demostrarse con columnas nominales, PK/FK, checks por grano, escritor/lector integral y transición poblada.
 
 ## Decisión y continuidad
 
@@ -42,4 +42,4 @@ Resultados de este corte: `ReferenciaF02SqliteDesechableTest` **2 pruebas, 6 ase
 | Migración poblada, reversión sin pérdida y consumidores existentes | Pendiente |
 | Persistencia institucional activada y revisión sobre resultado conservado | Bloqueada por diseño y aprobación estructural específica |
 
-La corrida global `php artisan test --compact` se intentó, pero se interrumpió tras un tramo prolongado sin nueva salida; antes de ello había marcado fallos cuyo resumen y nombres no llegó a imprimir. Una repetición con `--debug --stop-on-failure` confirmó **1.637 pruebas terminadas** sin llegar aún al primer fallo y también se interrumpió para evitar otra corrida prolongada. Por tanto, **la batería Laravel completa no está aprobada y sus fallos no están identificados**. El registro técnico parcial de depuración quedó fuera del repositorio en `%TEMP%/orion-full-debug-20261021.log`; no contiene historias clínicas reales. No se modificaron pruebas ajenas para ocultar esos fallos.
+La corrida global `php artisan test --compact` se intentó, pero se interrumpió tras un tramo prolongado sin nueva salida; antes de ello había marcado fallos cuyo resumen y nombres no llegó a imprimir. Una repetición con `--debug --stop-on-failure` confirmó **1.637 pruebas terminadas** sin llegar aún al primer fallo y también se interrumpió para evitar otra corrida prolongada. Por tanto, **la batería Laravel completa no está aprobada y sus fallos no están identificados**. El registro técnico parcial de depuración quedó fuera del repositorio en `%TEMP%/decision-full-debug-20261021.log`; no contiene historias clínicas reales. No se modificaron pruebas ajenas para ocultar esos fallos.

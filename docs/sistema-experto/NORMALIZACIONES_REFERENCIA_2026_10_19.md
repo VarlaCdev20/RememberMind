@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Normalizaciones de referencia implementadas
+# sistema experto — Normalizaciones de referencia implementadas
 
 Fecha: 19/10/2026. Solicitud: «realiza las normalizaciones». Estado: cinco
 ecuaciones nuevas implementadas, con seis perfiles de selección y pruebas.

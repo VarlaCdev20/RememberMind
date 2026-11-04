@@ -52,7 +52,7 @@ test('gobierno de reglas: cumplimiento, disponibilidad y responsive en la aplica
     await page.setViewport({ width: 1440, height: 1000 });
     const response = await page.goto(`${base}/admin/sistema-experto/reglas`, { waitUntil: 'networkidle0' });
     assert.equal(response.status(), 200);
-    const version = await page.$eval('#gob-version', el => [...el.options].find(o => o.textContent.includes('ORION-COGNITIVO-1'))?.value);
+    const version = await page.$eval('#gob-version', el => [...el.options].find(o => o.textContent.includes('Perfil cognitivo inicial'))?.value);
     assert.ok(version);
     await page.select('#gob-version', version); await page.waitForNetworkIdle({ idleTime: 250 });
     const button = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find(el => el.textContent.includes('Probar condiciones')));

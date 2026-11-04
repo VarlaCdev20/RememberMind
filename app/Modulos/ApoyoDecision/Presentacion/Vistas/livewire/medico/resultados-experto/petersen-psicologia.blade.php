@@ -23,21 +23,21 @@
                 @if($vistaMultidominio)
                 <div class="rm-psychology-pattern-result">
                     <i class="ph ph-brain" aria-hidden="true"></i>
-                    <div><span>Resultado orientativo</span><h2 id="orion-resultado-actual">Perfil compatible con posible DCL {{ $patrones[$petersen['patron']] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p></div>
+                    <div><span>Resultado orientativo</span><h2 id="decision-resultado-actual">Perfil compatible con posible DCL {{ $patrones[$petersen['patron']] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p></div>
                 </div>
                 @endif
             </section>
             @if($vistaMultidominio)
             <aside class="rm-psychology-warning" aria-label="Límite de interpretación">
-                <i class="ph ph-warning" aria-hidden="true"></i><div><h2>Resultado orientativo, no diagnóstico</h2><p>Este resultado debe revisarse junto con la historia del residente, su autonomía y otras posibles causas.</p><strong>No constituye un diagnóstico médico confirmado.</strong><button type="button" wire:click="irASeccion('orion-petersen-detalle')" class="rm-psychology-link">Ver fundamento y límites <i class="ph ph-arrow-right" aria-hidden="true"></i></button></div>
+                <i class="ph ph-warning" aria-hidden="true"></i><div><h2>Resultado orientativo, no diagnóstico</h2><p>Este resultado debe revisarse junto con la historia del residente, su autonomía y otras posibles causas.</p><strong>No constituye un diagnóstico médico confirmado.</strong><button type="button" wire:click="irASeccion('decision-petersen-detalle')" class="rm-psychology-link">Ver fundamento y límites <i class="ph ph-arrow-right" aria-hidden="true"></i></button></div>
             </aside>
             @else
             <div class="rm-psychology-resident__date"><strong>Consulta actual</strong><span>Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}</span></div>
             @endif
         </div>
         @unless($vistaMultidominio)
-        <section class="rm-psychology-pending rm-psychology-pending--pattern" aria-labelledby="orion-resultado-actual">
-            <div class="rm-psychology-pending__main"><span class="rm-psychology-pending__status"><i class="ph ph-brain" aria-hidden="true"></i>Resultado orientativo</span><h2 id="orion-resultado-actual">Perfil compatible con posible DCL {{ $patrones[$petersen['patron']] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p><p class="rm-psychology-inline-warning">Requiere interpretación profesional; no es un diagnóstico confirmado.</p></div>
+        <section class="rm-psychology-pending rm-psychology-pending--pattern" aria-labelledby="decision-resultado-actual">
+            <div class="rm-psychology-pending__main"><span class="rm-psychology-pending__status"><i class="ph ph-brain" aria-hidden="true"></i>Resultado orientativo</span><h2 id="decision-resultado-actual">Perfil compatible con posible DCL {{ $patrones[$petersen['patron']] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p><p class="rm-psychology-inline-warning">Requiere interpretación profesional; no es un diagnóstico confirmado.</p></div>
             <div class="rm-psychology-pending__needs"><button type="button" class="rm-btn rm-btn-secondary" x-on:click="ayudaTema = 'resultado'; ayudaAbierta = true"><i class="ph ph-info" aria-hidden="true"></i>¿Por qué este resultado?</button><button type="button" class="rm-btn rm-btn-primary" wire:click="irASeccion('fuentes-disponibles')"><i class="ph ph-files" aria-hidden="true"></i>Ver evidencias</button></div>
         </section>
         @endunless
@@ -50,8 +50,8 @@
             <div class="rm-psychology-resident__date"><strong>Consulta actual</strong><span>Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}</span></div>
             <span class="rm-psychology-resident__state"><i class="ph ph-warning-circle" aria-hidden="true"></i>Sin evaluación histórica completa</span>
         </section>
-        <section class="rm-psychology-pending {{ $areasEsperadasDocumentadas ? 'is-expected' : '' }}" aria-labelledby="orion-resultado-actual">
-            <div class="rm-psychology-pending__main"><span class="rm-psychology-pending__status"><i class="ph {{ $areasEsperadasDocumentadas ? 'ph-smiley' : 'ph-warning-circle' }}" aria-hidden="true"></i>{{ $resumenPetersen['estado'] }}</span><h2 id="orion-resultado-actual">{{ $resumenPetersen['titulo'] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p><button type="button" class="rm-psychology-help-link" x-on:click="ayudaTema = 'resultado'; ayudaAbierta = true">¿Qué significa este resultado?</button></div>
+        <section class="rm-psychology-pending {{ $areasEsperadasDocumentadas ? 'is-expected' : '' }}" aria-labelledby="decision-resultado-actual">
+            <div class="rm-psychology-pending__main"><span class="rm-psychology-pending__status"><i class="ph {{ $areasEsperadasDocumentadas ? 'ph-smiley' : 'ph-warning-circle' }}" aria-hidden="true"></i>{{ $resumenPetersen['estado'] }}</span><h2 id="decision-resultado-actual">{{ $resumenPetersen['titulo'] }}</h2><p>{{ $resumenPetersen['explicacion'] }}</p><button type="button" class="rm-psychology-help-link" x-on:click="ayudaTema = 'resultado'; ayudaAbierta = true">¿Qué significa este resultado?</button></div>
             <div class="rm-psychology-pending__needs">
             @if($areasEsperadasDocumentadas)
                 <h3>Continuar el seguimiento</h3>
@@ -71,7 +71,7 @@
         </section>
     @endif
 
-    <div id="orion-petersen-criterios" class="rm-psychology-dashboard {{ $vistaMultidominio ? 'rm-psychology-dashboard--multidomain' : 'rm-psychology-dashboard--compact' }} {{ $hayPatron ? 'has-pattern' : '' }}" tabindex="-1">
+    <div id="decision-petersen-criterios" class="rm-psychology-dashboard {{ $vistaMultidominio ? 'rm-psychology-dashboard--multidomain' : 'rm-psychology-dashboard--compact' }} {{ $hayPatron ? 'has-pattern' : '' }}" tabindex="-1">
         <div class="rm-psychology-dashboard__main">
             <section class="rm-psychology-panel" aria-labelledby="psicologia-dominios-titulo">
                 <header><div><h2 id="psicologia-dominios-titulo">{{ $vistaMultidominio ? 'Perfil cognitivo por dominios' : 'Rendimiento por dominios cognitivos' }}</h2><p>Resultado documentado en cada área; no son porcentajes de deterioro.</p></div><button type="button" class="rm-psychology-help" x-on:click="ayudaTema = 'dominios'; ayudaAbierta = true" aria-label="Explicar los cinco dominios cognitivos"><i class="ph ph-question" aria-hidden="true"></i></button></header>
@@ -90,7 +90,7 @@
                         @endforeach
                     </ul>
                 @endif
-                <button type="button" wire:click="irASeccion('orion-petersen-detalle')" class="rm-psychology-link">Ver el detalle de las áreas <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+                <button type="button" wire:click="irASeccion('decision-petersen-detalle')" class="rm-psychology-link">Ver el detalle de las áreas <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
             </section>
 
             <section class="rm-psychology-panel" aria-labelledby="psicologia-evolucion-titulo">
@@ -125,7 +125,7 @@
                     <header><div><h2 id="psicologia-proceso-titulo">Proceso de evaluación</h2></div></header>
                     <ol><li><i class="ph ph-file-text" aria-hidden="true"></i><span>Registro original</span></li><li><i class="ph ph-chart-bar" aria-hidden="true"></i><span>Valoración</span></li><li><i class="ph ph-list-checks" aria-hidden="true"></i><span>Criterios</span></li><li><i class="ph ph-brain" aria-hidden="true"></i><span>Perfil orientativo</span></li></ol>
                     @unless($hayPatron)<p>La consulta se detiene cuando falta una valoración o condición necesaria.</p>@endunless
-                    <button type="button" wire:click="irASeccion('orion-petersen-detalle')" class="rm-btn rm-btn-secondary">{{ $hayPatron ? 'Ver cómo se obtuvo' : 'Ver qué falta' }} <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+                    <button type="button" wire:click="irASeccion('decision-petersen-detalle')" class="rm-btn rm-btn-secondary">{{ $hayPatron ? 'Ver cómo se obtuvo' : 'Ver qué falta' }} <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
                 </section>
             @endif
             <section class="rm-psychology-panel" aria-labelledby="psicologia-fuentes-titulo">
@@ -141,7 +141,7 @@
                         <li><span>{{ $nombre }}</span><strong data-state="{{ $estado }}">{{ ['S' => 'Sustentado', 'N' => 'No acreditado', 'U' => 'Pendiente', 'X' => 'Contradictorio'][$estado] ?? 'Pendiente' }}</strong></li>
                     @endforeach
                 </ul>
-                <button type="button" wire:click="irASeccion('orion-petersen-detalle')" class="rm-psychology-link">Ver criterios y soportes <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+                <button type="button" wire:click="irASeccion('decision-petersen-detalle')" class="rm-psychology-link">Ver criterios y soportes <i class="ph ph-arrow-right" aria-hidden="true"></i></button>
             </section>
         </div>
     </div>

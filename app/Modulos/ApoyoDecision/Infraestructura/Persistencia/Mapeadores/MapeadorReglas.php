@@ -16,8 +16,8 @@ use App\Models\VersionModeloExperto;
 use DomainException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\ValueObjects\Conocimiento\OperadorCondicionEnum;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum;
 
 /** Traduce condiciones y consecuencias registradas a reglas del motor. */
 final readonly class MapeadorReglas

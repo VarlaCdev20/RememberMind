@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Investigación de los 19 componentes cognitivos
+# sistema experto — Investigación de los 19 componentes cognitivos
 
 Fecha de corte: 19 de octubre de 2026. Versión documental 1.5.
 Destinatarios: Medicina, Psicología y equipo de desarrollo de RememberMind.
@@ -394,7 +394,7 @@ Debe prevalecer el manual exacto de la edición seleccionada.
 [catálogo editorial 2024](https://www.pearsonassessments.com/content/dam/school/global/clinical/us/assets/latam/2024-latam-catalogo.pdf),
 [Q-global](https://qglobal.pearsonclinical.com/qg/static/Product/es/WAIS-IV/WAIS-IV_Enter_Scores.htm).
 
-## Contratos implementados y ubicación en O.R.I.O.N.
+## Contratos implementados y ubicación en sistema experto
 
 `RegistroMetodosInstrumentales::ejecutar()` conserva las puntuaciones y añade
 `interpretacion_matematica` a cada medida individual, también en la fluidez parcial.

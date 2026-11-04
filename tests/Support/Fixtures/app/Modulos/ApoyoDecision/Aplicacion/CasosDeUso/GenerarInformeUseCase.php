@@ -9,8 +9,8 @@ use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoDclDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\ResultadoInferenciaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
-use MotorExperto\dominio\orion\Services\Explicacion\GeneradorExplicacionService;
+use MotorExperto\dominio\Entities\Conocimiento\RelacionSemantica;
+use MotorExperto\dominio\Services\Explicacion\GeneradorExplicacionService;
 
 /** Organiza los resultados y las explicaciones recibidas en los tres niveles del InformeExpertoDTO, manteniendo su trazabilidad experimental. */
 final readonly class GenerarInformeUseCase

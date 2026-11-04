@@ -70,7 +70,7 @@ final class ContratoDTOsTest extends TestCase
     public function test_dependencias_sin_laravel_ni_inversion_de_capas(): void
     {
         $raiz = dirname(__DIR__, 5);
-        foreach (['DTOs' => '/tests/Support/Fixtures/app/Modulos/ApoyoDecision/Aplicacion/DTOs', 'Domain' => '/motor-experto/dominio/orion'] as $capa => $ruta) {
+        foreach (['DTOs' => '/tests/Support/Fixtures/app/Modulos/ApoyoDecision/Aplicacion/DTOs', 'Domain' => '/motor-experto/dominio'] as $capa => $ruta) {
             $archivos = $capa === 'DTOs' ? array_map(fn ($clase) => (new ReflectionClass($clase))->getFileName(), [EvidenciasEntradaDTO::class, SolicitudInferenciaDTO::class, ResultadoInferenciaDTO::class, ResultadoDclDTO::class, InformeExpertoDTO::class]) : null;
             foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz.$ruta)) as $archivo) {
                 if (! $archivo->isFile() || $archivo->getExtension() !== 'php') {

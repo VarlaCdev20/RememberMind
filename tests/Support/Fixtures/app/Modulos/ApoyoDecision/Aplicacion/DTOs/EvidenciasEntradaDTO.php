@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\orion\Entities\Hechos\EvidenciaCognitiva;
-use MotorExperto\dominio\orion\Entities\Hechos\HechoExperto;
-use MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo;
+use MotorExperto\dominio\Entities\Hechos\EvidenciaCognitiva;
+use MotorExperto\dominio\Entities\Hechos\HechoExperto;
+use MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo;
 use DateTimeImmutable;
 use DomainException;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use DateTimeImmutable;
 use MotorExperto\inferencia\EvaluarPerfilInstitucional;
 use MotorExperto\conocimiento\AdmisibilidadCognitivaInstitucional;
@@ -23,7 +23,7 @@ final class PerfilInstitucionalAdoptadoTest extends TestCase
 {
     private function paquete(): PaqueteConocimiento
     {
-        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
+        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoCognitivo)->leer());
         $p = (new P)->construir($red, 'VERSION-SINTETICA', 'AUTOR-SINTETICO', '2026-10-19 08:00:00');
         $t = $p->declaracion()['tablas'];
         $t['fuentes_datos_expertas'][] = ['cod_fuente_dato_experta' => 'FUENTE-SINTETICA', 'cod_version_modelo' => $p->version,

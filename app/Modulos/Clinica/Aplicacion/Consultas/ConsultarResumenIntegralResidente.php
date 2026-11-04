@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Reúne hechos del expediente autorizado sin diagnosticar ni ejecutar O.R.I.O.N.
+ * Reúne hechos del expediente autorizado sin diagnosticar ni ejecutar sistema experto
  * Los recuentos proceden de registros originales del período, no de las relaciones
  * limitadas de la cabecera. La interpretación reutiliza exclusivamente las reglas vigentes.
  */

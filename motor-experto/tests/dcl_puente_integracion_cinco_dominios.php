@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /** Ensayo de extremo a extremo: fuentes sintéticas de cinco dominios → puente de interpretación ficticia → Petersen → explicación; ningún paciente real. */
-require_once __DIR__.'/orion_cinco_dominios_experimental.php';
+require_once __DIR__.'/cinco_dominios_experimental.php';
 require_once __DIR__.'/dcl_puente_referencias_experimental.php';
 
 use MotorExperto\investigacion\dcl\IntegradorReferenciasDCLExperimental;

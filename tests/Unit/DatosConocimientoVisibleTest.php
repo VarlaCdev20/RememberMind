@@ -10,6 +10,17 @@ use PHPUnit\Framework\TestCase;
 
 final class DatosConocimientoVisibleTest extends TestCase
 {
+    public function test_versiones_conservadas_tienen_etiquetas_publicas_neutras(): void
+    {
+        $historicos = \MotorExperto\conservacion\IdentificadoresHistoricos::class;
+        $lenguaje = \App\Modulos\ApoyoDecision\Aplicacion\DTOs\LenguajeResultadosExperto::class;
+        self::assertSame('Perfil cognitivo inicial', $lenguaje::version($historicos::PERFIL_COGNITIVO));
+        self::assertSame('Patrones de Petersen', $lenguaje::version($historicos::PETERSEN));
+        self::assertSame('EXPERTO-REVISION-2', $lenguaje::version(explode('-', $historicos::PERFIL_COGNITIVO, 2)[0].'-REVISION-2'));
+        self::assertSame('VERSION-OTRA-1', $lenguaje::version('VERSION-OTRA-1'));
+        self::assertSame('No disponible', $lenguaje::version(null));
+    }
+
     private function tablas(): array
     {
         return ['nodos_semanticos' => [['cod_nodo_semantico' => 'N1', 'nombre' => 'Concepto original']],

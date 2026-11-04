@@ -72,7 +72,7 @@ Capturas `output/experto-antes-*` y `output/experto-despues-*` provienen del Lar
 | Comando / evidencia | Resultado | Alcance |
 |---|---|---|
 | `php motor-experto/tests/independencia.php` | PASS: cinco casos | Motor sin Laravel/Eloquent |
-| `php motor-experto/tests/orion_independencia.php` | Ejecutado sin error/salida | Independencia adicional del motor |
+| `php motor-experto/tests/dominio_independencia.php` | Ejecutado sin error/salida | Independencia adicional del motor |
 | PHPUnit directo con extensiones SQLite, filtro `SistemaExperto` | 756 pruebas, 5622 aserciones, una omitida | Omisión existente de aislamiento transaccional: requiere PostgreSQL; no acreditado aquí |
 | Filtro `LaboratorioExpertoFrontendTest` | 24 pruebas, 256 aserciones | Consulta, simulaciones segregadas, permisos, catálogo, versiones e integridad |
 | Filtro `InformeCognitivoTest|NavegacionSistemaExpertoTest|ProyectarRedConocimientoTest` | 40 pruebas, 324 aserciones | Lectura, asignación/revocación de Enfermería, exclusión técnica, navegación y proyección |

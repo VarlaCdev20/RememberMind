@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SistemaExperto\Domain\Services\Compuertas;
 
-use MotorExperto\dominio\orion\Services\Compuertas\EvaluadorEvaluabilidadService;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum as D;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EvaluabilidadEnum as V;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
+use MotorExperto\dominio\Services\Compuertas\EvaluadorEvaluabilidadService;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum as D;
+use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum as V;
+use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
+use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as S;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as F;
 use PHPUnit\Framework\TestCase;
@@ -219,7 +219,7 @@ final class EvaluadorEvaluabilidadServiceTest extends TestCase
 
     /**
      * Ejecuta los colaboradores reales del servicio sobre un escenario artificial.
-     * @param array{memoria: \MotorExperto\dominio\orion\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario
+     * @param array{memoria: \MotorExperto\dominio\Entities\Hechos\MemoriaTrabajo, candidatas: array, contexto: array, procedencias: array} $escenario
      * @param D $dominio
      * @return array
      * @throws \DomainException

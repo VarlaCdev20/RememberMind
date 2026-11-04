@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { residentWorkspace, residentGraph } from '../../resources/frontend/scripts/modules/expert-resident-workspace.js';
-import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/orion-explorador.js';
+import { knowledgeGraph, distribuirRedCompacta } from '../../resources/frontend/scripts/modules/expert-graph.js';
 
 test('las clases del lienzo forman expresiones Alpine válidas con y sin recorrido', () => {
     const vista = readFileSync(new URL('../../resources/views/components/ui/expert-graph-canvas.blade.php', import.meta.url), 'utf8');

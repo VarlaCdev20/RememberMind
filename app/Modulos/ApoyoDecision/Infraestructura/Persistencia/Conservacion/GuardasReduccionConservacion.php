@@ -6,12 +6,14 @@ namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use MotorExperto\conservacion\IdentificadoresHistoricos;
 
 /** Garantías físicas de bloques y soportes; PostgreSQL serializa por evaluación. */
 final class GuardasReduccionConservacion
 {
     public function instalar(): void
     {
+        $formato = IdentificadoresHistoricos::CONSERVACION;
         $h = ProyeccionReduccionExperta::HECHOS;
         $v = ProyeccionReduccionExperta::VINCULOS;
         $iad = array_values(ProyeccionReduccionExperta::IAD);
@@ -19,11 +21,11 @@ final class GuardasReduccionConservacion
         $igual = implode(' AND ', array_map(fn ($c) => DB::getDriverName() === 'pgsql' ? "NEW.{$c} IS NOT DISTINCT FROM OLD.{$c}" : "NEW.{$c} IS OLD.{$c}", $base));
         $vacia = implode(' AND ', array_map(fn ($c) => "OLD.{$c} IS NULL", $iad));
         $anexo = "($vacia) AND NEW.cod_evidencia_iadl_instantanea IS NOT NULL AND ($igual)";
-        $duplicado = "EXISTS (SELECT 1 FROM {$h} h JOIN evidencias_criterio_evaluacion s ON s.cod_evidencia_evaluacion=h.cod_evidencia_evaluacion JOIN evaluacion_criterios c ON c.cod_evaluacion_criterio=s.cod_evaluacion_criterio WHERE c.version_conservacion='ORION-SNAP-2' AND h.cod_hecho_instantanea<>NEW.cod_hecho_instantanea AND h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion)";
+        $duplicado = "EXISTS (SELECT 1 FROM {$h} h JOIN evidencias_criterio_evaluacion s ON s.cod_evidencia_evaluacion=h.cod_evidencia_evaluacion JOIN evaluacion_criterios c ON c.cod_evaluacion_criterio=s.cod_evaluacion_criterio WHERE c.version_conservacion='{$formato}' AND h.cod_hecho_instantanea<>NEW.cod_hecho_instantanea AND h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion)";
         $contexto = "NOT EXISTS (SELECT 1 FROM evaluacion_criterios c WHERE c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio AND
             ((NEW.cod_evidencia_evaluacion IS NOT NULL AND EXISTS (SELECT 1 FROM evidencias_evaluacion e WHERE e.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion AND e.cod_evaluacion_experta=c.cod_evaluacion_experta))
-            OR (NEW.cod_hecho_instantanea IS NOT NULL AND c.version_conservacion='ORION-SNAP-2' AND EXISTS (SELECT 1 FROM {$h} h WHERE h.cod_hecho_instantanea=NEW.cod_hecho_instantanea AND h.cod_evaluacion_experta=c.cod_evaluacion_experta))))";
-        $snap = "EXISTS (SELECT 1 FROM evaluacion_criterios c WHERE c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio AND c.version_conservacion='ORION-SNAP-2')";
+            OR (NEW.cod_hecho_instantanea IS NOT NULL AND c.version_conservacion='{$formato}' AND EXISTS (SELECT 1 FROM {$h} h WHERE h.cod_hecho_instantanea=NEW.cod_hecho_instantanea AND h.cod_evaluacion_experta=c.cod_evaluacion_experta))))";
+        $snap = "EXISTS (SELECT 1 FROM evaluacion_criterios c WHERE c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio AND c.version_conservacion='{$formato}')";
         $incompleto = "NEW.orden_conservacion IS NULL OR NEW.orden_conservacion<0 OR NEW.rol_en_criterio<>'SOPORTE_EXPERIMENTAL' OR NEW.estado_participacion<>'PRUEBA_TECNICA' OR (NEW.cod_evidencia_evaluacion IS NOT NULL AND (SELECT count(*) FROM {$h} h JOIN evaluacion_criterios c ON c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio WHERE h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion AND h.cod_evaluacion_experta=c.cod_evaluacion_experta)<>1)";
         $propietario = '(SELECT c.cod_evaluacion_experta FROM evaluacion_criterios c WHERE c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio)';
         $hechoNuevo = "COALESCE(NEW.cod_hecho_instantanea,(SELECT h.cod_hecho_instantanea FROM {$h} h WHERE h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion AND h.cod_evaluacion_experta={$propietario}))";

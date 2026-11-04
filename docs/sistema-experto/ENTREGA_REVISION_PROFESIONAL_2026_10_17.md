@@ -64,18 +64,18 @@ que un total global de instrumento determine los cinco dominios.
 ## Evidencias y pendientes
 
 - PostgreSQL desechable, cierre final: revisiones e inventario, **20 pruebas /
-  65 aserciones PASS** (`orion-revision-final.pg.xml` en TEMP).
+  65 aserciones PASS** (`decision-revision-final.pg.xml` en TEMP).
 - Concurrencia PostgreSQL: **1 prueba / 8 aserciones PASS**, dos profesionales
   y dos procesos con barrera; una firma guardada, otra rechazada, una auditoría
-  (`orion-revision-race.pg.xml`).
+  (`decision-revision-race.pg.xml`).
 - Primer grupo SQLite: 100 pruebas / 670 aserciones; un fallo del contador
   histórico 105. Se actualizó al inventario aprobado 106; contador e inventario
   se repitieron, **9 pruebas / 341 aserciones PASS**. Cierre del grupo completo:
-  **100 pruebas / 989 aserciones PASS** (`orion-revision-final.sqlite.xml`).
+  **100 pruebas / 989 aserciones PASS** (`decision-revision-final.sqlite.xml`).
 - Protección adicional de revisión abierta y render final: **2 pruebas /
   16 aserciones PASS** en SQLite; ambas incluidas también en la ejecución final
   PostgreSQL. Cambiar de evaluación exige guardar o cancelar la revisión abierta.
-- Build Vite: PASS (`orion-revision.build.log`).
+- Build Vite: PASS (`decision-revision.build.log`).
 - Gate independiente de persistencia y seguridad: PASS técnico, sin P1/P2
   pendientes; no equivale a aprobación de metodología clínica.
 - Revisión visual: no ejecutada; el navegador está deshabilitado en Work.

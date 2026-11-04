@@ -1,4 +1,4 @@
-# O.R.I.O.N. — Cinco referencias geriátricas adicionales
+# sistema experto — Cinco referencias geriátricas adicionales
 
 Consulta e implementación: 19/10/2026, America/La_Paz. Población de interés:
 personas mayores de 60 años. Estado: **implementación matemática de referencia**,

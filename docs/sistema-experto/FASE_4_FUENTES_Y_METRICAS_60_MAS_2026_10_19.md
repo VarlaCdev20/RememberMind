@@ -1,5 +1,5 @@
 ---
-title: "O.R.I.O.N. — Fuentes profesionales, población 60+ y puente instrumental"
+title: "sistema experto — Fuentes profesionales, población 60+ y puente instrumental"
 status: CURRENT
 last_reviewed: 2026-10-19
 source_of_truth: false
@@ -77,8 +77,8 @@ Inventario local comprobado mediante consultas de solo lectura el 19/10/2026, si
 | Versión del catálogo | Estado | Reglas conservadas | Consecuencia para esta conexión |
 |---|---|---:|---|
 | `MEM-INV-20261008` | INACTIVO | 0 | Investigación, no paquete ejecutable |
-| `ORION-V1-20261008` | INACTIVO | 0 | Cinco criterios; relaciones de pertenencia/asociación, sin contrato habilitante ni reglas |
-| `SIM-ORION-LOCAL-1` | ACTIVO | 8 | Laboratorio; se excluye de la consulta institucional |
+| `base documental anterior` | INACTIVO | 0 | Cinco criterios; relaciones de pertenencia/asociación, sin contrato habilitante ni reglas |
+| `SIM-EXPERTO-LOCAL-1` | ACTIVO | 8 | Laboratorio; se excluye de la consulta institucional |
 
 No existe una versión activa no experimental que esta investigación pueda seleccionar legítimamente. Se necesita conservar una versión institucional con sus reglas declaradas y vincular sus preguntas originales; activar el rótulo de la versión vacía no completa esos contenidos. La autoría de creación deberá provenir de Medicina/Psicología en el gestor existente, no de elegir automáticamente una cuenta del sistema. Este inventario no se presenta como un nuevo guardado o una activación clínica.
 
@@ -90,7 +90,7 @@ La consulta devuelve `persistido=false`; no modifica resultados históricos. La 
 |---|---|---|
 | Cabecera, reglas y trazas D-137 | Residente, versión y relaciones de condiciones/soportes | No conservan por sí solos todas las capturas originales, preguntas sin respuesta y el contexto de extracción |
 | `hechos_instantanea_experta` / contrato OBS | Escalares, fecha y autor bajo el contrato observacional aprobado | Su escritor no representa el nuevo perfil declarativo completo ni sus componentes y metadatos instrumentales |
-| `AlmacenInstantaneas` | Conservación ORION-SNAP-2 para su contrato y clases originales | Recibe otra `MemoriaTrabajo` y contratos experimentales; no se quitan sus guardas para guardar este resultado como clínico |
+| `AlmacenInstantaneas` | Conservación conservación de instantáneas v2 para su contrato y clases originales | Recibe otra `MemoriaTrabajo` y contratos experimentales; no se quitan sus guardas para guardar este resultado como clínico |
 | `ArchivoEjecucionesExperimentales` | Evidencia privada cifrada del laboratorio | No es archivo institucional; no se usa como depósito JSON de historias reales |
 
 No se añadieron tablas, columnas, catálogos o permisos. Se conserva el inventario de 106 tablas de negocio y la 4FN. La conservación institucional íntegra sigue en fase 6, con la obligación de reutilizar el esquema y presentar un diccionario concreto si aparece un cambio estructural necesario. Un archivo técnico o un hash no reemplazan los originales ni la representación relacional.
@@ -120,7 +120,7 @@ Candidato aislado desde `add60ab3`, incorporando únicamente los archivos propio
 | Prueba adicional de literal textual y admisibilidad de Memoria, en cada motor | **1 prueba / 4 aserciones**, PASS en SQLite y PostgreSQL desechable; sin cambiar código productivo |
 | Total de casos distintos comprobados por motor | **219**; 6826 aserciones SQLite / 6825 PostgreSQL |
 | `php motor-experto/tests/independencia.php` | PASS: cinco casos técnicos sin Laravel/Eloquent |
-| `php motor-experto/tests/orion_independencia.php` | PASS: dominio y huellas sin Laravel, Composer o SQL |
+| `php motor-experto/tests/dominio_independencia.php` | PASS: dominio y huellas sin Laravel, Composer o SQL |
 | Pint, sintaxis de PHP propio y enlaces locales de las actas | PASS |
 | `npm run build` del candidato | PASS, 3,88 s; sin cambios de interfaz en este incremento |
 

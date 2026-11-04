@@ -100,7 +100,7 @@ Verificación de HEAD `40219c13` más los cinco archivos PHP propios en candidat
 | SQLite `:memory:`, selección relacionada | **182 pruebas / 6378 aserciones PASS**, 1 min 52 s |
 | PostgreSQL desechable, misma selección | **182 pruebas / 6377 aserciones PASS**, 2 min 18 s; parada del servidor confirmada |
 | Unitarias iniciales de comprobación, edad, perfil y referencias | **116 pruebas / 1187 aserciones PASS**; incluidas después en la selección relacionada, no se suman como casos nuevos |
-| Independencia del motor y dominio O.R.I.O.N. | **PASS** en ambos scripts |
+| Independencia del motor y dominio sistema experto | **PASS** en ambos scripts |
 | Pint, cinco archivos PHP del incremento | **PASS** |
 | Formato de diff y enlaces locales de los documentos | **PASS**; diccionario con 23 métodos y 19 componentes |
 

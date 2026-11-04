@@ -100,7 +100,7 @@ flowchart LR
 
 Los cuatro patrones se implementan en `PETERSEN-INSTITUCIONAL-1`. En el corte
 inicial no eran reglas SQL administrables. El [incremento del 20/10](GOBIERNO_PETERSEN_Y_QA_CAPTURA_2026_10_20.md)
-los conecta al gestor mediante la familia `ORION-PETERSEN-1`, separada de las
+los conecta al gestor mediante la familia `patrones de Petersen`, separada de las
 17 reglas A–D y sin alterar el contrato clínico adoptado.
 
 ## Integridad, 4FN y seguridad
@@ -149,7 +149,7 @@ normalización aunque se recalcule el hash del contenedor se detecta al reproduc
 V1/V2 conservan sus ramas y formatos históricos.
 
 `ARTEFACTO-MOTOR-2` incluye código puro, lock de Composer y la red documental
-`orion-v1-conceptos.json`. El manifiesto verifica conjunto y bytes. La prueba de
+`conceptos-cognitivos.json`. El manifiesto verifica conjunto y bytes. La prueba de
 reproducción ejecuta otro proceso PHP con solo el código extraído del ZIP y una
 captura sintética en memoria; no depende del checkout ni de Laravel.
 
@@ -197,7 +197,7 @@ presenta como aceptación visual completa.
 | Cierre final SQLite del formulario, permisos, arquitectura y roles | **55 pruebas / 4944 aserciones**, sin fallos/errores/omisiones |
 | Cierre final PostgreSQL desechable, incluidos núcleo y concurrencia real | **87 pruebas / 5052 aserciones**, sin fallos/errores/omisiones; clúster detenido y retirado por el script |
 | Arquitectura y matriz de roles en el workspace | 18 / 4768 y 12 / 58, respectivamente, PASS; se mantienen aparte por contener el workspace cambios simultáneos ajenos |
-| Independencia del motor y O.R.I.O.N. | Ambos ejecutables PASS sin Laravel ni SQL |
+| Independencia del motor y sistema experto | Ambos ejecutables PASS sin Laravel ni SQL |
 | Compilación frontend | `npm run build`: PASS, 107 módulos, 8,02 s |
 | Revisiones independientes | Persistencia, seguridad y corrección final C05: PASS estáticos acotados |
 | Sintaxis, formato y enlaces locales | PHP lint/Pint, `git diff --check` y enlaces locales de documentos propios, PASS |
@@ -231,7 +231,7 @@ $filtro = 'CapturaPetersenOriginalTest|PermisosPetersenOriginalTest|PetersenInst
 ./scripts/probar-postgres.ps1 -Filtro $filtro -Informe storage/app/private/petersen-cierre-postgres.xml -Log storage/app/private/petersen-cierre-postgres.log
 php vendor/phpunit/phpunit/phpunit --filter 'CapturaPetersenOriginalTest|PermisosPetersenOriginalTest|RolesVistasPermisosMatrixTest|FolderOrganizationTest|FrontendArchitectureTest' --log-junit storage/app/private/petersen-cierre-sqlite.xml
 php motor-experto/tests/independencia.php
-php motor-experto/tests/orion_independencia.php
+php motor-experto/tests/dominio_independencia.php
 npm run build
 ```
 

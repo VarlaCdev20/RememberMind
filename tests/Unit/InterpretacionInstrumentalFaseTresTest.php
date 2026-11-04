@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoOrion;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoConocimientoCognitivo;
 use MotorExperto\conocimiento\PerfilConceptualCognitivo;
 use MotorExperto\instrumentos\CalculadorReconocimientoHvlt;
 use MotorExperto\instrumentos\CatalogoCapturaCognitiva;
@@ -216,7 +216,7 @@ final class InterpretacionInstrumentalFaseTresTest extends TestCase
 
     public function test_perfil_conserva_reconocimiento_sin_convertirlo_en_medicion_normalizada(): void
     {
-        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoOrion)->leer());
+        $red = (new PerfilConceptualCognitivo)->construir((new ArchivoConocimientoCognitivo)->leer());
         $resultado = (new RegistroMetodosInstrumentales)->ejecutar(CalculadorReconocimientoHvlt::METODO, $this->reconocimiento());
         $e = ['perfil' => 'SINTETICO', 'metodo' => CalculadorReconocimientoHvlt::METODO,
             'fuentes_entradas' => [], 'captura' => $this->reconocimiento(), 'normalizacion' => $resultado];

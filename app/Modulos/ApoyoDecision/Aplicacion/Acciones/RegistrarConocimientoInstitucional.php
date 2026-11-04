@@ -8,7 +8,7 @@ use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
 use App\Models\User;
 use App\Models\VersionModeloExperto;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\IdentidadesConocimiento;
-use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoOrion;
+use App\Modulos\ApoyoDecision\Dominio\Puertos\FuenteConocimientoCognitivo;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -33,7 +33,7 @@ final class RegistrarConocimientoInstitucional
             }
             $fecha = now()->format('Y-m-d H:i:s');
             $id = app(CodigosEntidad::class)->siguiente('versiones_modelo_experto');
-            $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoOrion::class)->leer());
+            $red = (new PerfilConceptualCognitivo)->construir(app(FuenteConocimientoCognitivo::class)->leer());
             // No vincular los antiguos catálogos TEST como fuentes institucionales.
             $vinculos = [];
             $p = (new P)->construir($red, $id, $actor->getKey(), $fecha, $vinculos);

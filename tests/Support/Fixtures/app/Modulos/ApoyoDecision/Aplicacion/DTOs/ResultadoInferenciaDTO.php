@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\DTOs;
 
-use MotorExperto\dominio\orion\Entities\Cognicion\ResultadoDominio;
-use MotorExperto\dominio\orion\Entities\Cognicion\VectorCognitivo;
-use MotorExperto\dominio\orion\Entities\Conocimiento\ReglaExperta;
-use MotorExperto\dominio\orion\Entities\Conocimiento\RelacionSemantica;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\DominioCognitivoEnum;
-use MotorExperto\dominio\orion\ValueObjects\Cognicion\EstadoDominioEnum;
+use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
+use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
+use MotorExperto\dominio\Entities\Conocimiento\ReglaExperta;
+use MotorExperto\dominio\Entities\Conocimiento\RelacionSemantica;
+use MotorExperto\dominio\ValueObjects\Cognicion\DominioCognitivoEnum;
+use MotorExperto\dominio\ValueObjects\Cognicion\EstadoDominioEnum;
 use DomainException;
 
 /** Transporta los cinco resultados de Domain con evaluabilidad, evidencias, reglas y trazabilidad, manteniendo separados los dominios. */
@@ -68,7 +68,7 @@ final readonly class ResultadoInferenciaDTO
             if (! is_array($evaluacion) || ! ($evaluacion['regla'] ?? null) instanceof ReglaExperta
                 || $evaluacion['regla']->id !== $id || $evaluacion['regla']->versionConocimiento !== $solicitud->versionConocimiento
                 || ($evaluacion['memoria'] ?? null) !== $perfilCognitivo->memoria
-                || ! ($evaluacion['estado'] ?? null) instanceof \MotorExperto\dominio\orion\ValueObjects\Conocimiento\EstadoReglaEnum) {
+                || ! ($evaluacion['estado'] ?? null) instanceof \MotorExperto\dominio\ValueObjects\Conocimiento\EstadoReglaEnum) {
                 throw new DomainException('Evaluación estructurada ajena al resultado original.');
             }
         }

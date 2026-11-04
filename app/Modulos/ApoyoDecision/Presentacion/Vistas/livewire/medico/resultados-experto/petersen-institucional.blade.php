@@ -16,38 +16,38 @@
 
 @if($psicologia)
     @include('apoyodecision::livewire.medico.resultados-experto.petersen-psicologia')
-    <details id="orion-petersen-detalle" class="rm-psychology-technical">
+    <details id="decision-petersen-detalle" class="rm-psychology-technical">
         <summary>Consultar reglas, soportes y criterios en detalle</summary>
 @endif
-<x-ui.section-card title="Detalle del resultado cognitivo" subtitle="Valoraciones, reglas y soportes utilizados" icon="ph-brain" class="rm-orion-petersen-card">
+<x-ui.section-card title="Detalle del resultado cognitivo" subtitle="Valoraciones, reglas y soportes utilizados" icon="ph-brain" class="rm-decision-petersen-card">
     @unless($psicologia)
     {{-- Banner de síntesis clínica orientativa --}}
-    <div class="rm-orion-petersen-hero {{ $petersen['patron'] ? 'has-pattern' : 'is-limited' }}">
-        <div class="rm-orion-petersen-hero-grid">
-            <div class="rm-orion-petersen-hero-main">
-                <span class="rm-orion-petersen-icon" aria-hidden="true"><i class="ph ph-brain"></i></span>
+    <div class="rm-decision-petersen-hero {{ $petersen['patron'] ? 'has-pattern' : 'is-limited' }}">
+        <div class="rm-decision-petersen-hero-grid">
+            <div class="rm-decision-petersen-hero-main">
+                <span class="rm-decision-petersen-icon" aria-hidden="true"><i class="ph ph-brain"></i></span>
                 <div class="min-w-0">
-                    <p class="rm-orion-petersen-kicker">Resultado de la consulta actual</p>
-                    <span class="rm-orion-petersen-status">{{ $resumenPetersen['estado'] }}</span>
-                    <h2 class="rm-orion-petersen-result" id="orion-resultado-actual">
+                    <p class="rm-decision-petersen-kicker">Resultado de la consulta actual</p>
+                    <span class="rm-decision-petersen-status">{{ $resumenPetersen['estado'] }}</span>
+                    <h2 class="rm-decision-petersen-result" id="decision-resultado-actual">
                         {{ $petersen['patron'] ? 'Perfil compatible con posible DCL '.$patrones[$petersen['patron']] : $resumenPetersen['titulo'] }}
                     </h2>
-                    <p class="rm-orion-petersen-explanation">
+                    <p class="rm-decision-petersen-explanation">
                         {{ $resumenPetersen['explicacion'] }}
                     </p>
-                    <div class="rm-orion-petersen-hero-actions">
-                        <a href="#orion-petersen-criterios" class="rm-btn rm-btn-primary"><i class="ph ph-list-checks" aria-hidden="true"></i>Por qué este resultado</a>
+                    <div class="rm-decision-petersen-hero-actions">
+                        <a href="#decision-petersen-criterios" class="rm-btn rm-btn-primary"><i class="ph ph-list-checks" aria-hidden="true"></i>Por qué este resultado</a>
                         @if($datos && $informe)<button type="button" wire:click="abrirConsulta('registro')" class="rm-btn rm-btn-secondary"><i class="ph ph-files" aria-hidden="true"></i>Ver evidencias</button>@endif
                     </div>
                 </div>
             </div>
-            <aside class="rm-orion-petersen-guidance" aria-label="Cómo interpretar el resultado">
+            <aside class="rm-decision-petersen-guidance" aria-label="Cómo interpretar el resultado">
                 <h3><i class="ph ph-warning-circle" aria-hidden="true"></i>Resultado orientativo, no diagnóstico</h3>
                 @if(count($petersen['impedimentos']))
                     @if($resumenPetersen['faltan_mediciones'] && $resumenFuentes && $resumenFuentes['instrumentales'] === 0)
-                        <p class="rm-orion-petersen-guidance-reason">Hay registros de seguimiento, pero no se ha registrado una aplicación cognitiva instrumental para interpretar las cinco áreas.</p>
+                        <p class="rm-decision-petersen-guidance-reason">Hay registros de seguimiento, pero no se ha registrado una aplicación cognitiva instrumental para interpretar las cinco áreas.</p>
                     @else
-                        <p class="rm-orion-petersen-guidance-reason">{{ $explicarMotivo($petersen['impedimentos'][0]) }}</p>
+                        <p class="rm-decision-petersen-guidance-reason">{{ $explicarMotivo($petersen['impedimentos'][0]) }}</p>
                     @endif
                 @else
                     <p>Las cinco áreas cognitivas y los requisitos de valoración explican qué pudo comprobarse.</p>
@@ -55,7 +55,7 @@
                 <p>Es una orientación basada en la información disponible. Debe interpretarse con la historia y el contexto funcional del residente. No constituye un diagnóstico médico confirmado.</p>
             </aside>
         </div>
-        <p class="rm-orion-petersen-meta">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}. Este cálculo actual todavía no está guardado como evaluación histórica completa y no admite revisión profesional.</p>
+        <p class="rm-decision-petersen-meta">Información considerada hasta el {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($petersen['fecha_corte'] ?? null, 'momento de la consulta') }}. Este cálculo actual todavía no está guardado como evaluación histórica completa y no admite revisión profesional.</p>
 
         @if(! $petersen['patron'] && ($petersen['requisitos']['C02']['estado'] ?? null) === 'N')
             <div class="rm-expert-no-pattern mt-3" role="status">
@@ -65,7 +65,7 @@
         @endif
 
         @if(count($petersen['impedimentos']) > 1)
-            <details class="rm-orion-petersen-detail-panel mt-3">
+            <details class="rm-decision-petersen-detail-panel mt-3">
                 <summary>Ver todos los motivos que impiden clasificar</summary>
                 <ul class="list-disc pl-5 mt-2 space-y-1">
                     @foreach($petersen['impedimentos'] as $motivo)<li>{{ $explicarMotivo($motivo) }}</li>@endforeach
@@ -96,7 +96,7 @@
     @endif
 
     @unless($psicologia)
-    <div id="orion-petersen-criterios" class="rm-expert-profile-grid" tabindex="-1">
+    <div id="decision-petersen-criterios" class="rm-expert-profile-grid" tabindex="-1">
         <section class="rm-expert-profile-grid__domains" aria-label="Perfil cognitivo por dominios">
             @include('apoyodecision::livewire.medico.resultados-experto.grafico-areas', [
                 'graficoId' => 'petersen-dominios',
@@ -114,29 +114,29 @@
                     <li data-state="{{ $estadoCodigo }}"><span>{{ $nombre }}</span><strong>{{ ['S' => 'Sustentado', 'N' => 'No acreditado', 'X' => 'Contradictorio', 'U' => 'Pendiente'][$estadoCodigo] ?? 'No interpretable' }}</strong></li>
                 @endforeach
             </ul>
-            <a href="#orion-petersen-detalle" class="rm-btn rm-btn-secondary">Ver el detalle de los criterios</a>
+            <a href="#decision-petersen-detalle" class="rm-btn rm-btn-secondary">Ver el detalle de los criterios</a>
         </section>
     </div>
 
     {{-- Estados reales: no se traducen a puntuaciones ni se colorean como diagnóstico. --}}
-    <div id="orion-petersen-detalle">
+    <div id="decision-petersen-detalle">
         <h2 class="sr-only" tabindex="-1">Estado de los cinco criterios Petersen</h2>
         @if($requisitosPendientes->isNotEmpty() && $requisitosPendientes->count() < count($nombresRequisitos))
-            <p class="rm-orion-note mt-2">{{ $requisitosPendientes->count() }} {{ $requisitosPendientes->count() === 1 ? 'criterio sigue pendiente' : 'criterios siguen pendientes' }}. Puede consultar cada motivo en el detalle.</p>
+            <p class="rm-decision-note mt-2">{{ $requisitosPendientes->count() }} {{ $requisitosPendientes->count() === 1 ? 'criterio sigue pendiente' : 'criterios siguen pendientes' }}. Puede consultar cada motivo en el detalle.</p>
         @endif
     </div>
     @endunless
 
-    <details class="rm-orion-petersen-detail-panel">
+    <details class="rm-decision-petersen-detail-panel">
     <summary>Ver las cinco áreas y {{ $requisitosPendientes->isNotEmpty() ? 'los criterios pendientes' : 'los criterios evaluados' }}</summary>
-    <div class="rm-orion-petersen-details">
+    <div class="rm-decision-petersen-details">
     {{-- Cinco dominios --}}
-    <div class="rm-orion-petersen-column space-y-3">
+    <div class="rm-decision-petersen-column space-y-3">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-sm text-[var(--rm-text-primary)]">Cinco dominios</h2>
             <span class="text-xs text-[var(--rm-text-secondary)]">Abra cada área para ver qué información falta</span>
         </div>
-        <div class="rm-orion-petersen-list">
+        <div class="rm-decision-petersen-list">
             @foreach($petersen['dominios'] as $codigo => $d)
                 @php($estadoDominio = ['A' => 'Alteración objetiva con soporte', 'P' => 'Rendimiento esperado con soporte', 'U' => 'Pendiente de medición', 'I' => 'No interpretable', 'X' => 'Contradictorio'][$d['estado']] ?? 'No evaluado')
                 <details class="{{ $d['estado'] === 'U' ? 'border-b border-[var(--rm-border)] px-1 py-2' : 'rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3.5 shadow-sm' }} min-w-0">
@@ -171,12 +171,12 @@
     </div>
 
     {{-- Criterios Petersen --}}
-    <div class="rm-orion-petersen-column space-y-3">
+    <div class="rm-decision-petersen-column space-y-3">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-sm text-[var(--rm-text-primary)]">Criterios Petersen</h2>
             <span class="text-xs text-[var(--rm-text-secondary)]">Estado de los cinco requisitos</span>
         </div>
-        <div class="rm-orion-petersen-list">
+        <div class="rm-decision-petersen-list">
             @foreach($nombresRequisitos as $codigo => $nombre)
                 @php($requisito = $petersen['requisitos'][$codigo])
                 @php($estadoReq = ['S' => 'Acreditado', 'N' => 'No acreditado', 'U' => ($codigo === 'C02' ? 'Pendiente de valorar las áreas' : 'Pendiente de valoración'), 'X' => 'Contradictorio'][$requisito['estado']] ?? 'No evaluado')

@@ -7,7 +7,7 @@ namespace App\Modulos\ApoyoDecision\Aplicacion\CasosDeUso;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\EvidenciasEntradaDTO;
 use App\Modulos\ApoyoDecision\Aplicacion\DTOs\SolicitudInferenciaDTO;
 use DomainException;
-use MotorExperto\dominio\orion\Repositories\Hechos\EvidenciaRepositoryInterface;
+use MotorExperto\dominio\Repositories\Hechos\EvidenciaRepositoryInterface;
 use RuntimeException;
 
 /** Obtiene la instantánea del caso ficticio mediante el contrato de evidencias de Domain y la entrega sin modificar sus hechos ni su procedencia. */

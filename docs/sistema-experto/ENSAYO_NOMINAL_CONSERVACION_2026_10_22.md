@@ -10,11 +10,11 @@ Se mantienen el [máximo de 110](DECISION_MAXIMO_110_TABLAS_2026_10_21.md), el b
 
 La rama observada es `feature/apoyo-decision-informe-neurocognitivo`, HEAD local `47da9c0f`. El árbol tenía numerosos cambios simultáneos; se preservaron. No se ejecutaron operaciones de staging, commit, push ni despliegue.
 
-Los archivos propios de este corte son `prototipos/orion-conservacion-nominal/`, `tests/Feature/ConservacionNominalCompuestaTest.php`, `tests/Unit/ContratoNominalTest.php`, este informe y su entrada en el README del sistema experto. No se atribuyen a este corte las modificaciones concurrentes de aplicación, frontend, BDD u otros módulos. `git diff --stat` no incluye el contenido de los archivos todavía sin seguimiento; el estado se inspeccionó además con `git status --short`.
+Los archivos propios de este corte son `prototipos/experto-conservacion-nominal/`, `tests/Feature/ConservacionNominalCompuestaTest.php`, `tests/Unit/ContratoNominalTest.php`, este informe y su entrada en el README del sistema experto. No se atribuyen a este corte las modificaciones concurrentes de aplicación, frontend, BDD u otros módulos. `git diff --stat` no incluye el contenido de los archivos todavía sin seguimiento; el estado se inspeccionó además con `git status --short`.
 
 ## Implementación real de este corte
 
-Se añadió [el candidato nominal ejecutable](../../prototipos/orion-conservacion-nominal/README.md), fuera del contenedor Laravel y de las migraciones. Usa el mapa cerrado F02 y el motor PHP existente.
+Se añadió [el candidato nominal ejecutable](../../prototipos/experto-conservacion-nominal/README.md), fuera del contenedor Laravel y de las migraciones. Usa el mapa cerrado F02 y el motor PHP existente.
 
 ```mermaid
 flowchart LR
@@ -61,16 +61,16 @@ La representación física suma **1215 columnas** entre las 34 tablas. Las mayor
 
 ## Diccionario y matrices completas
 
-El [generador](../../prototipos/orion-conservacion-nominal/generar-diccionario.php) compila el candidato exclusivamente en SQLite en memoria y genera 14 artefactos reproducibles:
+El [generador](../../prototipos/experto-conservacion-nominal/generar-diccionario.php) compila el candidato exclusivamente en SQLite en memoria y genera 14 artefactos reproducibles:
 
-- [Cobertura de las 783 rutas](../../prototipos/orion-conservacion-nominal/cobertura-783.csv).
-- [Cobertura de las 51 ubicaciones](../../prototipos/orion-conservacion-nominal/cobertura-51-rutas.csv).
-- [Modelos y propietarios](../../prototipos/orion-conservacion-nominal/modelos.csv).
-- [Campos locales, tipos y destinos](../../prototipos/orion-conservacion-nominal/matriz-campos.csv).
-- [Diccionario físico](../../prototipos/orion-conservacion-nominal/diccionario-fisico.csv), [FK](../../prototipos/orion-conservacion-nominal/fk.csv) e [índices](../../prototipos/orion-conservacion-nominal/indices.csv).
-- [Modelo entidad-relación](../../prototipos/orion-conservacion-nominal/modelo-er.mmd).
-- DDL exacta de ensayo para [SQLite](../../prototipos/orion-conservacion-nominal/esquema-sqlite.sql) y [PostgreSQL](../../prototipos/orion-conservacion-nominal/esquema-pgsql.sql), con reversión para ambos motores.
-- [Referencias semánticas pendientes](../../prototipos/orion-conservacion-nominal/referencias-conocimiento-pendientes.csv) y [resumen cuantificado](../../prototipos/orion-conservacion-nominal/resumen.json).
+- [Cobertura de las 783 rutas](../../prototipos/experto-conservacion-nominal/cobertura-783.csv).
+- [Cobertura de las 51 ubicaciones](../../prototipos/experto-conservacion-nominal/cobertura-51-rutas.csv).
+- [Modelos y propietarios](../../prototipos/experto-conservacion-nominal/modelos.csv).
+- [Campos locales, tipos y destinos](../../prototipos/experto-conservacion-nominal/matriz-campos.csv).
+- [Diccionario físico](../../prototipos/experto-conservacion-nominal/diccionario-fisico.csv), [FK](../../prototipos/experto-conservacion-nominal/fk.csv) e [índices](../../prototipos/experto-conservacion-nominal/indices.csv).
+- [Modelo entidad-relación](../../prototipos/experto-conservacion-nominal/modelo-er.mmd).
+- DDL exacta de ensayo para [SQLite](../../prototipos/experto-conservacion-nominal/esquema-sqlite.sql) y [PostgreSQL](../../prototipos/experto-conservacion-nominal/esquema-pgsql.sql), con reversión para ambos motores.
+- [Referencias semánticas pendientes](../../prototipos/experto-conservacion-nominal/referencias-conocimiento-pendientes.csv) y [resumen cuantificado](../../prototipos/experto-conservacion-nominal/resumen.json).
 
 Las **651 rutas locales** no reemplazan ni recortan las 783 ubicaciones originales: los mismos modelos de conocimiento aparecen en ambas ramas. El generador comprueba un destino unívoco para cada una de las 783 rutas y las 51 ubicaciones, y falla si el inventario cambia sin actualizar el mapa. `--check` comprueba que los artefactos versionables coinciden con el código.
 
@@ -108,9 +108,9 @@ El fallo intermedio deja cero cabeceras y cero filas hijas. El ensayo poblado re
 ## Pruebas y reproducción
 
 ```powershell
-php prototipos/orion-conservacion-nominal/generar-diccionario.php --check
-php vendor/bin/pint prototipos/orion-conservacion-nominal tests/Feature/ConservacionNominalCompuestaTest.php tests/Unit/ContratoNominalTest.php --test
-php artisan test --filter='ConservacionNominalCompuestaTest|ContratoNominalTest|CicloObservacionalConservadoTest|EjecucionConsultaCognitivaTest|ResumenPetersenVisibleTest|MotivoPetersenVisibleTest|SistemaExpertoOrionNivel1Test' --compact --stop-on-failure
+php prototipos/experto-conservacion-nominal/generar-diccionario.php --check
+php vendor/bin/pint prototipos/experto-conservacion-nominal tests/Feature/ConservacionNominalCompuestaTest.php tests/Unit/ContratoNominalTest.php --test
+php artisan test --filter='ConservacionNominalCompuestaTest|ContratoNominalTest|CicloObservacionalConservadoTest|EjecucionConsultaCognitivaTest|ResumenPetersenVisibleTest|MotivoPetersenVisibleTest|SistemaExpertoNivel1Test' --compact --stop-on-failure
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/probar-postgres.ps1 -Filtro 'ConservacionNominalCompuestaTest|ContratoNominalTest'
 ```
 
@@ -120,8 +120,8 @@ Los resultados finales de este corte se registran en la tabla siguiente. Las eje
 | --- | --- | --- |
 | Diccionario, matrices y DDL | SQLite en memoria, sin iniciar Laravel | 14 artefactos; 783 rutas y 51 ubicaciones con destino; reproducción de artefactos comprobada. |
 | Representación tipada | SQLite | 2 pruebas unitarias / 13 aserciones: incluye `PHP_INT_MAX`, precisión textual, `PHP_FLOAT_MAX`, signo de `-0.0`, booleano frente a entero, NULL y ausencia. |
-| Batería final SQLite y unitarias | Filtro exacto indicado arriba; incluye ejecución Livewire, cuatro perfiles y revisión observacional independiente | **34 pruebas satisfactorias, 317 aserciones, una omitida**: la carrera se ejecuta en PostgreSQL. Duración 155,23 s. [Salida completa](../../prototipos/orion-conservacion-nominal/evidencia/sqlite-final.txt). |
-| Batería final del candidato en PostgreSQL | Cluster desechable propio, PHP 8.3.33 / PostgreSQL 18 | **7 pruebas, 154 aserciones, cero fallos y cero omisiones**. Duración 115,39 s. [JUnit](../../prototipos/orion-conservacion-nominal/evidencia/postgres-final.junit.xml) y [salida](../../prototipos/orion-conservacion-nominal/evidencia/postgres-final.txt). |
+| Batería final SQLite y unitarias | Filtro exacto indicado arriba; incluye ejecución Livewire, cuatro perfiles y revisión observacional independiente | **34 pruebas satisfactorias, 317 aserciones, una omitida**: la carrera se ejecuta en PostgreSQL. Duración 155,23 s. [Salida completa](../../prototipos/experto-conservacion-nominal/evidencia/sqlite-final.txt). |
+| Batería final del candidato en PostgreSQL | Cluster desechable propio, PHP 8.3.33 / PostgreSQL 18 | **7 pruebas, 154 aserciones, cero fallos y cero omisiones**. Duración 115,39 s. [JUnit](../../prototipos/experto-conservacion-nominal/evidencia/postgres-final.junit.xml) y [salida](../../prototipos/experto-conservacion-nominal/evidencia/postgres-final.txt). |
 | Entradas y replay completos | SQLite y PostgreSQL desechables | Diez variantes: cuatro perfiles, falta de C03, falta de gobierno, falta de datos, NULL/ausencia/orden, seis fuentes/documentos y vínculo interpretativo. Se comparan todas las entradas y el contenido completo reproducido con las huellas de ambas ramas. |
 | Concurrencia | PostgreSQL desechable | Tres conexiones y dos esperas de lock comprobadas; inserción tardía rechazada, solicitud repetida sin duplicación. |
 | Atomicidad, FK, identidad, cierre y reversión añadida | Bases desechables | Rollback parcial, rechazo de identidad ajena y propietario de otra evaluación, cierre incompleto, historia inmutable y restauración del candidato poblado. |

@@ -74,7 +74,7 @@ final class SucesionObservacionalTest extends TestCase
     {
         $uuid = (string) Str::uuid();
         $antes = $this->ejecutar($uuid);
-        $version = app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-ARCHIVO',
+        $version = app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-ARCHIVO',
             'Archivar repetición conservando los resultados anteriores.', retiradas: [$this->paquete['reglas']['OBS-MEM-01']['regla']]);
         $this->control->update(['repite_preguntas' => false, 'olvida_indicaciones' => true]);
         self::assertSame($antes['id'], $this->ejecutar($uuid)['id']);
@@ -84,7 +84,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertArrayNotHasKey('OBS-MEM-01', $despues['resumen']);
         self::assertSame('CUMPLE', $despues['resumen']['OBS-MEM-02']['estado']);
         self::assertCount(2, $despues['resumen']);
-        self::assertSame('ORION-OBS-ARCHIVO', app(ConsultarHallazgosObservacionales::class)->consultar($this->actor, $this->residente)['version']);
+        self::assertSame('EXPERTO-OBS-ARCHIVO', app(ConsultarHallazgosObservacionales::class)->consultar($this->actor, $this->residente)['version']);
         self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
     }
 
@@ -99,7 +99,7 @@ final class SucesionObservacionalTest extends TestCase
 
     public function test_dos_reglas_comparten_evidencia_sin_duplicar_hechos_ni_consecuencia(): void
     {
-        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-COMPARTIDA', 'Añadir otra definición sobre el mismo indicador.', nueva: $this->nuevaRegla());
+        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-COMPARTIDA', 'Añadir otra definición sobre el mismo indicador.', nueva: $this->nuevaRegla());
         $resultado = $this->ejecutar();
         self::assertCount(4, $resultado['resumen']);
         self::assertSame('CUMPLE', $resultado['resumen']['OBS-MEM-NUEVA']['estado']);
@@ -114,7 +114,7 @@ final class SucesionObservacionalTest extends TestCase
 
     public function test_sustituir_usa_la_nueva_definicion_y_su_antecesora_original(): void
     {
-        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-SUSTITUCION', 'Sustituir la definición manteniendo su trazabilidad.',
+        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-SUSTITUCION', 'Sustituir la definición manteniendo su trazabilidad.',
             nueva: $this->nuevaRegla(), sustituye: $this->paquete['reglas']['OBS-MEM-01']['regla']);
         $r = $this->ejecutar();
         self::assertCount(3, $r['resumen']);
@@ -125,7 +125,7 @@ final class SucesionObservacionalTest extends TestCase
 
     public function test_archivar_todas_las_reglas_conserva_fuentes_sin_inventar_hallazgos(): void
     {
-        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-SIN-REGLAS', 'Retirar todas las definiciones de esta revisión.',
+        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-SIN-REGLAS', 'Retirar todas las definiciones de esta revisión.',
             retiradas: array_column($this->paquete['reglas'], 'regla'));
         $r = $this->ejecutar();
         self::assertSame([], $r['resumen']);
@@ -142,7 +142,7 @@ final class SucesionObservacionalTest extends TestCase
         $nueva = $this->nuevaRegla();
         $nueva['condiciones'][0]['valor'] = $this->paquete['valores']['NO'];
         try {
-            app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-INCOMPATIBLE', 'Esta condición no corresponde a la consecuencia.', nueva: $nueva);
+            app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-INCOMPATIBLE', 'Esta condición no corresponde a la consecuencia.', nueva: $nueva);
             self::fail('Debe rechazar la definición incompatible.');
         } catch (DomainException $e) {
             self::assertStringContainsString('afirmativo', $e->getMessage());
@@ -161,7 +161,7 @@ final class SucesionObservacionalTest extends TestCase
             (string) Str::uuid(), $paqueteAntiguo, $lectura['instantanea'], $informe));
         self::assertSame('OBS-SNAP-1', DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', $id)->value('version_conservacion'));
         $antes = app(Lector::class)->consultar($this->actor, $this->residente, $id);
-        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-HISTORIA', 'Retiro posterior que no cambia la historia conservada.');
+        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-HISTORIA', 'Retiro posterior que no cambia la historia conservada.');
         self::assertSame($antes['informe_completo'], app(Lector::class)->consultar($this->actor, $this->residente, $id)['informe_completo']);
     }
 
@@ -175,10 +175,10 @@ final class SucesionObservacionalTest extends TestCase
 
     public function test_pantalla_presenta_la_regla_sustituta_desde_su_ejecucion_conservada(): void
     {
-        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-PANTALLA', 'Conectar la regla sustituta a la consulta autorizada.',
+        app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-PANTALLA', 'Conectar la regla sustituta a la consulta autorizada.',
             nueva: $this->nuevaRegla(), sustituye: $this->paquete['reglas']['OBS-MEM-01']['regla']);
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->assertSee('Nueva revisión de la observación')->assertDontSee('ORION-OBS-PANTALLA')
+            ->assertSee('Nueva revisión de la observación')->assertDontSee('EXPERTO-OBS-PANTALLA')
             ->call('ejecutarObservaciones')->assertHasNoErrors()->assertSee('Evaluación observacional guardada')
             ->assertSee('Nueva revisión de la observación')->assertDontSee('No se pudo consultar la evaluación');
         self::assertDatabaseCount('evaluaciones_expertas', 1);
@@ -187,10 +187,10 @@ final class SucesionObservacionalTest extends TestCase
 
     public function test_sucesion_ambigua_se_rechaza_sin_crear_evaluacion(): void
     {
-        $hija = app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'ORION-OBS-UNICA', 'Primera sucesora de la familia observacional.');
+        $hija = app(Gestor::class)->crearRevision($this->actor, $this->paquete['version'], 'EXPERTO-OBS-UNICA', 'Primera sucesora de la familia observacional.');
         $otra = (array) DB::table('versiones_modelo_experto')->where('cod_version_modelo', $hija)->sole();
         $otra['cod_version_modelo'] = 'OBS-RAMA-AJENA';
-        $otra['codigo_version'] = 'ORION-OBS-RAMA';
+        $otra['codigo_version'] = 'EXPERTO-OBS-RAMA';
         DB::table('versiones_modelo_experto')->insert($otra);
         try {
             $this->ejecutar();

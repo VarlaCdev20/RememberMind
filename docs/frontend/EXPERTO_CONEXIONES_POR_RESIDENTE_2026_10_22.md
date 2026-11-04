@@ -78,7 +78,7 @@ equivalen a una validación visual de los cinco anchos.
 
 Comprobado en esta reanudación:
 
-- `node --test tests/Frontend/expert-resident-workspace.test.js tests/Frontend/orion-explorador.test.js`:
+- `node --test tests/Frontend/expert-resident-workspace.test.js tests/Frontend/expert-graph.test.js`:
   10 pruebas correctas. Incluyen inicialización sin recursión, selección y retorno
   por vínculos existentes, dirección original, enfoque recuperable y distribución
   de 90 nodos sin superposición de posiciones.

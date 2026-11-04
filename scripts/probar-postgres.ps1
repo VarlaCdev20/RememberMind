@@ -1,6 +1,6 @@
 param(
     [string]$PostgresBin = (Join-Path $env:ProgramFiles 'PostgreSQL/18/bin'),
-    [string]$Filtro = 'AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|CargaConocimientoOrionTest|ConocimientoPanelTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest',
+    [string]$Filtro = 'AccesoDashboardPorRolTest|AuthenticationTest|BddOperativaV2Test|ContratoPersonalInstitucionalTest|ContratoDocumentacionUsuarioTest|ContratoSeguridadCuentaTest|FichaCuidadosTest|RetiradaLaboratorioExpertoTest|ExploradorExpertoTest|RolesVistasPermisosMatrixTest|Fase3AdmisionAtomicidadTest|AlojamientoBloqueoPostgresTest|Fase3ConcurrenciaCamaPostgresTest|PersistenciaExpertaTest|ResultadosExpertoResidenteTest|PaqueteInvestigadoCOGMEMTest|DolorMigrationTest',
     [string]$Informe,
     [string]$Log
 )

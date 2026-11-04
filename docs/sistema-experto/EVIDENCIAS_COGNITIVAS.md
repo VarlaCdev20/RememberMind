@@ -30,7 +30,7 @@ contrato de `controles_cognitivos` en esta tarea.
 La documentación de árboles es propuesta histórica, no fuente de reglas para
 esta implementación. Las rutas antiguas Backend/Frontend quedan sustituidas por
 las de `app/Modulos`. No se modifica el motor ni se pretende sincronizar el
-Documento Maestro externo de O.R.I.O.N. con esta entrega.
+Documento Maestro externo de sistema experto con esta entrega.
 
 ## Observación, instrumento y resultado
 

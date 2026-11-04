@@ -44,7 +44,7 @@ contrato de conocimiento o versión experimental.
 Fuentes: [RedSemantica.php:15](../../../motor-experto/conocimiento/RedSemantica.php:15),
 [PertenenciaVariableCognitiva.php:12](../../../motor-experto/conocimiento/PertenenciaVariableCognitiva.php:12),
 [PaqueteConocimiento.php:88](../../../motor-experto/conocimiento/PaqueteConocimiento.php:88),
-[ConsultarExploracionOrion.php:20](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarExploracionOrion.php:20).
+[ConsultarGrafoExperto.php:20](../../../app/Modulos/ApoyoDecision/Aplicacion/Consultas/ConsultarGrafoExperto.php:20).
 
 ## Cómo mejorar su explicación
 

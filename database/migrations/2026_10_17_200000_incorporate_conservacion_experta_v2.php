@@ -6,6 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use MotorExperto\conservacion\IdentificadoresHistoricos;
 
 /** Extensión de nueve tablas aprobada por la propietaria el 17/10/2026. */
 return new class extends Migration
@@ -167,7 +168,8 @@ return new class extends Migration
         $this->check(self::TABLAS[7], 'snap_consecuencia_conocida', "consecuencia_tipo <> 'NULL'");
         $this->check(self::TABLAS[8], 'snap_forma_condicion', "(operador IN ('IGUAL_A','DISTINTO_DE') AND variable IS NOT NULL AND literal_tipo <> 'NULL') OR (operador IN ('Y','O','NO') AND variable IS NULL AND literal_tipo = 'NULL')");
         $this->check(self::TABLAS[0], 'snap_episodio_original', "(tipo_origen = 'D137' AND ((cod_atencion IS NOT NULL AND cod_actividad IS NULL) OR (cod_atencion IS NULL AND cod_actividad IS NOT NULL))) OR (tipo_origen <> 'D137' AND cod_atencion IS NULL AND cod_actividad IS NULL)");
-        $this->check('evaluacion_criterios', 'snap_tipo_criterio', "(tipo_registro = 'D137' AND estado_evaluabilidad IS NOT NULL AND version_conservacion IS NULL AND cod_criterio_padre IS NULL) OR (version_conservacion IS NOT NULL AND version_conservacion = 'ORION-SNAP-2' AND orden_conservacion IS NOT NULL AND orden_conservacion >= 0 AND ((tipo_registro = 'DOMINIO' AND estado_evaluabilidad IS NOT NULL AND cod_criterio_padre IS NULL) OR (tipo_registro = 'SUBCOMPONENTE' AND estado_evaluabilidad IS NULL AND cod_criterio_padre IS NOT NULL) OR (tipo_registro = 'DCL' AND estado_evaluabilidad IS NULL AND cod_criterio_padre IS NULL)))");
+        $formato = IdentificadoresHistoricos::CONSERVACION;
+        $this->check('evaluacion_criterios', 'snap_tipo_criterio', "(tipo_registro = 'D137' AND estado_evaluabilidad IS NOT NULL AND version_conservacion IS NULL AND cod_criterio_padre IS NULL) OR (version_conservacion IS NOT NULL AND version_conservacion = '{$formato}' AND orden_conservacion IS NOT NULL AND orden_conservacion >= 0 AND ((tipo_registro = 'DOMINIO' AND estado_evaluabilidad IS NOT NULL AND cod_criterio_padre IS NULL) OR (tipo_registro = 'SUBCOMPONENTE' AND estado_evaluabilidad IS NULL AND cod_criterio_padre IS NOT NULL) OR (tipo_registro = 'DCL' AND estado_evaluabilidad IS NULL AND cod_criterio_padre IS NULL)))");
         $this->check(self::TABLAS[0], 'snap_origen', "(tipo_origen = 'D137' AND cod_evidencia_evaluacion IS NOT NULL) OR (tipo_origen IN ('REFERENCIA_EXTERNA_SINTETICA','REFERENCIA_CRITERIO_SINTETICA','REFERENCIA_IADL_SINTETICA','REVISION_TECNICA_SINTETICA') AND cod_evidencia_evaluacion IS NULL)");
     }
 

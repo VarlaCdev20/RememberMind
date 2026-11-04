@@ -6,7 +6,7 @@ Fecha: 19/10/2026. Alcance: implementación y verificación del contrato adoptad
 
 La propietaria aprobó explícitamente el [contrato A–D](PROPUESTA_CONTRATO_INSTITUCIONAL_FASE_4_2026_10_19.md). Las 286 entradas conciliadas son observaciones clínicas por componente. Su realidad no las transforma en medidas de una prueba estandarizada. La [fase 2](DICTAMEN_CIERRE_FASE_2_2026_10_19.md) conserva su conciliación y la [fase 3](CIERRE_TECNICO_FASE_3_2026_10_19.md), los métodos de cálculo investigados.
 
-Esta entrega añade un paquete institucional independiente de las fixtures: `ORION-COGNITIVO-1`, cinco dominios, diecinueve componentes, quince reglas G09 y dos reglas de Memoria. No añade tablas, columnas, permisos, dependencias, registros de residentes ni mediciones. Mantiene la estructura relacional y el inventario vigente de 106 tablas de negocio.
+Esta entrega añade un paquete institucional independiente de las fixtures: `perfil cognitivo inicial`, cinco dominios, diecinueve componentes, quince reglas G09 y dos reglas de Memoria. No añade tablas, columnas, permisos, dependencias, registros de residentes ni mediciones. Mantiene la estructura relacional y el inventario vigente de 106 tablas de negocio.
 
 ## Checklist funcional
 
@@ -121,7 +121,7 @@ $filtro = 'ConocimientoCognitivoInstitucionalTest|PerfilInstitucionalAdoptadoTes
 php vendor/phpunit/phpunit/phpunit --filter $filtro --log-junit storage/app/private/fase4-adoptado-sqlite.xml
 ./scripts/probar-postgres.ps1 -Filtro ($filtro + '|GobiernoReglasConcurrenciaPostgresTest') -Informe storage/app/private/fase4-adoptado-postgres.xml -Log storage/app/private/fase4-adoptado-postgres.log
 php motor-experto/tests/independencia.php
-php motor-experto/tests/orion_independencia.php
+php motor-experto/tests/dominio_independencia.php
 npm run build
 ```
 
