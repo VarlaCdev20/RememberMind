@@ -73,8 +73,8 @@
    --rm-palette-surface-muted: #B8ADA1;
    /* Captura administrativa sin matiz crema, solicitada por la propietaria. */
    --rm-form-panel: #E9E5E2;
-   --rm-form-section: #F5F7F5;
-   --rm-form-input: #FFFFFF;
+   --rm-form-section: var(--rm-form-panel);
+   --rm-form-input: var(--rm-form-panel);
    --rm-palette-ink: #4A4642;
    --rm-palette-ink-secondary: #67615B;
    /* Salvia complementaria: se conservan los mentas existentes. */

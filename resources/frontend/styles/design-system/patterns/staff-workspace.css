@@ -246,12 +246,12 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 .rm-staff-registration-dialog :is(input, select, textarea, button, label, p, h2, h3, legend) { font-family: var(--rm-font-family) !important; }
 .rm-staff-registration-dialog .rm-staff-registration :is(.rm-input, .rm-btn, .rm-btn-primary, .rm-btn-secondary) { border-radius: var(--rm-radius-xl); }
-.rm-staff-registration-dialog .rm-staff-registration .rm-input { min-height: 54px; font-size: var(--rm-font-size-section) !important; background: var(--rm-surface); border-color: color-mix(in srgb, var(--rm-primary) 45%, var(--rm-border)); }
-.rm-staff-registration-dialog .rm-staff-registration .rm-label { font-size: var(--rm-font-size-body-lg); font-weight: 700; }
+.rm-staff-registration-dialog .rm-staff-registration .rm-input { min-height: 58px; font-size: calc(var(--rm-font-size-section) + 1px) !important; background: var(--rm-surface); border-color: color-mix(in srgb, var(--rm-primary) 45%, var(--rm-border)); }
+.rm-staff-registration-dialog .rm-staff-registration .rm-label { font-size: calc(var(--rm-font-size-body-lg) + 1px); font-weight: 700; }
 .rm-staff-registration-dialog .rm-staff-registration .rm-form-section { border-radius: var(--rm-radius-2xl); }
 
-.rm-staff-registration-dialog .rm-modal-panel { width: min(1180px, calc(100vw - 32px)); max-width: 1180px; max-height: min(94dvh, 860px); border-radius: var(--rm-radius-2xl); background: var(--rm-form-panel) !important; }
-.rm-staff-registration-dialog .rm-modal-header { align-items: center; padding-block: var(--rm-space-1); background: var(--rm-sage-soft) !important; }
+.rm-staff-registration-dialog .rm-modal-panel { width: min(1240px, calc(100vw - 32px)); max-width: 1240px; max-height: min(94dvh, 860px); border-radius: var(--rm-radius-2xl); background: var(--rm-form-panel) !important; }
+.rm-staff-registration-dialog .rm-modal-header { align-items: center; padding-block: var(--rm-space-1); background: var(--rm-form-panel) !important; }
 .rm-staff-registration-dialog .rm-modal-body { padding: var(--rm-space-5); background: var(--rm-form-panel); }
 .rm-staff-registration-dialog .rm-modal-panel__title { font-family: var(--rm-font-friendly); font-size: var(--rm-font-size-section); font-weight: 800; }
 .rm-staff-registration__identity-layout { display: grid; grid-template-columns: 168px minmax(0, 1fr); align-items: start; gap: var(--rm-space-5); }
@@ -301,10 +301,11 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 /* Más contraste cromático en la captura, con la paleta cálida compartida. */
 .rm-staff-registration-dialog .rm-staff-registration .rm-form-section {
-    border-color: color-mix(in srgb, var(--rm-primary) 38%, var(--rm-border-soft));
-    background: var(--rm-form-section);
+    border: 0;
+    padding: var(--rm-space-2) 0;
+    background: transparent;
 }
-.rm-staff-registration-dialog .rm-form-section-title { color: var(--rm-primary-ink); font-size: var(--rm-font-size-section); }
+.rm-staff-registration-dialog .rm-form-section-title { color: var(--rm-primary-ink); font-size: calc(var(--rm-font-size-section) + 3px); }
 .rm-staff-registration-dialog .rm-staff-registration__photo { background: var(--rm-sage-soft); color: var(--rm-primary-ink); border-color: var(--rm-primary); }
 .rm-staff-registration-dialog .rm-staff-registration__footer .rm-btn-primary { background: var(--rm-primary-ink) !important; color: var(--rm-surface) !important; border-color: var(--rm-primary-ink); min-height: 48px; font-size: var(--rm-font-size-body-lg); }
 .rm-staff-registration-dialog .rm-staff-registration .rm-input::placeholder { color: color-mix(in srgb, var(--rm-text-secondary) 72%, transparent); opacity: 1; font-weight: 400; text-align: center; }
@@ -317,3 +318,6 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration-dialog .rm-staff-registration__footer { background: var(--rm-form-panel); }
 .rm-staff-registration-dialog .rm-staff-registration__footer .rm-btn-primary { background: var(--rm-palette-mint) !important; color: var(--rm-palette-petroleum-950) !important; }
 .rm-staff-registration-dialog .rm-staff-registration__photo-picker { background: var(--rm-sage-soft) !important; color: var(--rm-primary-ink) !important; }
+
+.rm-staff-registration-dialog .rm-staff-registration__form .rm-form-section > p { font-size: var(--rm-font-size-section); }
+.rm-staff-registration-dialog .rm-staff-registration__footer button { font-size: calc(var(--rm-font-size-body-lg) + 1px); }
