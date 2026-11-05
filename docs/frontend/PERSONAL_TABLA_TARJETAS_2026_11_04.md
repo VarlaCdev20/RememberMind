@@ -94,3 +94,9 @@ Registrar trabajador reutiliza ui.form-section como Nuevo usuario de Superadmin:
 Ver ficha conserva action-button compartido, ahora variante pequeña, sin expansión en tarjetas: menor tipografía y fondo de32 px con área de interacción de44 px. Sin cambios de acciones/permisos.
 
 Verificación: build correcto;6 pruebas PHP /42 aserciones (paginador y wizard/confirmación integral). E2E focal final PASS (38 s): diez combinaciones tabla/tarjetas y formulario en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco, salto sin cambio de página en fixture, cierre de formulario y oscuro390. Primera QA detectó overflow de los pasos en390 px; corregido antes del PASS. Cero errores JS/HTTP. Capturas sintéticas formulario-1440/1280/1024/768/390 y listado actualizadas y revisadas en escritorio/móvil. Formulario operativo abierto sin introducir ni guardar datos; cuatro pasos y sección compartida confirmados. Sin cambios de BDD, reglas, permisos o legacy; CI completa no ejecutada.
+
+## Centrado del conjunto y tipografía del paginador
+
+Se agrupan rango, números y salto directo en el centro mediante flex, sin repartirlos por los extremos. Tipografía friendly compartida (Nunito Sans),12 px, cifras tabulares y menor peso; se conservan formas circulares, cápsula y objetivos táctiles. En móvil el rango queda debajo del grupo centrado. Comprobación en la pestaña operativa recargada: texto y números de12 px, sin desbordamiento y diferencia de centrado inferior a0,01 px.
+
+Build correcto; E2E focal PASS (104 s): tabla/tarjetas y formulario en cinco anchos, filtros, menús/foco, salto y oscuro390; capturas sintéticas actualizadas e inspección visual del conjunto en1440 px. Ajuste exclusivamente CSS de la variante compacta; sin cambios funcionales, BDD, permisos o legacy. CI completa no ejecutada.
