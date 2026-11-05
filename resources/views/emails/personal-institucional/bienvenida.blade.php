@@ -34,10 +34,10 @@
         <div class="content">
             <h2 style="margin-top: 0;">¡Hola, {{ $nombre_completo }}!</h2>
             <p class="subtitle">
-                @if($estado_general === 'ACTIVO')
-                    Tu registro institucional ha sido completado satisfactoriamente.
-                @elseif($estado_general === 'DOCUMENTACION_PENDIENTE' || count($documentos_pendientes) > 0)
-                    Tu registro ha sido creado, pero cuentas con <strong>documentación pendiente</strong> que debes regularizar a la brevedad.
+                @if(count($documentos_pendientes) > 0 || $estado_general === 'DOCUMENTACION_PENDIENTE')
+                    Tu registro ha sido creado, pero cuentas con <strong>documentación pendiente</strong> que debes entregar dentro del plazo indicado.
+                @elseif($estado_general === 'ACTIVO')
+                    Tu cuenta y ficha de personal han sido registradas.
                 @else
                     Tu registro institucional ha sido procesado.
                 @endif
@@ -50,8 +50,14 @@
                     <p style="margin: 5px 0 0 0;"><strong>Contraseña Temporal:</strong></p>
                     <div class="password">{{ $plainPassword }}</div>
                     <p style="font-size: 12px; color: #166534; margin-top: 15px; margin-bottom: 0;">
-                        <em>Puedes actualizar esta contraseña desde tu cuenta. No compartas estas credenciales.</em>
+                        <em>Esta contraseña es temporal. Debes crear tu contraseña personal antes de continuar. No compartas estas credenciales.</em>
                     </p>
+                    @if($urlCambioPassword)
+                        <p style="margin: 20px 0 0"><a href="{{ $urlCambioPassword }}" style="display: inline-block; padding: 12px 18px; background-color: #3F7D5A; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: bold;">CREAR MI CONTRASEÑA AHORA</a></p>
+                        <p style="font-size: 12px">El enlace es personal, de un solo uso y tiene vencimiento. También puedes <a href="{{ route('login') }}">iniciar sesión</a> con tus credenciales temporales y cambiarla al ingresar.</p>
+                    @else
+                        <p><a href="{{ route('password.inicial') }}">INGRESAR Y CAMBIAR CONTRASEÑA</a></p>
+                    @endif
                 </div>
             @else
                 <div class="card">
@@ -108,13 +114,13 @@
                         Consulta con Gerencia los documentos solicitados. El seguimiento documental no suspende automáticamente tu acceso.
                     </div>
                 @else
-                    <p style="margin: 0; color: #31c48d;"><strong>¡Excelente!</strong> No tienes documentación personal pendiente.</p>
+                    <p style="margin: 0; color: #31c48d;"><strong>¡Excelente!</strong> No hay documentos personales solicitados como pendientes en esta alta.</p>
                 @endif
             </div>
 
             <h3 class="section-title">Documentación Institucional</h3>
             <div class="card">
-                <p style="margin-top: 0; font-size: 13px;">Se han generado y/o adjuntado los siguientes documentos institucionales a este correo. Deberás imprimirlos, firmarlos y subirlos al sistema:</p>
+                <p style="margin-top: 0; font-size: 13px;">Gerencia gestiona los documentos institucionales y su firma. Los adjuntos disponibles, cuando corresponda, se indican a continuación:</p>
                 @if(count($documentos_institucionales_generados) > 0)
                     <ul>
                         @foreach($documentos_institucionales_generados as $doc)

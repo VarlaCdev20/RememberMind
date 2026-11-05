@@ -44,6 +44,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-26 10:00:00'));
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        (require base_path('database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php'))->up();
         $this->seed(RolesAndPermissionsSeeder::class);
         Storage::fake('local');
         Storage::fake('public');
@@ -345,7 +346,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
     {
         Mail::fake();
         $resultado = app(GuardarPersonalInstitucional::class)->guardar($this->actor, [
-            'esEdicion' => false, 'correo' => 'alta-privada@example.test', 'contrasena_temporal' => 'TemporalAlta#123',
+            'esEdicion' => false, 'pais_documento'=>'BO', 'tipo_documento'=>'CI', 'pais_telefono'=>'BO', 'correo' => 'alta-privada@example.test', 'contrasena_temporal' => 'TemporalAlta#123',
             'nombres' => 'Nueva persona', 'ap_paterno' => 'Sintética', 'numero_documento' => '89123456', 'expedido' => 'LP',
             'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'Dirección de prueba',
             'roles_seleccionados' => ['ADMINISTRADOR'],

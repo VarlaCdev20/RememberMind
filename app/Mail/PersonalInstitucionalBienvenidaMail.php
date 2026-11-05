@@ -24,6 +24,7 @@ class PersonalInstitucionalBienvenidaMail extends Mailable
     public ?string $plainPassword;
     public array $documentos_subidos;
     public array $documentos_institucionales_generados;
+    public ?string $urlCambioPassword = null;
 
     public function __construct(User $usuario, string $rol_label, string $area_nombre, string $estado_general, array $documentos_pendientes, string $fecha_limite, array $pdfPaths = [], ?string $plainPassword = null, array $documentos_subidos = [], array $documentos_institucionales_generados = [])
     {
@@ -61,6 +62,7 @@ class PersonalInstitucionalBienvenidaMail extends Mailable
                 'documentos_institucionales_generados' => $this->documentos_institucionales_generados,
                 'fecha_limite' => $this->fecha_limite,
                 'plainPassword' => $this->plainPassword,
+                'urlCambioPassword' => $this->urlCambioPassword,
             ]
         );
     }

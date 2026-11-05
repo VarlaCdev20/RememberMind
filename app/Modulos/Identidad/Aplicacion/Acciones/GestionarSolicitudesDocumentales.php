@@ -22,19 +22,23 @@ final class GestionarSolicitudesDocumentales
 {
     public function __construct(private readonly AutorizarGestionPersonal $alcance, private readonly CapacidadDocumentalPersonal $capacidad) {}
 
-    public function emitir(User $actor, array $entrada): SolicitudDocumentalPersonal
+    public function emitir(User $actor, array $entrada, ?string $fechaLimiteAlta = null): SolicitudDocumentalPersonal
     {
         $actor = $this->alcance->autorizar($actor);
         abort_unless($actor->hasAnyRole(['GERENTE', 'SUPERADMINISTRADOR']), 403);
         $this->capacidad->exigir();
-        $datos = Validator::make($entrada, [
+        $datos = Validator::make([...$entrada, 'fecha_limite_alta'=>$fechaLimiteAlta], [
             'rol' => ['required', Rule::in(AutorizarGestionPersonal::ROLES_TRABAJADOR)],
             'tipo_documento' => ['required', 'string', 'max:60'], 'nombre_documento' => ['required', 'string', 'max:160'],
             'indicaciones' => ['nullable', 'string', 'max:4000'], 'motivo' => ['required', 'string', 'min:5', 'max:4000'],
             'personas' => ['required', 'array', 'min:1', 'max:100'], 'personas.*' => ['required', 'string', 'distinct', 'exists:personal,cod_personal'],
             'origen_plazo' => ['required', 'in:ALTA,SOLICITUD_POSTERIOR'], 'fecha_limite' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
             'clave_solicitud' => ['required', 'uuid'],
+            'fecha_limite_alta' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
         ])->validate();
+        if ($fechaLimiteAlta !== null && $datos['origen_plazo'] !== 'ALTA') {
+            throw ValidationException::withMessages(['fecha_limite_alta'=>'La fecha del registro solo corresponde a solicitudes del alta.']);
+        }
         $tipo = collect(DocumentosPersonalInstitucional::paraRol($datos['rol']))->firstWhere('id', $datos['tipo_documento']);
         if (! $tipo || ($datos['origen_plazo'] === 'ALTA' && $tipo['obligatorio_inmediato'])) {
             throw ValidationException::withMessages(['tipo_documento' => 'Selecciona un respaldo compatible; el mínimo inmediato del alta no se posterga.']);
@@ -45,7 +49,7 @@ final class GestionarSolicitudesDocumentales
         $personas = $datos['personas'];
         sort($personas);
 
-        return app(GeneradorCodigo::class)->serializar('solicitudes_documentales_personal', function () use ($actor, $datos, $personas) {
+        return app(GeneradorCodigo::class)->serializar('solicitudes_documentales_personal', function () use ($actor, $datos, $personas, $fechaLimiteAlta) {
             $this->alcance->autorizar($actor);
             $previa = SolicitudDocumentalPersonal::where('clave_solicitud', $datos['clave_solicitud'])->with('rol', 'destinatarios')->first();
             if ($previa) {
@@ -53,7 +57,7 @@ final class GestionarSolicitudesDocumentales
                 $mismos = $previa->cod_usuario_solicitante === $actor->getKey() && $previa->rol->name === $datos['rol'] && $personas === $emitidos
                     && $previa->tipo_documento === $datos['tipo_documento'] && $previa->nombre_documento === trim($datos['nombre_documento'])
                     && $previa->motivo === trim($datos['motivo']) && $previa->indicaciones === ($datos['indicaciones'] ?? null)
-                    && $previa->destinatarios->every(fn ($d) => $d->origen_plazo === $datos['origen_plazo'] && ($d->origen_plazo === 'ALTA' || $d->fecha_limite_original->toDateString() === $datos['fecha_limite']));
+                    && $previa->destinatarios->every(fn ($d) => $d->origen_plazo === $datos['origen_plazo'] && ($d->origen_plazo === 'ALTA' ? ($fechaLimiteAlta === null || $d->fecha_limite_original->toDateString() === $fechaLimiteAlta) : $d->fecha_limite_original->toDateString() === $datos['fecha_limite']));
                 abort_unless($mismos, 409, 'La solicitud ya fue confirmada con otro contenido.');
 
                 return $previa;
@@ -65,11 +69,21 @@ final class GestionarSolicitudesDocumentales
                 throw ValidationException::withMessages(['personas' => 'Actualiza las personas seleccionadas.']);
             }
             $limites = [];
+            $plazosPrevios = $datos['origen_plazo'] === 'ALTA'
+                ? DestinatarioSolicitudDocumental::whereIn('cod_personal', $personas)->where('origen_plazo', 'ALTA')->get(['cod_personal', 'fecha_limite_original'])->groupBy('cod_personal')
+                : collect();
             foreach ($targets as $personal) {
                 $usuario = $personal->usuario ? User::with('roles')->lockForUpdate()->find($personal->cod_usuario) : null;
                 abort_unless($usuario && $usuario->hasRole($datos['rol']), 403);
                 $this->alcance->autorizar($actor, $usuario);
-                $limite = $datos['origen_plazo'] === 'ALTA' ? $usuario->fecha_hora_alta?->copy()->addDays(7)->startOfDay() : Carbon::parse($datos['fecha_limite'])->startOfDay();
+                $limite = $datos['origen_plazo'] === 'ALTA' ? ($fechaLimiteAlta !== null ? Carbon::parse($fechaLimiteAlta)->startOfDay() : $usuario->fecha_hora_alta?->copy()->addDays(7)->startOfDay()) : Carbon::parse($datos['fecha_limite'])->startOfDay();
+                if ($datos['origen_plazo'] === 'ALTA') {
+                    $originales = ($plazosPrevios->get($personal->getKey()) ?? collect())->pluck('fecha_limite_original')->map(fn ($fecha) => $fecha->toDateString())->unique()->values();
+                    if ($originales->count() > 1 || ($originales->count() === 1 && $fechaLimiteAlta !== null && Carbon::parse($originales[0])->toDateString() !== $fechaLimiteAlta)) {
+                        throw ValidationException::withMessages(['fecha_limite'=>'El expediente ya conserva otro plazo original. Usa su seguimiento documental; no se sustituye la fecha del alta.']);
+                    }
+                    if ($originales->count() === 1) $limite = Carbon::parse($originales[0])->startOfDay();
+                }
                 if (! $limite || $limite->lt(today())) {
                     throw ValidationException::withMessages(['origen_plazo' => 'El alta no tiene fecha técnica conocida o su plazo ya pasó. Usa una solicitud posterior con fecha prospectiva.']);
                 }

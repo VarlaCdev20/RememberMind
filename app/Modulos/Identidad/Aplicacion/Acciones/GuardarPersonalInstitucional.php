@@ -42,6 +42,7 @@ final class GuardarPersonalInstitucional
         abort_unless($edicion || $actor->can('usuarios.crear') || $alcance->esGerencia($actor), 403);
         $personal = $usuario->personal;
         $entrada = DatosPersonalesTrabajador::normalizar($entrada);
+        $entrada['fecha_ingreso'] = $edicion ? $personal?->fecha_ingreso?->toDateString() : today()->toDateString();
         $entrada['correo'] = mb_strtolower(trim((string) ($entrada['correo'] ?? '')));
         $roles = array_values($entrada['roles_seleccionados'] ?? []);
         $rolesActuales = $edicion ? $usuario->getRoleNames()->all() : [];
@@ -72,6 +73,7 @@ final class GuardarPersonalInstitucional
         }
         abort_unless(Schema::hasColumns('personal', ['pais_documento', 'tipo_documento', 'pais_telefono']), 409, 'La ampliación aprobada de países debe instalarse antes de guardar personal.');
         $internacional = IdentificacionInternacionalPersonal::reglas($entrada['pais_documento'] ?? null, $entrada['tipo_documento'] ?? null, $entrada['pais_telefono'] ?? null);
+        $postergables = array_column(DocumentosPersonalInstitucional::postergables($roles[0]), 'id');
         $datos = Validator::make([...$entrada, 'foto_perfil' => $foto], [
             ...DatosPersonalesTrabajador::reglasNombre(),
             'correo' => ['required', 'email', 'max:120', Rule::unique('usuarios', 'correo')->ignore($usuario->getKey(), 'cod_usuario')],
@@ -87,7 +89,18 @@ final class GuardarPersonalInstitucional
             'contrasena_temporal' => [$edicion ? 'nullable' : 'required', 'string', 'min:12', 'max:72'],
             'foto_perfil' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'archivos_temporales' => ['sometimes', 'array'], 'archivos_temporales.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+            'documentos_con_plazo' => ['sometimes', 'array', 'max:'.count($postergables)],
+            'documentos_con_plazo.*' => ['required', 'string', 'distinct', Rule::in($postergables)],
+            'fecha_limite_documentacion' => [empty($entrada['documentos_con_plazo']) ? 'nullable' : 'required', 'date_format:Y-m-d', 'after_or_equal:today'],
         ])->validate();
+        $solicitados = $datos['documentos_con_plazo'] ?? [];
+        if ($solicitados) {
+            if ($edicion) throw ValidationException::withMessages(['documentos_con_plazo'=>'Los plazos posteriores se gestionan desde Documentación laboral.']);
+            app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->exigir();
+            if (array_intersect($solicitados, array_keys(array_filter($datos['archivos_temporales'] ?? [])))) {
+                throw ValidationException::withMessages(['documentos_con_plazo'=>'No solicites como pendiente un archivo que ya adjuntaste.']);
+            }
+        }
         $clasificacion = ClasificacionRolInstitucional::paraRol($roles[0]);
         $catalogo = DocumentosPersonalInstitucional::paraRol($roles[0]);
         $catalogoPorCodigo = array_column($catalogo, null, 'id');
@@ -163,9 +176,7 @@ final class GuardarPersonalInstitucional
                     'fecha_nacimiento' => $datos['fecha_nacimiento'], 'genero' => $datos['genero'], 'telefono' => IdentificacionInternacionalPersonal::telefonoInternacional($datos['pais_telefono'], $datos['telefono']),
                     'direccion' => $datos['direccion'], 'profesion' => $personal->exists && ! $cambiaRoles ? $personal->profesion : $roles[0], 'matricula_profesional' => $datos['matricula_prof'] ?? null,
                     'observacion' => $datos['observaciones'] ?? null]);
-                if (array_key_exists('fecha_ingreso', $datos)) {
-                    $personal->fecha_ingreso = $datos['fecha_ingreso'];
-                }
+                if (! $edicion) $personal->fecha_ingreso = $usuario->fecha_hora_alta?->toDateString() ?? today()->toDateString();
                 $personal->estado = $datos['estado_personal'] ?? $personal->estado ?? 'ACTIVO';
                 $personal->save();
                 if ($cambiaRoles) {
@@ -195,17 +206,24 @@ final class GuardarPersonalInstitucional
                         $adjuntos[$codigo.'.'.strtolower($archivo->getClientOriginalExtension())] = $this->archivos->rutaAbsoluta($almacenado['ruta_archivo']);
                     }
                 }
+                foreach ($datos['documentos_con_plazo'] ?? [] as $codigoPendiente) {
+                    app(GestionarSolicitudesDocumentales::class)->emitir($actor, [
+                        'rol'=>$roles[0], 'tipo_documento'=>$codigoPendiente, 'nombre_documento'=>$catalogoPorCodigo[$codigoPendiente]['nombre'],
+                        'personas'=>[$personal->getKey()], 'origen_plazo'=>'ALTA', 'fecha_limite'=>null,
+                        'motivo'=>'Entrega documental pendiente solicitada al registrar al trabajador.', 'clave_solicitud'=>(string) Str::uuid(),
+                    ], fechaLimiteAlta: $datos['fecha_limite_documentacion']);
+                }
                 activity('Usuarios')->causedBy($actor)->performedOn($usuario)->event('personal')->log($edicion ? 'Actualizó datos de personal institucional.' : 'Registró cuenta y personal institucional.');
                 $guardado = $usuario->fresh(['personal', 'roles']);
                 if (! $edicion) {
                     $cargados = Documento::query()->where('cod_usuario', $usuario->getKey())->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO'])->pluck('tipo_documento')->all();
                     // R01A: el catálogo de respaldos opcionales no es una solicitud pendiente.
-                    $pendientes = array_column(array_filter($catalogoPorCodigo, fn ($doc) => $doc['obligatorio_inmediato'] && ! in_array($doc['id'], $cargados, true)), 'nombre');
+                    $pendientes = array_column(array_filter($catalogoPorCodigo, fn ($doc) => in_array($doc['id'], $datos['documentos_con_plazo'] ?? [], true)), 'nombre');
                     $subidos = array_column(array_filter($catalogoPorCodigo, fn ($doc) => in_array($doc['id'], $cargados, true)), 'nombre');
                     DB::afterCommit(function () use ($guardado, $clasificacion, $pendientes, $subidos, $adjuntos, $datos, &$correoEnviado) {
                         try {
                             $this->notificaciones->bienvenidaPersonal($guardado, $clasificacion['rol_label'], 'Sin asignación operativa',
-                                $guardado->estado, $pendientes, '', $adjuntos, $datos['contrasena_temporal'], $subidos);
+                                $guardado->estado, $pendientes, $pendientes ? \Carbon\Carbon::parse($datos['fecha_limite_documentacion'])->format('d/m/Y') : '', $adjuntos, $datos['contrasena_temporal'], $subidos);
                             $correoEnviado = true;
                         } catch (\Throwable $error) {
                             $correoEnviado = false;

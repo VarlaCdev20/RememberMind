@@ -66,7 +66,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
         $this->assertSame('FLORES', $usuario->personal->apellido_paterno);
         $this->assertSame('12345678', $usuario->personal->numero_documento);
         $this->assertSame('MAT_SINTETICA', $usuario->personal->matricula_profesional);
-        $this->assertNull($usuario->personal->fecha_ingreso);
+        $this->assertSame(today()->toDateString(), $usuario->personal->fecha_ingreso->toDateString());
         $this->assertTrue($usuario->hasRole('ADMINISTRADOR'));
         $this->assertSame($contactosAntes, Contacto::count());
         $this->assertDatabaseCount('asignaciones_personal', 0);

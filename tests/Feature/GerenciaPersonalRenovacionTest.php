@@ -55,7 +55,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->set('matricula_prof', str_repeat('A', 51))->assertHasErrors(['matricula_prof'])
             ->set('matricula_prof', 'abc-123')->assertHasNoErrors(['matricula_prof'])->assertSet('matricula_prof', 'ABC-123')
             ->set('observaciones', '')->assertSet('camposValidados.observaciones', false)
-            ->set('fecha_ingreso', '')->assertSet('camposValidados.fecha_ingreso', false)
+            ->set('fecha_ingreso', '')->assertSet('fecha_ingreso', today()->toDateString())
             ->set('observaciones', 'observación sintética')->assertSet('camposValidados.observaciones', true)
             ->assertHasErrors(['telefono'])->set('pasoActual', 2)->assertSeeHtml('id="trabajador-rol-source"');
     }

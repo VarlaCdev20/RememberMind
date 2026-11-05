@@ -48,7 +48,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     const solicitudesFallidas=[];
     page.on('response', r=>{if(r.status()>=400)solicitudesFallidas.push({ruta:new URL(r.url()).pathname,estado:r.status()});});
     await page.setRequestInterception(true);
-    page.on('request',r=>r.url().startsWith(base+'/') ? r.continue({headers:{...r.headers(),'X-RM-GERENCIA-QA':token}}) : r.abort());
+    page.on('request',r=>r.url().startsWith('blob:') ? r.continue() : r.url().startsWith(base+'/') ? r.continue({headers:{...r.headers(),'X-RM-GERENCIA-QA':token}}) : r.abort());
     await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
     const out=join(root,'output/auditoria-integral-20261025/gerencia-renovada',process.env.RM_GERENCIA_QA_CORRECCION ? 'correccion-concurrente' : (process.env.RM_GERENCIA_QA_ACCESIBILIDAD ? 'aceptacion-accesibilidad' : (process.env.RM_GERENCIA_QA_RAPIDO ? 'depuracion-rapida' : ''))); mkdirSync(out,{recursive:true});
     t.after(async()=>{
@@ -125,10 +125,14 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     }
     if (process.env.RM_GERENCIA_QA_PERSONAL) {
         const personalOut = join(out, 'personal-unificado'); mkdirSync(personalOut, {recursive:true});
-        const documentoPdf = db+'.pdf', documentoTexto = db+'.txt';
-        writeFileSync(documentoPdf, '%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF');
+        const documentoPdf = db+'.pdf', documentoTexto = db+'.txt', documentoImagen = db+'.png';
+        const stream='BT /F1 18 Tf 36 100 Td (DOCUMENTO SINTETICO DE PRUEBA) Tj ET';
+        const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 240] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>','<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'];
+        let pdf='%PDF-1.4\n';const offsets=[0];objects.forEach((obj,i)=>{offsets.push(Buffer.byteLength(pdf));pdf+=(i+1)+' 0 obj\n'+obj+'\nendobj\n';});const xref=Buffer.byteLength(pdf);pdf+='xref\n0 6\n0000000000 65535 f \n'+offsets.slice(1).map(offset=>String(offset).padStart(10,'0')+' 00000 n \n').join('')+'trailer << /Size 6 /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF';
+        writeFileSync(documentoPdf,pdf);
+        writeFileSync(documentoImagen,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9N8AAAAASUVORK5CYII=','base64'));
         writeFileSync(documentoTexto, 'Archivo sintético que no es un documento permitido.');
-        t.after(()=>{for(const archivo of [documentoPdf, documentoTexto]){assert.equal(resolve(dirname(archivo)),resolve(tmpdir()));rmSync(archivo,{force:true});}});
+        t.after(()=>{for(const archivo of [documentoPdf, documentoTexto, documentoImagen]){assert.equal(resolve(dirname(archivo)),resolve(tmpdir()));rmSync(archivo,{force:true});}});
         for (const width of [1440,1280,1024,768,390]) {
             await page.setViewport({width,height:960});
             await go('/admin/personal-institucional');
@@ -310,6 +314,9 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.waitForFunction(()=>document.querySelector('#trabajador-direccion')?.textContent.includes('AV. ARCE, N.º 120, ZONA SOPOCACHI'));
             await page.waitForFunction(()=>!document.querySelector('.rm-staff-registration__location')?.open);
             await page.screenshot({path:join(personalOut,`direccion-completada-${width}.png`),fullPage:true});
+            const maps = new URL(await page.$eval('.rm-staff-registration__maps',e=>e.href));
+            assert.equal(maps.hostname,'www.google.com');assert.equal(maps.searchParams.get('api'),'1');assert.match(maps.searchParams.get('query'),/AV. ARCE/);
+
             await page.focus('#trabajador-numero_documento');
             await page.locator('#trabajador-numero_documento').fill('AB123456'); await page.keyboard.press('Tab');
             await page.$eval('#trabajador-nacimiento', e=>{e.value='1990-01-01'; e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));e.dispatchEvent(new FocusEvent('blur',{bubbles:true}));});
@@ -321,9 +328,12 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.screenshot({path:join(personalOut,`laboral-errores-${width}.png`),fullPage:true});
             await elegirOpcion('trabajador-rol','ADMINISTRADOR');
             await page.waitForFunction(()=>document.querySelector('#trabajador-rol')?.closest('.rm-field--valid'));
-            await page.focus('#trabajador-matricula');
-            await page.locator('#trabajador-matricula').fill('abc-123');await page.keyboard.press('Tab');
-            await page.waitForFunction(()=>document.querySelector('#trabajador-matricula')?.value==='ABC-123' && document.querySelector('#trabajador-matricula')?.closest('.rm-field--valid'));
+            assert.equal(await page.$('#trabajador-matricula'),null,'La matrícula se captura en documentación, no en información laboral');
+            assert.equal(await page.$eval('#trabajador-ingreso',e=>e.readOnly),true,'La fecha se toma del registro');
+            await page.focus('#trabajador-observaciones');
+            await page.locator('#trabajador-observaciones').fill('observación sintética');await page.keyboard.press('Tab');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-observaciones')?.value==='OBSERVACIÓN SINTÉTICA' && document.querySelector('#trabajador-observaciones')?.closest('.rm-field--valid'));
+            assert.equal(await page.$eval('#trabajador-rol span',e=>getComputedStyle(e).textTransform),'uppercase');
             await page.screenshot({path:join(personalOut,`laboral-${width}.png`),fullPage:true});
             await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
             await page.waitForSelector('#trabajador-correo',{visible:true});
@@ -342,6 +352,12 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.screenshot({path:join(personalOut,`cuenta-${width}.png`),fullPage:true});
             await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
             await page.waitForSelector('#documento-CI',{visible:true});
+            await page.focus('input[value="DOMICILIO"]');await page.locator('input[value="DOMICILIO"]').click();
+            await page.waitForSelector('#trabajador-fecha-limite',{visible:true});
+            await page.$eval('#trabajador-fecha-limite',e=>{const date=new Date(e.min+'T12:00:00');date.setDate(date.getDate()+15);e.value=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));e.dispatchEvent(new FocusEvent('blur',{bubbles:true}));});
+            await page.waitForFunction(()=>document.querySelector('#trabajador-fecha-limite')?.closest('.rm-field--valid'));
+            await page.screenshot({path:join(personalOut,`documentos-plazo-${width}.png`),fullPage:true});
+
             assert.equal(await page.$eval('.rm-staff-registration__review', e=>e.textContent.includes('Sintetica#12345')),false,'El resumen no expone la contraseña');
             await page.locator('.rm-staff-registration button[type="submit"]').click();
             await page.waitForFunction(()=>['CI','FOTO_DOC','CV'].every(id=>document.getElementById('documento-'+id)?.getAttribute('aria-invalid')==='true'));
@@ -351,6 +367,17 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await (await page.$('#documento-CI')).uploadFile(documentoPdf);
             await page.waitForFunction(()=>document.getElementById('documento-CI')?.closest('.rm-field--valid'));
             await page.screenshot({path:join(personalOut,`documentos-${width}.png`),fullPage:true});
+            await page.focus('#vista-documento-CI');await page.locator('#vista-documento-CI').click();
+            await page.waitForSelector('#personal-vista-documento iframe',{visible:true});
+            assert.match(await page.$eval('#personal-vista-documento iframe',e=>e.src),/^blob:/);
+            await page.screenshot({path:join(personalOut,`vista-pdf-${width}.png`),fullPage:true});
+            await page.locator('#personal-cerrar-vista-documento').click();await page.waitForSelector('#personal-vista-documento',{hidden:true});
+            await (await page.$('#documento-FOTO_DOC')).uploadFile(documentoImagen);
+            await page.waitForSelector('#vista-documento-FOTO_DOC',{visible:true});
+            await page.focus('#vista-documento-FOTO_DOC');await page.locator('#vista-documento-FOTO_DOC').click();
+            await page.waitForFunction(()=>document.querySelector('#personal-vista-documento img')?.naturalWidth===1);
+            await page.locator('#personal-cerrar-vista-documento').click();await page.waitForSelector('#personal-vista-documento',{hidden:true});
+
             await page.focus('.rm-field:has(#documento-CI) .rm-staff-registration__remove-file');
             await page.locator('.rm-field:has(#documento-CI) .rm-staff-registration__remove-file').click();
             await page.waitForFunction(()=>!document.getElementById('documento-CI')?.closest('.rm-field--valid') && !document.getElementById('documento-CI')?.value);

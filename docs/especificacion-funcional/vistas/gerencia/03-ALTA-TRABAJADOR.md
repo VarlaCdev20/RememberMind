@@ -114,3 +114,8 @@ Gerencia puede iniciar o reemitir un enlace de recuperación para las cuentas de
 El primer acceso y la recuperación son operaciones distintas: no se adopta 15B como sustituto del alta con contraseña temporal. La reemisión debe invalidar el enlace anterior aplicable y evitar dobles envíos por reintentos; tokens con expiración y uso limitado conforme al mecanismo real. No crear un servicio paralelo de autenticación.
 
 Pruebas requeridas: cambio obligatorio no eludible en HTTP/Livewire, credenciales incorrectas, fallo de entrega tratado por separado, recuperación ajena/manipulada, permiso revocado, roles destino excluidos, cuenta suspendida, enlace expirado/usado y reemisión. **Estado:** decisión adoptada; implementación y verificación pendientes. Cualquier necesidad estructural concreta sigue su aprobación propia.
+
+
+## Actualización de la propietaria — 05/11/2026
+
+En el alta, Gerencia elige la fecha límite para los documentos expresamente solicitados que admiten plazo. Esta decisión sustituye el plazo inicial fijo de siete días en ese flujo; conserva el mínimo inmediato y la única prórroga de siete días. La fecha de ingreso será el día de confirmación del registro, asignada por servidor; la edición conserva la original. El correo inicial incorpora la contraseña temporal y un enlace del mecanismo existente para cambiarla. Implementación, evidencia y límites: [Alta, documentación y acceso](../../../frontend/PERSONAL_ALTA_DOCUMENTACION_CORREO_2026_11_05.md).

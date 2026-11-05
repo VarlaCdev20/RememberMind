@@ -4,6 +4,11 @@ namespace App\Modulos\Identidad\Dominio\Reglas;
 
 final class DocumentosPersonalInstitucional
 {
+    public static function postergables(string $rol): array
+    {
+        if (! in_array($rol, ClasificacionRolInstitucional::ROLES, true) || in_array($rol, ['GERENTE', 'SUPERADMINISTRADOR'], true)) return [];
+        return array_values(array_filter(self::paraRol($rol), fn ($doc) => $doc['tipo'] === 'ingresante' && ! $doc['obligatorio_inmediato'] && $doc['permite_plazo']));
+    }
     public static function paraRol(string $rol): array
     {
 
@@ -81,7 +86,7 @@ final class DocumentosPersonalInstitucional
             }
         }
 
-        // Con Plazo (48 horas)
+        // Respaldos que Gerencia puede solicitar con una fecha límite.
         $docs[] = [
             'id' => 'DOMICILIO',
             'nombre' => 'Referencia o Comprobante de Domicilio',

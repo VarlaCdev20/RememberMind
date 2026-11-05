@@ -82,6 +82,9 @@ class PersonalInstitucionalForm extends Component
 
     public $observaciones;
 
+    public array $documentos_con_plazo = [];
+    public ?string $fecha_limite_documentacion = null;
+
     // Direcciones jerárquicas
     public ?string $pais_direccion = 'BO';
 
@@ -191,6 +194,7 @@ class PersonalInstitucionalForm extends Component
         $this->cargos_list = $this->catalogoCargosAdministrativosPorRol();
 
         if (! $this->usuarioId) {
+            $this->fecha_ingreso = today()->toDateString();
             $this->contrasena_temporal = Str::password(12, true, true, true, false);
             $this->tempId = (string) Str::uuid();
         }
@@ -213,6 +217,8 @@ class PersonalInstitucionalForm extends Component
         $this->fecha_ingreso = $personal?->fecha_ingreso?->format('Y-m-d');
         $this->foto_perfil = $usuario->foto;
         $this->foto_guardada = $usuario->foto;
+        $this->fecha_registro = $usuario->fecha_hora_alta?->toDateString();
+        $this->hora_registro = $usuario->fecha_hora_alta?->format('H:i');
         $this->nombres = $personal?->nombres;
         $this->ap_paterno = $personal?->apellido_paterno;
         $this->ap_materno = $personal?->apellido_materno;
@@ -287,6 +293,9 @@ class PersonalInstitucionalForm extends Component
             'direccion.required' => 'Completa la ubicación y pulsa «Usar esta dirección».',
             'fecha_ingreso.date_format' => 'Introduce una fecha de ingreso válida.',
             'matricula_prof.max' => 'La matrícula admite hasta 50 caracteres.',
+            'documentos_con_plazo.*.in'=>'Este documento no admite plazo para la función elegida.',
+            'fecha_limite_documentacion.required'=>'Elige la fecha límite para los documentos solicitados.',
+            'fecha_limite_documentacion.after_or_equal'=>'La fecha límite no puede estar vencida.',
             'contrasena_temporal.max' => 'La contraseña admite hasta 72 caracteres.',
             'archivos_temporales.*.file' => 'Selecciona un archivo válido.',
             'archivos_temporales.*.mimes' => 'Usa un archivo PDF, JPG, PNG o WebP.',
@@ -326,6 +335,14 @@ class PersonalInstitucionalForm extends Component
     public function updatedFechaNacimiento($value)
     {
         $this->calcularEdad($value);
+    }
+
+    public function updatedFechaIngreso(): void
+    {
+        if (! $this->esEdicion && blank($this->fecha_ingreso)) {
+            $this->fecha_ingreso = today()->toDateString();
+            $this->validarCampoFormulario('fecha_ingreso');
+        }
     }
 
     public function calcularEdad($value)
@@ -469,7 +486,43 @@ class PersonalInstitucionalForm extends Component
     {
         $this->roles_seleccionados = $value ? [$value] : [];
         $this->sincronizarClasificacionDesdeRoles(false);
+        $permitidos = array_column($this->documentosConfigurados, 'id');
+        foreach (array_keys($this->archivos_temporales) as $codigo) {
+            if (! in_array($codigo, $permitidos, true)) $this->removerDocumento($codigo);
+        }
+        $this->documentos_con_plazo = [];
+        $this->fecha_limite_documentacion = null;
+        $this->resetValidation(['documentos_con_plazo', 'fecha_limite_documentacion']);
+        unset($this->camposValidados['documentos_con_plazo'], $this->camposValidados['fecha_limite_documentacion']);
+        $this->dispatch('documentos-personal-catalogo', codigos: $permitidos);
         $this->validarCampoFormulario('roles_seleccionados');
+    }
+
+    public function updatedDocumentosConPlazo(): void
+    {
+        if ($this->documentos_con_plazo && ! $this->fecha_limite_documentacion) {
+            $this->fecha_limite_documentacion = today()->addDays(7)->toDateString();
+            $this->resetValidation('fecha_limite_documentacion');
+            unset($this->camposValidados['fecha_limite_documentacion']);
+        }
+        if (! $this->documentos_con_plazo) {
+            $this->fecha_limite_documentacion = null;
+            $this->resetValidation('fecha_limite_documentacion');
+            unset($this->camposValidados['fecha_limite_documentacion']);
+        }
+        $this->validarCampoFormulario('documentos_con_plazo');
+    }
+
+    public function getGoogleMapsUrlProperty(): ?string
+    {
+        if (! filled($this->direccion)) return null;
+        $url = 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($this->direccion);
+        return strlen($url) <= 2048 ? $url : null;
+    }
+
+    public function getDocumentosPostergablesProperty(): array
+    {
+        return DocumentosPersonalInstitucional::postergables($this->rol_seleccionado ?: '');
     }
 
     public function updatedRolesSeleccionados($value = null, $key = null): void
@@ -661,6 +714,12 @@ class PersonalInstitucionalForm extends Component
         ]);
 
         if (! filled($value)) return;
+        $this->documentos_con_plazo = array_values(array_diff($this->documentos_con_plazo, [$key]));
+        if (! $this->documentos_con_plazo) {
+            $this->fecha_limite_documentacion = null;
+            $this->resetValidation('fecha_limite_documentacion');
+            unset($this->camposValidados['fecha_limite_documentacion']);
+        }
         $esInstitucional = $documento['tipo'] === 'institucional';
         $this->camposValidados['archivos_temporales.'.$key] = true;
         $this->estado_documentos[$key] = $esInstitucional ? 'FIRMADO_SUBIDO' : 'CARGADO';
@@ -737,7 +796,7 @@ class PersonalInstitucionalForm extends Component
                 'numero_documento'=>[...$internacional['numero_documento'],Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
                 'genero'=>'required|in:M,F','fecha_nacimiento'=>DatosPersonalesTrabajador::reglaNacimiento(),
                 'direccion'=>'required|string|max:255'],
-            2 => ['roles_seleccionados'=>'required|array|'.($this->esEdicion ? 'min:1' : 'size:1'),'roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date_format:Y-m-d','matricula_prof'=>'nullable|string|max:50','observaciones'=>'nullable|string'],
+            2 => ['roles_seleccionados'=>'required|array|'.($this->esEdicion ? 'min:1' : 'size:1'),'roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date_format:Y-m-d','observaciones'=>'nullable|string'],
             3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
                 'contrasena_temporal'=>($this->esEdicion ? 'nullable' : 'required').'|string|min:12|max:72'],
             4 => $this->reglasDocumentos(),
@@ -755,7 +814,10 @@ class PersonalInstitucionalForm extends Component
 
     private function reglasDocumentos(): array
     {
-        $reglas = ['archivos_temporales' => 'array'];
+        $reglas = ['archivos_temporales' => 'array', 'matricula_prof'=>'nullable|string|max:50',
+            'documentos_con_plazo'=>['array', 'max:'.count($this->documentosPostergables)],
+            'documentos_con_plazo.*'=>['string', 'distinct', Rule::in(array_column($this->documentosPostergables, 'id'))],
+            'fecha_limite_documentacion'=>[$this->documentos_con_plazo ? 'required' : 'nullable', 'date_format:Y-m-d', 'after_or_equal:today']];
         foreach ($this->documentosConfigurados as $documento) {
             if ($documento['tipo'] === 'ingresante') {
                 $requerido = ! $this->esEdicion && $documento['obligatorio_inmediato'];
@@ -849,7 +911,7 @@ class PersonalInstitucionalForm extends Component
             $this->camposValidados['ap_materno'] = filled($this->ap_materno);
             return;
         }
-        for ($paso = 1; $paso <= 3; $paso++) {
+        for ($paso = 1; $paso <= 4; $paso++) {
             $reglas = $this->reglasPaso($paso);
             if (! array_key_exists($campo, $reglas)) {
                 continue;
@@ -978,7 +1040,7 @@ class PersonalInstitucionalForm extends Component
         $estadoDocumental = $this->determinarEstadoDocumental();
 
         try {
-            $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'pais_documento' => $this->pais_documento, 'tipo_documento' => $this->tipo_documento, 'pais_telefono' => $this->pais_telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad]);
+            $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'pais_documento' => $this->pais_documento, 'tipo_documento' => $this->tipo_documento, 'pais_telefono' => $this->pais_telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad, 'documentos_con_plazo'=>$this->documentos_con_plazo, 'fecha_limite_documentacion'=>$this->fecha_limite_documentacion]);
             $usuario = $resultado['usuario'];
 
             if (app(AutorizarGestionPersonal::class)->esGerencia(auth()->user())) {
