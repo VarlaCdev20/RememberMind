@@ -1,20 +1,13 @@
 @if($modalGestionAbierto)
- @if(auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR'))
+ @if((auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) || !$usuarioSeleccionadoId)
   @php($cerrarEditorPersonal = $modalTabInicial === 'horarios' ? null : "\$dispatch('gerencia-personal-cerrar')")
-  <x-ui.modal-livewire id="gerencia-personal-ficha" wire:model="modalGestionAbierto" :title="$modalTabInicial === 'horarios' ? 'Horarios del trabajador' : ($usuarioSeleccionadoId ? 'Ficha y documentos del trabajador' : 'Registrar trabajador')" max-width="lg" close-method="cerrarModal" :alpine-close="$cerrarEditorPersonal" icon="ph-identification-badge">
+  <x-ui.modal-livewire id="gerencia-personal-ficha" wire:model="modalGestionAbierto" :title="$modalTabInicial === 'horarios' ? 'Horarios del trabajador' : ($usuarioSeleccionadoId ? 'Ficha y documentos del trabajador' : 'Registrar trabajador')" :max-width="$modalTabInicial === 'horarios' ? 'lg' : '5xl'" :class="$modalTabInicial === 'horarios' ? '' : 'rm-staff-registration-dialog'" close-method="cerrarModal" :alpine-close="$cerrarEditorPersonal" icon="ph-identification-badge">
    @if($modalTabInicial === 'horarios')
     <livewire:identidad.personal-institucional-horarios :usuario-id="$usuarioSeleccionadoId" :abrir-formulario-inicial="$abrirFormularioHorarioInicial" wire:key="gerencia-horarios-{{ $usuarioSeleccionadoId }}" />
    @else
     <livewire:identidad.personal-institucional-form :usuario-id="$usuarioSeleccionadoId" wire:key="gerencia-personal-{{ $usuarioSeleccionadoId ?? 'nuevo' }}" />
    @endif
   </x-ui.modal-livewire>
- @else
- @if(!$usuarioSeleccionadoId)
-  <div x-data="{ open: true }" x-trap.noscroll="open" class="rm-staff-overlay fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 px-4 backdrop-blur-sm sm:p-6">
-  <div class="rm-staff-dialog relative my-8 flex w-full max-w-3xl flex-col overflow-hidden rounded-[2rem] border border-borde bg-fondo-card shadow-2xl" role="dialog" aria-modal="true" aria-label="Registrar personal institucional">
-   <livewire:identidad.personal-institucional-form :usuario-id="null" wire:key="wizard-nuevo" />
-  </div>
-  </div>
  @else
   <div x-data="{ open: true }" x-trap.noscroll="open" class="rm-staff-overlay fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 px-4 backdrop-blur-sm sm:p-6">
   <div class="rm-staff-dialog relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] border border-borde bg-fondo-card shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="staff-dialog-title">
@@ -127,6 +120,5 @@
    </div>
   </div>
   </div>
- @endif
  @endif
  @endif

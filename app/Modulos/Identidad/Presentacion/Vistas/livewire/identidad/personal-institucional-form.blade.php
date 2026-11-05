@@ -1,7 +1,7 @@
 <div class="rm-staff-workspace rm-staff-registration" x-data="{ dirty: false }" @input="dirty = true" @change="dirty = true" @gerencia-personal-cerrar.window="if (!dirty || confirm('¿Descartar los cambios sin guardar?')) { $dispatch('cerrar-modal-gestion-personal') }">
-    @unless(auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR'))
+    @if($esEdicion && (!auth()->user()->hasRole('GERENTE') || auth()->user()->hasRole('SUPERADMINISTRADOR')))
         <x-ui.collection-header :title="$esEdicion ? 'Editar trabajador' : 'Registrar trabajador'" subtitle="Identidad, información laboral, cuenta y documentación" icon="ph-identification-badge" />
-    @endunless
+    @endif
     <nav class="rm-staff-registration__steps" aria-label="Pasos del registro">
         @foreach([1=>['Identidad y contacto','ph-user-circle'],2=>['Información laboral','ph-briefcase'],3=>['Cuenta de acceso','ph-shield-check'],4=>['Documentación y revisión','ph-check-square']] as $numero=>[$nombre,$icono])
             <button type="button" wire:click="gotoStep({{ $numero }})" @disabled($numero > $pasoActual) @if($pasoActual === $numero) aria-current="step" @endif @class(['rm-staff-registration__step','is-complete'=>$numero < $pasoActual])>
@@ -9,17 +9,37 @@
             </button>
         @endforeach
     </nav>
-    <p class="rm-help mt-3" role="status">Paso {{ $pasoActual }} de 4. Se guarda todo al finalizar.</p>
+    <div class="rm-staff-registration__progress-copy"><p class="rm-help" role="status">Paso {{ $pasoActual }} de 4 · Se guarda todo al finalizar</p><span>{{ (int) round(($pasoActual / 4) * 100) }} %</span></div>
+    <div class="rm-staff-registration__progress" role="progressbar" aria-label="Progreso del registro" aria-valuemin="1" aria-valuemax="4" aria-valuenow="{{ $pasoActual }}"><span style="width: {{ ($pasoActual / 4) * 100 }}%"></span></div>
     @if($errors->any())<x-ui.callout variant="warning" title="Revisa los datos indicados"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></x-ui.callout>@endif
     <form wire:submit="guardar" class="rm-staff-registration__form space-y-4 mt-4">
         @if($pasoActual === 1)
-        <x-ui.form-section title="Identidad y contacto" description="Datos personales y medios de contacto del trabajador." icon="ph-user-circle" :columns="2">
+        <x-ui.form-section title="Identidad y contacto" description="Datos personales y medios de contacto del trabajador." icon="ph-user-circle" :columns="1">
+            <div class="rm-staff-registration__identity-layout">
+                <aside class="rm-staff-registration__portrait">
+                    <div class="rm-staff-registration__photo">
+                        @if($foto_perfil && !is_string($foto_perfil) && !$errors->has('foto_perfil'))
+                            <img src="{{ $foto_perfil->temporaryUrl() }}" alt="Vista previa de la fotografía del trabajador">
+                        @else
+                            <i class="ph-bold ph-user" aria-hidden="true"></i><span>{{ is_string($foto_perfil) && $foto_perfil !== '' ? 'Fotografía registrada' : 'Sin fotografía' }}</span>
+                        @endif
+                    </div>
+                    <x-ui.field label="Fotografía (opcional)" for="trabajador-fotografia" error="foto_perfil">
+                        <label class="rm-btn rm-btn-secondary rm-staff-registration__photo-picker" for="trabajador-fotografia"><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Elegir foto<input id="trabajador-fotografia" class="sr-only" type="file" wire:model="foto_perfil" accept="image/jpeg,image/png,image/webp" aria-label="Fotografía del trabajador"></label>
+                        <p class="rm-help">JPG, PNG o WebP · Hasta 2 MB</p>
+                        @if($esEdicion && is_string($foto_perfil))<p class="rm-help">La fotografía guardada se conserva si no eliges otra.</p>@endif
+                        <p class="rm-help" wire:loading wire:target="foto_perfil" role="status">Preparando fotografía…</p>
+                    </x-ui.field>
+                </aside>
+                <div class="rm-staff-registration__details">
             @foreach(['nombres'=>'Nombres','ap_paterno'=>'Apellido paterno','ap_materno'=>'Apellido materno (opcional)','numero_documento'=>'Número de documento','expedido'=>'Expedido en','telefono'=>'Celular'] as $campo=>$etiqueta)
-                <x-ui.field :label="$etiqueta" :for="'trabajador-'.$campo"><input id="trabajador-{{ $campo }}" class="rm-input" type="text" wire:model="{{ $campo }}" @if($campo !== 'ap_materno') required @endif>@error($campo)<p role="alert">{{ $message }}</p>@enderror</x-ui.field>
+                <x-ui.field :label="$etiqueta" :for="'trabajador-'.$campo" :required="$campo !== 'ap_materno'"><input id="trabajador-{{ $campo }}" class="rm-input" type="text" wire:model="{{ $campo }}" @if($campo !== 'ap_materno') required @endif>@error($campo)<p role="alert">{{ $message }}</p>@enderror</x-ui.field>
             @endforeach
-            <x-ui.field label="Fecha de nacimiento" for="trabajador-nacimiento"><input id="trabajador-nacimiento" class="rm-input" type="date" wire:model="fecha_nacimiento" required></x-ui.field>
-            <x-ui.field label="Género" for="trabajador-genero"><select id="trabajador-genero" class="rm-input" wire:model="genero" required><option value="">Seleccionar</option><option value="F">Femenino</option><option value="M">Masculino</option></select></x-ui.field>
-            <x-ui.field label="Dirección" for="trabajador-direccion"><textarea id="trabajador-direccion" class="rm-input" wire:model="direccion" maxlength="255" required></textarea></x-ui.field>
+            <x-ui.field label="Fecha de nacimiento" for="trabajador-nacimiento" required><input id="trabajador-nacimiento" class="rm-input" type="date" wire:model="fecha_nacimiento" required></x-ui.field>
+            <x-ui.field label="Género" for="trabajador-genero" required><select id="trabajador-genero" class="rm-input" wire:model="genero" required><option value="">Seleccionar</option><option value="F">Femenino</option><option value="M">Masculino</option></select></x-ui.field>
+            <x-ui.field label="Dirección" for="trabajador-direccion" required><textarea id="trabajador-direccion" class="rm-input" wire:model="direccion" rows="2" maxlength="255" required></textarea></x-ui.field>
+                </div>
+            </div>
         </x-ui.form-section>
         @elseif($pasoActual === 2)
         <x-ui.form-section title="Información laboral" description="Función institucional y datos del expediente laboral." icon="ph-briefcase" :columns="2">
@@ -53,7 +73,7 @@
         <div class="rm-management-actions rm-staff-registration__footer">
             <button class="rm-btn-secondary" type="button" @click="if (!dirty || confirm('¿Descartar los cambios sin guardar?')) { $dispatch('cerrar-modal-gestion-personal') }">Cancelar</button>
             @if($pasoActual > 1)<button class="rm-btn-secondary" type="button" wire:click="retrocederPaso" wire:loading.attr="disabled">Atrás</button>@endif
-            @if($pasoActual < 4)<button class="rm-btn-primary" type="button" wire:click="avanzarPaso" wire:loading.attr="disabled">Continuar</button>@else<button class="rm-btn-primary" type="submit" wire:loading.attr="disabled" wire:target="guardar,archivos_temporales">{{ $esEdicion ? 'Guardar cambios' : 'Registrar trabajador' }}</button>@endif
+            @if($pasoActual < 4)<button class="rm-btn-primary" type="button" wire:click="avanzarPaso" wire:loading.attr="disabled">Continuar</button>@else<button class="rm-btn-primary" type="submit" wire:loading.attr="disabled" wire:target="guardar,archivos_temporales,foto_perfil">{{ $esEdicion ? 'Guardar cambios' : 'Registrar trabajador' }}</button>@endif
             <span class="rm-help" wire:loading wire:target="guardar" role="status">Guardando el registro…</span>
         </div>
     </form>

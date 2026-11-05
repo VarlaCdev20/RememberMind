@@ -613,6 +613,11 @@ class PersonalInstitucionalForm extends Component
         unset($this->observacion_documentos[$key]);
     }
 
+    public function updatedFotoPerfil(): void
+    {
+        $this->validateOnly('foto_perfil');
+    }
+
     public function validarPasoActual(): void
     {
         app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null, $this->roles_seleccionados);

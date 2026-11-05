@@ -108,6 +108,28 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertDatabaseCount('documentos', 0);
     }
 
+    public function test_alta_de_trabajador_reutiliza_modal_centrado_para_cuentas_autorizadas(): void
+    {
+        foreach (['GERENTE', 'SUPERADMINISTRADOR'] as $rol) {
+            $actor = User::factory()->create();
+            $actor->assignRole($rol);
+            $this->actingAs($actor);
+            Livewire::test(PersonalInstitucionalPanel::class)->call('abrirModalNuevo')
+                ->assertSet('modalGestionAbierto', true)
+                ->assertSeeHtml('rm-staff-registration-dialog')
+                ->assertDontSeeHtml('rm-staff-overlay');
+        }
+    }
+
+    public function test_fotografia_del_formulario_rechaza_archivos_no_validos_sin_avanzar(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)
+            ->set('foto_perfil', UploadedFile::fake()->create('documento.pdf', 10, 'application/pdf'))
+            ->assertHasErrors(['foto_perfil'])
+            ->assertSet('pasoActual', 1);
+    }
+
     public function test_wizard_no_salta_validaciones_y_revalida_permiso_al_guardar(): void
     {
         $actor = $this->gerente();
@@ -150,12 +172,16 @@ class GerenciaPersonalRenovacionTest extends TestCase
             'numero_documento' => '56789123', 'expedido' => 'LP', 'fecha_nacimiento' => '1990-01-01', 'genero' => 'F',
             'telefono' => '77712345', 'direccion' => 'Dirección de prueba', 'correo' => 'formulario@remembermind.test',
             'contrasena_temporal' => 'Sintetica#12345', 'rol_seleccionado' => 'ADMINISTRADOR',
-        ])->set('archivos_temporales.CI', UploadedFile::fake()->create('ci.pdf', 10, 'application/pdf'))
+        ])->set('foto_perfil', UploadedFile::fake()->image('perfil.jpg'))
+            ->set('archivos_temporales.CI', UploadedFile::fake()->create('ci.pdf', 10, 'application/pdf'))
             ->set('archivos_temporales.FOTO_DOC', UploadedFile::fake()->image('foto.jpg'))
             ->set('archivos_temporales.CV', UploadedFile::fake()->create('cv.pdf', 10, 'application/pdf'))
             ->call('guardar')->assertHasNoErrors()->assertDispatched('actualizarTablaPersonal')
             ->assertDispatched('cerrar-modal-gestion-personal')->assertSet('contrasena_temporal', '');
         $this->assertDatabaseHas('usuarios', ['correo' => 'formulario@remembermind.test', 'estado' => 'ACTIVO']);
+        $foto = User::where('correo', 'formulario@remembermind.test')->sole()->foto;
+        $this->assertNotEmpty($foto);
+        Storage::disk('public')->assertExists($foto);
         $this->assertDatabaseHas('personal', ['nombres' => 'ALTA SINTÉTICA', 'numero_documento' => '56789123']);
         $this->assertDatabaseCount('documentos', 3);
     }
