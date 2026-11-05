@@ -148,3 +148,7 @@ Se añaden ejemplos sintéticos como placeholders, centrados y con tinta secunda
 ## Retirada del matiz amarillo del formulario
 
 La propietaria rechaza expresamente el crema/amarillo de las superficies. Se definen tokens semánticos compartidos para panel gris cálido neutro (#E8E7E5), sección clara gris verdosa (#F5F7F5) y campo blanco; variantes oscuras remiten a los tokens petróleo existentes. Se consumen solo en el modal de alta/edición de personal, sin recolorear el sistema entero. Encabezado salvia claro, fotografía/carga salvia y acción principal menta existente con tinta petróleo oscura. Se conserva Nunito, tamaños, pasos compactos y ejemplos centrados; rojo/verde de validación mantienen prioridad. Sin cambios de backend, permisos o BDD. Build y E2E focal cinco anchos; capturas sintéticas se revisan antes de cierre. Pestaña operativa requiere recarga manual por navegador integrado deshabilitado.
+
+## Fondo café grisáceo solicitado
+
+La propietaria concreta el fondo del formulario en café grisáceo: se ajusta el token compartido rm-form-panel de#E8E7E5 a#D8D2CF. Solo los consumidores del formulario cambian; campos blancos, secciones claras, acentos menta/salvia y variante oscura se conservan. Cambio exclusivo de color, sin backend o datos. Build y revisión E2E focal de cinco tamaños para cierre.
