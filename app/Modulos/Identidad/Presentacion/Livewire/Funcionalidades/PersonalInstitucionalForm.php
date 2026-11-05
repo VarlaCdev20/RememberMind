@@ -34,6 +34,8 @@ class PersonalInstitucionalForm extends Component
     public ?string $pais_documento = 'BO';
     public ?string $tipo_documento = 'CI';
     public ?string $pais_telefono = 'BO';
+    #[Locked] public bool $otro_pais_documento = false;
+    #[Locked] public bool $otro_pais_telefono = false;
 
     #[Locked]
     public array $camposValidados = [];
@@ -280,7 +282,9 @@ class PersonalInstitucionalForm extends Component
         $this->pais_documento = $personal?->pais_documento;
         $this->tipo_documento = $personal?->tipo_documento;
         $this->pais_telefono = $personal?->pais_telefono;
-        $prefijo = IdentificacionInternacionalPersonal::PAISES[$this->pais_telefono]['codigo'] ?? null;
+        $this->otro_pais_documento = $this->pais_documento !== null && ! isset(IdentificacionInternacionalPersonal::PAISES[$this->pais_documento]);
+        $this->otro_pais_telefono = $this->pais_telefono !== null && ! isset(IdentificacionInternacionalPersonal::PAISES[$this->pais_telefono]);
+        $prefijo = IdentificacionInternacionalPersonal::paisesTelefono()[$this->pais_telefono]['codigo'] ?? null;
         if ($prefijo && str_starts_with($this->telefono ?? '', $prefijo)) {
             $this->telefono = substr($this->telefono, strlen($prefijo));
         }
@@ -695,7 +699,7 @@ class PersonalInstitucionalForm extends Component
 
     public function updatedPaisDocumento(): void
     {
-        $this->tipo_documento = IdentificacionInternacionalPersonal::PAISES[$this->pais_documento]['doc'] ?? null;
+        $this->tipo_documento = IdentificacionInternacionalPersonal::paises()[$this->pais_documento]['doc'] ?? null;
         $this->expedido = null;
         $this->resetValidation(['pais_documento', 'tipo_documento', 'numero_documento', 'expedido']);
         foreach (['tipo_documento', 'numero_documento', 'expedido'] as $campo) unset($this->camposValidados[$campo]);
@@ -716,6 +720,30 @@ class PersonalInstitucionalForm extends Component
         unset($this->camposValidados['telefono']);
         if (filled($this->telefono)) $this->validarCampoFormulario('telefono');
     }
+
+    public function activarOtroPais(string $ambito): void
+    {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null);
+        abort_unless(in_array($ambito, ['documento','telefono'], true), 422);
+        $modo = 'otro_pais_'.$ambito;
+        $this->{$modo} = ! $this->{$modo};
+        $campo = 'pais_'.$ambito;
+        $this->{$campo} = null;
+        $this->resetValidation($campo);
+        unset($this->camposValidados[$campo]);
+        if ($ambito === 'documento') {
+            $this->tipo_documento = null;
+            $this->expedido = null;
+            $this->resetValidation(['tipo_documento','expedido','numero_documento']);
+            unset($this->camposValidados['tipo_documento'], $this->camposValidados['expedido'], $this->camposValidados['numero_documento']);
+        } else {
+            $this->resetValidation('telefono');
+            unset($this->camposValidados['telefono']);
+        }
+    }
+
+    public function getTodosPaisesProperty(): array { return IdentificacionInternacionalPersonal::paises(); }
+    public function getTodosPaisesTelefonoProperty(): array { return IdentificacionInternacionalPersonal::paisesTelefono(); }
 
     public function getPaisesProperty(): array { return IdentificacionInternacionalPersonal::PAISES; }
     public function getTiposDocumentoProperty(): array { return IdentificacionInternacionalPersonal::tipos($this->pais_documento); }

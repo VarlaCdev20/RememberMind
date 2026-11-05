@@ -158,3 +158,13 @@ test('selector conserva bandera local y la actualiza con el valor seleccionado',
     selector.value = 'PE'; assert.equal(selector.selectedFlag,'/images/flags/pe.svg');
     selector.value = ''; assert.equal(selector.selectedFlag,'');
 });
+
+test('búsqueda de otro país espera dos letras y acepta alias sin acentos', () => {
+    const selector = rmSelector(null, {searchOnly:true});
+    selector.options = [{value:'FR',label:'Francia'}, {value:'NL',label:'Países Bajos',search:'Holanda'}];
+    assert.equal(selector.hasSearch,true); assert.deepEqual(selector.filtered,[]);
+    selector.search='F'; assert.equal(selector.waitingSearch,true);
+    selector.search='fran'; assert.equal(selector.filtered[0].value,'FR');
+    selector.search='HOLANDA'; assert.equal(selector.filtered[0].value,'NL');
+    selector.search='país inventado'; assert.deepEqual(selector.filtered,[]);
+});

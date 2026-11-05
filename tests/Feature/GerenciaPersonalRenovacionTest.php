@@ -309,6 +309,28 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->set('numero_documento','1234567')->assertHasErrors(['numero_documento']);
     }
 
+    public function test_otro_pais_resuelve_iso_y_se_recupera_al_editar_sin_columnas_adicionales(): void
+    {
+        $actor = $this->gerente();
+        $columnas = \Illuminate\Support\Facades\Schema::getColumnListing('personal');
+        $form = Livewire::test(PersonalInstitucionalForm::class)->call('activarOtroPais','documento')
+            ->assertSet('otro_pais_documento',true)->assertSet('pais_documento',null)->assertSee('Especifica el país del documento')
+            ->set('pais_documento','FR')->assertSet('tipo_documento','DOCUMENTO_NACIONAL')
+            ->call('activarOtroPais','telefono')->assertSet('pais_telefono',null)->set('pais_telefono','FR')
+            ->set(['nombres'=>'Prueba','ap_paterno'=>'Internacional','numero_documento'=>'AB123456','fecha_nacimiento'=>'1990-01-01',
+                'genero'=>'F','telefono'=>'612345678','direccion'=>'Calle de prueba','correo'=>'francia@remembermind.test',
+                'contrasena_temporal'=>'Sintetica#12345','rol_seleccionado'=>'ADMINISTRADOR'])
+            ->set('archivos_temporales.CI',UploadedFile::fake()->create('identidad.pdf',10,'application/pdf'))
+            ->set('archivos_temporales.FOTO_DOC',UploadedFile::fake()->image('foto.jpg'))
+            ->set('archivos_temporales.CV',UploadedFile::fake()->create('cv.pdf',10,'application/pdf'))
+            ->call('guardar')->assertHasNoErrors()->assertDispatched('cerrar-modal-gestion-personal');
+        $usuario = User::where('correo','francia@remembermind.test')->sole();
+        $this->assertDatabaseHas('personal',['cod_usuario'=>$usuario->getKey(),'pais_documento'=>'FR','pais_telefono'=>'FR','telefono'=>'+33612345678','tipo_documento'=>'DOCUMENTO_NACIONAL']);
+        $this->assertSame($columnas,\Illuminate\Support\Facades\Schema::getColumnListing('personal'));
+        Livewire::test(PersonalInstitucionalForm::class,['usuarioId'=>$usuario->getKey()])->assertSet('otro_pais_documento',true)
+            ->assertSet('otro_pais_telefono',true)->assertSet('pais_documento','FR')->assertSet('telefono','612345678');
+    }
+
     public function test_recuperacion_gerencial_reutiliza_broker_sin_cambiar_password_y_limita_reintentos(): void
     {
         $actor = $this->gerente();

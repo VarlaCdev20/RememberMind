@@ -23,16 +23,36 @@ final class IdentificacionInternacionalPersonal
         'US'=>['nombre'=>'Estados Unidos','codigo'=>'+1','doc'=>'PASAPORTE','telefono'=>'[2-9][0-9]{2}[2-9][0-9]{6}','max_tel'=>10],
     ];
 
+    private static ?array $catalogo = null;
+
+    public static function paises(): array
+    {
+        if (self::$catalogo === null) {
+            $datos = json_decode(file_get_contents(__DIR__.'/../Datos/paises_iso_telefonia.json'), true, 512, JSON_THROW_ON_ERROR);
+            $paises = [];
+            foreach ($datos as $iso=>$pais) {
+                $paises[$iso] = [...$pais, 'doc'=>'DOCUMENTO_NACIONAL', 'max_tel'=>$pais['max_tel'] ?? 15];
+            }
+            self::$catalogo = array_replace_recursive($paises, self::PAISES);
+        }
+        return self::$catalogo;
+    }
+
+    public static function paisesTelefono(): array
+    {
+        return array_filter(self::paises(), fn ($pais)=>isset($pais['codigo'], $pais['telefono']));
+    }
+
     public static function tipos(mixed $pais): array
     {
         $pais = is_string($pais) ? $pais : null;
-        $doc = self::PAISES[$pais]['doc'] ?? null;
+        $doc = self::paises()[$pais]['doc'] ?? null;
         return array_values(array_unique(array_filter([$doc, $pais === 'ES' ? 'NIE' : null, 'PASAPORTE'])));
     }
 
     public static function formato(?string $pais, ?string $tipo): array
     {
-        if ($tipo === 'PASAPORTE') return ['regex'=>'[A-Z0-9]{1,30}','max'=>30,'captura'=>'documento','ayuda'=>'Letras y números, sin espacios; hasta 30 caracteres.'];
+        if ($tipo === 'PASAPORTE' || (! isset(self::PAISES[$pais]) && $tipo === 'DOCUMENTO_NACIONAL')) return ['regex'=>'[A-Z0-9]{1,30}','max'=>30,'captura'=>'documento','ayuda'=>'Letras y números, sin espacios; hasta 30 caracteres.'];
         return match ($pais) {
             'BO'=>['regex'=>'[0-9]{5,10}','max'=>10,'captura'=>'numero','ayuda'=>'CI: entre 5 y 10 dígitos.'],
             'AR'=>['regex'=>'[0-9]{7,8}','max'=>8,'captura'=>'numero','ayuda'=>'DNI: 7 u 8 dígitos, sin puntos.'],
@@ -52,19 +72,19 @@ final class IdentificacionInternacionalPersonal
         $tipo = is_string($tipo) ? $tipo : null;
         $paisTelefono = is_string($paisTelefono) ? $paisTelefono : null;
         $formato = self::formato($paisDocumento, $tipo);
-        $telefono = self::PAISES[$paisTelefono]['telefono'] ?? '[0-9]{1,15}';
+        $telefono = self::paisesTelefono()[$paisTelefono]['telefono'] ?? '[0-9]{1,15}';
         return [
-            'pais_documento'=>['required', Rule::in(array_keys(self::PAISES))],
+            'pais_documento'=>['required', Rule::in(array_keys(self::paises()))],
             'tipo_documento'=>['required', Rule::in(self::tipos($paisDocumento))],
-            'pais_telefono'=>['required', Rule::in(array_keys(self::PAISES))],
+            'pais_telefono'=>['required', Rule::in(array_keys(self::paisesTelefono()))],
             'numero_documento'=>['required','string','max:30','regex:~^'.$formato['regex'].'$~D'],
             'expedido'=>$paisDocumento === 'BO' && $tipo === 'CI' ? ['required',Rule::in(['LP','CB','SC','OR','PT','CH','TJ','BE','PN'])] : ['nullable','prohibited'],
-            'telefono'=>['required','string','regex:~^'.$telefono.'$~D'],
+            'telefono'=>['required','string','max:'.(self::paisesTelefono()[$paisTelefono]['max_tel'] ?? 15),'regex:~^'.$telefono.'$~D'],
         ];
     }
 
     public static function telefonoInternacional(string $pais, string $numero): string
     {
-        return self::PAISES[$pais]['codigo'].$numero;
+        return self::paisesTelefono()[$pais]['codigo'].$numero;
     }
 }

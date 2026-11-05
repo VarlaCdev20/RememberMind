@@ -229,6 +229,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             assert.equal(focoInvalido.focused,true); assert.equal(focoInvalido.outline,focoInvalido.border);
             assert.equal(focoInvalido.offset,'0px'); assert.equal(focoInvalido.shadow,'none');
             await page.screenshot({path:join(personalOut,`validacion-${width}.png`),fullPage:true});
+            await page.focus('#trabajador-pais-documento');
             await page.click('#trabajador-pais-documento');
             await page.waitForSelector('#trabajador-pais-documento-op-5',{visible:true});
             await page.click('#trabajador-pais-documento-op-5');
@@ -243,12 +244,40 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             });
             await page.click('#trabajador-pais-telefono-op-4');
             await page.waitForFunction(()=>document.querySelector('.rm-staff-registration__phone > span')?.textContent==='+56' && document.querySelector('#trabajador-telefono')?.maxLength===9);
+            await page.focus('#trabajador-genero');
             await page.click('#trabajador-genero');
             await page.waitForSelector('#trabajador-genero-op-1',{visible:true});
             await page.click('#trabajador-genero-op-1');
             await page.waitForFunction(()=>document.querySelector('#trabajador-genero')?.textContent.includes('Femenino') && document.querySelector('#trabajador-genero')?.getAttribute('aria-invalid')==='false' && document.querySelector('#trabajador-genero')?.closest('.rm-field--valid'));
             assert.equal(await page.$eval('#trabajador-telefono',e=>e.getAttribute('aria-invalid')),'true','Cambiar país revalida el número ya escrito');
             await page.screenshot({path:join(personalOut,`paises-${width}.png`),fullPage:true});
+            await page.focus('[data-otro-pais="documento"]');
+            await page.click('[data-otro-pais="documento"]');
+            const buscarDocumento = '.rm-control-popover:has(#trabajador-pais-documento-otro-list) input[role="combobox"]';
+            await page.waitForSelector(buscarDocumento,{visible:true});
+            await page.locator(buscarDocumento).fill('PAIS INEXISTENTE');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-pais-documento-otro-list')?.querySelectorAll('[role="option"]').length===0);
+            assert.equal(await page.$eval('#trabajador-pais-documento-otro-source',e=>e.value),'','El texto libre no se guarda como código de país');
+            await page.locator(buscarDocumento).fill('francia');
+            await page.waitForSelector('#trabajador-pais-documento-otro-op-0',{visible:true});
+            await page.screenshot({path:join(personalOut,`otro-pais-busqueda-${width}.png`)});
+            await page.click('#trabajador-pais-documento-otro-op-0');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-pais-documento-otro')?.textContent.includes('Francia'));
+            await page.waitForFunction(()=>document.querySelector('#trabajador-tipo-documento-source')?.value==='DOCUMENTO_NACIONAL' && !document.querySelector('[data-otro-pais="telefono"]')?.disabled);
+            await page.focus('[data-otro-pais="telefono"]');
+            await page.locator('[data-otro-pais="telefono"]').click();
+            const buscarTelefono = '.rm-control-popover:has(#trabajador-pais-telefono-otro-list) input[role="combobox"]';
+            await page.waitForSelector(buscarTelefono,{visible:true});
+            await page.locator(buscarTelefono).fill('francia');
+            await page.waitForSelector('#trabajador-pais-telefono-otro-op-0',{visible:true});
+            await page.click('#trabajador-pais-telefono-otro-op-0');
+            await page.waitForFunction(()=>document.querySelector('.rm-staff-registration__phone > span')?.textContent==='+33');
+            await page.locator('#trabajador-telefono').fill('612345678');
+            await page.keyboard.press('Tab');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-telefono')?.closest('.rm-field--valid'));
+            assert.match(await page.$eval('#trabajador-pais-telefono-otro img',e=>e.src),/fr\.svg$/);
+            await page.screenshot({path:join(personalOut,`otro-pais-${width}.png`),fullPage:true});
+
 
 
             await page.click('.rm-staff-registration__footer button:first-child');

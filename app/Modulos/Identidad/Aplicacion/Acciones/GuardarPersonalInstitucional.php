@@ -102,7 +102,7 @@ final class GuardarPersonalInstitucional
             $faltantes = [];
             foreach ($catalogo as $documento) {
                 if ($documento['tipo'] === 'ingresante' && $documento['obligatorio_inmediato'] && ! isset($uploads[$documento['id']])) {
-                    $nombreRespaldo = $documento['id'] === 'CI' && $datos['tipo_documento'] !== 'CI' ? 'documento de identidad ('.$datos['tipo_documento'].')' : $documento['nombre'];
+                    $nombreRespaldo = $documento['id'] === 'CI' && $datos['tipo_documento'] !== 'CI' ? 'documento de identidad ('.str_replace('_', ' ', $datos['tipo_documento']).')' : $documento['nombre'];
                     $faltantes['archivos_temporales.'.$documento['id']] = 'Adjunte '.$nombreRespaldo.'.';
                 }
             }

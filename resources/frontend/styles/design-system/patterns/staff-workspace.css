@@ -340,3 +340,5 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 .rm-staff-registration-dialog .rm-modal-body { scroll-padding-block: 24px 96px; }
 .rm-staff-registration-dialog .rm-staff-registration :is(input, textarea, .rm-choice__trigger) { scroll-margin-block: var(--rm-space-4); }
+
+.rm-staff-registration-dialog .rm-staff-registration__other-country { min-height: 44px; justify-content: center; font-size: var(--rm-font-size-label); box-shadow: none; color: var(--rm-primary-ink); }

@@ -1,9 +1,9 @@
-@props(['label' => 'Seleccionar', 'id' => null, 'value' => null, 'autoSubmit' => false, 'teleport' => 'body', 'searchThreshold' => 15])
+@props(['label' => 'Seleccionar', 'id' => null, 'value' => null, 'autoSubmit' => false, 'teleport' => 'body', 'searchThreshold' => 15, 'searchOnly' => false])
 @php
     $model = $attributes->wire('model')->value();
     $controlId = $id ?: 'selector-'.str_replace('.', '-', $model ?: ($attributes->get('name') ?: uniqid()));
 @endphp
-<div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit), searchThreshold: @js((int) $searchThreshold) })" @if($model) wire:key="{{ $controlId }}" @endif>
+<div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit), searchThreshold: @js((int) $searchThreshold), searchOnly: @js((bool) $searchOnly) })" @if($model) wire:key="{{ $controlId }}" @endif>
     <select x-ref="native" {{ $attributes->except(['class', 'aria-label'])->merge(['id' => $controlId.'-source']) }} tabindex="-1" aria-hidden="true" hidden>{{ $slot }}</select>
     <button type="button" id="{{ $controlId }}" x-ref="trigger" class="rm-choice__trigger" aria-label="{{ $attributes->get('aria-label', $label) }}" aria-invalid="{{ $attributes->get('aria-invalid', 'false') }}" @if($attributes->has('aria-describedby')) aria-describedby="{{ $attributes->get('aria-describedby') }}" @endif aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $controlId }}-list" :disabled="bloqueado" @click="open ? close() : show()" @keydown.arrow-down.prevent="show()">
         <template x-if="selectedFlag"><img class="rm-choice__flag" :src="selectedFlag" alt="" aria-hidden="true" width="24" height="18"></template><span x-text="label"></span><i class="ph-bold ph-caret-down" aria-hidden="true" :class="{ 'is-open': open }"></i>
@@ -16,7 +16,7 @@
                     <button type="button" role="option" :id="'{{ $controlId }}-op-' + index" :tabindex="!hasSearch && active === index ? 0 : -1" :aria-selected="selected(option.value)" :disabled="option.disabled" :class="{ 'is-selected': selected(option.value), 'is-highlighted': active === index }" @mouseenter="active = index" @click="choose(option)"><template x-if="option.flag"><img class="rm-choice__flag" :src="option.flag" alt="" aria-hidden="true" width="24" height="18"></template><span class="rm-choice__option-label" x-text="option.label"></span><i x-show="selected(option.value)" class="ph-bold ph-check" aria-hidden="true"></i></button>
                 </template>
             </div>
-            <p x-show="filtered.length === 0" class="rm-control-help" role="status">Sin coincidencias. Prueba otra búsqueda.</p>
+            <p x-show="filtered.length === 0" class="rm-control-help" role="status"><span x-show="waitingSearch">Escribe al menos dos letras para buscar el país.</span><span x-show="!waitingSearch">Sin coincidencias. Prueba otra búsqueda.</span></p>
             <p class="rm-control-help" x-show="options.length > 10">Desliza para ver más opciones</p>
             <button type="button" x-show="multiple" class="rm-btn-secondary" @click="close()">Listo</button>
         </div>

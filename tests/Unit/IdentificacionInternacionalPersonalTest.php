@@ -9,6 +9,21 @@ use Tests\TestCase;
 
 class IdentificacionInternacionalPersonalTest extends TestCase
 {
+    public function test_catalogo_local_tiene_codigos_banderas_y_patrones_validos(): void
+    {
+        $this->assertCount(250,Identificacion::paises());
+        foreach (Identificacion::paises() as $iso=>$pais) {
+            $this->assertMatchesRegularExpression('/^[A-Z]{2}$/',$iso);
+            $this->assertNotEmpty($pais['nombre']);
+            $this->assertFileExists(public_path('images/flags/'.strtolower($iso).'.svg'));
+        }
+        foreach (Identificacion::paisesTelefono() as $pais) {
+            $this->assertMatchesRegularExpression('/^\\+[1-9][0-9]{0,2}$/',$pais['codigo']);
+            $this->assertLessThanOrEqual(15,strlen(ltrim($pais['codigo'],'+'))+$pais['max_tel']);
+            $this->assertNotFalse(preg_match('~^'.$pais['telefono'].'$~D',''));
+        }
+    }
+
     public static function formatos(): array
     {
         return [
@@ -28,6 +43,10 @@ class IdentificacionInternacionalPersonalTest extends TestCase
             ['BR','CPF','12345678901',null,'BR','11912345678',true],
             ['MX','CURP','ABCD900101HDFRRN09',null,'MX','5512345678',true],
             ['US','SSN','123456789',null,'US','2025550199',false],
+            ['FR','DOCUMENTO_NACIONAL','AB123456',null,'FR','612345678',true],
+            ['FR','PASAPORTE','AB123456',null,'FR','012345678',false],
+            ['Francia','PASAPORTE','AB123456',null,'FR','612345678',false],
+            ['FR','PASAPORTE','AB123456',null,'AQ','612345678',false],
             ['ZZ','CI','12345678',null,'BO','77712345',false],
         ];
     }

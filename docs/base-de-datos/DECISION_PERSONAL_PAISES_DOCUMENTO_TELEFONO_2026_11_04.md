@@ -37,3 +37,7 @@ Instalador explícito comprueba destino local remembermind_dev PostgreSQL, prueb
 ## Evidencia de instalación local
 
 Instalada explícitamente mediante scripts/instalar-personal-paises.php después de48 pruebas/276 aserciones correctas en SQLite y el mismo alcance48/276 en PostgreSQL desechable. Registro migrations añadido solo para este DDL. Verificado en salida privada output/personal-paises-instalacion-20261104.json:122 tablas físicas, tres columnas nuevas, hash de filas anteriores idéntico, campos previos nulos y respaldo con catálogo legible. No se imprimieron ni alteraron datos personales previos. La salida de instalación contiene únicamente metadatos técnicos y referencias al respaldo privado; no se incorpora al commit.
+
+## Ampliación de opciones sin DDL del05/11/2026
+
+La propietaria acepta Otro país mediante búsqueda y selección de un código reconocido. Se amplía el catálogo local de opciones, conservando exactamente las tres columnas anteriores y sin campos adicionales de nombre/prefijo. El alcance actualizado y sus límites constan en [Personal: Otro país](../frontend/PERSONAL_OTRO_PAIS_2026_11_05.md). El límite anterior de13 países corresponde a la primera entrega; las reglas particulares de esos13 se conservan. No cambia el inventario de tablas, columnas ni unicidad.
