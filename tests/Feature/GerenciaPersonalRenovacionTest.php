@@ -55,7 +55,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->assertDontSee('Estadísticas de pacientes atendidos')
             ->set('busquedaResumen', 'Sin coincidencia')->assertSee('Sin coincidencias')
             ->call('limpiarFiltrosResumen')->assertSee($trabajador->correo)
-            ->call('abrirModalNuevo')->assertSee('Paso 1 de 4')->assertSee('Identidad y contacto')
+            ->call('abrirModalNuevo')->assertSee('Pasos del registro')->assertSee('Identidad y contacto')
             ->call('cerrarModal')->assertSet('modalGestionAbierto', false);
         $this->assertFalse($actor->can('usuarios.crear'));
         $this->assertDatabaseCount('asignaciones_personal', 0);
@@ -132,11 +132,67 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->assertSet('camposValidados.telefono', true)->assertSee('Dato válido')
             ->set('telefono', 'mal')->assertHasErrors(['telefono'])
             ->assertSet('camposValidados.telefono', null)
-            ->set('ap_materno', '')->assertHasNoErrors(['ap_materno'])
+            ->set('ap_paterno', 'Prueba')->set('ap_materno', '')->assertHasNoErrors(['ap_materno'])
             ->assertSet('camposValidados.ap_materno', false)
             ->set('fecha_nacimiento', now()->subYears(101)->toDateString())->assertHasErrors(['fecha_nacimiento' => 'after_or_equal'])
-            ->call('avanzarPaso')->assertHasErrors(['nombres', 'ap_paterno', 'direccion', 'genero'])
+            ->call('avanzarPaso')->assertHasErrors(['nombres', 'direccion', 'genero'])
             ->assertSet('pasoActual', 1)->assertDispatched('personal-validacion-fallida');
+    }
+
+    public function test_apellidos_alternativos_y_formato_de_identidad_en_servidor(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)
+            ->set('ap_paterno', '')->assertHasErrors(['ap_paterno'])
+            ->set('telefono', '123')->assertHasErrors(['telefono'])
+            ->set('ap_materno', 'muñoz')->assertHasNoErrors(['ap_paterno', 'ap_materno'])->assertHasErrors(['telefono'])
+            ->assertSet('ap_materno', 'MUÑOZ')
+            ->set('nombres', 'maría josé')->assertHasNoErrors(['nombres'])->assertSet('nombres', 'MARÍA JOSÉ')
+            ->set('nombres', 'María123')->assertHasErrors(['nombres' => 'regex'])
+            ->set('numero_documento', 'AB12345')->assertHasErrors(['numero_documento' => 'regex'])
+            ->set('expedido', 'LP3')->assertHasErrors(['expedido' => 'regex'])
+            ->set('direccion', 'calle 12')->assertSet('direccion', 'CALLE 12');
+    }
+
+    public function test_accion_rechaza_identidad_manipulada_sin_crear_cuenta(): void
+    {
+        $actor = $this->gerente();
+        $cantidad = User::count();
+        $base = ['esEdicion' => false, 'correo' => 'invalido@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
+            'nombres' => 'María', 'ap_paterno' => 'Prueba', 'numero_documento' => '99887766', 'expedido' => 'LP',
+            'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'Calle 12',
+            'roles_seleccionados' => ['ADMINISTRADOR']];
+        foreach ([['nombres' => 'María123'], ['ap_paterno' => '', 'ap_materno' => ''],
+            ['numero_documento' => 'AB12345'], ['telefono' => 'ABC12345']] as $invalido) {
+            try {
+                app(GuardarPersonalInstitucional::class)->guardar($actor, [...$base, ...$invalido]);
+                $this->fail('La identidad inválida no puede guardarse.');
+            } catch (ValidationException $e) {
+                foreach (array_keys($invalido) as $campo) {
+                    $this->assertArrayHasKey($campo, $e->errors());
+                }
+            }
+        }
+        $this->assertSame($cantidad, User::count());
+        $this->assertDatabaseCount('documentos', 0);
+    }
+
+    public function test_alta_con_solo_apellido_materno_normaliza_y_persiste_sin_cambiar_credenciales(): void
+    {
+        $actor = $this->gerente();
+        $resultado = app(GuardarPersonalInstitucional::class)->guardar($actor, [
+            'esEdicion' => false, 'correo' => 'MATERNO@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
+            'nombres' => 'maría josé', 'ap_materno' => 'muñoz', 'numero_documento' => '99123456', 'expedido' => 'lp',
+            'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'calle 12',
+            'roles_seleccionados' => ['ADMINISTRADOR'],
+            'archivos_temporales' => ['CI' => UploadedFile::fake()->create('ci.pdf', 10, 'application/pdf'),
+                'FOTO_DOC' => UploadedFile::fake()->image('foto.jpg'), 'CV' => UploadedFile::fake()->create('cv.pdf', 10, 'application/pdf')],
+        ]);
+        $usuario = $resultado['usuario'];
+        $this->assertSame('materno@remembermind.test', $usuario->correo);
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('Sintetica#12345', $usuario->password));
+        $this->assertDatabaseHas('personal', ['cod_usuario' => $usuario->getKey(), 'nombres' => 'MARÍA JOSÉ',
+            'apellido_paterno' => '', 'apellido_materno' => 'MUÑOZ', 'direccion' => 'CALLE 12', 'expedicion_documento' => 'LP']);
     }
 
     public function test_validacion_por_campo_rechaza_correo_duplicado_y_clave_corta(): void

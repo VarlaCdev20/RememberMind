@@ -10,6 +10,7 @@ use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Dominio\Reglas\ClasificacionRolInstitucional;
 use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
+use App\Modulos\Identidad\Dominio\Reglas\DatosPersonalesTrabajador;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -38,6 +39,7 @@ final class GuardarPersonalInstitucional
         $alcance->autorizar($actor, $edicion ? $usuario : null, $entrada['roles_seleccionados']);
         abort_unless($edicion || $actor->can('usuarios.crear') || $alcance->esGerencia($actor), 403);
         $personal = $usuario->personal;
+        $entrada = DatosPersonalesTrabajador::normalizar($entrada);
         $entrada['correo'] = mb_strtolower(trim((string) ($entrada['correo'] ?? '')));
         $roles = array_values($entrada['roles_seleccionados'] ?? []);
         $rolesActuales = $edicion ? $usuario->getRoleNames()->all() : [];
@@ -67,11 +69,10 @@ final class GuardarPersonalInstitucional
             $foto = null;
         }
         $datos = Validator::make([...$entrada, 'foto_perfil' => $foto], [
-            'nombres' => ['required', 'string', 'max:100'], 'ap_paterno' => ['required', 'string', 'max:80'],
-            'ap_materno' => ['nullable', 'string', 'max:80'],
+            ...DatosPersonalesTrabajador::reglasNombre(),
             'correo' => ['required', 'email', 'max:120', Rule::unique('usuarios', 'correo')->ignore($usuario->getKey(), 'cod_usuario')],
             'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore($personal?->getKey(), 'cod_personal')],
-            'expedido' => ['required', 'string', 'max:20'], 'genero' => ['required', Rule::in(['M', 'F'])],
+            'expedido' => ['required', 'string', 'max:20', DatosPersonalesTrabajador::SOLO_LETRAS], 'genero' => ['required', Rule::in(['M', 'F'])],
             'fecha_nacimiento' => ['required', 'date', 'before_or_equal:'.now()->subYears(18)->toDateString(), 'after_or_equal:'.now()->subYears(100)->toDateString()],
             'telefono' => ['required', 'regex:/^[67][0-9]{7}$/'], 'direccion' => ['required', 'string', 'max:255'],
             'observaciones' => ['nullable', 'string'], 'matricula_prof' => ['nullable', 'string', 'max:50'],
@@ -149,7 +150,7 @@ final class GuardarPersonalInstitucional
                     $usuario->update(['foto' => $foto['ruta_archivo']]);
                 }
                 $personal = Personal::query()->where('cod_usuario', $usuario->getKey())->lockForUpdate()->first() ?? new Personal(['cod_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'), 'cod_usuario' => $usuario->getKey()]);
-                $personal->fill(['nombres' => mb_strtoupper(trim($datos['nombres'])), 'apellido_paterno' => mb_strtoupper(trim($datos['ap_paterno'])),
+                $personal->fill(['nombres' => mb_strtoupper(trim($datos['nombres'])), 'apellido_paterno' => mb_strtoupper(trim($datos['ap_paterno'] ?? '')),
                     'apellido_materno' => filled($datos['ap_materno'] ?? null) ? mb_strtoupper(trim($datos['ap_materno'])) : null,
                     'numero_documento' => $datos['numero_documento'], 'expedicion_documento' => $datos['expedido'],
                     'fecha_nacimiento' => $datos['fecha_nacimiento'], 'genero' => $datos['genero'], 'telefono' => $datos['telefono'],

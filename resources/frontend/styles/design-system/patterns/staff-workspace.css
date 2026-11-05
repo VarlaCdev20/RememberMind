@@ -267,9 +267,9 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration__details > * { min-width: 0; }
 .rm-staff-registration__details textarea { min-height: 44px; }
 .rm-staff-registration__steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--rm-space-2); padding-block: var(--rm-space-1); }
-.rm-staff-registration__steps::before { content: ''; position: absolute; top: 22px; inset-inline: 12%; height: 2px; background: color-mix(in srgb, var(--rm-form-accent) 55%, var(--rm-border-soft)); }
-.rm-staff-registration__step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: start; gap: var(--rm-space-1); min-width: 0; min-height: 48px; padding: 0 var(--rm-space-1); border: 0; background: transparent; color: var(--rm-text-secondary); font-size: var(--rm-font-size-body); font-weight: 700; white-space: normal; overflow-wrap: anywhere; text-align: center; }
-.rm-staff-registration__step-icon { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-pill); background: var(--rm-surface); color: var(--rm-text-secondary); font-size: var(--rm-icon-md); }
+.rm-staff-registration__steps::before { content: ''; position: absolute; top: 24px; inset-inline: 12%; height: 2px; background: color-mix(in srgb, var(--rm-form-accent) 55%, var(--rm-border-soft)); }
+.rm-staff-registration__step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: start; gap: var(--rm-space-1); min-width: 0; min-height: 48px; padding: 0 var(--rm-space-1); border: 0; background: transparent; color: var(--rm-text-secondary); font-size: var(--rm-font-size-body-lg); font-weight: 700; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.rm-staff-registration__step-icon { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-pill); background: var(--rm-surface); color: var(--rm-text-secondary); font-size: var(--rm-icon-md); }
 .rm-staff-registration__step[aria-current="step"] { color: var(--rm-primary-ink); }
 .rm-staff-registration__step[aria-current="step"] .rm-staff-registration__step-icon { border-color: var(--rm-primary-ink); background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950) !important; }
 .rm-staff-registration__step.is-complete .rm-staff-registration__step-icon { background: var(--rm-form-accent); border-color: var(--rm-primary-ink); color: var(--rm-palette-petroleum-950); }
@@ -328,4 +328,6 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 .rm-staff-registration-dialog .rm-staff-registration__steps { margin-bottom: var(--rm-space-2); }
 .rm-staff-registration-dialog .rm-staff-registration__step:disabled .rm-staff-registration__step-icon { background: var(--rm-form-panel); color: var(--rm-text-secondary); border-color: var(--rm-border); }
-.rm-staff-registration-dialog .rm-staff-registration > p[role="status"] { margin: var(--rm-space-2) 0 var(--rm-space-3); line-height: var(--rm-line-height-body); }
+
+.rm-staff-registration-dialog .rm-staff-registration textarea { resize: none; }
+.rm-staff-registration__surname-help { grid-column: 1 / -1; margin: 0; }

@@ -190,22 +190,31 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.click('.rm-staff-registration button[wire\\:click="avanzarPaso"]');
             await page.waitForFunction(() => document.querySelectorAll('.rm-staff-registration [aria-invalid="true"]').length >= 8);
             assert.equal(await page.$eval('#trabajador-nombres', e => e === document.activeElement), true, 'Foco en el primer dato faltante');
-            await page.type('#trabajador-nombres', 'Validación sintética');
+            await page.type('#trabajador-nombres', 'Validación sintética9');
             await page.keyboard.press('Tab');
             await page.waitForFunction(() => document.querySelector('#trabajador-nombres')?.closest('.rm-field--valid'));
-            await page.type('#trabajador-telefono', '123');
+            assert.equal(await page.$eval('#trabajador-nombres', e => e.value), 'VALIDACIÓN SINTÉTICA');
+            await page.type('#trabajador-ap_materno', 'muñoz9');
+            await page.keyboard.press('Tab');
+            await page.waitForFunction(() => document.querySelector('#trabajador-ap_materno')?.closest('.rm-field--valid'));
+            assert.equal(await page.$eval('#trabajador-ap_materno', e => e.value), 'MUÑOZ');
+            assert.equal(await page.$eval('#trabajador-ap_paterno', e => e.getAttribute('aria-invalid')), 'false');
+            assert.equal(await page.$eval('#trabajador-numero_documento', e => e.getAttribute('aria-invalid')), 'true', 'Corregir apellidos conserva los demás errores');
+            assert.equal(await page.$eval('#trabajador-direccion', e => getComputedStyle(e).resize), 'none');
+            assert.equal(await page.$eval('.rm-staff-registration', e => e.textContent.includes('Se guarda todo al finalizar')), false);
+            await page.type('#trabajador-telefono', 'a123b');
             await page.keyboard.press('Tab');
             await page.waitForFunction(() => document.querySelector('#trabajador-telefono')?.closest('.rm-field--invalid')?.innerText.includes('8 dígitos'));
-            await page.click('#trabajador-telefono');
-            await page.keyboard.down('Control'); await page.keyboard.press('KeyA'); await page.keyboard.up('Control');
-            await page.keyboard.press('Backspace');
-            await page.type('#trabajador-telefono', '77712345');
+            await page.locator('#trabajador-telefono').fill('77712345');
             await page.keyboard.press('Tab');
-            await page.waitForFunction(() => document.querySelector('#trabajador-telefono')?.closest('.rm-field--valid'));
+            await page.waitForFunction(() => document.querySelector('#trabajador-telefono')?.closest('.rm-field--valid')).catch(async error => {
+                error.message += ' ' + await page.$eval('#trabajador-telefono', e => JSON.stringify({width:innerWidth, value:e.value, feedback:e.closest('.rm-field').innerText, classes:e.closest('.rm-field').className}));
+                throw error;
+            });
             const feedback = await page.$eval('.rm-staff-registration', e => ({
                 overflow:e.scrollWidth>e.clientWidth+1,
                 links:[...e.querySelectorAll('[aria-invalid="true"]')].every(input => document.getElementById(input.getAttribute('aria-describedby'))?.textContent.trim()),
-                optionalNeutral:!e.querySelector('#trabajador-ap_materno').closest('.rm-field--valid, .rm-field--invalid'),
+                optionalNeutral:!e.querySelector('#trabajador-ap_paterno').closest('.rm-field--valid, .rm-field--invalid'),
                 green:getComputedStyle(e.querySelector('#trabajador-telefono')).borderColor,
                 red:getComputedStyle(e.querySelector('#trabajador-numero_documento')).borderColor,
             }));
@@ -305,7 +314,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     let dialogos=0, aceptarDialogos=false;
     page.on('dialog',async d=>{dialogos++;aceptarDialogos ? await d.accept() : await d.dismiss();});
     await page.keyboard.press('Escape');
-    await page.waitForFunction(()=>document.querySelector('#trabajador-nombres')?.value==='Nombre sin guardar');
+    await page.waitForFunction(()=>document.querySelector('#trabajador-nombres')?.value==='NOMBRE SIN GUARDAR');
     assert.equal(dialogos,1,'Escape debe pedir confirmación si hay datos nuevos.');
     await page.screenshot({path:join(out,'personal-validacion-390.png'),fullPage:true});
     await go('/admin/areas-institucionales');

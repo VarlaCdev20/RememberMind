@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\GuardarPersonalInstitucional;
 use App\Modulos\Identidad\Dominio\Reglas\ClasificacionRolInstitucional;
 use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
+use App\Modulos\Identidad\Dominio\Reglas\DatosPersonalesTrabajador;
 use App\Modulos\Identidad\Infraestructura\Documentos\GenerarDocumentoInstitucional;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -284,9 +285,7 @@ class PersonalInstitucionalForm extends Component
     protected function rules()
     {
         return [
-            'nombres' => 'required|string|max:100',
-            'ap_paterno' => 'required|string|max:80',
-            'ap_materno' => 'nullable|string|max:80',
+            ...DatosPersonalesTrabajador::reglasNombre(),
             'correo' => 'required|email|max:120|unique:usuarios,correo,'.$this->usuarioId.',cod_usuario',
             'fecha_ingreso' => 'nullable|date',
             'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal') : null, 'cod_personal')],
@@ -302,7 +301,10 @@ class PersonalInstitucionalForm extends Component
     protected function messages()
     {
         return [
-            'ap_paterno.required' => 'El apellido paterno es obligatorio.',
+            'nombres.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
+            'ap_paterno.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
+            'ap_materno.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
+            'expedido.regex' => 'Usa solo letras para el lugar de expedición.',
             'telefono.required' => 'El celular es obligatorio.',
             'telefono.regex' => 'Escribe 8 dígitos, empezando por 6 o 7.',
             'direccion.required' => 'La dirección es obligatoria.',
@@ -314,8 +316,8 @@ class PersonalInstitucionalForm extends Component
             'correo.email' => 'El formato del correo es inválido.',
             'correo.unique' => 'Este correo ya está registrado.',
             'nombres.required' => 'El nombre es obligatorio.',
-            'ap_paterno.required_without' => 'Debe ingresar el apellido paterno o materno.',
-            'ap_materno.required_without' => 'Debe ingresar el apellido paterno o materno.',
+            'ap_paterno.required_without' => 'Escribe al menos uno de los dos apellidos.',
+            'ap_materno.required_without' => 'Escribe al menos uno de los dos apellidos.',
             'numero_documento.required' => 'El CI es obligatorio.',
             'numero_documento.regex' => 'El documento de identidad debe contener solo números y tener entre 5 y 10 dígitos.',
             'numero_documento.unique' => 'Este CI ya se encuentra registrado.',
@@ -643,9 +645,9 @@ class PersonalInstitucionalForm extends Component
     private function reglasPaso(int $paso): array
     {
         return match ($paso) {
-            1 => ['foto_perfil'=>$this->reglaFotografia(),'nombres'=>'required|string|max:100','ap_paterno'=>'required|string|max:80','ap_materno'=>'nullable|string|max:80',
+            1 => ['foto_perfil'=>$this->reglaFotografia(),...DatosPersonalesTrabajador::reglasNombre(),
                 'numero_documento'=>['required','regex:/^[0-9]{5,10}$/',Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
-                'expedido'=>'required|string|max:20','genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
+                'expedido'=>['required','string','max:20',DatosPersonalesTrabajador::SOLO_LETRAS],'genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
                 'telefono'=>['required','regex:/^[67][0-9]{7}$/'],'direccion'=>'required|string|max:255'],
             2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50','observaciones'=>'nullable|string'],
             3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
@@ -674,6 +676,9 @@ class PersonalInstitucionalForm extends Component
 
     public function updated(string $campo): void
     {
+        if (in_array($campo, DatosPersonalesTrabajador::MAYUSCULAS, true) && is_string($this->{$campo})) {
+            $this->{$campo} = mb_strtoupper(trim($this->{$campo}));
+        }
         if ($campo === 'correo') {
             $this->correo = trim(mb_strtolower($this->correo ?? ''));
         }
@@ -684,6 +689,16 @@ class PersonalInstitucionalForm extends Component
 
     private function validarCampoFormulario(string $campo): void
     {
+        if (in_array($campo, ['ap_paterno', 'ap_materno'], true)) {
+            unset($this->camposValidados['ap_paterno'], $this->camposValidados['ap_materno']);
+            $reglas = array_intersect_key(DatosPersonalesTrabajador::reglasNombre(), array_flip(['ap_paterno', 'ap_materno']));
+            foreach (['ap_paterno', 'ap_materno'] as $apellido) {
+                $this->validateOnly($apellido, $reglas);
+            }
+            $this->camposValidados['ap_paterno'] = filled($this->ap_paterno);
+            $this->camposValidados['ap_materno'] = filled($this->ap_materno);
+            return;
+        }
         for ($paso = 1; $paso <= 3; $paso++) {
             $reglas = $this->reglasPaso($paso);
             if (! array_key_exists($campo, $reglas)) {
