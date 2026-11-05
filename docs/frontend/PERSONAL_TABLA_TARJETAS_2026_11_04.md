@@ -158,3 +158,9 @@ Ajuste posterior solicitado: café grisáceo más claro, rm-form-panel#E9E5E2 (a
 ## Superficie unificada y captura más amplia
 
 A petición de la propietaria se retira el blanco: en tema claro sección y campos consumen el mismo café grisáceo claro rm-form-panel#E9E5E2. Encabezado, cuerpo y pie comparten fondo; fotografía/carga y acción principal mantienen acentos salvia/menta. Se elimina el recuadro interior y su padding lateral para liberar ancho, con labels y bordes de campos conservados. Modal máximo1240 px, campos58 px, Nunito18 px en captura y16 px en etiquetas/acciones; título de sección20 px. Se preservan distribución responsive y estados de validación con prioridad de color. Sin cambios de dominio, permisos o BDD. Build correcto y E2E focal de cinco tamaños para verificación final; no se modifica la pestaña operativa mientras el navegador integrado está deshabilitado.
+
+## Verde de Continuar en la parte superior, aclarado
+
+La propietaria aprueba como referencia el verde menta de Continuar y pide aplicarlo arriba y a algunos controles. Se conserva la cabecera delgada, cuatro pasos y línea fina: cabecera, paso activo/completados, Elegir foto y Continuar comparten el acento; pendientes más legibles (opacidad80%, labels13 px y peso700). Tinta oscura para contraste. Sin doble barra ni cambios funcionales.
+
+Aclaración inmediata de la propietaria: usar ese verde más clarito. Se deriva un único rm-form-accent en el contenedor (75% menta existente +25% superficie café grisáceo clara), sin recolorear otras pantallas. La estructura y versión menta inicial pasaron E2E de cinco anchos (42 s), incluida carga de Nunito y validaciones; el aclarado posterior cambia solo el token local y tiene build correcto. La captura del tono aclarado no se volvió a generar y la pestaña operativa requiere recarga; no se presenta la captura anterior como evidencia del aclarado. No hay cambios de backend, BDD o permisos.

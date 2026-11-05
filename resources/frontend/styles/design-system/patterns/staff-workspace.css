@@ -236,9 +236,10 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 /* Registro institucional: secciones compartidas y progreso como el alta de usuarios. */
 .rm-staff-registration-dialog {
+    --rm-form-accent: color-mix(in srgb, var(--rm-palette-mint) 75%, var(--rm-form-section));
     --rm-surface: var(--rm-form-section);
     --rm-surface-soft: var(--rm-form-panel);
-    --rm-primary: var(--rm-palette-mint);
+    --rm-primary: var(--rm-form-accent);
     --rm-font-family: "Nunito", sans-serif;
     --rm-font-body: "Nunito", sans-serif;
     --rm-font-friendly: "Nunito", sans-serif;
@@ -251,7 +252,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration-dialog .rm-staff-registration .rm-form-section { border-radius: var(--rm-radius-2xl); }
 
 .rm-staff-registration-dialog .rm-modal-panel { width: min(1240px, calc(100vw - 32px)); max-width: 1240px; max-height: min(94dvh, 860px); border-radius: var(--rm-radius-2xl); background: var(--rm-form-panel) !important; }
-.rm-staff-registration-dialog .rm-modal-header { align-items: center; padding-block: var(--rm-space-1); background: var(--rm-form-panel) !important; }
+.rm-staff-registration-dialog .rm-modal-header { align-items: center; padding-block: var(--rm-space-1); background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950); }
 .rm-staff-registration-dialog .rm-modal-body { padding: var(--rm-space-5); background: var(--rm-form-panel); }
 .rm-staff-registration-dialog .rm-modal-panel__title { font-family: var(--rm-font-friendly); font-size: var(--rm-font-size-section); font-weight: 800; }
 .rm-staff-registration__identity-layout { display: grid; grid-template-columns: 168px minmax(0, 1fr); align-items: start; gap: var(--rm-space-5); }
@@ -266,13 +267,13 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration__details > * { min-width: 0; }
 .rm-staff-registration__details textarea { min-height: 44px; }
 .rm-staff-registration__steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--rm-space-2); padding-block: var(--rm-space-1); }
-.rm-staff-registration__steps::before { content: ''; position: absolute; top: 20px; inset-inline: 12%; height: 2px; background: var(--rm-border-soft); }
-.rm-staff-registration__step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: start; gap: var(--rm-space-1); min-width: 0; min-height: 48px; padding: 0 var(--rm-space-1); border: 0; background: transparent; color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); font-weight: 650; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.rm-staff-registration__steps::before { content: ''; position: absolute; top: 20px; inset-inline: 12%; height: 2px; background: color-mix(in srgb, var(--rm-form-accent) 55%, var(--rm-border-soft)); }
+.rm-staff-registration__step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: start; gap: var(--rm-space-1); min-width: 0; min-height: 48px; padding: 0 var(--rm-space-1); border: 0; background: transparent; color: var(--rm-text-secondary); font-size: var(--rm-font-size-label); font-weight: 700; white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .rm-staff-registration__step-icon { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-pill); background: var(--rm-surface); color: var(--rm-text-secondary); font-size: var(--rm-icon-md); }
 .rm-staff-registration__step[aria-current="step"] { color: var(--rm-primary-ink); }
-.rm-staff-registration__step[aria-current="step"] .rm-staff-registration__step-icon { border-color: var(--rm-primary-ink); background: var(--rm-primary-ink) !important; color: var(--rm-surface) !important; }
-.rm-staff-registration__step.is-complete .rm-staff-registration__step-icon { background: var(--rm-action-primary); border-color: var(--rm-action-primary); color: var(--rm-text-on-primary); }
-.rm-staff-registration__step:disabled { opacity: .6; cursor: not-allowed; }
+.rm-staff-registration__step[aria-current="step"] .rm-staff-registration__step-icon { border-color: var(--rm-primary-ink); background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950) !important; }
+.rm-staff-registration__step.is-complete .rm-staff-registration__step-icon { background: var(--rm-form-accent); border-color: var(--rm-primary-ink); color: var(--rm-palette-petroleum-950); }
+.rm-staff-registration__step:disabled { opacity: .8; cursor: not-allowed; }
 .rm-staff-registration__step-short { display: none; }
 .rm-staff-registration .rm-form-section { margin-bottom: 0; padding: var(--rm-space-4); box-shadow: none; }
 .rm-staff-registration .rm-form-section-title { font-size: var(--rm-font-size-body); }
@@ -316,8 +317,11 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration-dialog .rm-staff-registration__step[aria-current="step"] .rm-staff-registration__step-icon i { color: inherit; }
 
 .rm-staff-registration-dialog .rm-staff-registration__footer { background: var(--rm-form-panel); }
-.rm-staff-registration-dialog .rm-staff-registration__footer .rm-btn-primary { background: var(--rm-palette-mint) !important; color: var(--rm-palette-petroleum-950) !important; }
-.rm-staff-registration-dialog .rm-staff-registration__photo-picker { background: var(--rm-sage-soft) !important; color: var(--rm-primary-ink) !important; }
+.rm-staff-registration-dialog .rm-staff-registration__footer .rm-btn-primary { background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950) !important; }
+.rm-staff-registration-dialog .rm-staff-registration__photo-picker { background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950) !important; border-color: var(--rm-primary); }
 
 .rm-staff-registration-dialog .rm-staff-registration__form .rm-form-section > p { font-size: var(--rm-font-size-section); }
 .rm-staff-registration-dialog .rm-staff-registration__footer button { font-size: calc(var(--rm-font-size-body-lg) + 1px); }
+
+.rm-staff-registration-dialog .rm-modal-header .rm-modal-panel__title { color: var(--rm-palette-petroleum-950); }
+.rm-staff-registration-dialog .rm-staff-registration__step[aria-current="step"] .rm-staff-registration__step-label { color: var(--rm-primary-ink); font-weight: 800; }
