@@ -45,6 +45,44 @@ class GerenciaPersonalRenovacionTest extends TestCase
         return $actor;
     }
 
+    public function test_direccion_filtra_por_padres_y_aplica_solo_con_confirmacion(): void
+    {
+        $this->gerente();
+        $form = Livewire::test(PersonalInstitucionalForm::class)->set('direccion', 'DIRECCIÓN ANTERIOR')
+            ->set('ciudad_id', 'LPZ')->set('municipio_id', 'MUN_LPZ')->set('zona_id', 'ZON_SOP')
+            ->set('calle_id', 'CAL_ARC')->set('nro_casa', '120')->assertSet('direccion', 'DIRECCIÓN ANTERIOR')
+            ->call('completarDireccion')->assertHasNoErrors()->assertDispatched('direccion-personal-completada')
+            ->assertSet('direccion', 'AV. ARCE, N.º 120, ZONA SOPOCACHI, LA PAZ, LA PAZ, BOLIVIA');
+        $form->set('pais_direccion', 'PE')->assertSet('ciudad_id', null)->assertSet('municipio_id', null)
+            ->assertSet('zona_id', null)->assertSet('calle_id', null)->assertSet('pais_documento', 'BO')
+            ->assertSet('departamentos_list', [])->assertSet('direccion', 'AV. ARCE, N.º 120, ZONA SOPOCACHI, LA PAZ, LA PAZ, BOLIVIA')
+            ->set('ciudad_id', 'LPZ')->assertHasErrors(['ciudad_id'])
+            ->call('completarDireccion')->assertHasErrors(['ciudad_id'])->assertNotDispatched('cerrar-modal-gestion-personal');
+    }
+
+    public function test_direccion_otra_permite_pais_sin_sugerencias_y_rechaza_cruce_de_zonas(): void
+    {
+        $this->gerente();
+        $form = Livewire::test(PersonalInstitucionalForm::class)->set('ciudad_id', 'LPZ')->set('municipio_id', 'MUN_EAL')
+            ->set('zona_id', 'ZON_SOP')->set('calle_id', 'CAL_ARC')
+            ->call('completarDireccion')->assertHasErrors(['zona_id', 'calle_id']);
+        $form->set('pais_direccion', 'PE')->set('ciudad_id', 'OTRA')->set('otro_departamento', 'región sintética')
+            ->set('municipio_id', 'OTRA')->set('otro_municipio', 'ciudad sintética')->set('zona_id', 'OTRA')
+            ->set('otra_zona', 'barrio sintético')->set('calle_id', 'OTRA')->set('otra_calle', 'calle sintética')
+            ->call('completarDireccion')->assertHasNoErrors()->assertSet('direccion', 'CALLE SINTÉTICA, ZONA BARRIO SINTÉTICO, CIUDAD SINTÉTICA, REGIÓN SINTÉTICA, PERÚ');
+    }
+
+    public function test_nacimiento_del_formulario_valida_18_a_50_y_publica_limites_html(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-11-05 14:00:00'));
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->assertSeeHtml('min="1975-11-06"')->assertSeeHtml('max="2008-11-05"')
+            ->set('fecha_nacimiento', '2008-11-06')->assertHasErrors(['fecha_nacimiento'])->assertSee('al menos 18 años')
+            ->set('fecha_nacimiento', '2008-11-05')->assertHasNoErrors(['fecha_nacimiento'])
+            ->set('fecha_nacimiento', '1975-11-05')->assertHasErrors(['fecha_nacimiento'])->assertSee('más de 50 años')
+            ->set('fecha_nacimiento', '1975-11-06')->assertHasNoErrors(['fecha_nacimiento']);
+    }
+
     public function test_directorio_gerencial_tiene_recorrido_propio_sin_paneles_de_demostracion(): void
     {
         $actor = $this->gerente();

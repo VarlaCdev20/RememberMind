@@ -115,6 +115,7 @@ return [
     'livewire.features.alertas.historial-alerta' => 'app/Modulos/Alertas/Presentacion/Vistas/livewire/features/alertas/historial-alerta.blade.php',
     'livewire.identidad.areas-institucionales-panel' => 'app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/areas-institucionales-panel.blade.php',
     'livewire.identidad.personal-institucional-form' => 'app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-form.blade.php',
+    'livewire.identidad.partials.personal-direccion' => 'app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/partials/personal-direccion.blade.php',
     'livewire.identidad.personal-institucional-horarios' => 'app/Modulos/Institucion/Presentacion/Vistas/livewire/identidad/personal-institucional-horarios.blade.php',
     'livewire.identidad.personal-institucional-panel.modales.directorio' => 'app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/directorio.blade.php',
     'livewire.identidad.personal-institucional-panel.modales.gestion' => 'app/Modulos/Identidad/Presentacion/Vistas/livewire/identidad/personal-institucional-panel/modales/gestion.blade.php',

@@ -77,6 +77,24 @@ class ContratoPersonalInstitucionalTest extends TestCase
         $this->assertTrue($resultado['correo_enviado']);
     }
 
+    public function test_backend_rechaza_menor_de_18_y_mayor_de_50_sin_escribir(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-11-05 14:00:00'));
+        $actor = $this->actor();
+        $antes = Personal::count();
+        foreach (['2008-11-06', '1975-11-05'] as $fecha) {
+            try {
+                app(GuardarPersonalInstitucional::class)->guardar($actor, [...$this->entrada(), 'fecha_nacimiento'=>$fecha]);
+                $this->fail('La edad debe validarse sin depender del navegador.');
+            } catch (\Illuminate\Validation\ValidationException $error) {
+                $this->assertArrayHasKey('fecha_nacimiento', $error->errors());
+            }
+        }
+        $this->assertSame($antes, Personal::count());
+        $this->assertDatabaseMissing('usuarios', ['correo'=>'nuevo-personal@example.test']);
+        Mail::assertNothingSent();
+    }
+
     public function test_actor_nulo_o_inactivo_no_produce_efectos(): void
     {
         $inactivo = $this->actor(estado: 'INACTIVO');

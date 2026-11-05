@@ -25,4 +25,17 @@ final class DatosPersonalesTrabajador
             'ap_materno' => ['nullable', 'required_without:ap_paterno', 'string', 'max:80', self::SOLO_LETRAS],
         ];
     }
+
+    /** Incluye los 50 años completos; excluye desde el cumpleaños 51. */
+    public static function limitesNacimiento(): array
+    {
+        return ['min' => now()->startOfDay()->subYearsNoOverflow(51)->addDay()->toDateString(),
+            'max' => now()->startOfDay()->subYearsNoOverflow(18)->toDateString()];
+    }
+
+    public static function reglaNacimiento(): array
+    {
+        $limites = self::limitesNacimiento();
+        return ['required', 'date_format:Y-m-d', 'after_or_equal:'.$limites['min'], 'before_or_equal:'.$limites['max']];
+    }
 }

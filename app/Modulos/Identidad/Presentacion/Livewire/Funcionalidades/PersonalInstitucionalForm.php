@@ -81,6 +81,12 @@ class PersonalInstitucionalForm extends Component
     public $observaciones;
 
     // Direcciones jerárquicas
+    public ?string $pais_direccion = 'BO';
+
+    public ?string $otro_departamento = null;
+
+    public ?string $otro_municipio = null;
+
     public $ciudad_id;
 
     public $municipio_id;
@@ -221,61 +227,7 @@ class PersonalInstitucionalForm extends Component
         $this->ciudad = null;
         $this->observaciones = $personal?->observacion;
 
-        // Cargar direcciones jerárquicas usando catálogos internos
-        $direccionRaw = $personal?->direccion;
-        $ciudadRaw = null;
-        $zonaRaw = null;
-
-        $municipioNombre = '';
-        $calleNombre = '';
-        $nroCasa = '';
-
-        if ($direccionRaw && preg_match('/^DEPARTAMENTO:\s*(.*?)\s*\|\s*MUNICIPIO:\s*(.*?)\s*\|\s*ZONA:\s*(.*?)\s*\|\s*CALLE:\s*(.*?)\s*\|\s*NRO:\s*(.*)$/i', $direccionRaw, $matches)) {
-            [$ciudadRaw, $municipioNombre, $zonaRaw, $calleNombre, $nroCasa] = array_map('trim', array_slice($matches, 1));
-        } elseif ($direccionRaw && preg_match('/MUNICIPIO:\s*(.*?)\s*\|\s*CALLE:\s*(.*?)\s*\|\s*NRO:\s*(.*)/i', $direccionRaw, $matches)) {
-            $municipioNombre = trim($matches[1]);
-            $calleNombre = trim($matches[2]);
-            $nroCasa = trim($matches[3]);
-        } else {
-            $calleNombre = $direccionRaw ?: '';
-            $nroCasa = 'S/N';
-        }
-
-        $dept = collect($this->getDepartamentosCatalogo())->firstWhere('nombre', mb_strtoupper($ciudadRaw ?? ''));
-        if ($dept) {
-            $this->ciudad_id = $dept->id;
-            $this->municipios_list = $this->getMunicipiosCatalogo($dept->id);
-
-            $mun = collect($this->municipios_list)->firstWhere('nombre', mb_strtoupper($municipioNombre));
-            if ($mun) {
-                $this->municipio_id = $mun->id;
-                $this->zonas_list = $this->getZonasCatalogo($mun->id);
-
-                $zonaModel = collect($this->zonas_list)->firstWhere('nombre', mb_strtoupper($zonaRaw ?? ''));
-                if ($zonaModel) {
-                    $this->zona_id = $zonaModel->id;
-                    $this->calles_list = $this->getCallesCatalogo($zonaModel->id);
-
-                    $calleModel = collect($this->calles_list)->firstWhere('nombre', mb_strtoupper($calleNombre));
-                    if ($calleModel) {
-                        $this->calle_id = $calleModel->id;
-                    } else {
-                        if ($calleNombre) {
-                            $this->calle_id = 'OTRA';
-                            $this->otra_calle = $calleNombre;
-                        }
-                    }
-                } else {
-                    if ($zonaRaw) {
-                        $this->zona_id = 'OTRA';
-                        $this->otra_zona = $zonaRaw;
-                        $this->calle_id = 'OTRA';
-                        $this->otra_calle = $calleNombre;
-                    }
-                }
-            }
-        }
-        $this->nro_casa = $nroCasa;
+        // La dirección existente se conserva como texto, sin inferir sus componentes.
         $this->roles_seleccionados = $usuario->roles->pluck('name')->toArray();
         $this->rol_seleccionado = count($this->roles_seleccionados) > 0 ? $this->roles_seleccionados[0] : '';
         $this->matricula_prof = $personal?->matricula_profesional;
@@ -305,7 +257,7 @@ class PersonalInstitucionalForm extends Component
             'fecha_ingreso' => 'nullable|date',
             'numero_documento' => [...$internacional['numero_documento'], Rule::unique('personal', 'numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal') : null, 'cod_personal')],
             'estado' => 'required|string',
-            'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
+            'fecha_nacimiento' => DatosPersonalesTrabajador::reglaNacimiento(),
             'foto_perfil' => $this->reglaFotografia(),
             'roles_seleccionados' => 'required|array|min:1',
             'roles_seleccionados.*' => 'exists:roles,name',
@@ -346,8 +298,9 @@ class PersonalInstitucionalForm extends Component
             'genero.required' => 'El género es obligatorio.',
             'expedido.required' => 'El departamento de expedición es obligatorio.',
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.date_format' => 'Introduce una fecha válida con día, mes y año.',
             'fecha_nacimiento.before_or_equal' => 'El trabajador debe tener al menos 18 años.',
-            'fecha_nacimiento.after_or_equal' => 'La edad excede el límite permitido (100 años).',
+            'fecha_nacimiento.after_or_equal' => 'El trabajador no puede tener más de 50 años.',
             'foto_perfil.image' => 'El archivo debe ser una imagen válida.',
             'foto_perfil.mimes' => 'La foto debe ser en formato JPG, JPEG, PNG o WEBP.',
             'foto_perfil.max' => 'La fotografía no debe superar los 2MB de peso.',
@@ -386,12 +339,15 @@ class PersonalInstitucionalForm extends Component
         $this->calle_id = null;
         $this->otra_zona = null;
         $this->otra_calle = null;
+        $this->otro_departamento = null;
+        $this->otro_municipio = null;
 
         $this->municipios_list = $value
             ? $this->getMunicipiosCatalogo($value)
             : [];
         $this->zonas_list = [];
         $this->calles_list = [];
+        $this->limpiarValidacionUbicacion();
     }
 
     public function updatedMunicipioId($value)
@@ -400,11 +356,13 @@ class PersonalInstitucionalForm extends Component
         $this->calle_id = null;
         $this->otra_zona = null;
         $this->otra_calle = null;
+        $this->otro_municipio = null;
 
         $this->zonas_list = $value
             ? $this->getZonasCatalogo($value)
             : [];
         $this->calles_list = [];
+        $this->limpiarValidacionUbicacion();
     }
 
     public function updatedZonaId($value)
@@ -418,6 +376,7 @@ class PersonalInstitucionalForm extends Component
         $this->calles_list = ($value && $value !== 'OTRA')
             ? $this->getCallesCatalogo($value)
             : [];
+        $this->limpiarValidacionUbicacion();
     }
 
     public function updatedCalleId($value)
@@ -425,6 +384,69 @@ class PersonalInstitucionalForm extends Component
         if ($value !== 'OTRA') {
             $this->otra_calle = null;
         }
+        $this->limpiarValidacionUbicacion();
+    }
+
+    public function updatedPaisDireccion(): void
+    {
+        $this->ciudad_id = null;
+        $this->updatedCiudadId(null);
+        $this->departamentos_list = $this->getDepartamentosCatalogo();
+    }
+
+    private function reglasUbicacion(): array
+    {
+        return [
+            'pais_direccion' => ['required', Rule::in(array_keys(IdentificacionInternacionalPersonal::paises()))],
+            'ciudad_id' => ['required', Rule::in([...array_column($this->getDepartamentosCatalogo(), 'id'), 'OTRA'])],
+            'municipio_id' => ['required', Rule::in([...array_column($this->getMunicipiosCatalogo($this->ciudad_id), 'id'), 'OTRA'])],
+            'zona_id' => ['required', Rule::in([...array_column($this->getZonasCatalogo($this->municipio_id), 'id'), 'OTRA'])],
+            'calle_id' => ['required', Rule::in([...array_column($this->getCallesCatalogo($this->zona_id), 'id'), 'OTRA'])],
+            'otro_departamento' => ['nullable', 'required_if:ciudad_id,OTRA', 'string', 'max:60', 'not_regex:~[\r\n\x00-\x1F]~'],
+            'otro_municipio' => ['nullable', 'required_if:municipio_id,OTRA', 'string', 'max:60', 'not_regex:~[\r\n\x00-\x1F]~'],
+            'otra_zona' => ['nullable', 'required_if:zona_id,OTRA', 'string', 'max:60', 'not_regex:~[\r\n\x00-\x1F]~'],
+            'otra_calle' => ['nullable', 'required_if:calle_id,OTRA', 'string', 'max:80', 'not_regex:~[\r\n\x00-\x1F]~'],
+            'nro_casa' => ['nullable', 'string', 'max:15', 'not_regex:~[\r\n\x00-\x1F]~'],
+        ];
+    }
+
+    private function limpiarValidacionUbicacion(): void
+    {
+        $campos = array_keys($this->reglasUbicacion());
+        $this->resetValidation($campos);
+        foreach ($campos as $campo) unset($this->camposValidados[$campo]);
+    }
+
+    protected function validationAttributes(): array
+    {
+        return ['pais_direccion'=>'país de residencia', 'ciudad_id'=>'departamento o región', 'municipio_id'=>'municipio o ciudad',
+            'zona_id'=>'zona o barrio', 'calle_id'=>'calle o avenida', 'otro_departamento'=>'otro departamento o región',
+            'otro_municipio'=>'otro municipio o ciudad', 'otra_zona'=>'otra zona o barrio', 'otra_calle'=>'otra calle o avenida', 'nro_casa'=>'número de vivienda'];
+    }
+
+    public function completarDireccion(): void
+    {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null);
+        foreach (['otro_departamento', 'otro_municipio', 'otra_zona', 'otra_calle', 'nro_casa'] as $campo) {
+            if (is_string($this->{$campo})) $this->{$campo} = mb_strtoupper(trim($this->{$campo}));
+        }
+        $this->validate($this->reglasUbicacion());
+        $nombre = fn ($lista, $id, $otro) => $id === 'OTRA' ? $otro : collect($lista)->firstWhere('id', $id)->nombre;
+        $partes = [
+            $nombre($this->getCallesCatalogo($this->zona_id), $this->calle_id, $this->otra_calle),
+            filled($this->nro_casa) ? 'N.º '.$this->nro_casa : null,
+            'ZONA '.$nombre($this->getZonasCatalogo($this->municipio_id), $this->zona_id, $this->otra_zona),
+            $nombre($this->getMunicipiosCatalogo($this->ciudad_id), $this->municipio_id, $this->otro_municipio),
+            $nombre($this->getDepartamentosCatalogo(), $this->ciudad_id, $this->otro_departamento),
+            IdentificacionInternacionalPersonal::paises()[$this->pais_direccion]['nombre'],
+        ];
+        $direccion = mb_strtoupper(implode(', ', array_filter($partes)));
+        \Illuminate\Support\Facades\Validator::make(['direccion'=>$direccion], ['direccion'=>['required', 'string', 'max:255']],
+            ['direccion.max'=>'La dirección supera 255 caracteres. Abrevia sus componentes antes de aplicarla.'])->validate();
+        $this->direccion = $direccion;
+        $this->validarCampoFormulario('direccion');
+        foreach (array_keys($this->reglasUbicacion()) as $campo) $this->camposValidados[$campo] = filled($this->{$campo});
+        $this->dispatch('direccion-personal-completada');
     }
 
     public function updatedRolSeleccionado($value)
@@ -670,7 +692,7 @@ class PersonalInstitucionalForm extends Component
         return match ($paso) {
             1 => [...$internacional,'foto_perfil'=>$this->reglaFotografia(),...DatosPersonalesTrabajador::reglasNombre(),
                 'numero_documento'=>[...$internacional['numero_documento'],Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
-                'genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
+                'genero'=>'required|in:M,F','fecha_nacimiento'=>DatosPersonalesTrabajador::reglaNacimiento(),
                 'direccion'=>'required|string|max:255'],
             2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50','observaciones'=>'nullable|string'],
             3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
@@ -764,6 +786,13 @@ class PersonalInstitucionalForm extends Component
 
     private function validarCampoFormulario(string $campo): void
     {
+        $ubicacion = $this->reglasUbicacion();
+        if (array_key_exists($campo, $ubicacion)) {
+            unset($this->camposValidados[$campo]);
+            $this->validateOnly($campo, $ubicacion);
+            $this->camposValidados[$campo] = filled($this->{$campo});
+            return;
+        }
         if (in_array($campo, ['ap_paterno', 'ap_materno'], true)) {
             unset($this->camposValidados['ap_paterno'], $this->camposValidados['ap_materno']);
             $reglas = array_intersect_key(DatosPersonalesTrabajador::reglasNombre(), array_flip(['ap_paterno', 'ap_materno']));
@@ -1012,14 +1041,23 @@ class PersonalInstitucionalForm extends Component
 
     public function getDepartamentosCatalogo()
     {
+        if ($this->pais_direccion !== 'BO') return [];
         return [
             (object) ['id' => 'LPZ', 'nombre' => 'LA PAZ'],
+            (object) ['id' => 'CHQ', 'nombre' => 'CHUQUISACA'],
+            (object) ['id' => 'CBB', 'nombre' => 'COCHABAMBA'],
+            (object) ['id' => 'ORU', 'nombre' => 'ORURO'],
+            (object) ['id' => 'PTS', 'nombre' => 'POTOSÍ'],
+            (object) ['id' => 'TJA', 'nombre' => 'TARIJA'],
+            (object) ['id' => 'SCZ', 'nombre' => 'SANTA CRUZ'],
+            (object) ['id' => 'BEN', 'nombre' => 'BENI'],
+            (object) ['id' => 'PND', 'nombre' => 'PANDO'],
         ];
     }
 
     public function getMunicipiosCatalogo($deptId)
     {
-        if ($deptId === 'LPZ') {
+        if ($this->pais_direccion === 'BO' && $deptId === 'LPZ') {
             return [
                 (object) ['id' => 'MUN_LPZ', 'nombre' => 'LA PAZ'],
                 (object) ['id' => 'MUN_EAL', 'nombre' => 'EL ALTO'],
@@ -1031,6 +1069,7 @@ class PersonalInstitucionalForm extends Component
 
     public function getZonasCatalogo($munId)
     {
+        if (! in_array($munId, array_column($this->getMunicipiosCatalogo($this->ciudad_id), 'id'), true)) return [];
         if ($munId === 'MUN_LPZ') {
             return [
                 (object) ['id' => 'ZON_SUR', 'nombre' => 'ZONA SUR (OBRAJES/CALACOTO/SAN MIGUEL)'],
@@ -1053,6 +1092,7 @@ class PersonalInstitucionalForm extends Component
 
     public function getCallesCatalogo($zonaId)
     {
+        if (! in_array($zonaId, array_column($this->getZonasCatalogo($this->municipio_id), 'id'), true)) return [];
         switch ($zonaId) {
             case 'ZON_SUR':
                 return [
@@ -1083,10 +1123,7 @@ class PersonalInstitucionalForm extends Component
                     (object) ['id' => 'CAL_SAT2', 'nombre' => 'PLAN 482'],
                 ];
             default:
-                return [
-                    (object) ['id' => 'CAL_PRI', 'nombre' => 'AV. PRINCIPAL'],
-                    (object) ['id' => 'CAL_SEC', 'nombre' => 'CALLE SECUNDARIA'],
-                ];
+                return [];
         }
     }
 }

@@ -11,7 +11,7 @@ import puppeteer from 'puppeteer';
 const root = resolve(new URL('../../', import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1'));
 const chrome = [process.env.PUPPETEER_EXECUTABLE_PATH, await puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(p => p && existsSync(p));
 
-test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable', { timeout: 300000, skip: !chrome }, async t => {
+test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable', { timeout: process.env.RM_GERENCIA_QA_PERSONAL ? 600000 : 300000, skip: !chrome }, async t => {
     const db = join(tmpdir(), `remembermind-gerencia-${randomBytes(8).toString('hex')}_testing.sqlite`);
     writeFileSync(db, '', { flag: 'wx' });
     t.after(() => {
@@ -277,6 +277,36 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.waitForFunction(()=>document.querySelector('#trabajador-telefono')?.closest('.rm-field--valid'));
             assert.match(await page.$eval('#trabajador-pais-telefono-otro img',e=>e.src),/fr\.svg$/);
             await page.screenshot({path:join(personalOut,`otro-pais-${width}.png`),fullPage:true});
+            await page.focus('.rm-staff-registration__location summary');
+            await page.locator('.rm-staff-registration__location summary').click();
+            await page.waitForSelector('#direccion-pais', {visible:true});
+            assert.match(await page.$eval('#direccion-pais', e=>e.textContent), /Bolivia/, 'La residencia no cambia con el país del teléfono/documento');
+            const elegirUbicacion = async (id, valor) => {
+                await page.focus('#'+id);
+                await page.locator('#'+id).click();
+                const index = await page.$eval('#'+id+'-source',(e,valor)=>Array.from(e.options).findIndex(o=>o.value===valor),valor);
+                assert.ok(index>=0, id+': opción '+valor);
+                await page.waitForSelector('#'+id+'-op-'+index,{visible:true});
+                await page.locator('#'+id+'-op-'+index).click();
+            };
+            await elegirUbicacion('direccion-ciudad_id','LPZ');
+            await page.waitForFunction(()=>document.querySelector('#direccion-municipio_id-source option[value="MUN_LPZ"]'));
+            await elegirUbicacion('direccion-municipio_id','MUN_LPZ');
+            await page.waitForFunction(()=>document.querySelector('#direccion-zona_id-source option[value="ZON_SOP"]'));
+            await elegirUbicacion('direccion-zona_id','ZON_SOP');
+            await page.waitForFunction(()=>document.querySelector('#direccion-calle_id-source option[value="CAL_ARC"]'));
+            await elegirUbicacion('direccion-calle_id','CAL_ARC');
+            await page.waitForFunction(()=>document.querySelector('#direccion-calle_id-source')?.value==='CAL_ARC' && !document.querySelector('[data-completar-direccion]')?.disabled);
+            await page.focus('#direccion-nro-casa');
+            await page.locator('#direccion-nro-casa').fill('120'); await page.keyboard.press('Tab');
+            await page.screenshot({path:join(personalOut,`direccion-${width}.png`),fullPage:true});
+            assert.equal(await page.$eval('#trabajador-direccion',e=>e.value),'','El asistente no reemplaza el texto sin aplicarlo');
+            await page.focus('[data-completar-direccion]');
+            await page.locator('[data-completar-direccion]').click();
+            await page.waitForFunction(()=>document.querySelector('#trabajador-direccion')?.value.includes('AV. ARCE, N.º 120, ZONA SOPOCACHI'));
+            await page.waitForFunction(()=>!document.querySelector('.rm-staff-registration__location')?.open);
+            await page.screenshot({path:join(personalOut,`direccion-completada-${width}.png`),fullPage:true});
+
 
 
 

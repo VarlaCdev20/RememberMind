@@ -1,9 +1,9 @@
-@props(['label' => 'Seleccionar', 'id' => null, 'value' => null, 'autoSubmit' => false, 'teleport' => 'body', 'searchThreshold' => 15, 'searchOnly' => false])
+@props(['label' => 'Seleccionar', 'id' => null, 'value' => null, 'autoSubmit' => false, 'teleport' => 'body', 'searchThreshold' => 15, 'searchOnly' => false, 'context' => null])
 @php
     $model = $attributes->wire('model')->value();
     $controlId = $id ?: 'selector-'.str_replace('.', '-', $model ?: ($attributes->get('name') ?: uniqid()));
 @endphp
-<div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit), searchThreshold: @js((int) $searchThreshold), searchOnly: @js((bool) $searchOnly) })" @if($model) wire:key="{{ $controlId }}" @endif>
+<div {{ $attributes->only('class')->merge(['class' => 'rm-choice']) }} x-data="rmSelector(@if($model) @entangle($model) @else @js($value) @endif, { native: @js(!$model), autoSubmit: @js((bool) $autoSubmit), searchThreshold: @js((int) $searchThreshold), searchOnly: @js((bool) $searchOnly) })" @if($model) wire:key="{{ $controlId }}{{ $context !== null ? '-'.$context : '' }}" @endif>
     <select x-ref="native" {{ $attributes->except(['class', 'aria-label'])->merge(['id' => $controlId.'-source']) }} tabindex="-1" aria-hidden="true" hidden>{{ $slot }}</select>
     <button type="button" id="{{ $controlId }}" x-ref="trigger" class="rm-choice__trigger" aria-label="{{ $attributes->get('aria-label', $label) }}" aria-invalid="{{ $attributes->get('aria-invalid', 'false') }}" @if($attributes->has('aria-describedby')) aria-describedby="{{ $attributes->get('aria-describedby') }}" @endif aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $controlId }}-list" :disabled="bloqueado" @click="open ? close() : show()" @keydown.arrow-down.prevent="show()">
         <template x-if="selectedFlag"><img class="rm-choice__flag" :src="selectedFlag" alt="" aria-hidden="true" width="24" height="18"></template><span x-text="label"></span><i class="ph-bold ph-caret-down" aria-hidden="true" :class="{ 'is-open': open }"></i>

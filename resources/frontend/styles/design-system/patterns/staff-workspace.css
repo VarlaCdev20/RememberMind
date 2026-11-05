@@ -342,3 +342,13 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration-dialog .rm-staff-registration :is(input, textarea, .rm-choice__trigger) { scroll-margin-block: var(--rm-space-4); }
 
 .rm-staff-registration-dialog .rm-staff-registration__other-country { min-height: 44px; justify-content: center; font-size: var(--rm-font-size-label); box-shadow: none; color: var(--rm-primary-ink); }
+.rm-staff-registration__address { grid-column: 1 / -1; display: grid; gap: var(--rm-space-3); }
+.rm-staff-registration__location { border-top: 1px solid var(--rm-border); padding-top: var(--rm-space-2); }
+.rm-staff-registration__location summary { display: flex; align-items: center; gap: var(--rm-space-2); min-height: 44px; cursor: pointer; color: var(--rm-primary-ink); font-weight: 800; border-radius: var(--rm-radius-lg); }
+.rm-staff-registration__location summary:focus-visible { outline: 2px solid var(--rm-primary-ink); outline-offset: 2px; }
+.rm-staff-registration__location-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--rm-space-3); margin-block: var(--rm-space-3); }
+.rm-staff-registration__location-fields > * { min-width: 0; }
+.rm-staff-registration__location-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--rm-space-3); }
+.rm-staff-registration-dialog .rm-staff-registration__location-footer button { min-height: 44px; background: var(--rm-form-accent) !important; color: var(--rm-palette-petroleum-950) !important; }
+@media (max-width: 1023px) { .rm-staff-registration__location-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .rm-staff-registration__location-fields { grid-template-columns: minmax(0, 1fr); } .rm-staff-registration__location-footer button { width: 100%; } }

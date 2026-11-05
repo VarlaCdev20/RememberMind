@@ -78,7 +78,7 @@ final class GuardarPersonalInstitucional
             ...$internacional,
             'numero_documento' => [...$internacional['numero_documento'], Rule::unique('personal', 'numero_documento')->ignore($personal?->getKey(), 'cod_personal')],
             'genero' => ['required', Rule::in(['M', 'F'])],
-            'fecha_nacimiento' => ['required', 'date', 'before_or_equal:'.now()->subYears(18)->toDateString(), 'after_or_equal:'.now()->subYears(100)->toDateString()],
+            'fecha_nacimiento' => DatosPersonalesTrabajador::reglaNacimiento(),
             'direccion' => ['required', 'string', 'max:255'],
             'observaciones' => ['nullable', 'string'], 'matricula_prof' => ['nullable', 'string', 'max:50'],
             'fecha_ingreso' => ['nullable', 'date'], 'estado_personal' => ['nullable', Rule::in(['ACTIVO', 'INACTIVO'])],
