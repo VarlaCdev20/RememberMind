@@ -141,6 +141,25 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         await page.evaluate(()=>{document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');});
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Tarjetas en modo oscuro sin desbordamiento');
         await page.screenshot({path:join(personalOut,'tarjetas-390-oscuro.png'),fullPage:true});
+        for (const width of [1440,1280,1024,768,390]) {
+            await page.setViewport({width,height:960});
+            await go('/admin/personal-institucional');
+            await page.click('.rm-pagination__go');
+            await page.waitForFunction(()=>document.querySelector('.rm-pagination [aria-current="page"]')?.textContent.trim()==='1');
+            await page.click('button[wire\\:click="abrirModalNuevo"]');
+            await page.waitForSelector('.rm-staff-registration #trabajador-nombres',{visible:true});
+            const form = await page.$eval('.rm-staff-registration', e=>({
+                overflow:e.scrollWidth>e.clientWidth+1,
+                steps:e.querySelectorAll('.rm-staff-registration__step').length,
+                section:!!e.querySelector('.rm-form-section'),
+                labels:[...e.querySelectorAll('input[id],select[id],textarea[id]')].every(input=>e.querySelector(`label[for="${input.id}"]`)),
+            }));
+            await page.screenshot({path:join(personalOut,`formulario-${width}.png`),fullPage:true});
+            assert.deepEqual(form,{overflow:false,steps:4,section:true,labels:true},`Formulario ${width}`);
+            await page.click('.rm-staff-registration__footer button:first-child');
+            await page.waitForSelector('.rm-staff-registration',{hidden:true});
+            evidencia.push({width,formulario:true,...form});
+        }
         assert.deepEqual(errors,[]); assert.deepEqual(solicitudesFallidas,[]);
         writeFileSync(join(personalOut,'resultado.json'),JSON.stringify({evidencia,filtros:true,oscuro390:true,errors,solicitudesFallidas},null,2));
         return;
