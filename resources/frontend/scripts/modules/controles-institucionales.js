@@ -38,7 +38,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false, s
             const control = this.$refs.native;
             if (!control) return;
             this.bloqueado = Boolean(control.disabled);
-            this.options = Array.from(control.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled }));
+            this.options = Array.from(control.options, o => ({ value: o.value, label: o.textContent.trim(), disabled: o.disabled, flag: o.dataset?.flag || '' }));
         },
         readNativeValue() {
             this.value = this.multiple
@@ -52,6 +52,7 @@ export function rmSelector(value = null, { native = false, autoSubmit = false, s
         get hasSearch() { return this.options.filter(option => option.value !== '' && !option.disabled).length >= Math.max(2, Number(searchThreshold) || 15); },
         get multiple() { return this.$refs.native?.multiple || false; },
         selected(value) { return this.multiple ? (Array.isArray(this.value) && this.value.includes(value)) : String(this.value ?? '') === value; },
+        get selectedFlag() { return this.options.find(option => this.selected(option.value))?.flag || ''; },
         get label() {
             const chosen = this.options.filter(o => this.selected(o.value));
             return chosen.length ? chosen.map(o => o.label).join(', ') : 'Seleccionar';

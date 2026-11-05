@@ -4,7 +4,7 @@ namespace App\Modulos\Identidad\Dominio\Reglas;
 
 final class DatosPersonalesTrabajador
 {
-    public const MAYUSCULAS = ['nombres', 'ap_paterno', 'ap_materno', 'expedido', 'direccion', 'matricula_prof', 'observaciones'];
+    public const MAYUSCULAS = ['nombres', 'ap_paterno', 'ap_materno', 'expedido', 'direccion', 'matricula_prof', 'observaciones', 'numero_documento'];
     public const SOLO_LETRAS = 'regex:~^(?=.*\p{L})[\p{L}\p{M}\s\x{0027}\x{2019}-]+$~u';
 
     public static function normalizar(array $entrada): array

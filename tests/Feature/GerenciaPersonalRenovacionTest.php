@@ -30,6 +30,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        (require base_path('database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php'))->up();
         $this->seed(RolesAndPermissionsSeeder::class);
         Storage::fake('public');
         Mail::fake();
@@ -65,7 +66,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
     {
         $actor = $this->gerente();
         $resultado = app(GuardarPersonalInstitucional::class)->guardar($actor, [
-            'esEdicion' => false, 'correo' => 'alta@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
+            'esEdicion' => false, 'pais_documento' => 'BO', 'tipo_documento' => 'CI', 'pais_telefono' => 'BO', 'correo' => 'alta@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
             'nombres' => 'Persona', 'ap_paterno' => 'Sintética', 'numero_documento' => '45678910', 'expedido' => 'LP',
             'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'Dirección de prueba',
             'roles_seleccionados' => ['ADMINISTRADOR'],
@@ -150,7 +151,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->set('nombres', 'maría josé')->assertHasNoErrors(['nombres'])->assertSet('nombres', 'MARÍA JOSÉ')
             ->set('nombres', 'María123')->assertHasErrors(['nombres' => 'regex'])
             ->set('numero_documento', 'AB12345')->assertHasErrors(['numero_documento' => 'regex'])
-            ->set('expedido', 'LP3')->assertHasErrors(['expedido' => 'regex'])
+            ->set('expedido', 'LP3')->assertHasErrors(['expedido' => 'in'])
             ->set('direccion', 'calle 12')->assertSet('direccion', 'CALLE 12');
     }
 
@@ -158,7 +159,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
     {
         $actor = $this->gerente();
         $cantidad = User::count();
-        $base = ['esEdicion' => false, 'correo' => 'invalido@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
+        $base = ['esEdicion' => false, 'pais_documento' => 'BO', 'tipo_documento' => 'CI', 'pais_telefono' => 'BO', 'correo' => 'invalido@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
             'nombres' => 'María', 'ap_paterno' => 'Prueba', 'numero_documento' => '99887766', 'expedido' => 'LP',
             'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'Calle 12',
             'roles_seleccionados' => ['ADMINISTRADOR']];
@@ -181,7 +182,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
     {
         $actor = $this->gerente();
         $resultado = app(GuardarPersonalInstitucional::class)->guardar($actor, [
-            'esEdicion' => false, 'correo' => 'MATERNO@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
+            'esEdicion' => false, 'pais_documento' => 'BO', 'tipo_documento' => 'CI', 'pais_telefono' => 'BO', 'correo' => 'MATERNO@remembermind.test', 'contrasena_temporal' => 'Sintetica#12345',
             'nombres' => 'maría josé', 'ap_materno' => 'muñoz', 'numero_documento' => '99123456', 'expedido' => 'lp',
             'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'calle 12',
             'roles_seleccionados' => ['ADMINISTRADOR'],
@@ -284,6 +285,28 @@ class GerenciaPersonalRenovacionTest extends TestCase
         Storage::disk('public')->assertExists($foto);
         $this->assertDatabaseHas('personal', ['nombres' => 'ALTA SINTÉTICA', 'numero_documento' => '56789123']);
         $this->assertDatabaseCount('documentos', 3);
+    }
+
+    public function test_pais_documento_y_prefijo_telefonico_se_conservan_al_editar(): void
+    {
+        $actor = $this->gerente();
+        $usuario = app(GuardarPersonalInstitucional::class)->guardar($actor, [
+            'esEdicion'=>false,'pais_documento'=>'PE','tipo_documento'=>'DNI','pais_telefono'=>'CL',
+            'correo'=>'extranjero@remembermind.test','contrasena_temporal'=>'Sintetica#12345',
+            'nombres'=>'Persona','ap_paterno'=>'Prueba','numero_documento'=>'88994455','expedido'=>null,
+            'fecha_nacimiento'=>'1990-01-01','genero'=>'F','telefono'=>'912345678','direccion'=>'Calle de prueba',
+            'roles_seleccionados'=>['ADMINISTRADOR'],
+            'archivos_temporales'=>['CI'=>UploadedFile::fake()->create('identidad.pdf',10,'application/pdf'),
+                'FOTO_DOC'=>UploadedFile::fake()->image('foto.jpg'),'CV'=>UploadedFile::fake()->create('cv.pdf',10,'application/pdf')],
+        ])['usuario'];
+        $this->assertDatabaseHas('personal',['cod_usuario'=>$usuario->getKey(),'pais_documento'=>'PE','tipo_documento'=>'DNI',
+            'pais_telefono'=>'CL','telefono'=>'+56912345678','expedicion_documento'=>null]);
+        Livewire::test(PersonalInstitucionalForm::class,['usuarioId'=>$usuario->getKey()])
+            ->assertSet('pais_documento','PE')->assertSet('tipo_documento','DNI')->assertSet('pais_telefono','CL')
+            ->assertSet('telefono','912345678')->assertDontSee('id="trabajador-expedido"',false)
+            ->set('pais_documento','BO')->assertSet('tipo_documento','CI')->assertSee('Departamento de expedición')
+            ->set('expedido','LP')->set('pais_documento','PE')->assertSet('expedido',null)
+            ->set('numero_documento','1234567')->assertHasErrors(['numero_documento']);
     }
 
     public function test_recuperacion_gerencial_reutiliza_broker_sin_cambiar_password_y_limita_reintentos(): void

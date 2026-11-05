@@ -9,7 +9,7 @@
    @endif
   </x-ui.modal-livewire>
  @else
-  <div x-data="{ open: true }" x-trap.noscroll="open" class="rm-staff-overlay fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 px-4 backdrop-blur-sm sm:p-6">
+  <div id="gerencia-personal-editor-superadmin" x-data="{ open: true }" x-trap.noscroll="open" class="rm-staff-overlay fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 px-4 backdrop-blur-sm sm:p-6">
   <div class="rm-staff-dialog relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] border border-borde bg-fondo-card shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="staff-dialog-title">
    <div class="rm-staff-dialog__header sticky top-0 z-10 flex items-center justify-between border-b border-borde bg-fondo-card px-8 py-5">
    <div class="flex min-w-0 items-center gap-4">

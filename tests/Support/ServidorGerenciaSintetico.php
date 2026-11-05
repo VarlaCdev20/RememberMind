@@ -62,6 +62,7 @@ if ($preparar) {
     if (filesize($archivo) !== 0) throw new RuntimeException('Solo se prepara una base temporal nueva y vacía.');
     $app->make(Kernel::class)->bootstrap();
     Artisan::call('migrate', ['--force'=>true]);
+    if (getenv('RM_GERENCIA_QA_PERSONAL')==='1') (require $raiz.'/database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php')->up();
     if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php')->up();
     if (getenv('RM_GERENCIA_QA_HISTORIA')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php')->up();
     Artisan::call('db:seed', ['--class'=>Database\Seeders\RolesAndPermissionsSeeder::class,'--force'=>true]);

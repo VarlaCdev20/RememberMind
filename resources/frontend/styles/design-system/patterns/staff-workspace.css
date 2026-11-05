@@ -331,3 +331,12 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 .rm-staff-registration-dialog .rm-staff-registration textarea { resize: none; }
 .rm-staff-registration__surname-help { grid-column: 1 / -1; margin: 0; }
+
+.rm-staff-registration-dialog .rm-choice__trigger { min-height: 58px; font-family: var(--rm-font-family); font-size: calc(var(--rm-font-size-section) + 1px); border-radius: var(--rm-radius-xl); background: var(--rm-form-input); box-shadow: none; }
+.rm-staff-registration-dialog .rm-control-popover { font-family: var(--rm-font-family); background: var(--rm-form-panel); }
+.rm-staff-registration__phone { position: relative; min-width: 0; }
+.rm-staff-registration__phone > span { position: absolute; inset-inline-start: var(--rm-space-3); top: 50%; transform: translateY(-50%); z-index: 1; font-weight: 800; color: var(--rm-primary-ink); pointer-events: none; }
+.rm-staff-registration-dialog .rm-staff-registration__phone .rm-input { padding-inline-start: 68px; }
+
+.rm-staff-registration-dialog .rm-modal-body { scroll-padding-block: 24px 96px; }
+.rm-staff-registration-dialog .rm-staff-registration :is(input, textarea, .rm-choice__trigger) { scroll-margin-block: var(--rm-space-4); }

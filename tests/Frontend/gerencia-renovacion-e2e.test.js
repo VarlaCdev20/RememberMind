@@ -180,7 +180,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
                 overflow:e.scrollWidth>e.clientWidth+1,
                 steps:e.querySelectorAll('.rm-staff-registration__step').length,
                 section:!!e.querySelector('.rm-form-section'),
-                labels:[...e.querySelectorAll('input[id],select[id],textarea[id]')].every(input=>e.querySelector(`label[for="${input.id}"]`)),
+                labels:[...e.querySelectorAll('input[id],select[id],textarea[id]')].filter(input=>!input.hidden).every(input=>e.querySelector(`label[for="${input.id}"]`)),
             }));
             await page.screenshot({path:join(personalOut,`formulario-${width}.png`),fullPage:true});
             assert.deepEqual(form,{overflow:false,steps:4,section:true,labels:true},`Formulario ${width}`);
@@ -229,6 +229,27 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             assert.equal(focoInvalido.focused,true); assert.equal(focoInvalido.outline,focoInvalido.border);
             assert.equal(focoInvalido.offset,'0px'); assert.equal(focoInvalido.shadow,'none');
             await page.screenshot({path:join(personalOut,`validacion-${width}.png`),fullPage:true});
+            await page.click('#trabajador-pais-documento');
+            await page.waitForSelector('#trabajador-pais-documento-op-5',{visible:true});
+            await page.click('#trabajador-pais-documento-op-5');
+            await page.waitForFunction(()=>!document.getElementById('trabajador-expedido') && document.querySelector('#trabajador-numero_documento')?.maxLength===8);
+            assert.match(await page.$eval('#trabajador-pais-documento',e=>e.textContent),/Perú/);
+            assert.match(await page.$eval('#trabajador-pais-documento img',e=>e.src),/pe\.svg$/);
+            await page.focus('#trabajador-pais-telefono');
+            await page.click('#trabajador-pais-telefono');
+            await page.waitForSelector('#trabajador-pais-telefono-op-4',{visible:true}).catch(async error=>{
+                error.message += ' ' + await page.$eval('#trabajador-pais-telefono',e=>JSON.stringify({width:innerWidth,expanded:e.getAttribute('aria-expanded'),source:document.getElementById('trabajador-pais-telefono-source')?.outerHTML,popup:document.getElementById('trabajador-pais-telefono-list')?.parentElement.outerHTML.slice(0,1800)}));
+                await page.screenshot({path:join(personalOut,'error-selector-pais.png'),fullPage:true}); throw error;
+            });
+            await page.click('#trabajador-pais-telefono-op-4');
+            await page.waitForFunction(()=>document.querySelector('.rm-staff-registration__phone > span')?.textContent==='+56' && document.querySelector('#trabajador-telefono')?.maxLength===9);
+            await page.click('#trabajador-genero');
+            await page.waitForSelector('#trabajador-genero-op-1',{visible:true});
+            await page.click('#trabajador-genero-op-1');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-genero')?.textContent.includes('Femenino') && document.querySelector('#trabajador-genero')?.getAttribute('aria-invalid')==='false' && document.querySelector('#trabajador-genero')?.closest('.rm-field--valid'));
+            assert.equal(await page.$eval('#trabajador-telefono',e=>e.getAttribute('aria-invalid')),'true','Cambiar país revalida el número ya escrito');
+            await page.screenshot({path:join(personalOut,`paises-${width}.png`),fullPage:true});
+
 
             await page.click('.rm-staff-registration__footer button:first-child');
             await page.waitForSelector('.rm-staff-registration',{hidden:true});

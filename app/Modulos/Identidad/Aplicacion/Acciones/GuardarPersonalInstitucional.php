@@ -14,6 +14,8 @@ use App\Modulos\Identidad\Dominio\Reglas\DatosPersonalesTrabajador;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
+use App\Modulos\Identidad\Dominio\Reglas\IdentificacionInternacionalPersonal;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -68,13 +70,16 @@ final class GuardarPersonalInstitucional
         if (is_string($foto) && $edicion && $foto === $usuario->foto) {
             $foto = null;
         }
+        abort_unless(Schema::hasColumns('personal', ['pais_documento', 'tipo_documento', 'pais_telefono']), 409, 'La ampliación aprobada de países debe instalarse antes de guardar personal.');
+        $internacional = IdentificacionInternacionalPersonal::reglas($entrada['pais_documento'] ?? null, $entrada['tipo_documento'] ?? null, $entrada['pais_telefono'] ?? null);
         $datos = Validator::make([...$entrada, 'foto_perfil' => $foto], [
             ...DatosPersonalesTrabajador::reglasNombre(),
             'correo' => ['required', 'email', 'max:120', Rule::unique('usuarios', 'correo')->ignore($usuario->getKey(), 'cod_usuario')],
-            'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore($personal?->getKey(), 'cod_personal')],
-            'expedido' => ['required', 'string', 'max:20', DatosPersonalesTrabajador::SOLO_LETRAS], 'genero' => ['required', Rule::in(['M', 'F'])],
+            ...$internacional,
+            'numero_documento' => [...$internacional['numero_documento'], Rule::unique('personal', 'numero_documento')->ignore($personal?->getKey(), 'cod_personal')],
+            'genero' => ['required', Rule::in(['M', 'F'])],
             'fecha_nacimiento' => ['required', 'date', 'before_or_equal:'.now()->subYears(18)->toDateString(), 'after_or_equal:'.now()->subYears(100)->toDateString()],
-            'telefono' => ['required', 'regex:/^[67][0-9]{7}$/'], 'direccion' => ['required', 'string', 'max:255'],
+            'direccion' => ['required', 'string', 'max:255'],
             'observaciones' => ['nullable', 'string'], 'matricula_prof' => ['nullable', 'string', 'max:50'],
             'fecha_ingreso' => ['nullable', 'date'], 'estado_personal' => ['nullable', Rule::in(['ACTIVO', 'INACTIVO'])],
             'roles_seleccionados' => ['required', 'array', $edicion && ! $cambiaRoles ? 'min:1' : 'size:1'],
@@ -97,7 +102,8 @@ final class GuardarPersonalInstitucional
             $faltantes = [];
             foreach ($catalogo as $documento) {
                 if ($documento['tipo'] === 'ingresante' && $documento['obligatorio_inmediato'] && ! isset($uploads[$documento['id']])) {
-                    $faltantes['archivos_temporales.'.$documento['id']] = 'Adjunte '.$documento['nombre'].'.';
+                    $nombreRespaldo = $documento['id'] === 'CI' && $datos['tipo_documento'] !== 'CI' ? 'documento de identidad ('.$datos['tipo_documento'].')' : $documento['nombre'];
+                    $faltantes['archivos_temporales.'.$documento['id']] = 'Adjunte '.$nombreRespaldo.'.';
                 }
             }
         }
@@ -152,8 +158,9 @@ final class GuardarPersonalInstitucional
                 $personal = Personal::query()->where('cod_usuario', $usuario->getKey())->lockForUpdate()->first() ?? new Personal(['cod_personal' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('personal'), 'cod_usuario' => $usuario->getKey()]);
                 $personal->fill(['nombres' => mb_strtoupper(trim($datos['nombres'])), 'apellido_paterno' => mb_strtoupper(trim($datos['ap_paterno'] ?? '')),
                     'apellido_materno' => filled($datos['ap_materno'] ?? null) ? mb_strtoupper(trim($datos['ap_materno'])) : null,
-                    'numero_documento' => $datos['numero_documento'], 'expedicion_documento' => $datos['expedido'],
-                    'fecha_nacimiento' => $datos['fecha_nacimiento'], 'genero' => $datos['genero'], 'telefono' => $datos['telefono'],
+                    'numero_documento' => $datos['numero_documento'], 'expedicion_documento' => $datos['expedido'] ?? null,
+                    'pais_documento' => $datos['pais_documento'], 'tipo_documento' => $datos['tipo_documento'], 'pais_telefono' => $datos['pais_telefono'],
+                    'fecha_nacimiento' => $datos['fecha_nacimiento'], 'genero' => $datos['genero'], 'telefono' => IdentificacionInternacionalPersonal::telefonoInternacional($datos['pais_telefono'], $datos['telefono']),
                     'direccion' => $datos['direccion'], 'profesion' => $personal->exists && ! $cambiaRoles ? $personal->profesion : $roles[0], 'matricula_profesional' => $datos['matricula_prof'] ?? null,
                     'observacion' => $datos['observaciones'] ?? null]);
                 if (array_key_exists('fecha_ingreso', $datos)) {

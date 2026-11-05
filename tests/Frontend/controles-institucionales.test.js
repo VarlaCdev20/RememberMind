@@ -149,3 +149,12 @@ test('tema sincroniza otras ventanas e ignora preferencias inválidas', () => {
     f.listeners.get('storage')({ key: 'remembermind-theme' });
     assert.equal(f.document.documentElement.dataset.theme, 'dark');
 });
+
+test('selector conserva bandera local y la actualiza con el valor seleccionado', () => {
+    const selector = rmSelector('BO');
+    selector.options = [{value:'BO',label:'Bolivia',flag:'/images/flags/bo.svg'}, {value:'PE',label:'Perú',flag:'/images/flags/pe.svg'}];
+    selector.$refs = {native:{multiple:false}};
+    assert.equal(selector.selectedFlag,'/images/flags/bo.svg');
+    selector.value = 'PE'; assert.equal(selector.selectedFlag,'/images/flags/pe.svg');
+    selector.value = ''; assert.equal(selector.selectedFlag,'');
+});

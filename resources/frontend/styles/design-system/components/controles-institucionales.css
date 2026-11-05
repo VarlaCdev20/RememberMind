@@ -35,3 +35,6 @@
 .rm-date-picker footer { display: flex; justify-content: space-between; gap: 5px; padding-top: 10px; margin-top: 8px; border-top: 1px solid var(--rm-border); }
 .rm-date-picker footer button { min-height: 36px; padding: 5px 8px; border-radius: var(--rm-radius-md); font-size: var(--rm-text-xs); font-weight: 700; color: var(--rm-primary-ink); }
 @media (prefers-reduced-motion: reduce) { .rm-choice *, .rm-control-popover * { transition: none !important; animation: none !important; transform: none !important; } }
+
+.rm-choice__flag { width: 24px; height: 18px; flex: 0 0 24px; object-fit: cover; border-radius: 2px; }
+.rm-choice__option-label { flex: 1; }

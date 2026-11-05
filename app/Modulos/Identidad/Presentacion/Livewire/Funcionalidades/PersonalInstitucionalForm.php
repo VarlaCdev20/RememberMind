@@ -3,6 +3,7 @@
 namespace App\Modulos\Identidad\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Area;
+use App\Modulos\Identidad\Dominio\Reglas\IdentificacionInternacionalPersonal;
 use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\GuardarPersonalInstitucional;
@@ -30,6 +31,9 @@ class PersonalInstitucionalForm extends Component
     #[Locked] public $usuarioId;
 
     public $esEdicion = false;
+    public ?string $pais_documento = 'BO';
+    public ?string $tipo_documento = 'CI';
+    public ?string $pais_telefono = 'BO';
 
     #[Locked]
     public array $camposValidados = [];
@@ -51,8 +55,6 @@ class PersonalInstitucionalForm extends Component
     public $ap_materno;
 
     public $numero_documento;
-
-    public $tipo_documento = 'CI';
 
     public $expedido;
 
@@ -275,6 +277,13 @@ class PersonalInstitucionalForm extends Component
         $this->roles_seleccionados = $usuario->roles->pluck('name')->toArray();
         $this->rol_seleccionado = count($this->roles_seleccionados) > 0 ? $this->roles_seleccionados[0] : '';
         $this->matricula_prof = $personal?->matricula_profesional;
+        $this->pais_documento = $personal?->pais_documento;
+        $this->tipo_documento = $personal?->tipo_documento;
+        $this->pais_telefono = $personal?->pais_telefono;
+        $prefijo = IdentificacionInternacionalPersonal::PAISES[$this->pais_telefono]['codigo'] ?? null;
+        if ($prefijo && str_starts_with($this->telefono ?? '', $prefijo)) {
+            $this->telefono = substr($this->telefono, strlen($prefijo));
+        }
         foreach ($usuario->documentos->whereNotIn('estado', ['ANULADO', 'ANULADA', 'REEMPLAZADO']) as $documento) {
             $this->estado_documentos[$documento->tipo_documento] = $documento->estado;
         }
@@ -284,11 +293,13 @@ class PersonalInstitucionalForm extends Component
 
     protected function rules()
     {
+        $internacional = IdentificacionInternacionalPersonal::reglas($this->pais_documento, $this->tipo_documento, $this->pais_telefono);
         return [
+            ...$internacional,
             ...DatosPersonalesTrabajador::reglasNombre(),
             'correo' => 'required|email|max:120|unique:usuarios,correo,'.$this->usuarioId.',cod_usuario',
             'fecha_ingreso' => 'nullable|date',
-            'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal') : null, 'cod_personal')],
+            'numero_documento' => [...$internacional['numero_documento'], Rule::unique('personal', 'numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal') : null, 'cod_personal')],
             'estado' => 'required|string',
             'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
             'foto_perfil' => $this->reglaFotografia(),
@@ -304,9 +315,16 @@ class PersonalInstitucionalForm extends Component
             'nombres.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
             'ap_paterno.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
             'ap_materno.regex' => 'Usa solo letras, espacios, guiones o apóstrofos.',
-            'expedido.regex' => 'Usa solo letras para el lugar de expedición.',
+            'pais_documento.required' => 'Selecciona el país emisor del documento.',
+            'pais_documento.in' => 'Selecciona un país disponible.',
+            'tipo_documento.required' => 'Selecciona el tipo de documento.',
+            'tipo_documento.in' => 'El tipo de documento no corresponde al país seleccionado.',
+            'pais_telefono.required' => 'Selecciona el país del celular.',
+            'pais_telefono.in' => 'Selecciona un país disponible.',
+            'expedido.in' => 'Selecciona un departamento de expedición válido.',
+            'expedido.prohibited' => 'La expedición departamental solo corresponde al CI de Bolivia.',
             'telefono.required' => 'El celular es obligatorio.',
-            'telefono.regex' => 'Escribe 8 dígitos, empezando por 6 o 7.',
+            'telefono.regex' => $this->pais_telefono === 'BO' ? 'Escribe 8 dígitos, empezando por 5, 6 o 7.' : 'El celular no tiene el formato del país seleccionado.',
             'direccion.required' => 'La dirección es obligatoria.',
             'roles_seleccionados.size' => 'Selecciona una función institucional.',
             'contrasena_temporal.required' => 'La contraseña temporal es obligatoria.',
@@ -319,7 +337,7 @@ class PersonalInstitucionalForm extends Component
             'ap_paterno.required_without' => 'Escribe al menos uno de los dos apellidos.',
             'ap_materno.required_without' => 'Escribe al menos uno de los dos apellidos.',
             'numero_documento.required' => 'El CI es obligatorio.',
-            'numero_documento.regex' => 'El documento de identidad debe contener solo números y tener entre 5 y 10 dígitos.',
+            'numero_documento.regex' => IdentificacionInternacionalPersonal::formato($this->pais_documento, $this->tipo_documento)['ayuda'],
             'numero_documento.unique' => 'Este CI ya se encuentra registrado.',
             'genero.required' => 'El género es obligatorio.',
             'expedido.required' => 'El departamento de expedición es obligatorio.',
@@ -644,11 +662,12 @@ class PersonalInstitucionalForm extends Component
 
     private function reglasPaso(int $paso): array
     {
+        $internacional = IdentificacionInternacionalPersonal::reglas($this->pais_documento, $this->tipo_documento, $this->pais_telefono);
         return match ($paso) {
-            1 => ['foto_perfil'=>$this->reglaFotografia(),...DatosPersonalesTrabajador::reglasNombre(),
-                'numero_documento'=>['required','regex:/^[0-9]{5,10}$/',Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
-                'expedido'=>['required','string','max:20',DatosPersonalesTrabajador::SOLO_LETRAS],'genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
-                'telefono'=>['required','regex:/^[67][0-9]{7}$/'],'direccion'=>'required|string|max:255'],
+            1 => [...$internacional,'foto_perfil'=>$this->reglaFotografia(),...DatosPersonalesTrabajador::reglasNombre(),
+                'numero_documento'=>[...$internacional['numero_documento'],Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
+                'genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
+                'direccion'=>'required|string|max:255'],
             2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50','observaciones'=>'nullable|string'],
             3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
                 'contrasena_temporal'=>($this->esEdicion ? 'nullable' : 'required').'|string|min:12|max:72'],
@@ -673,6 +692,34 @@ class PersonalInstitucionalForm extends Component
         }
         return $reglas;
     }
+
+    public function updatedPaisDocumento(): void
+    {
+        $this->tipo_documento = IdentificacionInternacionalPersonal::PAISES[$this->pais_documento]['doc'] ?? null;
+        $this->expedido = null;
+        $this->resetValidation(['pais_documento', 'tipo_documento', 'numero_documento', 'expedido']);
+        foreach (['tipo_documento', 'numero_documento', 'expedido'] as $campo) unset($this->camposValidados[$campo]);
+        if (filled($this->numero_documento)) $this->validarCampoFormulario('numero_documento');
+    }
+
+    public function updatedTipoDocumento(): void
+    {
+        if ($this->pais_documento !== 'BO' || $this->tipo_documento !== 'CI') $this->expedido = null;
+        $this->resetValidation(['numero_documento', 'expedido']);
+        unset($this->camposValidados['numero_documento'], $this->camposValidados['expedido']);
+        if (filled($this->numero_documento)) $this->validarCampoFormulario('numero_documento');
+    }
+
+    public function updatedPaisTelefono(): void
+    {
+        $this->resetValidation('telefono');
+        unset($this->camposValidados['telefono']);
+        if (filled($this->telefono)) $this->validarCampoFormulario('telefono');
+    }
+
+    public function getPaisesProperty(): array { return IdentificacionInternacionalPersonal::PAISES; }
+    public function getTiposDocumentoProperty(): array { return IdentificacionInternacionalPersonal::tipos($this->pais_documento); }
+    public function getFormatoDocumentoProperty(): array { return IdentificacionInternacionalPersonal::formato($this->pais_documento, $this->tipo_documento); }
 
     public function updated(string $campo): void
     {
@@ -832,7 +879,7 @@ class PersonalInstitucionalForm extends Component
         $estadoDocumental = $this->determinarEstadoDocumental();
 
         try {
-            $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad]);
+            $resultado = app(GuardarPersonalInstitucional::class)->guardar(auth()->user(), ['esEdicion' => $this->esEdicion, 'usuarioId' => $this->usuarioId, 'contrasena_temporal' => $this->contrasena_temporal, 'forzar_cambio_password' => $this->forzar_cambio_password, 'fecha_registro' => $this->fecha_registro, 'hora_registro' => $this->hora_registro, 'fecha_ingreso' => $this->fecha_ingreso, 'nombres' => $this->nombres, 'ap_paterno' => $this->ap_paterno, 'ap_materno' => $this->ap_materno, 'correo' => $this->correo, 'telefono' => $this->telefono, 'pais_documento' => $this->pais_documento, 'tipo_documento' => $this->tipo_documento, 'pais_telefono' => $this->pais_telefono, 'numero_documento' => $this->numero_documento, 'expedido' => $this->expedido, 'fecha_nacimiento' => $this->fecha_nacimiento, 'genero' => $this->genero, 'estado' => $this->estado, 'observaciones' => $this->observaciones, 'direccion' => $this->direccion, 'zona' => $this->zona, 'ciudad' => $this->ciudad, 'cod_area' => $this->cod_area, 'foto_perfil' => $this->foto_perfil, 'roles_seleccionados' => $this->roles_seleccionados, 'documentos_configurados' => $this->documentos_configurados, 'estado_documentos' => $this->estado_documentos, 'archivos_temporales' => $this->archivos_temporales, 'observacion_documentos' => $this->observacion_documentos, 'tempId' => $this->tempId, 'institucion_formacion' => $this->institucion_formacion, 'matricula_prof' => $this->matricula_prof, 'anios_exp' => $this->anios_exp, 'subtipo_enfermeria' => $this->subtipo_enfermeria, 'nivel_responsabilidad' => $this->nivel_responsabilidad]);
             $usuario = $resultado['usuario'];
 
             if (app(AutorizarGestionPersonal::class)->esGerencia(auth()->user())) {

@@ -27,6 +27,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        (require base_path('database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php'))->up();
         Storage::fake('public');
         Mail::fake();
         Role::findOrCreate('ADMINISTRADOR', 'web');
@@ -45,7 +46,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
 
     private function entrada(): array
     {
-        return ['esEdicion' => false, 'usuarioId' => null, 'correo' => 'nuevo-personal@example.test', 'contrasena_temporal' => 'ClaveSintetica#123',
+        return ['esEdicion' => false, 'pais_documento' => 'BO', 'tipo_documento' => 'CI', 'pais_telefono' => 'BO', 'usuarioId' => null, 'correo' => 'nuevo-personal@example.test', 'contrasena_temporal' => 'ClaveSintetica#123',
             'nombres' => 'Ana', 'ap_paterno' => 'Flores', 'ap_materno' => 'Rojas', 'numero_documento' => '12345678', 'expedido' => 'LP',
             'fecha_nacimiento' => '1990-01-01', 'genero' => 'F', 'telefono' => '77712345', 'direccion' => 'Dirección sintética',
             'estado' => 'ACTIVO', 'roles_seleccionados' => ['ADMINISTRADOR'], 'matricula_prof' => 'MAT_SINTETICA',
@@ -163,7 +164,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
     {
         $actor = $this->actor();
         $antes = User::count();
-        foreach ([['ap_paterno' => null], ['archivos_temporales' => []], ['roles_seleccionados' => 'ADMINISTRADOR']] as $invalido) {
+        foreach ([['ap_paterno' => null, 'ap_materno' => null], ['archivos_temporales' => []], ['roles_seleccionados' => 'ADMINISTRADOR']] as $invalido) {
             try {
                 app(GuardarPersonalInstitucional::class)->guardar($actor, [...$this->entrada(), ...$invalido]);
                 $this->fail('Debe rechazarse el registro incompleto.');
