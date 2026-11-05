@@ -32,3 +32,11 @@ Son fuentes de referencia visual, no pantallas restauradas. Los archivos termina
 Originales encontrados y preservados. Fuente vigente: instrucciones de la propietaria, AGENTS y flujo institucional; Git aporta evidencia histórica, no autorización funcional. Se verificó procedencia de archivos y rutas registradas con `route:list`; no se ejecutaron tests, build ni operaciones de datos porque no se cambió producto.
 
 La depuración global sigue pendiente de clasificar cada consumidor y sus sustitutos vigentes. La referencia visual exacta que recuerda la propietaria sigue sin identificación definitiva entre estos candidatos. No se borraron vistas ni cambios previos.
+
+## Galería local implementada
+
+Ruta GET /admin/referencias-formularios, con sesión, cuenta activa y permiso existente personal_institucional.ver; el controlador devuelve404 fuera de local/testing. No hay endpoints de escritura ni permisos nuevos. Incluye los tres diseños y19 apartados, selector de referencia, navegación entre pasos y botón de retorno a Personal.
+
+La exportación scripts/generar-referencias-formularios.php lee revisiones fijas de Git, extrae los apartados y elimina Blade, scripts, atributos de acciones, enlaces y datos dinámicos. Los controles quedan desactivados. Los fragmentos generados son referencia estática; conservan distribución/clases históricas con CSS actual, no equivalencia exacta con el acabado de2026. Catálogos y datos dependientes de backend se muestran vacíos, y esto se informa en la vista. No se reactivan operaciones antiguas ni el alta directa de residentes.
+
+Pruebas: ReferenciasFormulariosTest,4 pruebas/108 aserciones: acceso, permiso, bloqueo en producción,19 apartados y controles inertes. E2E de referencias PASS,95 combinaciones (19 apartados en1440/1280/1024/768/390 px), sin overflow, texto de backend, controles activos o errores JS/HTTP. Se detectó y corrigió la botonera histórica sobrante que desbordaba en390 px. Build correcto. Capturas sintéticas en output/auditoria-integral-20261025/gerencia-renovada/referencias-formularios; inspeccionadas en escritorio y móvil. Sin cambios de BDD ni datos reales. CI completa no ejecutada. La depuración global de vistas sigue separada y pendiente.

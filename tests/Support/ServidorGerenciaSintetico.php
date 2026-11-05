@@ -37,6 +37,7 @@ if (!$preparar) {
     $estatico = realpath($raiz.'/public'.rawurldecode($ruta));
     if ($estatico && str_starts_with($estatico, realpath($raiz.'/public').DIRECTORY_SEPARATOR) && is_file($estatico)) return false;
     if (!in_array($ruta, ['/dashboard','/cambiar-contrasena-inicial','/admin/personal-institucional','/admin/personal-documentacion','/admin/turnos-asignaciones','/admin/areas-institucionales','/admin/cobertura-equipo','/admin/residentes','/admin/alertas-clinicas','/admin/galeria'], true)
+        && !(getenv('RM_GERENCIA_QA_REFERENCIAS') === '1' && $ruta === '/admin/referencias-formularios')
         && !str_starts_with($ruta, '/admin/reportes/institucional')
         && $ruta !== '/admin/familia-social/red-apoyo'
         && !str_starts_with($ruta, '/admin/galeria/fotografias/')

@@ -108,6 +108,9 @@ return [
         Route::get('/{documento}/imprimir', [DocumentosUsuarioController::class, 'imprimirDocumento'])->name('imprimir');
     },
     'ruta_031' => static function (): void {
+        Route::get('/referencias-formularios', \App\Modulos\Identidad\Presentacion\Http\Controllers\ReferenciasFormulariosController::class)
+            ->middleware('permission:personal_institucional.ver')
+            ->name('referencias-formularios');
         Route::get('/personal-documentacion', \App\Modulos\Identidad\Presentacion\Livewire\Paginas\DocumentacionPersonalPanel::class)
             ->name('personal.documentacion');
         Route::get('/personal-documentacion/archivos/{documento}', \App\Modulos\Identidad\Presentacion\Http\Controllers\ArchivoDocumentalPersonalController::class)

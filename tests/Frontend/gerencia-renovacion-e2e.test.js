@@ -96,6 +96,33 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         rutas.push(['documentacion','/admin/personal-documentacion']);
     }
     const evidencia=[];
+    if (process.env.RM_GERENCIA_QA_REFERENCIAS) {
+        const refs = [['adulto','Registro de Admisión',6],['personal-pagina','Registro de Personal',6],['personal-modal','Registrar Personal Institucional',7]];
+        const galleryOut=join(out,'referencias-formularios'); mkdirSync(galleryOut,{recursive:true});
+        for (const width of [1440,1280,1024,768,390]) {
+            await page.setViewport({width,height:960}); await go('/admin/referencias-formularios');
+            for (const [key,title,total] of refs) {
+                await page.click(`[data-reference-choice="${key}"]`);
+                for(let step=1;step<=total;step++) {
+                    await page.click(`.rm-reference-gallery__steps[aria-label="Apartados de ${title}"] button:nth-child(${step})`);
+                    const selector=`[data-reference-step="${key}-${step}"]`;
+                    await page.waitForSelector(selector,{visible:true});
+                    const proof=await page.$eval(selector,e=>({
+                        pageOverflow:document.documentElement.scrollWidth>innerWidth+1,
+                        previewOverflow:e.scrollWidth>e.clientWidth+1,
+                        inert:[...e.querySelectorAll('input,select,textarea,button')].every(c=>c.disabled),
+                        backendText:/\$this|@foreach|@endif|\[object Object\]/.test(e.textContent),
+                    }));
+                    assert.deepEqual(proof,{pageOverflow:false,previewOverflow:false,inert:true,backendText:false},`${key}/${step}/${width}`);
+                    evidencia.push({width,key,step,...proof});
+                    if(step===1||width===1440) await page.screenshot({path:join(galleryOut,`${key}-${step}-${width}.png`),fullPage:true});
+                }
+            }
+        }
+        assert.deepEqual(errors,[]); assert.deepEqual(solicitudesFallidas,[]);
+        writeFileSync(join(galleryOut,'resultado.json'),JSON.stringify({evidencia,errors,solicitudesFallidas},null,2));
+        return;
+    }
     if (process.env.RM_GERENCIA_QA_PERSONAL) {
         const personalOut = join(out, 'personal-unificado'); mkdirSync(personalOut, {recursive:true});
         for (const width of [1440,1280,1024,768,390]) {
