@@ -309,7 +309,7 @@ class PersonalInstitucionalForm extends Component
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date_format' => 'Introduce una fecha válida con día, mes y año.',
             'fecha_nacimiento.before_or_equal' => 'El trabajador debe tener al menos 18 años.',
-            'fecha_nacimiento.after_or_equal' => 'El trabajador no puede tener más de 50 años.',
+            'fecha_nacimiento.after_or_equal' => 'El trabajador no puede tener más de 60 años.',
             'foto_perfil.image' => 'El archivo debe ser una imagen válida.',
             'foto_perfil.mimes' => 'La foto debe ser en formato JPG, JPEG, PNG o WEBP.',
             'foto_perfil.max' => 'La fotografía no debe superar los 2MB de peso.',

@@ -26,10 +26,10 @@ final class DatosPersonalesTrabajador
         ];
     }
 
-    /** Incluye los 50 años completos; excluye desde el cumpleaños 51. */
+    /** Incluye los 60 años completos; excluye desde el cumpleaños 61. */
     public static function limitesNacimiento(): array
     {
-        return ['min' => now()->startOfDay()->subYearsNoOverflow(51)->addDay()->toDateString(),
+        return ['min' => now()->startOfDay()->subYearsNoOverflow(61)->addDay()->toDateString(),
             'max' => now()->startOfDay()->subYearsNoOverflow(18)->toDateString()];
     }
 

@@ -8,12 +8,12 @@ use Tests\TestCase;
 
 class DatosPersonalesTrabajadorTest extends TestCase
 {
-    public function test_limites_incluyen_18_y_50_cumplidos_y_excluyen_17_y_51(): void
+    public function test_limites_incluyen_18_y_60_cumplidos_y_excluyen_17_y_61(): void
     {
         $this->travelTo(\Carbon\Carbon::parse('2026-11-05 14:00:00'));
-        $this->assertSame(['min'=>'1975-11-06', 'max'=>'2008-11-05'], DatosPersonalesTrabajador::limitesNacimiento());
-        foreach (['2008-11-05'=>true, '2008-11-06'=>false, '1976-11-05'=>true, '1976-11-04'=>true,
-            '1975-11-06'=>true, '1975-11-05'=>false, '2026-11-06'=>false, '2000-02-30'=>false] as $fecha=>$valida) {
+        $this->assertSame(['min'=>'1965-11-06', 'max'=>'2008-11-05'], DatosPersonalesTrabajador::limitesNacimiento());
+        foreach (['2008-11-05'=>true, '2008-11-06'=>false, '1966-11-05'=>true, '1966-11-04'=>true,
+            '1965-11-06'=>true, '1965-11-05'=>false, '2026-11-06'=>false, '2000-02-30'=>false] as $fecha=>$valida) {
             $this->assertSame($valida, Validator::make(['fecha'=>$fecha], ['fecha'=>DatosPersonalesTrabajador::reglaNacimiento()])->passes(), $fecha);
         }
     }

@@ -1,5 +1,7 @@
 # Personal: dirección asistida y edad — 05/11/2026
 
+> Actualización posterior: la propietaria amplía el límite a 60 años. Véase [decisión vigente](PERSONAL_EDAD_60_2026_11_05.md); las menciones a 50 describen el corte anterior.
+
 ## Decisión y alcance
 
 La propietaria solicita país/departamento/zona/calle dependientes, alternativa «Otra» y edad de 18 a 50 años en el formulario de personal. Se conserva la dirección textual de `personal.direccion` (255 caracteres). No se agregan columnas, tablas, permisos, relaciones, servicios externos ni información por suposición.

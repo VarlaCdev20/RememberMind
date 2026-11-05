@@ -156,15 +156,15 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->call('completarDireccion')->assertHasNoErrors()->assertSet('direccion', 'CALLE SINTÉTICA, ZONA BARRIO SINTÉTICO, CIUDAD SINTÉTICA, REGIÓN SINTÉTICA, PERÚ');
     }
 
-    public function test_nacimiento_del_formulario_valida_18_a_50_y_publica_limites_html(): void
+    public function test_nacimiento_del_formulario_valida_18_a_60_y_publica_limites_html(): void
     {
         $this->travelTo(\Carbon\Carbon::parse('2026-11-05 14:00:00'));
         $this->gerente();
-        Livewire::test(PersonalInstitucionalForm::class)->assertSeeHtml('min="1975-11-06"')->assertSeeHtml('max="2008-11-05"')
+        Livewire::test(PersonalInstitucionalForm::class)->assertSeeHtml('min="1965-11-06"')->assertSeeHtml('max="2008-11-05"')
             ->set('fecha_nacimiento', '2008-11-06')->assertHasErrors(['fecha_nacimiento'])->assertSee('al menos 18 años')
             ->set('fecha_nacimiento', '2008-11-05')->assertHasNoErrors(['fecha_nacimiento'])
-            ->set('fecha_nacimiento', '1975-11-05')->assertHasErrors(['fecha_nacimiento'])->assertSee('más de 50 años')
-            ->set('fecha_nacimiento', '1975-11-06')->assertHasNoErrors(['fecha_nacimiento']);
+            ->set('fecha_nacimiento', '1965-11-05')->assertHasErrors(['fecha_nacimiento'])->assertSee('más de 60 años')
+            ->set('fecha_nacimiento', '1965-11-06')->assertHasNoErrors(['fecha_nacimiento']);
     }
 
     public function test_directorio_gerencial_tiene_recorrido_propio_sin_paneles_de_demostracion(): void

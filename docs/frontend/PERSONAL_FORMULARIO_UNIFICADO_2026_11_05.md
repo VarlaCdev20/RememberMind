@@ -1,5 +1,7 @@
 # Registro de personal: cuatro pasos unificados — 05/11/2026
 
+> Actualización posterior: la propietaria amplía el límite a 60 años. Véase [decisión vigente](PERSONAL_EDAD_60_2026_11_05.md); las menciones a 50 describen el corte anterior.
+
 ## Alcance
 
 La propietaria solicita aplicar a todo el formulario el diseño y la validación por campo aprobados para identidad y dirección. Se reutilizan `ui.field`, `ui.selector` y `ui.form-section`, Nunito, las superficies café grisáceas, el acento verde y los estados de validación existentes. No hay DDL, nuevos permisos, requisitos profesionales o reglas clínicas.
