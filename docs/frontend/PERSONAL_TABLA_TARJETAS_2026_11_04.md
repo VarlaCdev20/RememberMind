@@ -100,3 +100,9 @@ Verificación: build correcto;6 pruebas PHP /42 aserciones (paginador y wizard/c
 Se agrupan rango, números y salto directo en el centro mediante flex, sin repartirlos por los extremos. Tipografía friendly compartida (Nunito Sans),12 px, cifras tabulares y menor peso; se conservan formas circulares, cápsula y objetivos táctiles. En móvil el rango queda debajo del grupo centrado. Comprobación en la pestaña operativa recargada: texto y números de12 px, sin desbordamiento y diferencia de centrado inferior a0,01 px.
 
 Build correcto; E2E focal PASS (104 s): tabla/tarjetas y formulario en cinco anchos, filtros, menús/foco, salto y oscuro390; capturas sintéticas actualizadas e inspección visual del conjunto en1440 px. Ajuste exclusivamente CSS de la variante compacta; sin cambios funcionales, BDD, permisos o legacy. CI completa no ejecutada.
+
+## Corrección de interpretación del centrado
+
+La propietaria aclara que el centrado corresponde al contenido de las burbujas. Se restituyen las posiciones anteriores: rango a la izquierda, navegación en el centro y salto a la derecha; adaptación móvil anterior conservada. Números y botón Ir usan centrado horizontal/vertical explícito, sin padding desplazado; valor del selector centrado con padding simétrico. Se mantienen12 px y fuente friendly. Comprobación en navegador operativo recargado: layout grid, rango alineado al inicio y todos los controles con justify-content/align-items center y padding0; selector text-align center.
+
+Build y E2E focal PASS (45 s), tabla/tarjetas y formulario en cinco anchos, filtros, menús/foco y oscuro390. Captura de escritorio revisada con las posiciones restauradas. Ajuste CSS sin cambios funcionales o de permisos; CI completa no ejecutada.
