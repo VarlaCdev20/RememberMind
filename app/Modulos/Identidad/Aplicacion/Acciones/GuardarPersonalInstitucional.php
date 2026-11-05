@@ -93,11 +93,15 @@ final class GuardarPersonalInstitucional
             }
         }
         if (! $edicion) {
+            $faltantes = [];
             foreach ($catalogo as $documento) {
                 if ($documento['tipo'] === 'ingresante' && $documento['obligatorio_inmediato'] && ! isset($uploads[$documento['id']])) {
-                    throw ValidationException::withMessages(['archivos_temporales.'.$documento['id'] => 'Adjunte '.$documento['nombre'].'.']);
+                    $faltantes['archivos_temporales.'.$documento['id']] = 'Adjunte '.$documento['nombre'].'.';
                 }
             }
+        }
+        if (! empty($faltantes)) {
+            throw ValidationException::withMessages($faltantes);
         }
         if ($edicion && $clasificacion['rol_operativo'] === 'MEDICO_GENERAL' && $usuario->estado === 'ACTIVO'
             && User::role('MEDICO GENERAL/GERIATRA')->where('estado', 'ACTIVO')->whereKeyNot($usuario->getKey())->exists()) {

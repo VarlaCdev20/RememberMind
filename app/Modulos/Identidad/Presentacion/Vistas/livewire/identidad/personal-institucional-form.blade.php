@@ -1,4 +1,4 @@
-<div class="rm-staff-workspace rm-staff-registration" x-data="{ dirty: false }" @input="dirty = true" @change="dirty = true" @gerencia-personal-cerrar.window="if (!dirty || confirm('¿Descartar los cambios sin guardar?')) { $dispatch('cerrar-modal-gestion-personal') }">
+<div class="rm-staff-workspace rm-staff-registration" x-data="{ dirty: false }" @personal-validacion-fallida.window="$nextTick(() => $el.querySelector('[aria-invalid=true]')?.focus())" @input="dirty = true" @change="dirty = true" @gerencia-personal-cerrar.window="if (!dirty || confirm('¿Descartar los cambios sin guardar?')) { $dispatch('cerrar-modal-gestion-personal') }">
     @if($esEdicion && (!auth()->user()->hasRole('GERENTE') || auth()->user()->hasRole('SUPERADMINISTRADOR')))
         <x-ui.collection-header :title="$esEdicion ? 'Editar trabajador' : 'Registrar trabajador'" subtitle="Identidad, información laboral, cuenta y documentación" icon="ph-identification-badge" />
     @endif
@@ -11,8 +11,8 @@
     </nav>
     <div class="rm-staff-registration__progress-copy"><p class="rm-help" role="status">Paso {{ $pasoActual }} de 4 · Se guarda todo al finalizar</p><span>{{ (int) round(($pasoActual / 4) * 100) }} %</span></div>
     <div class="rm-staff-registration__progress" role="progressbar" aria-label="Progreso del registro" aria-valuemin="1" aria-valuemax="4" aria-valuenow="{{ $pasoActual }}"><span style="width: {{ ($pasoActual / 4) * 100 }}%"></span></div>
-    @if($errors->any())<x-ui.callout variant="warning" title="Revisa los datos indicados"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></x-ui.callout>@endif
-    <form wire:submit="guardar" class="rm-staff-registration__form space-y-4 mt-4">
+    <p class="rm-help mt-3">Los campos con * son obligatorios. Al salir de cada campo se comprueba el dato; los opcionales vacíos no se marcan como correctos.</p>
+    <form wire:submit="guardar" class="rm-staff-registration__form space-y-4 mt-4" novalidate>
         @if($pasoActual === 1)
         <x-ui.form-section title="Identidad y contacto" description="Datos personales y medios de contacto del trabajador." icon="ph-user-circle" :columns="1">
             <div class="rm-staff-registration__identity-layout">
@@ -24,8 +24,8 @@
                             <i class="ph-bold ph-user" aria-hidden="true"></i><span>{{ is_string($foto_perfil) && $foto_perfil !== '' ? 'Fotografía registrada' : 'Sin fotografía' }}</span>
                         @endif
                     </div>
-                    <x-ui.field label="Fotografía (opcional)" for="trabajador-fotografia" error="foto_perfil">
-                        <label class="rm-btn rm-btn-secondary rm-staff-registration__photo-picker" for="trabajador-fotografia"><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Elegir foto<input id="trabajador-fotografia" class="sr-only" type="file" wire:model="foto_perfil" accept="image/jpeg,image/png,image/webp" aria-label="Fotografía del trabajador"></label>
+                    <x-ui.field label="Fotografía (opcional)" for="trabajador-fotografia" error="foto_perfil" :valid="$camposValidados['foto_perfil'] ?? false">
+                        <label class="rm-btn rm-btn-secondary rm-staff-registration__photo-picker" for="trabajador-fotografia"><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Elegir foto<input id="trabajador-fotografia" class="sr-only" type="file" wire:model="foto_perfil" aria-invalid="{{ $errors->has('foto_perfil') ? 'true' : 'false' }}" @if($errors->has('foto_perfil')) aria-describedby="trabajador-fotografia-error" @elseif($camposValidados['foto_perfil'] ?? false) aria-describedby="trabajador-fotografia-valid" @endif accept="image/jpeg,image/png,image/webp" aria-label="Fotografía del trabajador"></label>
                         <p class="rm-help">JPG, PNG o WebP · Hasta 2 MB</p>
                         @if($esEdicion && is_string($foto_perfil))<p class="rm-help">La fotografía guardada se conserva si no eliges otra.</p>@endif
                         <p class="rm-help" wire:loading wire:target="foto_perfil" role="status">Preparando fotografía…</p>
@@ -33,25 +33,25 @@
                 </aside>
                 <div class="rm-staff-registration__details">
             @foreach(['nombres'=>'Nombres','ap_paterno'=>'Apellido paterno','ap_materno'=>'Apellido materno (opcional)','numero_documento'=>'Número de documento','expedido'=>'Expedido en','telefono'=>'Celular'] as $campo=>$etiqueta)
-                <x-ui.field :label="$etiqueta" :for="'trabajador-'.$campo" :required="$campo !== 'ap_materno'"><input id="trabajador-{{ $campo }}" class="rm-input" type="text" wire:model="{{ $campo }}" @if($campo !== 'ap_materno') required @endif>@error($campo)<p role="alert">{{ $message }}</p>@enderror</x-ui.field>
+                <x-ui.field :label="$etiqueta" :for="'trabajador-'.$campo" :required="$campo !== 'ap_materno'" :error="$campo" :valid="$camposValidados[$campo] ?? false"><input id="trabajador-{{ $campo }}" class="rm-input" type="text" wire:model.live.blur="{{ $campo }}" aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @if($errors->has($campo) || ($camposValidados[$campo] ?? false)) aria-describedby="trabajador-{{ $campo }}-{{ $errors->has($campo) ? 'error' : 'valid' }}" @endif @if($campo !== 'ap_materno') required @endif></x-ui.field>
             @endforeach
-            <x-ui.field label="Fecha de nacimiento" for="trabajador-nacimiento" required><input id="trabajador-nacimiento" class="rm-input" type="date" wire:model="fecha_nacimiento" required></x-ui.field>
-            <x-ui.field label="Género" for="trabajador-genero" required><select id="trabajador-genero" class="rm-input" wire:model="genero" required><option value="">Seleccionar</option><option value="F">Femenino</option><option value="M">Masculino</option></select></x-ui.field>
-            <x-ui.field label="Dirección" for="trabajador-direccion" required><textarea id="trabajador-direccion" class="rm-input" wire:model="direccion" rows="2" maxlength="255" required></textarea></x-ui.field>
+            <x-ui.field label="Fecha de nacimiento" for="trabajador-nacimiento" required error="fecha_nacimiento" :valid="$camposValidados['fecha_nacimiento'] ?? false"><input id="trabajador-nacimiento" class="rm-input" type="date" wire:model.live.blur="fecha_nacimiento" aria-invalid="{{ $errors->has('fecha_nacimiento') ? 'true' : 'false' }}" @if($errors->has('fecha_nacimiento')) aria-describedby="trabajador-nacimiento-error" @elseif($camposValidados['fecha_nacimiento'] ?? false) aria-describedby="trabajador-nacimiento-valid" @endif required></x-ui.field>
+            <x-ui.field label="Género" for="trabajador-genero" required error="genero" :valid="$camposValidados['genero'] ?? false"><select id="trabajador-genero" class="rm-input" wire:model.live.blur="genero" aria-invalid="{{ $errors->has('genero') ? 'true' : 'false' }}" @if($errors->has('genero')) aria-describedby="trabajador-genero-error" @elseif($camposValidados['genero'] ?? false) aria-describedby="trabajador-genero-valid" @endif required><option value="">Seleccionar</option><option value="F">Femenino</option><option value="M">Masculino</option></select></x-ui.field>
+            <x-ui.field label="Dirección" for="trabajador-direccion" required error="direccion" :valid="$camposValidados['direccion'] ?? false"><textarea id="trabajador-direccion" class="rm-input" wire:model.live.blur="direccion" aria-invalid="{{ $errors->has('direccion') ? 'true' : 'false' }}" @if($errors->has('direccion')) aria-describedby="trabajador-direccion-error" @elseif($camposValidados['direccion'] ?? false) aria-describedby="trabajador-direccion-valid" @endif rows="2" maxlength="255" required></textarea></x-ui.field>
                 </div>
             </div>
         </x-ui.form-section>
         @elseif($pasoActual === 2)
         <x-ui.form-section title="Información laboral" description="Función institucional y datos del expediente laboral." icon="ph-briefcase" :columns="2">
-            <x-ui.field label="Función institucional y rol de acceso" for="trabajador-rol"><select id="trabajador-rol" class="rm-input" wire:model.live="rol_seleccionado" @disabled($esEdicion)><option value="">Seleccionar función</option>@foreach($roles as $rol)<option value="{{ $rol->name }}">{{ $rol->name }}</option>@endforeach</select><p class="rm-help">La edición de datos no cambia el rol de una cuenta existente.</p></x-ui.field>
-            <x-ui.field label="Fecha de ingreso laboral (opcional)" for="trabajador-ingreso"><input id="trabajador-ingreso" class="rm-input" type="date" wire:model="fecha_ingreso"></x-ui.field>
-            <x-ui.field label="Matrícula profesional (cuando corresponda)" for="trabajador-matricula"><input id="trabajador-matricula" class="rm-input" wire:model="matricula_prof" maxlength="50"></x-ui.field>
-            <x-ui.field label="Observaciones laborales (opcional)" for="trabajador-observaciones"><textarea id="trabajador-observaciones" class="rm-input" wire:model="observaciones"></textarea></x-ui.field>
+            <x-ui.field label="Función institucional y rol de acceso" for="trabajador-rol" error="roles_seleccionados" :valid="$camposValidados['roles_seleccionados'] ?? false" required><select id="trabajador-rol" class="rm-input" wire:model.live="rol_seleccionado" aria-invalid="{{ $errors->has('roles_seleccionados') ? 'true' : 'false' }}" @if($errors->has('roles_seleccionados')) aria-describedby="trabajador-rol-error" @elseif($camposValidados['roles_seleccionados'] ?? false) aria-describedby="trabajador-rol-valid" @endif @disabled($esEdicion)><option value="">Seleccionar función</option>@foreach($roles as $rol)<option value="{{ $rol->name }}">{{ $rol->name }}</option>@endforeach</select><p class="rm-help">La edición de datos no cambia el rol de una cuenta existente.</p></x-ui.field>
+            <x-ui.field label="Fecha de ingreso laboral (opcional)" for="trabajador-ingreso" error="fecha_ingreso" :valid="$camposValidados['fecha_ingreso'] ?? false"><input id="trabajador-ingreso" class="rm-input" type="date" wire:model.live.blur="fecha_ingreso" aria-invalid="{{ $errors->has('fecha_ingreso') ? 'true' : 'false' }}" @if($errors->has('fecha_ingreso')) aria-describedby="trabajador-ingreso-error" @elseif($camposValidados['fecha_ingreso'] ?? false) aria-describedby="trabajador-ingreso-valid" @endif></x-ui.field>
+            <x-ui.field label="Matrícula profesional (cuando corresponda)" for="trabajador-matricula" error="matricula_prof" :valid="$camposValidados['matricula_prof'] ?? false"><input id="trabajador-matricula" class="rm-input" wire:model.live.blur="matricula_prof" aria-invalid="{{ $errors->has('matricula_prof') ? 'true' : 'false' }}" @if($errors->has('matricula_prof')) aria-describedby="trabajador-matricula-error" @elseif($camposValidados['matricula_prof'] ?? false) aria-describedby="trabajador-matricula-valid" @endif maxlength="50"></x-ui.field>
+            <x-ui.field label="Observaciones laborales (opcional)" for="trabajador-observaciones" error="observaciones" :valid="$camposValidados['observaciones'] ?? false"><textarea id="trabajador-observaciones" class="rm-input" wire:model.live.blur="observaciones" aria-invalid="{{ $errors->has('observaciones') ? 'true' : 'false' }}" @if($errors->has('observaciones')) aria-describedby="trabajador-observaciones-error" @elseif($camposValidados['observaciones'] ?? false) aria-describedby="trabajador-observaciones-valid" @endif></textarea></x-ui.field>
         </x-ui.form-section>
         @elseif($pasoActual === 3)
         <x-ui.form-section title="Cuenta de acceso" description="Credenciales de acceso institucional." icon="ph-shield-check" :columns="2">
-            <x-ui.field label="Correo de acceso" for="trabajador-correo"><input id="trabajador-correo" class="rm-input" type="email" wire:model="correo" autocomplete="off" maxlength="120" required></x-ui.field>
-            @unless($esEdicion)<x-ui.field label="Contraseña temporal" for="trabajador-clave"><input id="trabajador-clave" class="rm-input" type="password" wire:model="contrasena_temporal" autocomplete="new-password" minlength="12" maxlength="72" required><p class="rm-help">Entrega el acceso por el canal institucional. No lo incluyas en observaciones.</p></x-ui.field>@endunless
+            <x-ui.field label="Correo de acceso" for="trabajador-correo" error="correo" :valid="$camposValidados['correo'] ?? false" required><input id="trabajador-correo" class="rm-input" type="email" wire:model.live.blur="correo" aria-invalid="{{ $errors->has('correo') ? 'true' : 'false' }}" @if($errors->has('correo')) aria-describedby="trabajador-correo-error" @elseif($camposValidados['correo'] ?? false) aria-describedby="trabajador-correo-valid" @endif autocomplete="off" maxlength="120" required></x-ui.field>
+            @unless($esEdicion)<x-ui.field label="Contraseña temporal" for="trabajador-clave" error="contrasena_temporal" :valid="$camposValidados['contrasena_temporal'] ?? false" required><input id="trabajador-clave" class="rm-input" type="password" wire:model.live.blur="contrasena_temporal" aria-invalid="{{ $errors->has('contrasena_temporal') ? 'true' : 'false' }}" @if($errors->has('contrasena_temporal')) aria-describedby="trabajador-clave-error" @elseif($camposValidados['contrasena_temporal'] ?? false) aria-describedby="trabajador-clave-valid" @endif autocomplete="new-password" minlength="12" maxlength="72" required><p class="rm-help">Entrega el acceso por el canal institucional. No lo incluyas en observaciones.</p></x-ui.field>@endunless
         </x-ui.form-section>
         <x-ui.callout variant="info" title="Cuenta y trabajo son distintos"><p>La nueva cuenta queda activa cuando el registro completo se confirma. El estado de documentos y la competencia profesional se revisan por separado.</p></x-ui.callout>
         @elseif($pasoActual === 4)
@@ -59,17 +59,18 @@
         <x-ui.form-section title="Documentación" description="Comprueba los datos y adjunta los documentos del alta." icon="ph-files" :columns="2">
             @foreach($this->documentosConfigurados as $documento)
                 @if($documento['tipo'] === 'ingresante')
-                <x-ui.field :label="$documento['nombre'].($documento['obligatorio_inmediato'] ? ' · requerido al alta' : ' · opcional')" :for="'documento-'.$documento['id']">
-                    <input id="documento-{{ $documento['id'] }}" type="file" wire:model="archivos_temporales.{{ $documento['id'] }}" accept="application/pdf,image/jpeg,image/png,image/webp">
+                <x-ui.field :label="$documento['nombre'].($documento['obligatorio_inmediato'] ? ' · requerido al alta' : ' · opcional')" :for="'documento-'.$documento['id']" :error="'archivos_temporales.'.$documento['id']" :valid="$camposValidados['archivos_temporales.'.$documento['id']] ?? false" :required="!$esEdicion && $documento['obligatorio_inmediato']">
+                    <input id="documento-{{ $documento['id'] }}" type="file" class="rm-input" wire:model="archivos_temporales.{{ $documento['id'] }}" aria-invalid="{{ $errors->has('archivos_temporales.'.$documento['id']) ? 'true' : 'false' }}" @if($errors->has('archivos_temporales.'.$documento['id'])) aria-describedby="documento-{{ $documento['id'] }}-error" @endif accept="application/pdf,image/jpeg,image/png,image/webp">
                     <p class="rm-help">{{ $documento['desc'] ?? '' }} PDF, JPG, PNG o WebP; hasta 5 MB. Cargar no equivale a aprobar.</p>
                     @if(isset($estado_documentos[$documento['id']]))<p>Estado registrado: {{ str_replace('_',' ', $estado_documentos[$documento['id']]) }}</p>@endif
-                    @error('archivos_temporales.'.$documento['id'])<p role="alert">{{ $message }}</p>@enderror
                 </x-ui.field>
                 @endif
             @endforeach
         </x-ui.form-section>
         <p class="rm-help" role="status" wire:loading wire:target="archivos_temporales">Preparando archivos…</p>
         @endif
+        @error('guardado')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
+        @error('archivos_temporales')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
         <div class="rm-management-actions rm-staff-registration__footer">
             <button class="rm-btn-secondary" type="button" @click="if (!dirty || confirm('¿Descartar los cambios sin guardar?')) { $dispatch('cerrar-modal-gestion-personal') }">Cancelar</button>
             @if($pasoActual > 1)<button class="rm-btn-secondary" type="button" wire:click="retrocederPaso" wire:loading.attr="disabled">Atrás</button>@endif

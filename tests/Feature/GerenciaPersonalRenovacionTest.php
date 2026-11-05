@@ -121,6 +121,50 @@ class GerenciaPersonalRenovacionTest extends TestCase
         }
     }
 
+    public function test_validacion_por_campo_corrige_error_y_no_marca_opcionales_vacios(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)
+            ->assertDontSee('Dato válido')
+            ->set('telefono', '123')->assertHasErrors(['telefono' => 'regex'])
+            ->assertSee('Escribe 8 dígitos')->assertSee('aria-invalid="true"', false)
+            ->set('telefono', '77712345')->assertHasNoErrors(['telefono'])
+            ->assertSet('camposValidados.telefono', true)->assertSee('Dato válido')
+            ->set('telefono', 'mal')->assertHasErrors(['telefono'])
+            ->assertSet('camposValidados.telefono', null)
+            ->set('ap_materno', '')->assertHasNoErrors(['ap_materno'])
+            ->assertSet('camposValidados.ap_materno', false)
+            ->set('fecha_nacimiento', now()->subYears(101)->toDateString())->assertHasErrors(['fecha_nacimiento' => 'after_or_equal'])
+            ->call('avanzarPaso')->assertHasErrors(['nombres', 'ap_paterno', 'direccion', 'genero'])
+            ->assertSet('pasoActual', 1)->assertDispatched('personal-validacion-fallida');
+    }
+
+    public function test_validacion_por_campo_rechaza_correo_duplicado_y_clave_corta(): void
+    {
+        $this->gerente();
+        User::factory()->create(['correo' => 'duplicado@remembermind.test']);
+        Livewire::test(PersonalInstitucionalForm::class)
+            ->set('correo', 'DUPLICADO@remembermind.test')->assertHasErrors(['correo' => 'unique'])
+            ->set('correo', 'disponible@remembermind.test')->assertHasNoErrors(['correo'])
+            ->assertSet('camposValidados.correo', true)
+            ->set('contrasena_temporal', 'corta')->assertHasErrors(['contrasena_temporal' => 'min'])
+            ->set('contrasena_temporal', 'Sintetica#12345')->assertHasNoErrors(['contrasena_temporal']);
+    }
+
+    public function test_guardado_muestra_juntos_todos_los_documentos_obligatorios_faltantes(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set([
+            'nombres' => 'Sintético', 'ap_paterno' => 'Validación',
+            'numero_documento' => '87654321', 'expedido' => 'LP', 'fecha_nacimiento' => '1990-01-01', 'genero' => 'F',
+            'telefono' => '77712345', 'direccion' => 'Dirección sintética', 'correo' => 'faltantes@remembermind.test',
+            'contrasena_temporal' => 'Sintetica#12345', 'rol_seleccionado' => 'ADMINISTRADOR',
+        ])->call('guardar')->assertHasErrors(['archivos_temporales.CI', 'archivos_temporales.FOTO_DOC', 'archivos_temporales.CV'])
+            ->assertSet('pasoActual', 4)->assertSee('Adjunte')->assertNotDispatched('cerrar-modal-gestion-personal');
+        $this->assertDatabaseMissing('usuarios', ['correo' => 'faltantes@remembermind.test']);
+        $this->assertDatabaseCount('documentos', 0);
+    }
+
     public function test_fotografia_del_formulario_rechaza_archivos_no_validos_sin_avanzar(): void
     {
         $this->gerente();

@@ -119,6 +119,7 @@
    --rm-nutrition: var(--rm-accent-gold);
    --rm-warning: var(--rm-palette-warning);
    --rm-danger: var(--rm-palette-danger);
+   --rm-validation-error: #CF2434; /* Error de captura: rojo vivo solicitado. */
    --rm-border: var(--rm-palette-border-soft);
    --rm-border-strong: var(--rm-palette-border-strong);
 
@@ -451,6 +452,7 @@
    --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 18%, var(--rm-surface));
    --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 18%, var(--rm-surface));
    --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 18%, var(--rm-surface));
+   --rm-validation-error: #FF818B;
    --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 18%, var(--rm-surface));
    --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 35%, var(--rm-text-primary));
    --rm-info-strong: color-mix(in srgb, var(--rm-info) 25%, var(--rm-text-primary));

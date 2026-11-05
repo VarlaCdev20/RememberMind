@@ -168,6 +168,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         await page.evaluate(()=>{document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');});
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Tarjetas en modo oscuro sin desbordamiento');
         await page.screenshot({path:join(personalOut,'tarjetas-390-oscuro.png'),fullPage:true});
+        page.on('dialog', async dialog => { await dialog.accept(); });
         for (const width of [1440,1280,1024,768,390]) {
             await page.setViewport({width,height:960});
             await go('/admin/personal-institucional');
@@ -183,6 +184,33 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             }));
             await page.screenshot({path:join(personalOut,`formulario-${width}.png`),fullPage:true});
             assert.deepEqual(form,{overflow:false,steps:4,section:true,labels:true},`Formulario ${width}`);
+            await page.click('.rm-staff-registration button[wire\\:click="avanzarPaso"]');
+            await page.waitForFunction(() => document.querySelectorAll('.rm-staff-registration [aria-invalid="true"]').length >= 8);
+            assert.equal(await page.$eval('#trabajador-nombres', e => e === document.activeElement), true, 'Foco en el primer dato faltante');
+            await page.type('#trabajador-nombres', 'Validación sintética');
+            await page.keyboard.press('Tab');
+            await page.waitForFunction(() => document.querySelector('#trabajador-nombres')?.closest('.rm-field--valid'));
+            await page.type('#trabajador-telefono', '123');
+            await page.keyboard.press('Tab');
+            await page.waitForFunction(() => document.querySelector('#trabajador-telefono')?.closest('.rm-field--invalid')?.innerText.includes('8 dígitos'));
+            await page.click('#trabajador-telefono');
+            await page.keyboard.down('Control'); await page.keyboard.press('KeyA'); await page.keyboard.up('Control');
+            await page.keyboard.press('Backspace');
+            await page.type('#trabajador-telefono', '77712345');
+            await page.keyboard.press('Tab');
+            await page.waitForFunction(() => document.querySelector('#trabajador-telefono')?.closest('.rm-field--valid'));
+            const feedback = await page.$eval('.rm-staff-registration', e => ({
+                overflow:e.scrollWidth>e.clientWidth+1,
+                links:[...e.querySelectorAll('[aria-invalid="true"]')].every(input => document.getElementById(input.getAttribute('aria-describedby'))?.textContent.trim()),
+                optionalNeutral:!e.querySelector('#trabajador-ap_materno').closest('.rm-field--valid, .rm-field--invalid'),
+                green:getComputedStyle(e.querySelector('#trabajador-telefono')).borderColor,
+                red:getComputedStyle(e.querySelector('#trabajador-numero_documento')).borderColor,
+            }));
+            assert.equal(await page.$eval('.rm-staff-registration', e => e.innerText.includes('Revisa los datos indicados')), false, 'Sin aviso amarillo superior');
+            assert.equal(feedback.overflow,false); assert.equal(feedback.links,true); assert.equal(feedback.optionalNeutral,true);
+            assert.notEqual(feedback.green, feedback.red, 'Los bordes válidos y erróneos se distinguen');
+            await page.screenshot({path:join(personalOut,`validacion-${width}.png`),fullPage:true});
+
             await page.click('.rm-staff-registration__footer button:first-child');
             await page.waitForSelector('.rm-staff-registration',{hidden:true});
             evidencia.push({width,formulario:true,...form});
@@ -269,7 +297,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         throw new Error(`${error.message}; errores JS: ${JSON.stringify(errors)}`);
     }
     await page.click('button[wire\\:click="avanzarPaso"]');
-    await page.waitForFunction(()=>document.querySelector('[role="dialog"]')?.innerText.includes('Revisa los datos indicados'));
+    await page.waitForFunction(()=>!!document.querySelector('.rm-staff-registration [aria-invalid="true"]'));
     await page.type('#trabajador-nombres','Nombre sin guardar');
     let dialogos=0, aceptarDialogos=false;
     page.on('dialog',async d=>{dialogos++;aceptarDialogos ? await d.accept() : await d.dismiss();});

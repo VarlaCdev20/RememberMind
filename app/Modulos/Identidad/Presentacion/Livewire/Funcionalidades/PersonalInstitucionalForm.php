@@ -30,6 +30,9 @@ class PersonalInstitucionalForm extends Component
 
     public $esEdicion = false;
 
+    #[Locked]
+    public array $camposValidados = [];
+
     // Acceso y Roles
     public $correo;
 
@@ -286,10 +289,10 @@ class PersonalInstitucionalForm extends Component
             'ap_materno' => 'nullable|string|max:80',
             'correo' => 'required|email|max:120|unique:usuarios,correo,'.$this->usuarioId.',cod_usuario',
             'fecha_ingreso' => 'nullable|date',
-            'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore(Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal'), 'cod_personal')],
+            'numero_documento' => ['required', 'regex:/^[0-9]{5,10}$/', Rule::unique('personal', 'numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario', $this->usuarioId)->value('cod_personal') : null, 'cod_personal')],
             'estado' => 'required|string',
             'fecha_nacimiento' => 'required|date|before_or_equal:'.now()->subYears(18)->format('Y-m-d').'|after_or_equal:'.now()->subYears(100)->format('Y-m-d'),
-            'foto_perfil' => is_string($this->foto_perfil) ? 'nullable|string' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'foto_perfil' => $this->reglaFotografia(),
             'roles_seleccionados' => 'required|array|min:1',
             'roles_seleccionados.*' => 'exists:roles,name',
             'tipo_personal' => 'required|in:salud,admin',
@@ -299,6 +302,14 @@ class PersonalInstitucionalForm extends Component
     protected function messages()
     {
         return [
+            'ap_paterno.required' => 'El apellido paterno es obligatorio.',
+            'telefono.required' => 'El celular es obligatorio.',
+            'telefono.regex' => 'Escribe 8 dígitos, empezando por 6 o 7.',
+            'direccion.required' => 'La dirección es obligatoria.',
+            'roles_seleccionados.size' => 'Selecciona una función institucional.',
+            'contrasena_temporal.required' => 'La contraseña temporal es obligatoria.',
+            'contrasena_temporal.min' => 'La contraseña debe tener al menos 12 caracteres.',
+            'archivos_temporales.*.required' => 'Adjunta este documento requerido para el alta.',
             'correo.required' => 'El correo es obligatorio.',
             'correo.email' => 'El formato del correo es inválido.',
             'correo.unique' => 'Este correo ya está registrado.',
@@ -311,7 +322,7 @@ class PersonalInstitucionalForm extends Component
             'genero.required' => 'El género es obligatorio.',
             'expedido.required' => 'El departamento de expedición es obligatorio.',
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.before_or_equal' => 'El usuario debe ser mayor de 18 años.',
+            'fecha_nacimiento.before_or_equal' => 'El trabajador debe tener al menos 18 años.',
             'fecha_nacimiento.after_or_equal' => 'La edad excede el límite permitido (100 años).',
             'foto_perfil.image' => 'El archivo debe ser una imagen válida.',
             'foto_perfil.mimes' => 'La foto debe ser en formato JPG, JPEG, PNG o WEBP.',
@@ -396,6 +407,7 @@ class PersonalInstitucionalForm extends Component
     {
         $this->roles_seleccionados = $value ? [$value] : [];
         $this->sincronizarClasificacionDesdeRoles(false);
+        $this->validarCampoFormulario('roles_seleccionados');
     }
 
     public function updatedRolesSeleccionados($value = null, $key = null): void
@@ -576,6 +588,7 @@ class PersonalInstitucionalForm extends Component
 
     public function updatedArchivosTemporales($value, $key)
     {
+        unset($this->camposValidados["archivos_temporales.$key"]);
         $this->validateOnly("archivos_temporales.$key", [
             "archivos_temporales.$key" => 'nullable|mimes:pdf,jpg,jpeg,png,webp|max:5120',
         ], [
@@ -584,6 +597,7 @@ class PersonalInstitucionalForm extends Component
         ]);
 
         $esInstitucional = collect($this->documentos_configurados)->firstWhere('id', $key)['tipo'] === 'institucional';
+        $this->camposValidados['archivos_temporales.'.$key] = true;
         $this->estado_documentos[$key] = $esInstitucional ? 'FIRMADO_SUBIDO' : 'CARGADO';
 
         if (function_exists('activity')) {
@@ -608,31 +622,78 @@ class PersonalInstitucionalForm extends Component
 
     public function removerDocumento($key)
     {
-        unset($this->archivos_temporales[$key]);
+        unset($this->archivos_temporales[$key], $this->camposValidados['archivos_temporales.'.$key]);
         $this->estado_documentos[$key] = 'PENDIENTE';
         unset($this->observacion_documentos[$key]);
     }
 
     public function updatedFotoPerfil(): void
     {
+        unset($this->camposValidados['foto_perfil']);
         $this->validateOnly('foto_perfil');
+        $this->camposValidados['foto_perfil'] = true;
     }
 
     public function validarPasoActual(): void
     {
         app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null, $this->roles_seleccionados);
-        $reglas = match ($this->pasoActual) {
-            1 => ['nombres'=>'required|string|max:100','ap_paterno'=>'required|string|max:80','ap_materno'=>'nullable|string|max:80',
-                'numero_documento'=>['required','regex:/^[0-9]{5,10}$/',Rule::unique('personal','numero_documento')->ignore(Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal'),'cod_personal')],
-                'expedido'=>'required|string|max:20','genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString(),
+        $this->validate($this->reglasPaso($this->pasoActual));
+    }
+
+    private function reglasPaso(int $paso): array
+    {
+        return match ($paso) {
+            1 => ['foto_perfil'=>$this->reglaFotografia(),'nombres'=>'required|string|max:100','ap_paterno'=>'required|string|max:80','ap_materno'=>'nullable|string|max:80',
+                'numero_documento'=>['required','regex:/^[0-9]{5,10}$/',Rule::unique('personal','numero_documento')->ignore($this->usuarioId ? Personal::where('cod_usuario',$this->usuarioId)->value('cod_personal') : null,'cod_personal')],
+                'expedido'=>'required|string|max:20','genero'=>'required|in:M,F','fecha_nacimiento'=>'required|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after_or_equal:'.now()->subYears(100)->toDateString(),
                 'telefono'=>['required','regex:/^[67][0-9]{7}$/'],'direccion'=>'required|string|max:255'],
-            2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50'],
+            2 => ['roles_seleccionados'=>'required|array|size:1','roles_seleccionados.*'=>'exists:roles,name','fecha_ingreso'=>'nullable|date','matricula_prof'=>'nullable|string|max:50','observaciones'=>'nullable|string'],
             3 => ['correo'=>['required','email','max:120',Rule::unique('usuarios','correo')->ignore($this->usuarioId,'cod_usuario')],
                 'contrasena_temporal'=>($this->esEdicion ? 'nullable' : 'required').'|string|min:12|max:72'],
-            4 => ['archivos_temporales'=>'array','archivos_temporales.*'=>'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120'],
+            4 => $this->reglasDocumentos(),
             default => ['pasoActual'=>'in:1,2,3,4'],
         };
-        $this->validate($reglas);
+    }
+
+    private function reglaFotografia(): string
+    {
+        return is_string($this->foto_perfil) ? 'nullable|string' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
+    }
+
+    private function reglasDocumentos(): array
+    {
+        $reglas = ['archivos_temporales' => 'array'];
+        foreach ($this->documentosConfigurados as $documento) {
+            if ($documento['tipo'] === 'ingresante') {
+                $requerido = ! $this->esEdicion && $documento['obligatorio_inmediato'];
+                $reglas['archivos_temporales.'.$documento['id']] = ($requerido ? 'required' : 'nullable').'|file|mimes:pdf,jpg,jpeg,png,webp|max:5120';
+            }
+        }
+        return $reglas;
+    }
+
+    public function updated(string $campo): void
+    {
+        if ($campo === 'correo') {
+            $this->correo = trim(mb_strtolower($this->correo ?? ''));
+        }
+        if (! in_array($campo, ['rol_seleccionado', 'foto_perfil'], true) && ! str_starts_with($campo, 'archivos_temporales.')) {
+            $this->validarCampoFormulario($campo);
+        }
+    }
+
+    private function validarCampoFormulario(string $campo): void
+    {
+        for ($paso = 1; $paso <= 3; $paso++) {
+            $reglas = $this->reglasPaso($paso);
+            if (! array_key_exists($campo, $reglas)) {
+                continue;
+            }
+            unset($this->camposValidados[$campo]);
+            $this->validateOnly($campo, $reglas);
+            $this->camposValidados[$campo] = filled(data_get($this, $campo));
+            return;
+        }
     }
 
     public function avanzarPaso(): void
@@ -648,19 +709,7 @@ class PersonalInstitucionalForm extends Component
                 }
             }
         } catch (ValidationException $e) {
-            if ($this->pasoActual === 1 && $e->validator->errors()->has('correo') && str_contains($e->validator->errors()->first('correo'), 'registrado')) {
-                $this->dispatch('mostrarAlerta', [
-                    'type' => 'error',
-                    'title' => 'Correo Duplicado',
-                    'message' => 'El correo ingresado ya existe en la base de datos. Por favor, utilice otro correo institucional.',
-                ]);
-            } else {
-                $this->dispatch('mostrarAlerta', [
-                    'type' => 'error',
-                    'title' => 'Campos Incompletos',
-                    'message' => 'Revise los campos obligatorios antes de continuar.',
-                ]);
-            }
+            $this->dispatch('personal-validacion-fallida');
             throw $e;
         }
     }
@@ -810,6 +859,13 @@ class PersonalInstitucionalForm extends Component
             }
 
         } catch (ValidationException $e) {
+            $this->dispatch('personal-validacion-fallida');
+            foreach (range(1, 4) as $paso) {
+                if (array_intersect(array_keys($e->errors()), array_keys($this->reglasPaso($paso)))) {
+                    $this->pasoActual = $paso;
+                    break;
+                }
+            }
             throw $e;
         } catch (HttpException $e) {
             throw $e;

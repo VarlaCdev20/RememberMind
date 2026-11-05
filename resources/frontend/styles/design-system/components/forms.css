@@ -416,3 +416,21 @@
     background-color: var(--rm-surface);
     border-color: var(--rm-border-soft);
 }
+
+/* Feedback validado por el servidor; el color siempre se acompaña de texto. */
+.rm-field--invalid :is(input, select, textarea, .rm-staff-registration__photo-picker) {
+    border: 2px solid var(--rm-validation-error) !important;
+    background-color: color-mix(in srgb, var(--rm-validation-error) 5%, var(--rm-surface)) !important;
+}
+.rm-field--valid :is(input, select, textarea, .rm-staff-registration__photo-picker) {
+    border-color: var(--rm-success-strong) !important;
+}
+.rm-field-valid {
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-1);
+    font-size: var(--rm-font-size-meta);
+    color: var(--rm-success-strong);
+}
+
+.rm-field--invalid > .rm-error { color: var(--rm-validation-error); }
