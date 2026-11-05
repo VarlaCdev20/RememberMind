@@ -152,3 +152,5 @@ La propietaria rechaza expresamente el crema/amarillo de las superficies. Se def
 ## Fondo café grisáceo solicitado
 
 La propietaria concreta el fondo del formulario en café grisáceo: se ajusta el token compartido rm-form-panel de#E8E7E5 a#D8D2CF. Solo los consumidores del formulario cambian; campos blancos, secciones claras, acentos menta/salvia y variante oscura se conservan. Cambio exclusivo de color, sin backend o datos. Build y revisión E2E focal de cinco tamaños para cierre.
+
+Ajuste posterior solicitado: café grisáceo más claro, rm-form-panel#E9E5E2 (antes#D8D2CF). Solo cambia el valor del token diurno; build correcto. No se repite E2E para este aclarado de color sin cambios de estructura o interacción; revisión visual del nuevo tono en pestaña operativa pendiente de recarga.
