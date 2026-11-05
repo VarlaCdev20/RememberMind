@@ -30,6 +30,8 @@ class PersonalInstitucionalForm extends Component
 
     #[Locked] public $usuarioId;
 
+    #[Locked] public ?array $direccionMapa = null;
+
     public $esEdicion = false;
     public ?string $pais_documento = 'BO';
     public ?string $tipo_documento = 'CI';
@@ -511,6 +513,72 @@ class PersonalInstitucionalForm extends Component
             unset($this->camposValidados['fecha_limite_documentacion']);
         }
         $this->validarCampoFormulario('documentos_con_plazo');
+    }
+
+    private function contextoMapaDireccion(): array
+    {
+        app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $this->usuarioId ? User::findOrFail($this->usuarioId) : null);
+        $reglas = $this->reglasUbicacion();
+        $this->validate(array_intersect_key($reglas, array_flip(['pais_direccion', 'ciudad_id', 'otro_departamento'])));
+        $departamento = $this->ciudad_id === 'OTRA' ? $this->otro_departamento
+            : collect($this->getDepartamentosCatalogo())->firstWhere('id', $this->ciudad_id)->nombre;
+        $municipio = $this->municipio_id === 'OTRA' ? $this->otro_municipio
+            : (collect($this->getMunicipiosCatalogo($this->ciudad_id))->firstWhere('id', $this->municipio_id)?->nombre);
+        \Illuminate\Support\Facades\Validator::make(['departamento'=>$departamento, 'municipio'=>$municipio],
+            ['departamento'=>['required','string','max:60','not_regex:~[\r\n\x00-\x1F]~'], 'municipio'=>['nullable','string','max:60','not_regex:~[\r\n\x00-\x1F]~']])->validate();
+        return ['pais'=>$this->pais_direccion, 'nombrePais'=>IdentificacionInternacionalPersonal::paises()[$this->pais_direccion]['nombre'],
+            'departamento'=>$departamento, 'municipio'=>$municipio];
+    }
+
+    public function centrarMapaDireccion(): array
+    {
+        $contexto = $this->contextoMapaDireccion();
+        $this->direccionMapa = null;
+        $this->resetValidation('mapa_direccion');
+        return app(\App\Modulos\Identidad\Infraestructura\Geografia\GeocodificadorDireccionPersonal::class)->centrar(...$contexto);
+    }
+
+    public function consultarDireccionMapa($latitud, $longitud): array
+    {
+        $contexto = $this->contextoMapaDireccion();
+        $this->direccionMapa = null;
+        $this->resetValidation('mapa_direccion');
+        $datos = \Illuminate\Support\Facades\Validator::make(['latitud'=>$latitud, 'longitud'=>$longitud],
+            ['latitud'=>['required','numeric','between:-85,85'], 'longitud'=>['required','numeric','between:-180,180']])->validate();
+        $resultado = app(\App\Modulos\Identidad\Infraestructura\Geografia\GeocodificadorDireccionPersonal::class)
+            ->resolver((float) $datos['latitud'], (float) $datos['longitud'], $contexto['pais']);
+        $this->direccionMapa = [...$resultado, 'contexto'=>$contexto];
+        return $resultado;
+    }
+
+    public function usarDireccionMapa(string $direccion): void
+    {
+        $contexto = $this->contextoMapaDireccion();
+        if (! $this->direccionMapa || $this->direccionMapa['contexto'] !== $contexto) {
+            throw ValidationException::withMessages(['mapa_direccion'=>'Vuelve a consultar el punto después de cambiar el departamento o municipio.']);
+        }
+        $direccion = mb_strtoupper(trim($direccion));
+        \Illuminate\Support\Facades\Validator::make(['direccion'=>$direccion],
+            ['direccion'=>['required','string','min:5','max:255','not_regex:~[\r\n\x00-\x1F]~']])->validate();
+        $datos = $this->direccionMapa;
+        $buscar = fn ($lista, $nombre) => collect($lista)->first(fn ($fila) => Str::ascii(mb_strtoupper($fila->nombre)) === Str::ascii($nombre))?->id;
+        if (filled($datos['departamento'])) {
+            $this->ciudad_id = $buscar($this->getDepartamentosCatalogo(), $datos['departamento']) ?: 'OTRA';
+            $this->otro_departamento = $this->ciudad_id === 'OTRA' ? $datos['departamento'] : null;
+        }
+        $this->municipio_id = $buscar($this->getMunicipiosCatalogo($this->ciudad_id), $datos['municipio']) ?: 'OTRA';
+        $this->otro_municipio = $this->municipio_id === 'OTRA' ? $datos['municipio'] : null;
+        $this->zona_id = $buscar($this->getZonasCatalogo($this->municipio_id), $datos['zona']) ?: 'OTRA';
+        $this->otra_zona = $this->zona_id === 'OTRA' ? $datos['zona'] : null;
+        $this->calle_id = $buscar($this->getCallesCatalogo($this->zona_id), $datos['calle']) ?: 'OTRA';
+        $this->otra_calle = $this->calle_id === 'OTRA' ? $datos['calle'] : null;
+        $this->nro_casa = $datos['numero'];
+        $this->direccion = $direccion;
+        $this->limpiarValidacionUbicacion(array_keys($this->reglasUbicacion()));
+        $this->validarCampoFormulario('direccion');
+        $this->direccionMapa = null;
+        $this->resetValidation('mapa_direccion');
+        $this->dispatch('direccion-personal-completada');
     }
 
     public function getGoogleMapsUrlProperty(): ?string

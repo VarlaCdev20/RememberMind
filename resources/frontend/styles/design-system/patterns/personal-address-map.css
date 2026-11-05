@@ -1,0 +1,19 @@
+.rm-address-map { margin-block: var(--rm-space-4); padding: var(--rm-space-4); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg); background: var(--rm-form-panel, var(--rm-surface)); min-width: 0; }
+.rm-address-map__intro, .rm-address-map__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-3); }
+.rm-address-map__intro > div { flex: 1 1 20rem; min-width: 0; }
+.rm-address-map__intro strong { color: var(--rm-primary-ink); font-weight: 800; }
+.rm-address-map__heading { margin-block: var(--rm-space-3); }
+.rm-address-map__canvas { width: 100%; height: clamp(280px, 36vh, 420px); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); margin-block: var(--rm-space-3); z-index: 0; font-family: inherit; background: var(--rm-form-panel, var(--rm-surface)); }
+.rm-address-map__canvas:focus-visible { outline: 3px solid var(--rm-focus); outline-offset: 3px; }
+.rm-address-map__canvas .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; font-family: inherit; color: var(--rm-primary-ink); }
+.rm-address-map__canvas .leaflet-control-attribution { font-size: 12px; line-height: 1.5; max-width: 100%; white-space: normal; }
+.rm-address-map__pin { font-size: 32px; line-height: 40px; text-align: center; }
+.rm-address-map__actions { display: flex; flex-wrap: wrap; gap: var(--rm-space-2); margin-block: var(--rm-space-3); }
+.rm-address-map__result { display: grid; gap: var(--rm-space-2); margin-top: var(--rm-space-4); }
+.rm-address-map__result label { font-weight: 800; font-size: var(--rm-font-size-compact); }
+.rm-address-map__result button { justify-self: start; }
+.rm-address-map :is(button, textarea) { min-height: 44px; }
+@media (max-width: 639px) { .rm-address-map { padding: var(--rm-space-3); } .rm-address-map__actions > button, .rm-address-map__intro > button, .rm-address-map__result > button { width: 100%; } .rm-address-map__canvas { height: 300px; } }
+.rm-staff-registration-dialog .rm-staff-registration .rm-address-map__result textarea { height: auto; min-height: 112px; line-height: 1.5; text-align: start; }
+.rm-staff-registration-dialog .rm-address-map .rm-btn-primary { background: var(--rm-form-accent); color: var(--rm-palette-petroleum-950); }
+.rm-address-map button { scroll-margin-block: 96px; }

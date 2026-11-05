@@ -119,6 +119,7 @@ config(['filesystems.disks.tmp-for-tests'=>[
     'driver'=>'local', 'root'=>$archivo.'.storage/tmp-livewire', 'throw'=>true,
 ]]);
 config(['logging.default'=>'single','logging.channels.single.path'=>$archivo.'.log']);
+if (getenv('RM_GERENCIA_QA_MAPA') === '1') require __DIR__.'/DireccionMapaSintetica.php';
 $kernel->pushMiddleware(AutenticarGerenciaSintetica::class);
 $request = Request::capture();
 $response = $kernel->handle($request);

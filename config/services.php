@@ -14,6 +14,12 @@ return [
     |
     */
 
+    'direccion_personal' => [
+        'geocoding_url' => env('PERSONAL_GEOCODING_URL', 'https://nominatim.openstreetmap.org'),
+        'tiles_url' => env('PERSONAL_MAP_TILES_URL', 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+        'user_agent' => 'RememberMind/1.0 (contact: remembermind.health@gmail.com)',
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
