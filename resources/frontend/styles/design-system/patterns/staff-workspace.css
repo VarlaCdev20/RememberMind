@@ -235,13 +235,25 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 
 /* Registro institucional: secciones compartidas y progreso como el alta de usuarios. */
-.rm-staff-registration-dialog .rm-modal-panel { width: min(1024px, calc(100vw - 32px)); max-width: 1024px; max-height: min(90dvh, 760px); border-radius: var(--rm-radius-md); }
+.rm-staff-registration-dialog {
+    --rm-font-family: "Nunito", sans-serif;
+    --rm-font-body: "Nunito", sans-serif;
+    --rm-font-friendly: "Nunito", sans-serif;
+    font-family: var(--rm-font-family);
+}
+.rm-staff-registration-dialog :is(input, select, textarea, button, label, p, h2, h3, legend) { font-family: var(--rm-font-family) !important; }
+.rm-staff-registration-dialog .rm-staff-registration :is(.rm-input, .rm-btn, .rm-btn-primary, .rm-btn-secondary) { border-radius: var(--rm-radius-xl); }
+.rm-staff-registration-dialog .rm-staff-registration .rm-input { min-height: 48px; font-size: var(--rm-font-size-body-lg); }
+.rm-staff-registration-dialog .rm-staff-registration .rm-label { font-size: var(--rm-font-size-body); font-weight: 700; }
+.rm-staff-registration-dialog .rm-staff-registration .rm-form-section { border-radius: var(--rm-radius-2xl); }
+
+.rm-staff-registration-dialog .rm-modal-panel { width: min(1180px, calc(100vw - 32px)); max-width: 1180px; max-height: min(94dvh, 860px); border-radius: var(--rm-radius-2xl); }
 .rm-staff-registration-dialog .rm-modal-header { align-items: center; padding-block: var(--rm-space-3); }
-.rm-staff-registration-dialog .rm-modal-body { padding: var(--rm-space-4); }
-.rm-staff-registration-dialog .rm-modal-panel__title { font-family: var(--rm-font-friendly); font-size: var(--rm-font-size-section); }
-.rm-staff-registration__identity-layout { display: grid; grid-template-columns: 152px minmax(0, 1fr); align-items: start; gap: var(--rm-space-5); }
+.rm-staff-registration-dialog .rm-modal-body { padding: var(--rm-space-5); }
+.rm-staff-registration-dialog .rm-modal-panel__title { font-family: var(--rm-font-friendly); font-size: var(--rm-font-size-section); font-weight: 800; }
+.rm-staff-registration__identity-layout { display: grid; grid-template-columns: 168px minmax(0, 1fr); align-items: start; gap: var(--rm-space-5); }
 .rm-staff-registration__portrait { display: grid; gap: var(--rm-space-3); min-width: 0; }
-.rm-staff-registration__photo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--rm-space-2); width: 128px; height: 144px; margin-inline: auto; border: 1px dashed var(--rm-border); border-radius: var(--rm-radius-md); background: var(--rm-surface-soft); color: var(--rm-text-secondary); overflow: hidden; }
+.rm-staff-registration__photo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--rm-space-2); width: 144px; height: 160px; margin-inline: auto; border: 1px dashed var(--rm-border); border-radius: var(--rm-radius-md); background: var(--rm-surface-soft); color: var(--rm-text-secondary); overflow: hidden; }
 .rm-staff-registration__photo > i { font-size: var(--rm-icon-xl); }
 .rm-staff-registration__photo > span { font-size: var(--rm-font-size-meta); text-align: center; }
 .rm-staff-registration__photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -281,4 +293,9 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     .rm-staff-registration .rm-form-grid { grid-template-columns: minmax(0, 1fr); }
     .rm-staff-registration__details { grid-template-columns: minmax(0, 1fr); }
     .rm-staff-registration__footer > button { flex: 1 1 auto; }
+}
+
+@media (max-width: 767px) {
+    .rm-staff-registration-dialog .rm-modal-body { padding: var(--rm-space-4); }
+    .rm-staff-registration-dialog .rm-staff-registration .rm-input { font-size: 16px; }
 }

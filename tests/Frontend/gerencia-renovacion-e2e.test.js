@@ -184,6 +184,9 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             }));
             await page.screenshot({path:join(personalOut,`formulario-${width}.png`),fullPage:true});
             assert.deepEqual(form,{overflow:false,steps:4,section:true,labels:true},`Formulario ${width}`);
+            assert.equal(await page.$eval('.rm-staff-registration', e =>
+                [...e.querySelectorAll('input, select, textarea, button, label')].every(control => getComputedStyle(control).fontFamily.startsWith('Nunito'))
+                && document.fonts.check('400 15px Nunito')), true, 'Nunito cargada en campos, etiquetas y botones');
             await page.click('.rm-staff-registration button[wire\\:click="avanzarPaso"]');
             await page.waitForFunction(() => document.querySelectorAll('.rm-staff-registration [aria-invalid="true"]').length >= 8);
             assert.equal(await page.$eval('#trabajador-nombres', e => e === document.activeElement), true, 'Foco en el primer dato faltante');
