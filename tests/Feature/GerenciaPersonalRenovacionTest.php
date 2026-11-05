@@ -45,6 +45,89 @@ class GerenciaPersonalRenovacionTest extends TestCase
         return $actor;
     }
 
+    public function test_todos_los_pasos_validan_cada_campo_sin_borrar_errores_ajenos(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set('telefono', '123')->assertHasErrors(['telefono'])
+            ->set('rol_seleccionado', 'ADMINISTRADOR')->assertSet('camposValidados.roles_seleccionados', true)
+            ->set('fecha_ingreso', 'fecha inválida')->assertHasErrors(['fecha_ingreso', 'telefono'])
+            ->set('fecha_ingreso', '2026-11-01')->assertHasNoErrors(['fecha_ingreso'])->assertHasErrors(['telefono'])
+            ->set('matricula_prof', str_repeat('A', 51))->assertHasErrors(['matricula_prof'])
+            ->set('matricula_prof', 'abc-123')->assertHasNoErrors(['matricula_prof'])->assertSet('matricula_prof', 'ABC-123')
+            ->set('observaciones', '')->assertSet('camposValidados.observaciones', false)
+            ->set('fecha_ingreso', '')->assertSet('camposValidados.fecha_ingreso', false)
+            ->set('observaciones', 'observación sintética')->assertSet('camposValidados.observaciones', true)
+            ->assertHasErrors(['telefono'])->set('pasoActual', 2)->assertSeeHtml('id="trabajador-rol-source"');
+    }
+
+    public function test_guardado_revisa_todos_los_pasos_y_vuelve_al_primero_invalido(): void
+    {
+        $this->gerente();
+        $form = Livewire::test(PersonalInstitucionalForm::class)->set([
+            'nombres'=>'Persona', 'ap_paterno'=>'Sintética', 'numero_documento'=>'87654321', 'expedido'=>'LP',
+            'fecha_nacimiento'=>'1990-01-01', 'genero'=>'F', 'telefono'=>'123', 'direccion'=>'Dirección sintética',
+            'correo'=>'validacion-integral@remembermind.test', 'contrasena_temporal'=>'corta', 'rol_seleccionado'=>'ADMINISTRADOR',
+        ])->set('pasoActual', 4)->call('guardar')->assertHasErrors(['telefono'])->assertSet('pasoActual', 1)
+            ->assertDispatched('personal-validacion-fallida');
+        $form->set('telefono', '77712345')->set('pasoActual', 4)->call('guardar')
+            ->assertHasErrors(['contrasena_temporal'])->assertSet('pasoActual', 3)
+            ->set('contrasena_temporal', 'Sintetica#12345')->set('pasoActual', 4)->call('guardar')
+            ->assertHasErrors(['archivos_temporales.CI', 'archivos_temporales.FOTO_DOC', 'archivos_temporales.CV'])->assertSet('pasoActual', 4);
+        $this->assertDatabaseMissing('usuarios', ['correo'=>'validacion-integral@remembermind.test']);
+        $this->assertDatabaseCount('documentos', 0);
+    }
+
+    public function test_recorrido_completo_llega_a_revision_sin_guardar_antes_de_confirmar(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set([
+            'nombres'=>'Persona', 'ap_paterno'=>'Sintética', 'numero_documento'=>'87654321', 'expedido'=>'LP',
+            'fecha_nacimiento'=>'1990-01-01', 'genero'=>'F', 'telefono'=>'77712345', 'direccion'=>'Dirección sintética',
+        ])->call('avanzarPaso')->assertSet('pasoActual', 2)->set('rol_seleccionado', 'ADMINISTRADOR')
+            ->call('avanzarPaso')->assertSet('pasoActual', 3)
+            ->set('correo', 'recorrido@remembermind.test')->set('contrasena_temporal', 'Sintetica#12345')
+            ->call('avanzarPaso')->assertSet('pasoActual', 4)->assertHasNoErrors()->assertSee('Resumen del registro')
+            ->assertSee('Documentación')->assertSee('recorrido@remembermind.test');
+        $this->assertDatabaseMissing('usuarios', ['correo'=>'recorrido@remembermind.test']);
+        $this->assertDatabaseCount('documentos', 0);
+    }
+
+    public function test_documentos_tienen_estados_por_campo_y_quitar_limpia_el_error(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set('rol_seleccionado', 'ADMINISTRADOR')
+            ->set('telefono', '123')->set('archivos_temporales.CI', UploadedFile::fake()->create('invalido.txt', 10, 'text/plain'))
+            ->assertHasErrors(['archivos_temporales.CI', 'telefono'])
+            ->set('archivos_temporales.CI', UploadedFile::fake()->create('identidad.pdf', 10, 'application/pdf'))
+            ->assertHasNoErrors(['archivos_temporales.CI'])->assertSet('camposValidados', fn ($campos)=>($campos['archivos_temporales.CI'] ?? false) === true)
+            ->assertHasErrors(['telefono'])->call('removerDocumento', 'CI')->assertHasNoErrors(['archivos_temporales.CI'])
+            ->assertSet('camposValidados', fn ($campos)=>!isset($campos['archivos_temporales.CI']))
+            ->set('archivos_temporales.NO_CONFIGURADO', UploadedFile::fake()->create('extra.pdf', 10, 'application/pdf'))
+            ->assertHasErrors(['archivos_temporales']);
+    }
+
+    public function test_cambiar_calle_conserva_el_verde_del_departamento_y_municipio(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set('ciudad_id', 'LPZ')->set('municipio_id', 'MUN_LPZ')
+            ->set('zona_id', 'ZON_SOP')->set('calle_id', 'CAL_ARC')->assertSet('camposValidados.ciudad_id', true)
+            ->assertSet('camposValidados.municipio_id', true)->assertSet('camposValidados.zona_id', true)
+            ->set('calle_id', 'CAL_6AG')->assertSet('camposValidados.ciudad_id', true)->assertSet('camposValidados.municipio_id', true);
+    }
+
+    public function test_fotografia_no_acepta_rutas_inventadas_y_vacia_no_es_verde(): void
+    {
+        $this->gerente();
+        Livewire::test(PersonalInstitucionalForm::class)->set('foto_perfil', 'ruta-inventada.jpg')->assertHasErrors(['foto_perfil'])
+            ->set('foto_perfil', UploadedFile::fake()->image('perfil.jpg'))->assertHasNoErrors(['foto_perfil'])
+            ->assertSet('camposValidados.foto_perfil', true)->set('foto_perfil', null)->assertHasNoErrors(['foto_perfil'])
+            ->assertSet('camposValidados.foto_perfil', false);
+        $usuario = User::factory()->create(['foto'=>'personal/perfil-sintetico.jpg']);
+        $usuario->assignRole('ADMINISTRADOR');
+        Livewire::test(PersonalInstitucionalForm::class, ['usuarioId'=>$usuario->getKey()])->set('foto_perfil', $usuario->foto)
+            ->assertHasNoErrors(['foto_perfil'])->set('foto_perfil', 'otra-ruta.jpg')->assertHasErrors(['foto_perfil']);
+    }
+
     public function test_direccion_filtra_por_padres_y_aplica_solo_con_confirmacion(): void
     {
         $this->gerente();

@@ -339,12 +339,22 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration-dialog .rm-staff-registration__phone .rm-input { padding-inline-start: 68px; }
 
 .rm-staff-registration-dialog .rm-modal-body { scroll-padding-block: 24px 96px; }
-.rm-staff-registration-dialog .rm-staff-registration :is(input, textarea, .rm-choice__trigger) { scroll-margin-block: var(--rm-space-4); }
+.rm-staff-registration-dialog .rm-staff-registration :is(input, textarea, .rm-choice__trigger, .rm-field) { scroll-margin-block: var(--rm-space-4); }
 
 .rm-staff-registration-dialog .rm-staff-registration__other-country { min-height: 44px; justify-content: center; font-size: var(--rm-font-size-label); box-shadow: none; color: var(--rm-primary-ink); }
 .rm-staff-registration__address { grid-column: 1 / -1; display: grid; gap: var(--rm-space-3); }
 .rm-staff-registration__address-preview { color: var(--rm-text-primary); overflow-wrap: anywhere; }
 .rm-staff-registration__address-preview > p:first-of-type { margin: 0; }
+.rm-staff-registration__password { display: flex; align-items: stretch; gap: var(--rm-space-2); min-width: 0; }
+.rm-staff-registration__password > input { flex: 1 1 auto; min-width: 0; }
+.rm-staff-registration__password > button { flex: 0 0 48px; min-height: 48px; padding: var(--rm-space-2); }
+.rm-staff-registration-dialog .rm-staff-registration .rm-input[type="file"] { min-height: 58px; height: auto; padding: var(--rm-space-2); max-width: 100%; font-size: var(--rm-font-size-body); }
+.rm-staff-registration .rm-input[type="file"]::file-selector-button { font: inherit; color: var(--rm-palette-petroleum-950); background: var(--rm-form-accent); border: 1px solid var(--rm-primary); border-radius: var(--rm-radius-lg); min-height: 44px; padding: var(--rm-space-2) var(--rm-space-3); margin-inline-end: var(--rm-space-2); cursor: pointer; }
+.rm-staff-registration__remove-file { justify-self: start; min-height: 44px; }
+.rm-staff-registration__review { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.rm-staff-registration__review > div { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(0, 2fr); gap: var(--rm-space-3); padding-block: var(--rm-space-2); border-bottom: 1px solid var(--rm-border); }
+.rm-staff-registration__review dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 639px) { .rm-staff-registration__review > div { grid-template-columns: minmax(0, 1fr); gap: var(--rm-space-1); } }
 .rm-staff-registration__location { border-top: 1px solid var(--rm-border); padding-top: var(--rm-space-2); }
 .rm-staff-registration__location summary { display: flex; align-items: center; gap: var(--rm-space-2); min-height: 44px; cursor: pointer; color: var(--rm-primary-ink); font-weight: 800; border-radius: var(--rm-radius-lg); }
 .rm-staff-registration__location summary:focus-visible { outline: 2px solid var(--rm-primary-ink); outline-offset: 2px; }

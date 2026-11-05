@@ -125,6 +125,10 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     }
     if (process.env.RM_GERENCIA_QA_PERSONAL) {
         const personalOut = join(out, 'personal-unificado'); mkdirSync(personalOut, {recursive:true});
+        const documentoPdf = db+'.pdf', documentoTexto = db+'.txt';
+        writeFileSync(documentoPdf, '%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF');
+        writeFileSync(documentoTexto, 'Archivo sintético que no es un documento permitido.');
+        t.after(()=>{for(const archivo of [documentoPdf, documentoTexto]){assert.equal(resolve(dirname(archivo)),resolve(tmpdir()));rmSync(archivo,{force:true});}});
         for (const width of [1440,1280,1024,768,390]) {
             await page.setViewport({width,height:960});
             await go('/admin/personal-institucional');
@@ -281,7 +285,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             if (!await page.$eval('.rm-staff-registration__location', e=>e.open)) await page.locator('.rm-staff-registration__location summary').click();
             await page.waitForSelector('#direccion-pais', {visible:true});
             assert.match(await page.$eval('#direccion-pais', e=>e.textContent), /Bolivia/, 'La residencia no cambia con el país del teléfono/documento');
-            const elegirUbicacion = async (id, valor) => {
+            const elegirOpcion = async (id, valor) => {
                 await page.focus('#'+id);
                 await page.locator('#'+id).click();
                 const index = await page.$eval('#'+id+'-source',(e,valor)=>Array.from(e.options).findIndex(o=>o.value===valor),valor);
@@ -289,13 +293,13 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
                 await page.waitForSelector('#'+id+'-op-'+index,{visible:true});
                 await page.locator('#'+id+'-op-'+index).click();
             };
-            await elegirUbicacion('direccion-ciudad_id','LPZ');
+            await elegirOpcion('direccion-ciudad_id','LPZ');
             await page.waitForFunction(()=>document.querySelector('#direccion-municipio_id-source option[value="MUN_LPZ"]'));
-            await elegirUbicacion('direccion-municipio_id','MUN_LPZ');
+            await elegirOpcion('direccion-municipio_id','MUN_LPZ');
             await page.waitForFunction(()=>document.querySelector('#direccion-zona_id-source option[value="ZON_SOP"]'));
-            await elegirUbicacion('direccion-zona_id','ZON_SOP');
+            await elegirOpcion('direccion-zona_id','ZON_SOP');
             await page.waitForFunction(()=>document.querySelector('#direccion-calle_id-source option[value="CAL_ARC"]'));
-            await elegirUbicacion('direccion-calle_id','CAL_ARC');
+            await elegirOpcion('direccion-calle_id','CAL_ARC');
             await page.waitForFunction(()=>document.querySelector('#direccion-calle_id-source')?.value==='CAL_ARC' && !document.querySelector('[data-completar-direccion]')?.disabled);
             await page.focus('#direccion-nro-casa');
             await page.locator('#direccion-nro-casa').fill('120'); await page.keyboard.press('Tab');
@@ -306,6 +310,52 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.waitForFunction(()=>document.querySelector('#trabajador-direccion')?.textContent.includes('AV. ARCE, N.º 120, ZONA SOPOCACHI'));
             await page.waitForFunction(()=>!document.querySelector('.rm-staff-registration__location')?.open);
             await page.screenshot({path:join(personalOut,`direccion-completada-${width}.png`),fullPage:true});
+            await page.focus('#trabajador-numero_documento');
+            await page.locator('#trabajador-numero_documento').fill('AB123456'); await page.keyboard.press('Tab');
+            await page.$eval('#trabajador-nacimiento', e=>{e.value='1990-01-01'; e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));e.dispatchEvent(new FocusEvent('blur',{bubbles:true}));});
+            await page.waitForFunction(()=>document.querySelector('#trabajador-nacimiento')?.closest('.rm-field--valid'));
+            await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
+            await page.waitForSelector('#trabajador-rol',{visible:true});
+            await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
+            await page.waitForFunction(()=>document.querySelector('#trabajador-rol')?.getAttribute('aria-invalid')==='true');
+            await page.screenshot({path:join(personalOut,`laboral-errores-${width}.png`),fullPage:true});
+            await elegirOpcion('trabajador-rol','ADMINISTRADOR');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-rol')?.closest('.rm-field--valid'));
+            await page.focus('#trabajador-matricula');
+            await page.locator('#trabajador-matricula').fill('abc-123');await page.keyboard.press('Tab');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-matricula')?.value==='ABC-123' && document.querySelector('#trabajador-matricula')?.closest('.rm-field--valid'));
+            await page.screenshot({path:join(personalOut,`laboral-${width}.png`),fullPage:true});
+            await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
+            await page.waitForSelector('#trabajador-correo',{visible:true});
+            await page.locator('#trabajador-correo').fill('correo-invalido');await page.keyboard.press('Tab');
+            await page.locator('#trabajador-clave').fill('corta');await page.keyboard.press('Tab');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-clave')?.closest('.rm-field--invalid') && document.querySelector('#trabajador-correo')?.closest('.rm-field--invalid'));
+            await page.screenshot({path:join(personalOut,`cuenta-errores-${width}.png`),fullPage:true});
+            await page.locator('#trabajador-correo').fill('persona-'+width+'@remembermind.test');await page.keyboard.press('Tab');
+            await page.locator('#trabajador-clave').fill('Sintetica#12345');await page.keyboard.press('Tab');
+            await page.waitForFunction(()=>document.querySelector('#trabajador-clave')?.closest('.rm-field--valid') && document.querySelector('#trabajador-correo')?.closest('.rm-field--valid'));
+            await page.locator('[aria-label="Mostrar contraseña temporal"]').click();
+            await page.waitForFunction(()=>document.querySelector('#trabajador-clave')?.type==='text');
+            assert.equal(await page.$eval('#trabajador-clave',e=>e.value),'Sintetica#12345');
+            await page.locator('[aria-label="Ocultar contraseña temporal"]').click();
+            await page.waitForFunction(()=>document.querySelector('#trabajador-clave')?.type==='password');
+            await page.screenshot({path:join(personalOut,`cuenta-${width}.png`),fullPage:true});
+            await page.locator('.rm-staff-registration button[wire\\:click="avanzarPaso"]').click();
+            await page.waitForSelector('#documento-CI',{visible:true});
+            assert.equal(await page.$eval('.rm-staff-registration__review', e=>e.textContent.includes('Sintetica#12345')),false,'El resumen no expone la contraseña');
+            await page.locator('.rm-staff-registration button[type="submit"]').click();
+            await page.waitForFunction(()=>['CI','FOTO_DOC','CV'].every(id=>document.getElementById('documento-'+id)?.getAttribute('aria-invalid')==='true'));
+            await page.screenshot({path:join(personalOut,`documentos-errores-${width}.png`),fullPage:true});
+            await (await page.$('#documento-CI')).uploadFile(documentoTexto);
+            await page.waitForFunction(()=>document.getElementById('documento-CI')?.closest('.rm-field')?.innerText.includes('El archivo debe ser PDF'));
+            await (await page.$('#documento-CI')).uploadFile(documentoPdf);
+            await page.waitForFunction(()=>document.getElementById('documento-CI')?.closest('.rm-field--valid'));
+            await page.screenshot({path:join(personalOut,`documentos-${width}.png`),fullPage:true});
+            await page.focus('.rm-field:has(#documento-CI) .rm-staff-registration__remove-file');
+            await page.locator('.rm-field:has(#documento-CI) .rm-staff-registration__remove-file').click();
+            await page.waitForFunction(()=>!document.getElementById('documento-CI')?.closest('.rm-field--valid') && !document.getElementById('documento-CI')?.value);
+            assert.equal(await page.$eval('.rm-staff-registration', e=>e.scrollWidth>e.clientWidth+1),false,'Todos los pasos mantienen el ancho del modal');
+
 
 
 
