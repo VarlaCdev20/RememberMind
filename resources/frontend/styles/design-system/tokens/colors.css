@@ -71,6 +71,10 @@
    --rm-palette-surface: #F7F3EF;
    --rm-palette-surface-soft: #EFEAE4;
    --rm-palette-surface-muted: #B8ADA1;
+   /* Captura administrativa sin matiz crema, solicitada por la propietaria. */
+   --rm-form-panel: #E8E7E5;
+   --rm-form-section: #F5F7F5;
+   --rm-form-input: #FFFFFF;
    --rm-palette-ink: #4A4642;
    --rm-palette-ink-secondary: #67615B;
    /* Salvia complementaria: se conservan los mentas existentes. */
@@ -452,6 +456,9 @@
    --rm-psychology-soft: color-mix(in srgb, var(--rm-psychology) 18%, var(--rm-surface));
    --rm-nutrition-soft: color-mix(in srgb, var(--rm-nutrition) 18%, var(--rm-surface));
    --rm-warning-soft: color-mix(in srgb, var(--rm-warning) 18%, var(--rm-surface));
+   --rm-form-panel: var(--rm-palette-petroleum-900);
+   --rm-form-section: var(--rm-palette-petroleum-800);
+   --rm-form-input: var(--rm-palette-petroleum-raised);
    --rm-validation-error: #FF818B;
    --rm-danger-soft: color-mix(in srgb, var(--rm-danger) 18%, var(--rm-surface));
    --rm-danger-strong: color-mix(in srgb, var(--rm-danger) 35%, var(--rm-text-primary));
