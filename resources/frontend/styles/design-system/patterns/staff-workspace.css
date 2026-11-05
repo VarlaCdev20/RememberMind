@@ -343,6 +343,8 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 
 .rm-staff-registration-dialog .rm-staff-registration__other-country { min-height: 44px; justify-content: center; font-size: var(--rm-font-size-label); box-shadow: none; color: var(--rm-primary-ink); }
 .rm-staff-registration__address { grid-column: 1 / -1; display: grid; gap: var(--rm-space-3); }
+.rm-staff-registration__address-preview { color: var(--rm-text-primary); overflow-wrap: anywhere; }
+.rm-staff-registration__address-preview > p:first-of-type { margin: 0; }
 .rm-staff-registration__location { border-top: 1px solid var(--rm-border); padding-top: var(--rm-space-2); }
 .rm-staff-registration__location summary { display: flex; align-items: center; gap: var(--rm-space-2); min-height: 44px; cursor: pointer; color: var(--rm-primary-ink); font-weight: 800; border-radius: var(--rm-radius-lg); }
 .rm-staff-registration__location summary:focus-visible { outline: 2px solid var(--rm-primary-ink); outline-offset: 2px; }

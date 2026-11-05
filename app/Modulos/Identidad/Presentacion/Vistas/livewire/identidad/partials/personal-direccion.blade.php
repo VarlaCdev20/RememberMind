@@ -1,5 +1,5 @@
-<details class="rm-staff-registration__location" wire:ignore.self @direccion-personal-completada.window="$el.open = false; dirty = true; $nextTick(() => document.getElementById('trabajador-direccion')?.focus())">
-    <summary><i class="ph-bold ph-map-pin" aria-hidden="true"></i> Completar por país, zona y calle</summary>
+<details @if(!filled($direccion)) open @endif class="rm-staff-registration__location" wire:ignore.self @direccion-personal-completada.window="$el.open = false; dirty = true; $nextTick(() => document.getElementById('direccion-encabezado')?.focus())">
+    <summary id="direccion-encabezado"><i class="ph-bold ph-map-pin" aria-hidden="true"></i> Dirección de residencia</summary>
     <p class="rm-help">Las sugerencias locales son parciales. Elige «Otra» si no encuentras tu dirección y revisa el texto antes de guardar.</p>
     <div class="rm-staff-registration__location-fields">
         <x-ui.field label="País de residencia" for="direccion-pais" error="pais_direccion" :valid="$camposValidados['pais_direccion'] ?? false" required>

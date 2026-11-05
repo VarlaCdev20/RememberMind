@@ -49,6 +49,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
     {
         $this->gerente();
         $form = Livewire::test(PersonalInstitucionalForm::class)->set('direccion', 'DIRECCIÓN ANTERIOR')
+            ->assertDontSeeHtml('<textarea id="trabajador-direccion"')->assertSee('DIRECCIÓN ANTERIOR')
             ->set('ciudad_id', 'LPZ')->set('municipio_id', 'MUN_LPZ')->set('zona_id', 'ZON_SOP')
             ->set('calle_id', 'CAL_ARC')->set('nro_casa', '120')->assertSet('direccion', 'DIRECCIÓN ANTERIOR')
             ->call('completarDireccion')->assertHasNoErrors()->assertDispatched('direccion-personal-completada')

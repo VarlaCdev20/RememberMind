@@ -200,7 +200,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             assert.equal(await page.$eval('#trabajador-ap_materno', e => e.value), 'MUÑOZ');
             assert.equal(await page.$eval('#trabajador-ap_paterno', e => e.getAttribute('aria-invalid')), 'false');
             assert.equal(await page.$eval('#trabajador-numero_documento', e => e.getAttribute('aria-invalid')), 'true', 'Corregir apellidos conserva los demás errores');
-            assert.equal(await page.$eval('#trabajador-direccion', e => getComputedStyle(e).resize), 'none');
+            assert.equal(await page.$('textarea#trabajador-direccion'), null, 'La dirección se captura una sola vez mediante los selectores');
             assert.equal(await page.$eval('.rm-staff-registration', e => e.textContent.includes('Se guarda todo al finalizar')), false);
             await page.type('#trabajador-telefono', 'a123b');
             await page.keyboard.press('Tab');
@@ -278,7 +278,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             assert.match(await page.$eval('#trabajador-pais-telefono-otro img',e=>e.src),/fr\.svg$/);
             await page.screenshot({path:join(personalOut,`otro-pais-${width}.png`),fullPage:true});
             await page.focus('.rm-staff-registration__location summary');
-            await page.locator('.rm-staff-registration__location summary').click();
+            if (!await page.$eval('.rm-staff-registration__location', e=>e.open)) await page.locator('.rm-staff-registration__location summary').click();
             await page.waitForSelector('#direccion-pais', {visible:true});
             assert.match(await page.$eval('#direccion-pais', e=>e.textContent), /Bolivia/, 'La residencia no cambia con el país del teléfono/documento');
             const elegirUbicacion = async (id, valor) => {
@@ -300,10 +300,10 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             await page.focus('#direccion-nro-casa');
             await page.locator('#direccion-nro-casa').fill('120'); await page.keyboard.press('Tab');
             await page.screenshot({path:join(personalOut,`direccion-${width}.png`),fullPage:true});
-            assert.equal(await page.$eval('#trabajador-direccion',e=>e.value),'','El asistente no reemplaza el texto sin aplicarlo');
+            assert.match(await page.$eval('#trabajador-direccion',e=>e.textContent),/Usar esta dirección/,'La selección requiere confirmación antes de sustituir la dirección');
             await page.focus('[data-completar-direccion]');
             await page.locator('[data-completar-direccion]').click();
-            await page.waitForFunction(()=>document.querySelector('#trabajador-direccion')?.value.includes('AV. ARCE, N.º 120, ZONA SOPOCACHI'));
+            await page.waitForFunction(()=>document.querySelector('#trabajador-direccion')?.textContent.includes('AV. ARCE, N.º 120, ZONA SOPOCACHI'));
             await page.waitForFunction(()=>!document.querySelector('.rm-staff-registration__location')?.open);
             await page.screenshot({path:join(personalOut,`direccion-completada-${width}.png`),fullPage:true});
 

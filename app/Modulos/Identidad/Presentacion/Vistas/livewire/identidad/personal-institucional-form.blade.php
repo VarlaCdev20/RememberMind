@@ -74,8 +74,12 @@
             <x-ui.field label="Fecha de nacimiento" for="trabajador-nacimiento" required error="fecha_nacimiento" :valid="$camposValidados['fecha_nacimiento'] ?? false"><input id="trabajador-nacimiento" class="rm-input" type="date" min="{{ $limitesNacimiento['min'] }}" max="{{ $limitesNacimiento['max'] }}" wire:model.live.blur="fecha_nacimiento" aria-invalid="{{ $errors->has('fecha_nacimiento') ? 'true' : 'false' }}" @if($errors->has('fecha_nacimiento')) aria-describedby="trabajador-nacimiento-error" @elseif($camposValidados['fecha_nacimiento'] ?? false) aria-describedby="trabajador-nacimiento-valid trabajador-nacimiento-help" @else aria-describedby="trabajador-nacimiento-help" @endif required><p id="trabajador-nacimiento-help" class="rm-help">De 18 a 50 años, inclusive.</p></x-ui.field>
             <x-ui.field label="Género" for="trabajador-genero" required error="genero" :valid="$camposValidados['genero'] ?? false"><x-ui.selector id="trabajador-genero" label="Género" wire:model.live="genero" :teleport="$destinoSelectoresPersonal" aria-invalid="{{ $errors->has('genero') ? 'true' : 'false' }}" :aria-describedby="$errors->has('genero') ? 'trabajador-genero-error' : (($camposValidados['genero'] ?? false) ? 'trabajador-genero-valid' : null)"><option value="" disabled>Seleccionar género</option><option value="F">Femenino</option><option value="M">Masculino</option></x-ui.selector></x-ui.field>
             <div class="rm-staff-registration__address">
-<x-ui.field label="Dirección" for="trabajador-direccion" required error="direccion" :valid="$camposValidados['direccion'] ?? false"><textarea id="trabajador-direccion" data-captura="texto" class="rm-input" placeholder="Ej. Calle Los Pinos, n.º 120" wire:model.live.blur="direccion" aria-invalid="{{ $errors->has('direccion') ? 'true' : 'false' }}" @if($errors->has('direccion')) aria-describedby="trabajador-direccion-error" @elseif($camposValidados['direccion'] ?? false) aria-describedby="trabajador-direccion-valid" @endif rows="2" maxlength="255" required></textarea></x-ui.field>
                 @include('livewire.identidad.partials.personal-direccion')
+                <div class="rm-staff-registration__address-preview" aria-live="polite">
+                    @if(filled($direccion))<span class="rm-help">Dirección seleccionada</span>@endif
+                    <p id="trabajador-direccion">{{ $direccion ?: 'Selecciona tu ubicación y pulsa «Usar esta dirección».' }}</p>
+                    @error('direccion')<p id="trabajador-direccion-error" class="rm-error" role="alert"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i>{{ $message }}</p>@enderror
+                </div>
             </div>
                 </div>
             </div>
