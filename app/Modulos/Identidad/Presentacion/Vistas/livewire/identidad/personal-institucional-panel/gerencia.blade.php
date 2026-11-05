@@ -62,7 +62,7 @@
                 </table>
             </div>
         @endif
-        @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" />@endif
+        @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="true" />@endif
     </x-ui.section-card>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)

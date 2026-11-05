@@ -82,3 +82,15 @@ Build correcto y E2E focal PASS (25 s): tabla/tarjetas en cinco anchos, búsqued
 ## Paginador más delgado
 
 Se elimina el padding vertical, el recuadro/fondo del grupo de páginas y su separación interna; margen superior reducido a4 px. Se conserva el resaltado salvia y los controles de44 px. Medición en la pestaña operativa recargada: franja de45,6 px, padding0 y sin borde exterior de navegación. Build y E2E focal PASS (25 s), diez combinaciones en cinco anchos, filtros, menús/foco y oscuro390; capturas actualizadas y revisadas. Sin cambios funcionales o de permisos. CI completa no ejecutada para este ajuste CSS.
+
+## Referencia del paginador, registro y ficha compacta
+
+Referencia visual aportada por la propietaria: cápsula baja con números, página actual circular con borde, flechas circulares separadas y selector/botón de salto. Se conserva esa composición centrada; adaptación al salvia ya aprobado, textos en español y superficies de32 px dentro de objetivos táctiles de44 px. Rango con tipografía de etiqueta y menor peso. En móvil se reorganizan navegación, salto y rango en filas centradas.
+
+ui.paginacion añade showJump opcional (desactivado por defecto), que usa gotoPage y el nombre real del paginador; Personal lo habilita. El grupo de números conserva display:contents en los consumidores anteriores. Salto real verificado en la pestaña operativa:1-12 ->13-24 ->1-12 sin mutaciones de datos.
+
+Registrar trabajador reutiliza ui.form-section como Nuevo usuario de Superadmin: progreso con iconos y línea, secciones de campos y pie uniforme. Se conservan sus cuatro pasos, todos los campos, validaciones, confirmación de descarte y autorización; no se copian campos ni permisos exclusivos de Superadmin. Se retira la cabecera duplicada únicamente dentro del modal gerencial. La cabecera de otros consumidores se conserva. En móvil se abrevian las etiquetas visuales de pasos, manteniendo sus nombres accesibles completos.
+
+Ver ficha conserva action-button compartido, ahora variante pequeña, sin expansión en tarjetas: menor tipografía y fondo de32 px con área de interacción de44 px. Sin cambios de acciones/permisos.
+
+Verificación: build correcto;6 pruebas PHP /42 aserciones (paginador y wizard/confirmación integral). E2E focal final PASS (38 s): diez combinaciones tabla/tarjetas y formulario en cinco anchos, búsqueda/vacío/limpieza, menú/Escape/foco, salto sin cambio de página en fixture, cierre de formulario y oscuro390. Primera QA detectó overflow de los pasos en390 px; corregido antes del PASS. Cero errores JS/HTTP. Capturas sintéticas formulario-1440/1280/1024/768/390 y listado actualizadas y revisadas en escritorio/móvil. Formulario operativo abierto sin introducir ni guardar datos; cuatro pasos y sección compartida confirmados. Sin cambios de BDD, reglas, permisos o legacy; CI completa no ejecutada.

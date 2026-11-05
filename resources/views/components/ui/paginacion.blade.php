@@ -1,4 +1,4 @@
-@props(['paginator', 'mode' => 'url', 'perPage' => 10, 'perPageName' => null, 'label' => 'registros', 'showPerPage' => true, 'scrollTo' => false, 'excludeQuery' => []])
+@props(['paginator', 'mode' => 'url', 'perPage' => 10, 'perPageName' => null, 'label' => 'registros', 'showPerPage' => true, 'showJump' => false, 'scrollTo' => false, 'excludeQuery' => []])
 @php
     $livewire = $mode === 'livewire';
     $cursor = method_exists($paginator, 'getCursorName');
@@ -54,6 +54,7 @@
     <nav class="rm-pagination__pages" aria-label="Páginas de {{ $label }}">
         @foreach(['previous' => ['Página anterior', 'ph-caret-left', $paginator->onFirstPage()], 'next' => ['Página siguiente', 'ph-caret-right', !$paginator->hasMorePages()]] as $direction => [$title, $icon, $disabled])
             @if($direction === 'next')
+                <span class="rm-pagination__numbers">
                 @php $previousNumber = null; @endphp
                 @foreach($pages as $number)
                     @if($previousNumber !== null && $number - $previousNumber > 1)<span class="rm-pagination__ellipsis" aria-hidden="true">…</span>@endif
@@ -62,6 +63,7 @@
                     @else<a class="rm-pagination__page" href="{{ $paginator->url($number) }}" wire:navigate aria-label="Ir a la página {{ $number }}">{{ $number }}</a>@endif
                     @php $previousNumber = $number; @endphp
                 @endforeach
+                </span>
             @endif
             @if($disabled)<button type="button" class="rm-pagination__page" disabled aria-label="{{ $title }}"><i class="ph-bold {{ $icon }}" aria-hidden="true"></i></button>
             @elseif($livewire)
@@ -70,4 +72,13 @@
             @else<a class="rm-pagination__page" rel="{{ $direction === 'previous' ? 'prev' : 'next' }}" href="{{ $paginator->{$direction.'PageUrl'}() }}" wire:navigate aria-label="{{ $title }}"><i class="ph-bold {{ $icon }}" aria-hidden="true"></i></a>@endif
         @endforeach
     </nav>
+    @if($showJump && $livewire && $last)
+        <form class="rm-pagination__jump" x-data="{}" @submit.prevent="$wire.gotoPage(Number($refs.page.value), @js($pageName))">
+            <label for="{{ $controlId }}-destino">Ir a página</label>
+            <span class="rm-pagination__destination"><select id="{{ $controlId }}-destino" x-ref="page" wire:key="{{ $pageName }}-destino-{{ $current }}" aria-label="Página de destino">
+                @for($number = 1; $number <= $last; $number++)<option value="{{ $number }}" @selected($number === $current)>{{ $number }}</option>@endfor
+            </select><i class="ph-bold ph-caret-down" aria-hidden="true"></i></span>
+            <button type="submit" class="rm-pagination__go" wire:loading.attr="disabled" aria-label="Ir a la página seleccionada">Ir</button>
+        </form>
+    @endif
 </footer>
