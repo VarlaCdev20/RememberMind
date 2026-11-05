@@ -423,14 +423,27 @@
     background-color: color-mix(in srgb, var(--rm-validation-error) 5%, var(--rm-surface)) !important;
 }
 .rm-field--valid :is(input, select, textarea, .rm-staff-registration__photo-picker) {
-    border-color: var(--rm-success-strong) !important;
+    border: 2px solid var(--rm-validation-success) !important;
 }
 .rm-field-valid {
     display: flex;
     align-items: center;
     gap: var(--rm-space-1);
     font-size: var(--rm-font-size-meta);
-    color: var(--rm-success-strong);
+    color: var(--rm-validation-success);
+    font-weight: var(--rm-font-weight-semibold);
 }
 
 .rm-field--invalid > .rm-error { color: var(--rm-validation-error); }
+
+/* Un único contorno continuo del estado: sin aro de foco de otro color. */
+.rm-field--invalid :is(input, select, textarea, .rm-staff-registration__photo-picker):is(:focus, :focus-within) {
+    outline: 1px solid var(--rm-validation-error) !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+}
+.rm-field--valid :is(input, select, textarea, .rm-staff-registration__photo-picker):is(:focus, :focus-within) {
+    outline: 1px solid var(--rm-validation-success) !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+}

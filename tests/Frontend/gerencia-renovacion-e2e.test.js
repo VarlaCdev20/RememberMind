@@ -221,6 +221,13 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
             assert.equal(await page.$eval('.rm-staff-registration', e => e.innerText.includes('Revisa los datos indicados')), false, 'Sin aviso amarillo superior');
             assert.equal(feedback.overflow,false); assert.equal(feedback.links,true); assert.equal(feedback.optionalNeutral,true);
             assert.notEqual(feedback.green, feedback.red, 'Los bordes válidos y erróneos se distinguen');
+            assert.equal(feedback.green, 'rgb(8, 122, 53)', 'Verde bandera para el dato válido');
+            const focoInvalido = await page.$eval('#trabajador-nacimiento', e => {
+                const css = getComputedStyle(e);
+                return {focused:e === document.activeElement, border:css.borderColor, outline:css.outlineColor, offset:css.outlineOffset, shadow:css.boxShadow};
+            });
+            assert.equal(focoInvalido.focused,true); assert.equal(focoInvalido.outline,focoInvalido.border);
+            assert.equal(focoInvalido.offset,'0px'); assert.equal(focoInvalido.shadow,'none');
             await page.screenshot({path:join(personalOut,`validacion-${width}.png`),fullPage:true});
 
             await page.click('.rm-staff-registration__footer button:first-child');
