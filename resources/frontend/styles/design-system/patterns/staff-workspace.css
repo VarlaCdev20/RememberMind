@@ -262,11 +262,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-registration__details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: var(--rm-space-3); min-width: 0; }
 .rm-staff-registration__details > * { min-width: 0; }
 .rm-staff-registration__details textarea { min-height: 44px; }
-.rm-staff-registration__progress-copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-2); margin-block: var(--rm-space-3) var(--rm-space-2); }
-.rm-staff-registration__progress-copy > span { font-size: var(--rm-font-size-label); font-weight: 700; color: var(--rm-primary-ink); }
-.rm-staff-registration__progress { height: 4px; border-radius: var(--rm-radius-pill); background: var(--rm-border-soft); overflow: hidden; }
-.rm-staff-registration__progress > span { display: block; height: 100%; border-radius: inherit; background: var(--rm-primary); }
-.rm-staff-registration__steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--rm-space-2); padding-block: var(--rm-space-3); border-bottom: 1px solid var(--rm-border-soft); }
+.rm-staff-registration__steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--rm-space-2); padding-block: var(--rm-space-3); }
 .rm-staff-registration__steps::before { content: ''; position: absolute; top: 34px; inset-inline: 12%; height: 2px; background: var(--rm-border-soft); }
 .rm-staff-registration__step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: start; gap: var(--rm-space-2); min-width: 0; padding: 0 var(--rm-space-1); border: 0; background: transparent; color: var(--rm-text-secondary); font-size: var(--rm-font-size-label); font-weight: 650; white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .rm-staff-registration__step-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-pill); background: var(--rm-surface); color: var(--rm-text-secondary); font-size: var(--rm-icon-md); }

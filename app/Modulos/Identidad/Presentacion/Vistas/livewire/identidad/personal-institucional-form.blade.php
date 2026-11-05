@@ -9,9 +9,7 @@
             </button>
         @endforeach
     </nav>
-    <div class="rm-staff-registration__progress-copy"><p class="rm-help" role="status">Paso {{ $pasoActual }} de 4 · Se guarda todo al finalizar</p><span>{{ (int) round(($pasoActual / 4) * 100) }} %</span></div>
-    <div class="rm-staff-registration__progress" role="progressbar" aria-label="Progreso del registro" aria-valuemin="1" aria-valuemax="4" aria-valuenow="{{ $pasoActual }}"><span style="width: {{ ($pasoActual / 4) * 100 }}%"></span></div>
-    <p class="rm-help mt-3">Los campos con * son obligatorios. Al salir de cada campo se comprueba el dato; los opcionales vacíos no se marcan como correctos.</p>
+    <p class="rm-help" role="status">Paso {{ $pasoActual }} de 4 · Los campos con * son obligatorios. Se guarda todo al finalizar.</p>
     <form wire:submit="guardar" class="rm-staff-registration__form space-y-4 mt-4" novalidate>
         @if($pasoActual === 1)
         <x-ui.form-section title="Identidad y contacto" description="Datos personales y medios de contacto del trabajador." icon="ph-user-circle" :columns="1">
