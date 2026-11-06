@@ -261,4 +261,55 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->assertDatabaseCount('jornadas', 2);
         $this->assertDatabaseCount('eventos_asignacion_personal', 2);
     }
+    public function test_tarjeta_selecciona_detalle_sin_escribir_y_filtros_retiro_no_dejan_datos_residuales(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-05 10:00:00'));
+        $turno = $this->turno('Noche de prueba', '20:00', '08:00');
+        $jornada = Jornada::create(['cod_turno'=>$turno->getKey(), 'fecha_jornada'=>'2026-11-05', 'estado'=>'ABIERTA']);
+        $asignacion = AsignacionPersonal::create(['cod_personal'=>$this->trabajador->personal->getKey(), 'cod_area'=>$this->area->getKey(), 'cod_jornada'=>$jornada->getKey(), 'estado'=>'ACTIVA']);
+        $auditorias = Activity::count();
+        $panel = Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$asignacion->getKey())
+            ->assertSet('asignacionSeleccionada',$asignacion->getKey())
+            ->assertViewHas('detalleAgenda',fn ($detalle)=>$detalle['asignacion']->cod_asignacion === $asignacion->getKey())
+            ->assertSee('06/11 08:00')->assertSee('Gestionar horarios')->assertDispatched('planificacion-detalle-seleccionado');
+        $panel->set('filtroTurno','Otro turno')->assertSet('asignacionSeleccionada',null)->assertViewHas('detalleAgenda',null);
+        $this->assertSame($auditorias,Activity::count());
+        $this->assertDatabaseCount('asignaciones_personal',1); $this->assertDatabaseCount('jornadas',1);
+        $panel->call('limpiarFiltros')->call('seleccionarAsignacion',$asignacion->getKey());
+        Role::findByName('GERENTE','web')->revokePermissionTo('asignaciones_personal.ver');
+        $panel->call('seleccionarAsignacion',$asignacion->getKey())->assertForbidden();
+    }
+
+    public function test_seleccion_solo_lectura_no_concede_edicion_y_rechaza_ids_fuera_del_periodo(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-05 10:00:00'));
+        $turno = $this->turno('Mañana', '08:00', '16:00');
+        $crear = function ($fecha) use ($turno) {
+            $jornada = Jornada::create(['cod_turno'=>$turno->getKey(), 'fecha_jornada'=>$fecha, 'estado'=>'ABIERTA']);
+            return AsignacionPersonal::create(['cod_personal'=>$this->trabajador->personal->getKey(), 'cod_area'=>$this->area->getKey(), 'cod_jornada'=>$jornada->getKey(), 'estado'=>'ACTIVA']);
+        };
+        $visible = $crear('2026-11-05'); $fuera = $crear('2025-01-01');
+        Role::findByName('GERENTE','web')->revokePermissionTo('turnos.asignar');
+        Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$visible->getKey())
+            ->assertSee('Asignación registrada; no confirma asistencia.')->assertDontSee('Gestionar horarios');
+        Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$fuera->getKey())->assertNotFound();
+        $this->assertDatabaseCount('asignaciones_personal',2);
+    }
+
+    public function test_visual_detecta_cruce_nocturno_entre_dias_y_no_marca_el_fin_contiguo(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-02 10:00:00'));
+        $noche = $this->turno('Noche', '20:00', '10:00'); $manana = $this->turno('Mañana', '08:00', '16:00');
+        $anterior = Jornada::create(['cod_turno'=>$noche->getKey(), 'fecha_jornada'=>'2026-11-01', 'estado'=>'ABIERTA']);
+        $actual = Jornada::create(['cod_turno'=>$manana->getKey(), 'fecha_jornada'=>'2026-11-02', 'estado'=>'ABIERTA']);
+        AsignacionPersonal::create(['cod_personal'=>$this->trabajador->personal->getKey(), 'cod_area'=>$this->area->getKey(), 'cod_jornada'=>$anterior->getKey(), 'estado'=>'ACTIVA']);
+        $asignacion = AsignacionPersonal::create(['cod_personal'=>$this->trabajador->personal->getKey(), 'cod_area'=>$this->area->getKey(), 'cod_jornada'=>$actual->getKey(), 'estado'=>'ACTIVA']);
+        Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$asignacion->getKey())
+            ->assertViewHas('detalleAgenda',fn ($detalle)=>$detalle['estado'] === 'CONFLICTO');
+        $noche->update(['hora_cierre'=>'08:00']);
+        Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$asignacion->getKey())
+            ->assertViewHas('detalleAgenda',fn ($detalle)=>$detalle['estado'] !== 'CONFLICTO');
+        $this->assertDatabaseCount('asignaciones_personal',2);
+    }
+
 }

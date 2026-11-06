@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Spatie\Permission\Models\Role;
 use Throwable;
 
@@ -70,6 +71,8 @@ class TurnosAsignacionesPanel extends Component
     public string $filtroTurno = '';
 
     public string $filtroEstado = '';
+
+    #[Locked] public ?string $asignacionSeleccionada = null;
 
     public string $vistaCalendario = 'semana';
 
@@ -188,9 +191,32 @@ class TurnosAsignacionesPanel extends Component
     public function abrirNuevaAsignacion(): void
     {
         $this->autorizarAsignacion();
+        $this->asignacionSeleccionada = null;
         $this->modalAbierto = true;
         $this->usuarioSeleccionado = null;
         $this->busquedaModal = '';
+    }
+
+    public function seleccionarAsignacion(string $codigo): void
+    {
+        $actor = auth()->user()?->fresh();
+        abort_unless($actor?->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR') && $actor->can('turnos.ver')
+            && $actor->can('jornadas.ver') && $actor->can('asignaciones_personal.ver'), 403);
+        $this->validate(['fechaSeleccionada'=>'required|date_format:Y-m-d']);
+        $asignaciones = $this->asignacionesFiltradas()->whereIn('estado', ['ACTIVO', 'ACTIVA'])->values();
+        $semana = $this->datosSemana(Carbon::parse($this->fechaSeleccionada), $asignaciones, $this->detectarConflictos($asignaciones));
+        $visible = collect($semana['dias'])->flatMap(fn ($dia) => $dia['eventos'])
+            ->contains(fn ($evento) => $evento['asignacion']->cod_asignacion === $codigo);
+        abort_unless($this->vistaCalendario === 'semana' && $visible, 404);
+        $this->asignacionSeleccionada = $codigo;
+        $this->dispatch('planificacion-detalle-seleccionado');
+    }
+
+    public function cerrarDetalleAsignacion(): void
+    {
+        $codigo = $this->asignacionSeleccionada;
+        $this->asignacionSeleccionada = null;
+        $this->dispatch('planificacion-detalle-cerrado', codigo: $codigo);
     }
 
     public function seleccionarUsuario(string $codUsuario): void
@@ -467,6 +493,22 @@ class TurnosAsignacionesPanel extends Component
             default => $this->datosSemana($fecha, $asignacionesActivas, $conflictos),
         };
 
+        $filasAgenda = collect();
+        $detalleAgenda = null;
+        if ($this->vistaCalendario === 'semana') {
+            $eventosAgenda = collect($datosCalendario['dias'])->flatMap(fn ($dia) => $dia['eventos']);
+            $detalleAgenda = $eventosAgenda->first(fn ($evento) => $evento['asignacion']->cod_asignacion === $this->asignacionSeleccionada);
+            if (! $detalleAgenda) $this->asignacionSeleccionada = null;
+            $filasAgenda = $turnos->map(fn ($turno) => ['codigo'=>$turno->getKey(), 'nombre'=>$turno->nombre,
+                'inicio'=>substr($turno->hora_inicio, 0, 5), 'fin'=>substr($turno->hora_cierre, 0, 5)]);
+            $filasAgenda = $filasAgenda->concat($eventosAgenda->map(fn ($evento) => [
+                'codigo'=>$evento['asignacion']->cod_turno, 'nombre'=>$evento['asignacion']->turno?->nombre ?: 'Sin turno registrado',
+                'inicio'=>$evento['inicio_hora'], 'fin'=>$evento['fin_hora']]))->unique('codigo')
+                ->when($this->filtroTurno !== '', fn ($filas) => $filas->where('nombre', $this->filtroTurno))->sortBy('inicio')->values();
+        } else {
+            $this->asignacionSeleccionada = null;
+        }
+
         $usuarioSeleccionado = $this->usuarioSeleccionado
             ? User::with(['roles'])->where('cod_usuario', $this->usuarioSeleccionado)->first()
             : null;
@@ -479,6 +521,8 @@ class TurnosAsignacionesPanel extends Component
             'roles' => $roles,
             'stats' => $this->metricas($personal, $asignacionesActivas, $turnos),
             'datosCalendario' => $datosCalendario,
+            'filasAgenda' => $filasAgenda,
+            'detalleAgenda' => $detalleAgenda,
             'personalModal' => $this->personalModal(),
             'usuarioSeleccionadoData' => $usuarioSeleccionado,
 
@@ -568,6 +612,13 @@ class TurnosAsignacionesPanel extends Component
     private function obtenerVirtualAsignaciones(): Collection
     {
         return AsignacionPersonal::query()
+            ->when(auth()->user()?->hasRole('GERENTE') && ! auth()->user()->hasRole('SUPERADMINISTRADOR'), function ($query) {
+                $fecha = Carbon::parse($this->fechaSeleccionada);
+                $inicio = match ($this->vistaCalendario) { 'dia'=>$fecha->copy(), 'mes'=>$fecha->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY), 'anio'=>$fecha->copy()->startOfYear(), default=>$fecha->copy()->startOfWeek(Carbon::MONDAY) };
+                $fin = match ($this->vistaCalendario) { 'dia'=>$fecha->copy(), 'mes'=>$fecha->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY), 'anio'=>$fecha->copy()->endOfYear(), default=>$fecha->copy()->endOfWeek(Carbon::SUNDAY) };
+                // Adjacent days preserve midnight overlaps at the visible boundary.
+                $query->whereHas('jornada', fn ($jornada) => $jornada->whereBetween('fecha_jornada', [$inicio->subDay()->toDateString(), $fin->addDay()->toDateString()]));
+            })
             ->with(['personal.usuario.roles', 'jornada.turno', 'area'])
             ->get()
             ->map(function (AsignacionPersonal $asignacion): object {
@@ -833,6 +884,7 @@ class TurnosAsignacionesPanel extends Component
     private function mapEvento(object $asignacion, Carbon $fecha, array $conflictos): array
     {
         $horario='Horario incompleto';
+        $inicio = $fin = null;
         if ($asignacion->turno?->hora_inicio && $asignacion->turno?->hora_fin) {
             $inicio=Carbon::parse($fecha->toDateString().' '.$asignacion->turno->hora_inicio);
             $fin=Carbon::parse($fecha->toDateString().' '.$asignacion->turno->hora_fin);
@@ -843,6 +895,10 @@ class TurnosAsignacionesPanel extends Component
             'titulo'=>$asignacion->usuario?->name ?: 'Trabajador sin identificar',
             'subtitulo'=>($asignacion->turno?->nombre ?: 'Sin turno registrado').' · '.($asignacion->area?->nombre ?: 'Sin área registrada'),
             'hora'=>$horario,
+            'fecha'=>$fecha->toDateString(),
+            'inicio_hora'=>$inicio?->format('H:i') ?? '—',
+            'fin_hora'=>$fin?->format('H:i') ?? '—',
+            'cruza_dia'=>$inicio && $fin && ! $inicio->isSameDay($fin),
             'asignacion' => $asignacion,
             'rol' => $this->rolVisual($asignacion->usuario),
             'estado' => ! $this->usuarioActivo($asignacion->usuario)
@@ -919,43 +975,15 @@ class TurnosAsignacionesPanel extends Component
 
     private function asignacionesSeCruzan(object $a, object $b): bool
     {
-        if (empty(array_intersect($a->dias_semana ?: [], $b->dias_semana ?: []))) {
-            return false;
-        }
-
-        $inicioA = $a->fecha_inicio ?? Carbon::create(1900, 1, 1);
-        $inicioB = $b->fecha_inicio ?? Carbon::create(1900, 1, 1);
-        $finA = $a->fecha_fin ?? Carbon::create(2999, 12, 31);
-        $finB = $b->fecha_fin ?? Carbon::create(2999, 12, 31);
-
-        if ($inicioA->gt($finB) || $inicioB->gt($finA)) {
-            return false;
-        }
-
-        return $this->rangosHoraSeCruzan(
-            $a->turno?->hora_inicio,
-            $a->turno?->hora_fin,
-            $b->turno?->hora_inicio,
-            $b->turno?->hora_fin
-        );
-    }
-
-    private function rangosHoraSeCruzan(?string $inicioA, ?string $finA, ?string $inicioB, ?string $finB): bool
-    {
-        if (! $inicioA || ! $finA || ! $inicioB || ! $finB) {
-            return true;
-        }
-
-        [$aInicio, $aFin] = $this->rangoMinutos($inicioA, $finA);
-        [$bInicio, $bFin] = $this->rangoMinutos($inicioB, $finB);
-
-        foreach ([-1440, 0, 1440] as $desplazamiento) {
-            if ($aInicio < $bFin + $desplazamiento && $bInicio + $desplazamiento < $aFin) {
-                return true;
-            }
-        }
-
-        return false;
+        if (! $a->fecha_inicio || ! $b->fecha_inicio || ! $a->turno?->hora_inicio || ! $a->turno?->hora_fin
+            || ! $b->turno?->hora_inicio || ! $b->turno?->hora_fin) return false;
+        $inicioA = Carbon::parse($a->fecha_inicio->toDateString().' '.$a->turno->hora_inicio);
+        $inicioB = Carbon::parse($b->fecha_inicio->toDateString().' '.$b->turno->hora_inicio);
+        $finA = Carbon::parse($a->fecha_inicio->toDateString().' '.$a->turno->hora_fin);
+        $finB = Carbon::parse($b->fecha_inicio->toDateString().' '.$b->turno->hora_fin);
+        if ($finA->lte($inicioA)) $finA->addDay();
+        if ($finB->lte($inicioB)) $finB->addDay();
+        return $inicioA->lt($finB) && $inicioB->lt($finA);
     }
 
     private function rangoMinutos(string $inicio, string $fin): array

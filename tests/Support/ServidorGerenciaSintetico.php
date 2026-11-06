@@ -101,6 +101,7 @@ if ($preparar) {
     }
     $contacto=App\Models\Contacto::create(['nombres'=>'Contacto de prueba','apellido_paterno'=>'Identidad sintética','correo'=>'contacto@example.test','estado'=>'ACTIVO']);
     App\Models\ResidenteContacto::create(['cod_residente_contacto'=>'QA_VINCULO_FAMILIAR','cod_residente'=>$residentes[0]->getKey(),'cod_contacto'=>$contacto->getKey(),'parentesco'=>'Hija','responsable_principal'=>false,'contacto_emergencia'=>false,'autoriza_informacion'=>true,'autoriza_salida'=>false,'estado'=>'ACTIVO']);
+    if (getenv('RM_GERENCIA_QA_PLANIFICACION') === '1') require __DIR__.'/PlanificacionDisenoSintetica.php';
     echo 'PREPARADO'; exit;
 }
 final class AutenticarGerenciaSintetica
