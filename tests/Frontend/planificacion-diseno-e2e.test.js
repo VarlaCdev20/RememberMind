@@ -74,6 +74,8 @@ test('Planificación aprobada: tarjetas Nunito, selección y cinco anchos', { ti
         if(width===1440)assert.ok(await page.$eval('.rm-planning__toolbar',e=>e.getBoundingClientRect().height<140),'Barra temporal compacta');
         assert.equal(await page.$eval('.rm-planning',e=>getComputedStyle(e).fontFamily.startsWith('Nunito')),true);
         assert.equal(await page.$eval('.rm-planning-event',e=>getComputedStyle(e).fontFamily.startsWith('Nunito')),true);
+        assert.ok(await page.$eval('.rm-planning-event strong',e=>parseFloat(getComputedStyle(e).fontSize)>=15),'Nombres legibles');
+        if(width===1440)assert.ok(await page.$eval('.rm-planning__workspace',e=>e.querySelector('.rm-planning__calendar').getBoundingClientRect().width / e.getBoundingClientRect().width >= .75),'Calendario ocupa al menos tres cuartas partes');
         assert.equal(await page.evaluate(()=>document.fonts.check('800 15px Nunito')),true);
         await page.evaluate(()=>{const b=[...document.querySelectorAll('[data-asignacion]')].find(e=>e.getClientRects().length);b.scrollIntoView({block:'center'});b.focus();});
         await page.screenshot({path:join(out,'agenda-'+width+'.png'),fullPage:true});
