@@ -237,6 +237,8 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     .rm-staff-directory__table .rm-staff-directory__actions { justify-content: center; flex-wrap: nowrap; }
 }
 .rm-staff-directory__table-wrap { min-width: 0; }
+.rm-staff-directory__results { min-width: 0; }
+.rm-staff-directory__results > .rm-section-header { padding: var(--rm-space-2) 0 var(--rm-space-3); border: 0; }
 @container management-workspace (max-width: 1099px) {
     .rm-staff-directory__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

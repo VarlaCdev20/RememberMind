@@ -13,7 +13,8 @@
         <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
             :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
     </x-ui.filter-bar>
-    <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" :class="'rm-staff-directory__panel'.($vistaListadoResumen === 'tabla' ? ' rm-staff-directory__panel--table' : '')">
+    <section class="rm-staff-directory__results" aria-label="Equipo institucional">
+        <x-ui.section-header title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" level="2" />
         <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
         @if($personalResumen->isEmpty())
             <x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o limpia los filtros para ver el equipo." icono="ph-users" />
@@ -62,7 +63,7 @@
         @endif
         <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
         @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="true" />@endif
-    </x-ui.section-card>
+    </section>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)
     <x-ui.modal-livewire id="gerencia-estado-laboral" wire:model="modalLaboral" title="Cambiar situación laboral" :subtitle="$nombreLaboral" close-method="cerrarEstadoLaboral" :dismiss-on-escape="false">

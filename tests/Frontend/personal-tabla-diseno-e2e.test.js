@@ -78,9 +78,10 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             firstRowHeight: document.querySelector('.rm-staff-directory__table tbody tr').getBoundingClientRect().height,
             small: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
             smallDetails: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).map(el => ({ label: el.innerText, height: el.getBoundingClientRect().height, style: getComputedStyle(el).minHeight })),
-            filtrosSeparados: !document.querySelector('.rm-staff-directory__panel').contains(document.querySelector('.rm-staff-directory__filters')),
-            fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__panel')).backgroundColor,
-            sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__panel')).boxShadow,
+            filtrosSeparados: !document.querySelector('.rm-staff-directory__results').contains(document.querySelector('.rm-staff-directory__filters')),
+            fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).backgroundColor,
+            sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).boxShadow,
+            sinContenedorCard: !document.querySelector('.rm-staff-directory__results').classList.contains('rm-card'),
             sinMarcoTabla: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'].every(prop => getComputedStyle(document.querySelector('.rm-staff-directory__table'))[prop] === '0px'),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
             sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
@@ -93,6 +94,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         assert.equal(medidas.filtrosSeparados, true);
         assert.equal(medidas.fondoPanel, 'rgba(0, 0, 0, 0)');
         assert.equal(medidas.sombraPanel, 'none');
+        assert.equal(medidas.sinContenedorCard, true);
         assert.equal(medidas.sinMarcoTabla, true);
         assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
