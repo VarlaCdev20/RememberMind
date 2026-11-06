@@ -5,6 +5,7 @@
     'imageAlt' => 'Cuidado y acompañamiento en Los Almendros',
     'imageLabel' => null,
     'compact' => false,
+    'rolePosition' => 'inline',
 ])
 @php
     $assignedRole = app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->activeRole(auth()->user())
@@ -42,7 +43,7 @@
         <p class="rm-dashboard-header__eyebrow">{{ $eyebrow }}</p>
         <div class="rm-dashboard-header__heading">
             <h1 class="rm-dashboard-header__title">{{ $title }}</h1>
-            @if($roleLabel)<span class="rm-dashboard-header__role"><span aria-hidden="true"></span>{{ $roleLabel }}</span>@endif
+            @if($roleLabel && $rolePosition !== 'corner')<span class="rm-dashboard-header__role"><span aria-hidden="true"></span>{{ $roleLabel }}</span>@endif
         </div>
         @if($subtitle)<p class="rm-dashboard-header__subtitle">{{ $subtitle }}</p>@endif
         <div class="rm-dashboard-header__metadata">
@@ -62,6 +63,7 @@
             @if($scope)<span class="rm-dashboard-header__scope">{{ $scope }}</span>@endif
         </div>
     </div>
+    @if($roleLabel && $rolePosition === 'corner')<span class="rm-dashboard-header__role rm-dashboard-header__role--corner"><span aria-hidden="true"></span>{{ $roleLabel }}</span>@endif
     @if($image)
         <div class="rm-dashboard-header__visual">
             <img src="{{ $image }}" alt="{{ $imageAlt }}" decoding="async" loading="eager">

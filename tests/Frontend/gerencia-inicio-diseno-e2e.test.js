@@ -41,10 +41,12 @@ test('inicio gerencial: composición compartida, enlaces y cinco anchos', { skip
     t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
     await page.goto(base + '/dashboard', { waitUntil: 'networkidle0' });
     await page.waitForSelector('.rm-manager-home');
+    assert.equal(await page.$('.rm-manager-home .rm-dashboard-header__scope'), null);
+    await page.$eval('.rm-manager-home .rm-dashboard-header__title', el => { el.textContent = 'Buenas tardes, Persona Sintética Apellidos Completos'; });
     const pruebas = [];
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await page.setViewport({ width, height: 900 });
-        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.evaluate(() => { window.scrollTo(0, 0); document.querySelector('[data-rm-main]').scrollTop = 0; });
         const datos = await page.evaluate(() => ({
             overflow: document.documentElement.scrollWidth - innerWidth,
             indicadores: document.querySelectorAll('.rm-manager-home .rm-metric-card').length,
@@ -55,11 +57,20 @@ test('inicio gerencial: composición compartida, enlaces y cinco anchos', { skip
             planning: document.querySelector('.rm-manager-home__planning').getBoundingClientRect().toJSON(),
             composicionCompartida: document.querySelector('.rm-manager-home').classList.contains('rm-dashboard-composition'),
             fuenteTitulo: getComputedStyle(document.querySelector('.rm-manager-home .rm-section-header__title')).fontFamily,
+            saludo: document.querySelector('.rm-manager-home .rm-dashboard-header__title').getBoundingClientRect().toJSON(),
+            cabecera: document.querySelector('.rm-manager-home .rm-dashboard-header').getBoundingClientRect().toJSON(),
+            etiqueta: document.querySelector('.rm-manager-home .rm-dashboard-header__role').getBoundingClientRect().toJSON(),
+            etiquetaEstilo: { posicion: getComputedStyle(document.querySelector('.rm-manager-home .rm-dashboard-header__role')).position, top: getComputedStyle(document.querySelector('.rm-manager-home .rm-dashboard-header__role')).top, padre: document.querySelector('.rm-manager-home .rm-dashboard-header__role').offsetParent?.className },
+            colorAcceso: getComputedStyle(document.querySelector('.rm-manager-home .rm-management-tabs a')).backgroundColor,
+            etiquetaVisible: (() => { const el = document.querySelector('.rm-manager-home .rm-dashboard-header__role'); const r = el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)); })(),
         }));
         assert.ok(datos.overflow <= 1, JSON.stringify({ width, ...datos }));
         assert.equal(datos.indicadores, 3);
         assert.equal(datos.composicionCompartida, true);
+        assert.equal(datos.etiquetaVisible, true, JSON.stringify({ width, etiqueta: datos.etiqueta, cabecera: datos.cabecera }));
         assert.match(datos.fuenteTitulo, /Nunito/);
+        assert.ok(datos.cabecera.right - datos.etiqueta.right <= 20 && datos.etiqueta.top - datos.cabecera.top <= 20, `Gerencia en la esquina superior: ${JSON.stringify({ width, cabecera: datos.cabecera, etiqueta: datos.etiqueta, estilo: datos.etiquetaEstilo })}`);
+        if (width >= 1024) assert.ok(datos.saludo.height <= 40 && datos.saludo.right <= datos.cabecera.right, `Saludo completo en una línea: ${JSON.stringify({ width, saludo: datos.saludo, cabecera: datos.cabecera })}`);
         assert.equal(datos.small, 0);
         if (width <= 768) assert.ok(datos.planning.top >= datos.pending.bottom, 'Paneles apilados en móvil y tablet');
         assert.ok(datos.enlaces.some(url => url.endsWith('/admin/personal-documentacion')));

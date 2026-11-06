@@ -23,6 +23,7 @@
 .rm-dashboard-header .rm-dashboard-header__title { font: 700 clamp(31px, 2.2vw, 34px)/1.15 var(--rm-font-brand); color: var(--rm-header-text); margin: 0; overflow-wrap: anywhere; letter-spacing: -.02em; }
 .rm-dashboard-header .rm-dashboard-header__role { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid color-mix(in srgb, var(--rm-header-accent) 42%, transparent); border-radius: var(--rm-radius-pill); background: color-mix(in srgb, var(--rm-header-accent) 11%, var(--rm-header-surface)); color: var(--rm-header-text); font: 700 11px/1.25 var(--rm-font-friendly); }
 .rm-dashboard-header__role > span { width: 5px; height: 5px; border-radius: 50%; background: var(--rm-header-accent); flex-shrink: 0; }
+.rm-dashboard-header__role--corner { position: absolute; top: var(--rm-space-3); right: var(--rm-space-3); z-index: 2; }
 .rm-dashboard-header .rm-dashboard-header__subtitle { font: 500 14px/1.5 var(--rm-font-heading); color: var(--rm-header-secondary); margin: 0; }
 .rm-dashboard-header__metadata {
     display: flex; flex-wrap: wrap; align-items: center; align-self: flex-start;
