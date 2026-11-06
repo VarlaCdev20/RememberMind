@@ -14,7 +14,6 @@
             :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
     </x-ui.filter-bar>
     <section class="rm-staff-directory__results" aria-label="Equipo institucional">
-        <x-ui.section-header title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" level="2" />
         <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
         @if($personalResumen->isEmpty())
             <x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o limpia los filtros para ver el equipo." icono="ph-users" />

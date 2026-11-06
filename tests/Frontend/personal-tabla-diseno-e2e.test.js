@@ -41,6 +41,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
     t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
     await page.goto(base + '/admin/personal-institucional', { waitUntil: 'networkidle0' });
     await page.waitForSelector('.rm-staff-directory__table');
+    assert.equal(await page.$('.rm-staff-directory__results > .rm-section-header'), null);
     assert.equal(await page.$('.rm-staff-directory__context'), null);
     assert.equal(await page.$('.rm-staff-directory__pagination .rm-pagination__jump'), null);
     const colores = await page.evaluate(() => {
