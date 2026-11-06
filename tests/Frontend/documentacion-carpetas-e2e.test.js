@@ -48,7 +48,8 @@ test('Documentación: tabla compartida, carpetas, miniaturas privadas y cinco an
         await page.goto(base+'/admin/personal-documentacion',{waitUntil:'networkidle0'});
         await page.waitForSelector('.rm-document-folder',{visible:true});
         assert.equal(await page.$$eval('.rm-document-folder',e=>e.length),4);
-        assert.ok(await page.$$eval('[data-folder-tone]',e=>new Set(e.map(e=>e.dataset.folderTone)).size)>=3);
+        assert.equal(await page.$$eval('.rm-document-folder__body',e=>new Set(e.map(e=>getComputedStyle(e).backgroundColor)).size),1,'Carpetas neutras y uniformes');
+        if(width===1440)assert.ok(await page.$eval('.rm-document-folder',e=>e.getBoundingClientRect().width)<300,'Carpetas compactas');
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
         const image=await page.waitForSelector('.rm-document-folders .rm-document-thumb img',{visible:true});
         await page.waitForFunction(()=>[...document.querySelectorAll('.rm-document-folders img')].every(i=>i.complete&&i.naturalWidth>0));

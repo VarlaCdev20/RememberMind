@@ -28,10 +28,10 @@
     $imagenDocumento = in_array(mb_strtolower($documento->extension), ['jpg','jpeg','png','webp'], true);
     $estadoVisible = ['CARGADO'=>'Cargado','PENDIENTE'=>'Pendiente de revisión','VALIDADO'=>'Validado','OBSERVADO'=>'Observado','VENCIDO'=>'Vencido registrado','ANULADO'=>'Anulado','ANULADA'=>'Anulada','REEMPLAZADO'=>'Reemplazado'][$documento->estado] ?? 'Estado por revisar';
     $tonoDocumento = match ($documento->estado) { 'VALIDADO'=>'success', 'OBSERVADO','VENCIDO'=>'warning', 'ANULADO','ANULADA','REEMPLAZADO'=>'neutral', default=>'info' };
-    [$colorCarpeta,$claseDocumento] = match ($documento->tipo_documento) {
-        'CI','FOTO_DOC'=>['sky','IDENTIDAD'], 'CV','EXP_LABORAL'=>['sage','TRAYECTORIA'],
-        'TITULO','MATRICULA','CERT_ESP','CAPACITACION'=>['lavender','FORMACIÓN'],
-        'DOMICILIO'=>['rose','DOMICILIO'], 'ANTECEDENTES'=>['sand','ANTECEDENTES'], default=>['sage','DOCUMENTO'] };
+    $claseDocumento = match ($documento->tipo_documento) {
+        'CI','FOTO_DOC'=>'IDENTIDAD', 'CV','EXP_LABORAL'=>'TRAYECTORIA',
+        'TITULO','MATRICULA','CERT_ESP','CAPACITACION'=>'FORMACIÓN',
+        'DOMICILIO'=>'DOMICILIO', 'ANTECEDENTES'=>'ANTECEDENTES', default=>'DOCUMENTO' };
 @endphp
         <tr wire:key="documento-tabla-{{ $documento->getKey() }}" data-documento-fila="{{ $documento->getKey() }}">
             <td data-label="Documento"><div class="rm-document-library__file">@include('identidad::livewire.identidad.documentacion-personal-miniatura')<div><strong>{{ $documento->nombre ?: 'Documento sin nombre' }}</strong><small>{{ $claseDocumento }} · {{ mb_strtoupper($documento->extension) ?: 'ARCHIVO' }}</small></div></div></td>
@@ -52,12 +52,12 @@
     $imagenDocumento = in_array(mb_strtolower($documento->extension), ['jpg','jpeg','png','webp'], true);
     $estadoVisible = ['CARGADO'=>'Cargado','PENDIENTE'=>'Pendiente de revisión','VALIDADO'=>'Validado','OBSERVADO'=>'Observado','VENCIDO'=>'Vencido registrado','ANULADO'=>'Anulado','ANULADA'=>'Anulada','REEMPLAZADO'=>'Reemplazado'][$documento->estado] ?? 'Estado por revisar';
     $tonoDocumento = match ($documento->estado) { 'VALIDADO'=>'success', 'OBSERVADO','VENCIDO'=>'warning', 'ANULADO','ANULADA','REEMPLAZADO'=>'neutral', default=>'info' };
-    [$colorCarpeta,$claseDocumento] = match ($documento->tipo_documento) {
-        'CI','FOTO_DOC'=>['sky','IDENTIDAD'], 'CV','EXP_LABORAL'=>['sage','TRAYECTORIA'],
-        'TITULO','MATRICULA','CERT_ESP','CAPACITACION'=>['lavender','FORMACIÓN'],
-        'DOMICILIO'=>['rose','DOMICILIO'], 'ANTECEDENTES'=>['sand','ANTECEDENTES'], default=>['sage','DOCUMENTO'] };
+    $claseDocumento = match ($documento->tipo_documento) {
+        'CI','FOTO_DOC'=>'IDENTIDAD', 'CV','EXP_LABORAL'=>'TRAYECTORIA',
+        'TITULO','MATRICULA','CERT_ESP','CAPACITACION'=>'FORMACIÓN',
+        'DOMICILIO'=>'DOMICILIO', 'ANTECEDENTES'=>'ANTECEDENTES', default=>'DOCUMENTO' };
 @endphp
-        <li class="rm-document-folder" data-folder-tone="{{ $colorCarpeta }}" wire:key="documento-carpeta-{{ $documento->getKey() }}" data-documento-carpeta="{{ $documento->getKey() }}">
+        <li class="rm-document-folder" wire:key="documento-carpeta-{{ $documento->getKey() }}" data-documento-carpeta="{{ $documento->getKey() }}">
             <span class="rm-document-folder__tab"><i class="ph-bold ph-folder" aria-hidden="true"></i>{{ $claseDocumento }}</span>
             <div class="rm-document-folder__body">
                 <div class="rm-document-folder__cover">@include('identidad::livewire.identidad.documentacion-personal-miniatura')<div class="rm-document-folder__identity"><span class="rm-document-folder__format">{{ mb_strtoupper($documento->extension) ?: 'ARCHIVO' }}</span><h3>{{ $documento->nombre ?: 'Documento sin nombre' }}</h3><p><i class="ph-bold ph-user" aria-hidden="true"></i>{{ trim($titular->nombres.' '.$titular->apellido_paterno.' '.$titular->apellido_materno) }}</p></div></div>
@@ -70,5 +70,5 @@
         @endforeach
     </ul>
     @endif
-    <div class="rm-document-library__footer"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /><p class="rm-help">Los colores distinguen tipos de documento. La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
+    <div class="rm-document-library__footer"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /><p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
 </section>
