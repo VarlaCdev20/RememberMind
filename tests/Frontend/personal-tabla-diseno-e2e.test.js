@@ -41,6 +41,8 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
     t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
     await page.goto(base + '/admin/personal-institucional', { waitUntil: 'networkidle0' });
     await page.waitForSelector('.rm-staff-directory__table');
+    assert.equal(await page.$('.rm-staff-directory__context'), null);
+    assert.equal(await page.$('.rm-staff-directory__pagination .rm-pagination__jump'), null);
     const colores = await page.evaluate(() => {
         const original = document.body.dataset.role;
         const leer = () => {
@@ -82,6 +84,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).backgroundColor,
             sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).boxShadow,
             sinContenedorCard: !document.querySelector('.rm-staff-directory__results').classList.contains('rm-card'),
+            paginacionContenida: [...document.querySelectorAll('.rm-staff-directory__pagination .rm-pagination__page')].every(el => el.getBoundingClientRect().left >= 0 && el.getBoundingClientRect().right <= innerWidth + 1),
             sinMarcoTabla: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'].every(prop => getComputedStyle(document.querySelector('.rm-staff-directory__table'))[prop] === '0px'),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
             sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
@@ -95,6 +98,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         assert.equal(medidas.fondoPanel, 'rgba(0, 0, 0, 0)');
         assert.equal(medidas.sombraPanel, 'none');
         assert.equal(medidas.sinContenedorCard, true);
+        assert.equal(medidas.paginacionContenida, true);
         assert.equal(medidas.sinMarcoTabla, true);
         assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);

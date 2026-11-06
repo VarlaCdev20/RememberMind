@@ -59,8 +59,7 @@
                     </tbody>
                 </table>
         @endif
-        <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
-        @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="true" />@endif
+        @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact rm-staff-directory__pagination" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="false" />@endif
     </section>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)
