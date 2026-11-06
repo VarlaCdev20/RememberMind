@@ -8,7 +8,7 @@
     'date' => null,
 ])
 
-<header {{ $attributes->class(['rm-collection-header']) }} data-tone="{{ $tone }}">
+<header {{ $attributes->class(['rm-collection-header']) }} data-tone="{{ $tone }}" data-rm-ui="page-heading">
     <div class="rm-collection-header__identity">
         <span class="rm-collection-header__icon" aria-hidden="true"><i class="ph-bold {{ $icon }}"></i></span>
         <div class="rm-collection-header__copy">

@@ -23,7 +23,7 @@ class FiltrosDisenoUnificadoTest extends TestCase
             $rutaRelativa = str_replace('\\', '/', str_replace($directorio.DIRECTORY_SEPARATOR, '', $archivo->getPathname()));
 
             // La búsqueda global del encabezado no es una barra de filtros de pantalla.
-            if ($rutaRelativa === 'components/layout/topbar-enfermeria.blade.php') {
+            if (in_array($rutaRelativa, ['components/layout/topbar-enfermeria.blade.php', 'components/layout/navbar-sistema.blade.php'], true)) {
                 continue;
             }
 

@@ -37,7 +37,7 @@
                 @endforeach
             </div>
         @else
-            <div class="rm-staff-directory__table-surface">
+            <x-ui.table-surface class="rm-staff-directory__table-surface">
                 <table class="rm-table rm-staff-directory__table" role="table">
                     <caption class="sr-only">Personal institucional y acceso</caption>
                     <thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Ficha</th><th scope="col">Acciones</th></tr></thead>
@@ -58,8 +58,8 @@
                         @endforeach
                     </tbody>
                 </table>
-                <x-ui.paginacion class="rm-pagination--compact rm-staff-directory__pagination" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="false" />
-            </div>
+                <x-slot:footer><x-ui.paginacion class="rm-pagination--compact rm-staff-directory__pagination" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="false" /></x-slot:footer>
+            </x-ui.table-surface>
         @endif
         @if($personalResumen->isNotEmpty() && $vistaListadoResumen === 'tarjetas')<x-ui.paginacion class="rm-pagination--compact rm-staff-directory__pagination" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="false" />@endif
     </section>

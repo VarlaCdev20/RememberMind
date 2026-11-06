@@ -24,7 +24,7 @@
     $flattenQuery($query);
     $scrollExpression = $scrollTo === false ? '' : '(($el.closest('.json_encode($scrollTo).') || document.querySelector('.json_encode($scrollTo).'))?.scrollIntoView({behavior: "instant"}))';
 @endphp
-<footer {{ $attributes->class(['rm-pagination']) }} @if($livewire) wire:key="paginacion-{{ $pageName }}" @endif>
+<footer {{ $attributes->class(['rm-pagination']) }} data-rm-ui="pagination" @if($livewire) wire:key="paginacion-{{ $pageName }}" @endif>
     <p class="rm-pagination__range" @if($livewire) aria-live="polite" @endif>
         @if($cursor)
             <strong>{{ $paginator->count() }}</strong> {{ $label }} en esta página

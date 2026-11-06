@@ -40,7 +40,7 @@ test('consulta cognitiva mantiene identidad, acciones y áreas legibles sin over
 
 test('identidad compacta aparece solo después de abandonar la tarjeta y desconecta su observador', () => {
     const source = read('app/Modulos/ApoyoDecision/Presentacion/Vistas/livewire/medico/resultados-experto/enfermeria.blade.php');
-    const definition = source.match(/class="rm-cognitive-reading" x-data="([\s\S]*?)">/)[1];
+    const definition = source.match(/class="rm-cognitive-reading[^\"]*" x-data="([\s\S]*?)"/)[1];
     let notify, observed, disconnected = false;
     class Observer {
         constructor(callback) { notify = callback; }

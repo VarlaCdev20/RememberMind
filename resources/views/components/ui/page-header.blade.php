@@ -35,7 +35,7 @@
     $resolvedActions = $actions ?? $slot;
 @endphp
 
-<header {{ $attributes->class(['rm-collection-header', 'rm-page-header']) }} data-tone="{{ $resolvedTone }}">
+<header {{ $attributes->class(['rm-collection-header', 'rm-page-header']) }} data-tone="{{ $resolvedTone }}" data-rm-ui="page-heading">
     <div class="rm-collection-header__identity">
         <span class="rm-collection-header__icon" aria-hidden="true"><i class="ph-bold {{ $resolvedIcon }}"></i></span>
         <div class="rm-collection-header__copy">

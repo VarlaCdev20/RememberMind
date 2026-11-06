@@ -1,0 +1,123 @@
+/* Superficies compartidas: cada rol conserva sus acentos y estados semánticos. */
+.rm-shell {
+    --rm-operational-font: var(--rm-font-body);
+    --rm-operational-surface: var(--rm-surface-raised);
+    --rm-operational-tint: color-mix(in srgb, var(--rm-role-primary, var(--rm-primary)) 13%, var(--rm-operational-surface));
+    --rm-operational-head: color-mix(in srgb, var(--rm-role-primary-soft, var(--rm-primary-soft)) 72%, var(--rm-operational-surface));
+    --rm-operational-ink: var(--rm-role-ink, var(--rm-text-primary));
+    --rm-operational-radius: var(--rm-radius-xl);
+}
+html .rm-shell [data-rm-main] :is(.rm-collection-header, .rm-page-header) {
+    min-height: 0;
+    padding: var(--rm-space-3) var(--rm-space-4);
+    gap: var(--rm-space-3);
+    border: 0 !important;
+    border-radius: var(--rm-operational-radius);
+    background: color-mix(in srgb, var(--rm-operational-surface) 90%, var(--rm-role-primary-soft, var(--rm-primary-soft))) !important;
+    background-image: none !important;
+    box-shadow: var(--rm-shadow-sm) !important;
+}
+html .rm-shell [data-rm-main] :is(.rm-collection-header, .rm-page-header)::before,
+html .rm-shell [data-rm-main] :is(.rm-collection-header, .rm-page-header)::after { display: none; }
+html .rm-shell [data-rm-main] :is(.rm-collection-header, .rm-page-header) h1 {
+    font-family: var(--rm-operational-font);
+    font-size: var(--rm-font-size-page);
+    font-weight: var(--rm-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    color: var(--rm-operational-ink);
+}
+.rm-collection-header__identity { flex: 1 1 auto; justify-content: center; }
+.rm-collection-header__copy { text-align: center; }
+.rm-collection-header__actions { align-items: center; }
+html .rm-shell [data-rm-main] .rm-filter-bar.rm-filter-bar {
+    border: 0 !important;
+    border-radius: var(--rm-operational-radius);
+    background: var(--rm-operational-tint) !important;
+    background-image: none !important;
+    box-shadow: var(--rm-shadow-sm);
+    padding: var(--rm-space-3) var(--rm-space-4);
+}
+html .rm-shell [data-rm-main] .rm-filter-bar .rm-label {
+    font: 600 var(--rm-font-size-meta)/1.4 var(--rm-operational-font);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+}
+html .rm-shell [data-rm-main] .rm-filter-bar :is(.rm-input, .rm-select, .rm-filter-search__input, .rm-choice__trigger) {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    background: var(--rm-operational-surface) !important;
+    border-color: color-mix(in srgb, var(--rm-role-primary, var(--rm-primary)) 60%, var(--rm-border-soft)) !important;
+    font-family: var(--rm-operational-font);
+}
+html .rm-shell [data-rm-main] .rm-filter-bar :is(input, select, button):focus-visible {
+    outline: 2px solid var(--rm-role-primary, var(--rm-primary));
+    outline-offset: 2px;
+}
+html .rm-shell [data-rm-main] :is(table.rm-table, table.rm-data-table) {
+    font-family: var(--rm-operational-font);
+    font-size: var(--rm-font-size-label);
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 0;
+    border-radius: var(--rm-operational-radius);
+    background: var(--rm-operational-surface);
+}
+html .rm-shell [data-rm-main] :is(.rm-table, .rm-data-table) thead th {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    background: var(--rm-operational-head);
+    color: var(--rm-operational-ink);
+    font: 600 var(--rm-font-size-meta)/1.4 var(--rm-operational-font);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-align: center;
+}
+html .rm-shell [data-rm-main] :is(.rm-table, .rm-data-table) :is(thead, tbody tr, tbody td) { border-bottom: 0; }
+html .rm-shell [data-rm-main] :is(.rm-table, .rm-data-table) tbody td {
+    font-family: var(--rm-operational-font);
+    text-transform: none;
+    padding-block: var(--rm-space-2);
+}
+html .rm-shell [data-rm-main] :is(.rm-table, .rm-data-table) th:first-child { border-start-start-radius: var(--rm-radius-lg); }
+html .rm-shell [data-rm-main] :is(.rm-table, .rm-data-table) th:last-child { border-start-end-radius: var(--rm-radius-lg); }
+html .rm-shell [data-rm-main] :is(.rm-table-surface, .rm-table-container, .rm-table-wrapper, .rm-table-card) {
+    border: 0;
+    border-radius: var(--rm-operational-radius);
+    background: var(--rm-operational-surface);
+    box-shadow: var(--rm-shadow-card);
+}
+.rm-table-surface { min-width: 0; }
+.rm-table-surface > .rm-pagination { margin: 0; padding: var(--rm-space-2) var(--rm-space-3); }
+.rm-table-surface :is(.rm-table-container, .rm-table-wrapper, .rm-table-card),
+.rm-table-surface table { box-shadow: none; }
+html .rm-shell [data-rm-main] .rm-pagination {
+    color: var(--rm-text-primary);
+    font-family: var(--rm-operational-font);
+    font-size: var(--rm-font-size-meta);
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    gap: var(--rm-space-2);
+}
+html .rm-shell [data-rm-main] .rm-pagination__page {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--rm-radius-md);
+    font-family: var(--rm-operational-font);
+}
+html .rm-shell [data-rm-main] .rm-pagination__page.is-current { color: var(--rm-operational-ink); }
+html .rm-shell [data-rm-main] .rm-pagination__page.is-current::before {
+    background: var(--rm-role-primary-soft, var(--rm-primary-soft));
+    border-color: var(--rm-role-primary, var(--rm-primary));
+}
+html .rm-shell [data-rm-main] .rm-pagination:not(.rm-pagination--compact) .rm-pagination__page.is-current {
+    background: var(--rm-role-primary-soft, var(--rm-primary-soft));
+    border-color: var(--rm-role-primary, var(--rm-primary));
+}
+@media (max-width: 760px) {
+    html .rm-shell [data-rm-main] :is(.rm-collection-header, .rm-page-header) { align-items: stretch; }
+    .rm-collection-header__aside { justify-items: center; }
+    .rm-collection-header__actions { justify-content: center; width: 100%; }
+    html .rm-shell [data-rm-main] .rm-filter-bar.rm-filter-bar { padding: var(--rm-space-3); }
+}

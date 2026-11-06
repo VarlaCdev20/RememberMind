@@ -17,6 +17,8 @@ related_modules: []
 
 Dirección aprobada por la propietaria el 6 de octubre de 2026 para el stack de skills. Este documento define cómo trabajar; sus valores objetivo no están aplicados automáticamente al producto.
 
+Ampliación visual aprobada el 06/11/2026: el diseño del directorio de personal se propaga mediante encabezados, filtros, tablas y paginación compartidos. [Implementación, consumidores y verificación](DISENO_OPERATIVO_COMPARTIDO.md). Se conservan los acentos por rol, estados semánticos y composición específica de captura y gráficos.
+
 ## Autoridad y alcance
 
 1. Instrucción actual de la propietaria y referencia visual aprobada para la pantalla.
