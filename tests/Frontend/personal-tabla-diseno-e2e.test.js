@@ -41,6 +41,32 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
     t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
     await page.goto(base + '/admin/personal-institucional', { waitUntil: 'networkidle0' });
     await page.waitForSelector('.rm-staff-directory__table');
+    const colores = await page.evaluate(() => {
+        const original = document.body.dataset.role;
+        const leer = () => {
+            const nav = document.querySelector('.rm-sidebar__nav');
+            const main = document.querySelector('[data-rm-main]');
+            return {
+                sidebar: getComputedStyle(document.querySelector('.rm-sidebar')).backgroundColor,
+                navbar: getComputedStyle(document.querySelector('.rm-topbar')).backgroundColor,
+                fondo: getComputedStyle(main).backgroundColor,
+                trama: getComputedStyle(main).backgroundImage,
+                activo: getComputedStyle(nav).getPropertyValue('--rm-item-active-bg').trim(),
+                acento: getComputedStyle(nav).getPropertyValue('--rm-item-active-accent').trim(),
+            };
+        };
+        document.body.dataset.role = 'manager';
+        const gerencia = leer();
+        document.body.dataset.role = 'nursing';
+        const enfermeria = leer();
+        document.body.dataset.role = original;
+        return { gerencia, enfermeria };
+    });
+    for (const propiedad of ['sidebar', 'navbar', 'fondo', 'trama']) {
+        assert.equal(colores.gerencia[propiedad], colores.enfermeria[propiedad], `Superficie compartida: ${propiedad}`);
+    }
+    assert.notEqual(colores.gerencia.acento, colores.enfermeria.acento, 'Gerencia conserva sus acentos morados');
+    assert.match(colores.gerencia.trama, /radial-gradient/);
     const matrix = [];
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await page.setViewport({ width, height: width <= 390 ? 844 : 800 });

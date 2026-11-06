@@ -8,6 +8,13 @@
     background: var(--rm-app-bg);
 }
 .rm-shell:has(.rm-app-frame) { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+html:not(.dark):not([data-theme="dark"]) .rm-shell:is([data-role="manager"], [data-role="nursing"]) {
+    --rm-shell-chrome-bg: var(--rm-palette-capuchino);
+    --rm-bg-shell: var(--rm-shell-chrome-bg);
+    --rm-header-bg: var(--rm-palette-header);
+    --rm-app-bg: var(--rm-palette-page);
+    --rm-bg-app: var(--rm-app-bg);
+}
 .rm-shell .rm-app-frame { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; overflow: hidden; }
 .rm-shell .rm-app-frame > [data-rm-topbar],
 .rm-shell .rm-app-frame > [data-role-preview-banner] { flex-shrink: 0; }
