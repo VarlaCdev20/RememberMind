@@ -82,6 +82,8 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             small: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
             smallDetails: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).map(el => ({ label: el.innerText, height: el.getBoundingClientRect().height, style: getComputedStyle(el).minHeight })),
             filtrosSeparados: !document.querySelector('.rm-staff-directory__results').contains(document.querySelector('.rm-staff-directory__filters')),
+            filtrosSinRecuadro: getComputedStyle(document.querySelector('.rm-staff-directory__filters')).borderTopWidth === '0px' && getComputedStyle(document.querySelector('.rm-staff-directory__filters')).backgroundColor === 'rgba(0, 0, 0, 0)',
+            tablaConRelieve: getComputedStyle(document.querySelector('.rm-staff-directory__table-surface')).boxShadow !== 'none',
             fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).backgroundColor,
             sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).boxShadow,
             sinContenedorCard: !document.querySelector('.rm-staff-directory__results').classList.contains('rm-card'),
@@ -97,6 +99,8 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         assert.equal(medidas.small, 0, JSON.stringify(medidas.smallDetails));
         assert.equal(medidas.filtrosSeparados, true);
+        assert.equal(medidas.filtrosSinRecuadro, true);
+        assert.equal(medidas.tablaConRelieve, true);
         assert.equal(medidas.fondoPanel, 'rgba(0, 0, 0, 0)');
         assert.equal(medidas.sombraPanel, 'none');
         assert.equal(medidas.sinContenedorCard, true);
