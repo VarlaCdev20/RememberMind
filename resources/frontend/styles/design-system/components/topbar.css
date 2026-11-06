@@ -15,6 +15,12 @@ html:not(.dark):not([data-theme="dark"]) .rm-shell:is([data-role="manager"], [da
     --rm-app-bg: var(--rm-palette-page);
     --rm-bg-app: var(--rm-app-bg);
 }
+html:not(.dark):not([data-theme="dark"]) .rm-shell[data-role="manager"] {
+    --rm-shell-chrome-bg: var(--rm-palette-capuchino);
+    --rm-header-bg: var(--rm-shell-chrome-bg);
+    --rm-app-bg: var(--rm-shell-chrome-bg);
+    --rm-bg-app: var(--rm-app-bg);
+}
 .rm-shell .rm-app-frame { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; overflow: hidden; }
 .rm-shell .rm-app-frame > [data-rm-topbar],
 .rm-shell .rm-app-frame > [data-role-preview-banner] { flex-shrink: 0; }

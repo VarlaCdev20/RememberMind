@@ -62,9 +62,9 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         document.body.dataset.role = original;
         return { gerencia, enfermeria };
     });
-    for (const propiedad of ['sidebar', 'navbar', 'fondo', 'trama']) {
-        assert.equal(colores.gerencia[propiedad], colores.enfermeria[propiedad], `Superficie compartida: ${propiedad}`);
-    }
+    assert.equal(colores.gerencia.sidebar, colores.gerencia.navbar, 'Sidebar y navbar del mismo color');
+    assert.equal(colores.gerencia.sidebar, colores.gerencia.fondo, 'Fondo del mismo color que la navegación');
+    assert.equal(colores.gerencia.trama, colores.enfermeria.trama, 'Se conserva la trama compartida');
     assert.notEqual(colores.gerencia.acento, colores.enfermeria.acento, 'Gerencia conserva sus acentos morados');
     assert.match(colores.gerencia.trama, /radial-gradient/);
     const matrix = [];
