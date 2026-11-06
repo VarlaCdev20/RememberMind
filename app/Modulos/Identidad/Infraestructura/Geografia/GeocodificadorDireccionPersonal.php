@@ -10,16 +10,16 @@ use Illuminate\Validation\ValidationException;
 
 final class GeocodificadorDireccionPersonal
 {
-    public function centrar(string $pais, string $nombrePais, string $departamento, ?string $municipio): array
+    public function centrar(string $pais, string $nombrePais, string $departamento, ?string $municipio, ?string $zona = null): array
     {
-        $datos = $this->consultar('search', ['q'=>implode(', ', array_filter([$municipio, $departamento, $nombrePais])),
+        $datos = $this->consultar('search', ['q'=>implode(', ', array_filter([$zona, $municipio, $departamento, $nombrePais])),
             'countrycodes'=>strtolower($pais), 'limit'=>1]);
         $lugar = $datos[0] ?? null;
         if (! is_array($lugar) || ! is_numeric($lugar['lat'] ?? null) || ! is_numeric($lugar['lon'] ?? null)) {
-            $this->fallar('No se encontró ese departamento o municipio. Revisa su nombre o completa la dirección manualmente.');
+            $this->fallar('No se encontró esa zona o región. Revisa su nombre, municipio y departamento o completa la dirección manualmente.');
         }
-        return ['lat'=>(float) $lugar['lat'], 'lon'=>(float) $lugar['lon'], 'zoom'=>$municipio ? 12 : 8,
-            'contexto'=>implode(', ', array_filter([$municipio, $departamento, $nombrePais]))];
+        return ['lat'=>(float) $lugar['lat'], 'lon'=>(float) $lugar['lon'], 'zoom'=>$zona ? 15 : ($municipio ? 12 : 8),
+            'contexto'=>implode(', ', array_filter([$zona, $municipio, $departamento, $nombrePais]))];
     }
 
     public function resolver(float $latitud, float $longitud, string $pais): array

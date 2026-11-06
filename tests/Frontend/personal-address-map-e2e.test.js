@@ -28,7 +28,7 @@ test('Mapa de dirección: selección, confirmación y teclado en cinco anchos', 
     });
     const base = `http://127.0.0.1:${port}`;
     const token = randomBytes(24).toString('hex');
-    const env = { ...process.env, RM_GERENCIA_QA_PERSONAL:'1', RM_GERENCIA_QA_AMPLIACION:'1', RM_GERENCIA_QA_MAPA:'1', APP_ENV:'testing', APP_URL:base, RM_GERENCIA_QA_DB:db, RM_GERENCIA_QA_TOKEN:token };
+    const env = { ...process.env, RM_GERENCIA_QA_PERSONAL:'1', RM_GERENCIA_QA_AMPLIACION:'1', RM_GERENCIA_QA_MAPA:'1', RM_GERENCIA_QA_ARCHIVOS:'1', APP_ENV:'testing', APP_URL:base, RM_GERENCIA_QA_DB:db, RM_GERENCIA_QA_TOKEN:token };
     const router = join(root,'tests/Support/ServidorGerenciaSintetico.php');
     const preparado = spawnSync('php',[router,'--preparar'],{ cwd:root, env, encoding:'utf8', timeout:45000, windowsHide:true });
     assert.equal(preparado.status,0,preparado.stderr+preparado.stdout);
@@ -65,11 +65,6 @@ test('Mapa de dirección: selección, confirmación y teclado en cinco anchos', 
         await page.evaluate(()=>document.fonts.ready);
     };
         await go('/dashboard');
-        assert.match(page.url(),/cambiar-contrasena-inicial/);
-        await page.type('#password-temporal','TemporalGerencia#123');
-        await page.type('#password-personal','PersonalGerencia#123');
-        await page.type('#password-personal-confirmacion','PersonalGerencia#123');
-        await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}),page.click('form[action$="/cambiar-contrasena-inicial"] button[type="submit"]')]);
         assert.match(page.url(),/dashboard$/);
     page.on('dialog',async d=>d.accept());
     for(const width of [1440,1280,1024,768,390]) {
@@ -86,6 +81,27 @@ test('Mapa de dirección: selección, confirmación y teclado en cinco anchos', 
         await page.waitForSelector('#personal-mapa-direccion.leaflet-container',{visible:true});
         await page.waitForFunction(()=>!!document.querySelector('.leaflet-tile-loaded'));
         assert.match(await page.$eval('.rm-address-map__heading',e=>e.innerText),/LA PAZ/);
+        const zonaCatalogo = await page.$eval('#direccion-zona_id-source', select => {
+            const option = [...select.options].find(o => o.value && o.value !== 'OTRA');
+            return option ? { value: option.value, nombre: option.textContent } : null;
+        });
+        assert.ok(zonaCatalogo, 'La prueba dispone de una zona del catálogo');
+        await page.evaluate(async zona => {
+            const root = document.querySelector('.rm-staff-registration');
+            await Livewire.find(root.getAttribute('wire:id')).set('zona_id', zona.value);
+        }, zonaCatalogo);
+        await page.waitForFunction(nombre => document.querySelector('.rm-address-map__heading').innerText.includes(nombre.trim()), { timeout: 10000 }, zonaCatalogo.nombre).catch(async error => {
+            console.error(await page.$eval('.rm-address-map', el => ({ texto: el.innerText, zonaActual: Alpine.$data(el).zonaActual, contexto: Alpine.$data(el).contexto, abierto: Alpine.$data(el).abierto })));
+            throw error;
+        });
+        await page.evaluate(async () => {
+            const root = document.querySelector('.rm-staff-registration');
+            const wire = Livewire.find(root.getAttribute('wire:id'));
+            await wire.set('zona_id', 'OTRA');
+            await wire.set('otra_zona', 'BARRIO DE PRUEBA');
+        });
+        await page.$$eval('.rm-address-map__heading button', botones => botones.find(b => b.textContent.includes('UBICAR ZONA')).click());
+        await page.waitForFunction(() => document.querySelector('.rm-address-map__heading').innerText.includes('BARRIO DE PRUEBA'));
         await page.$eval('#personal-mapa-direccion',e=>e.scrollIntoView({block:'center'}));
         await page.click('#personal-mapa-direccion');
         await page.waitForFunction(()=>!document.getElementById('personal-consultar-punto').disabled);

@@ -3,6 +3,17 @@ export function crearMapaDireccion(wire, tilesUrl) {
     return {
         abierto: false, cargando: false, consultando: false, mensaje: '', contexto: '', punto: null, propuesta: '', referencia: '',
         contextoActual: null,
+        zonaActual: null,
+        zonaInicializada: false,
+        cambiarZona(valor) {
+            const anterior = this.zonaActual;
+            this.zonaActual = valor;
+            if (!this.zonaInicializada) { this.zonaInicializada = true; return; }
+            if (anterior === valor) return;
+            secuencia++; this.punto = null; this.propuesta = ''; this.referencia = '';
+            this.cargando = this.consultando = false;
+            if (this.abierto && valor && valor !== 'OTRA') return this.abrir();
+        },
         cambiarContexto(valor) {
             if (this.contextoActual !== null && this.contextoActual !== valor) {
                 secuencia++; this.abierto = false; this.punto = null; this.propuesta = ''; this.mensaje = '';

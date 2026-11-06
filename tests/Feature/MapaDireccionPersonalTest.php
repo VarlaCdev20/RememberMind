@@ -49,6 +49,18 @@ class MapaDireccionPersonalTest extends TestCase
             && str_contains($r->header('User-Agent')[0], 'RememberMind') && !str_contains($r->url(),'NO%20ENVIAR'));
     }
 
+    public function test_zona_manual_centra_con_municipio_sin_enviar_domicilio_ni_guardarlo(): void
+    {
+        Http::fake(['nominatim.openstreetmap.org/*' => Http::response([['lat' => '-16.51', 'lon' => '-68.12']])]);
+        $form = $this->formulario()->set('zona_id', 'OTRA')->set('otra_zona', 'BARRIO DE PRUEBA')
+            ->set('direccion', 'DIRECCIÓN QUE NO DEBE ENVIARSE')->set('nro_casa', '123');
+        $form->call('centrarMapaDireccion')->assertHasNoErrors()
+            ->assertReturned(['lat' => -16.51, 'lon' => -68.12, 'zoom' => 15,
+                'contexto' => 'BARRIO DE PRUEBA, LA PAZ, LA PAZ, Bolivia'])
+            ->assertSet('direccion', 'DIRECCIÓN QUE NO DEBE ENVIARSE');
+        Http::assertSent(fn ($r) => $r['q'] === 'BARRIO DE PRUEBA, LA PAZ, LA PAZ, Bolivia'
+            && ! str_contains($r->url(), '123') && ! str_contains($r->url(), 'ENVIARSE'));
+    }
     public function test_consulta_punto_no_cambia_direccion_hasta_confirmar_y_completa_componentes(): void
     {
         Http::fake(['nominatim.openstreetmap.org/*'=>Http::response($this->respuesta())]);

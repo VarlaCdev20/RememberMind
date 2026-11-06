@@ -533,9 +533,13 @@ class PersonalInstitucionalForm extends Component
     public function centrarMapaDireccion(): array
     {
         $contexto = $this->contextoMapaDireccion();
+        $zona = $this->zona_id === 'OTRA' ? trim((string) $this->otra_zona)
+            : collect($this->getZonasCatalogo($this->municipio_id))->firstWhere('id', $this->zona_id)?->nombre;
+        \Illuminate\Support\Facades\Validator::make(['zona' => $zona],
+            ['zona' => ['nullable', 'string', 'max:60', 'not_regex:~[\r\n\x00-\x1F]~']])->validate();
         $this->direccionMapa = null;
         $this->resetValidation('mapa_direccion');
-        return app(\App\Modulos\Identidad\Infraestructura\Geografia\GeocodificadorDireccionPersonal::class)->centrar(...$contexto);
+        return app(\App\Modulos\Identidad\Infraestructura\Geografia\GeocodificadorDireccionPersonal::class)->centrar(...[...$contexto, 'zona' => $zona ?: null]);
     }
 
     public function consultarDireccionMapa($latitud, $longitud): array
