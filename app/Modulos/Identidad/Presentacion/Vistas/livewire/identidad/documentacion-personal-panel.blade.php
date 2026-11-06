@@ -1,6 +1,13 @@
-<div class="rm-management-workspace space-y-4">
-    <x-ui.collection-header :title="$gestor ? 'Documentación del personal' : 'Mi documentación solicitada'" subtitle="Solicitudes, entregas y revisión, con plazos e historia separados" icon="ph-folder-user"><x-slot:actions>@if($gestor && $disponible)@can('personal.gestionar')<button type="button" class="rm-btn-primary" wire:click="nuevaSolicitud" wire:loading.attr="disabled">Solicitar documentación</button>@endcan @endif @if($gestor)<a class="rm-btn-secondary" href="{{ route('admin.personal-institucional') }}">Volver a personal</a>@endif</x-slot:actions></x-ui.collection-header>
+<div class="rm-management-workspace rm-staff-documents space-y-4" x-data x-on:personal-documento-cerrado.window="$nextTick(() => requestAnimationFrame(() => Array.from($el.querySelectorAll('[data-documento-trigger]')).find(el => el.dataset.documentoTrigger === $event.detail.documento && el.getClientRects().length)?.focus()))">
+    <x-ui.collection-header :title="$gestor ? 'Documentación del personal' : 'Mi documentación'" subtitle="Archivos del expediente, solicitudes y seguimiento de entregas" icon="ph-folder-user"><x-slot:actions>@if($gestor)<a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal-institucional') }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver a personal</a>@endif</x-slot:actions></x-ui.collection-header>
     @if($mensaje)<x-ui.callout title="Operación confirmada" variant="success"><p role="status">{{ $mensaje }}</p></x-ui.callout>@endif
+    <nav class="rm-staff-documents__navigation" aria-label="Tipo de consulta documental">
+        <button type="button" wire:click="cambiarVista('archivos')" aria-pressed="{{ $vista === 'archivos' ? 'true' : 'false' }}" wire:loading.attr="disabled"><i class="ph ph-files" aria-hidden="true"></i>Archivos del personal</button>
+        <button type="button" wire:click="cambiarVista('solicitudes')" aria-pressed="{{ $vista === 'solicitudes' ? 'true' : 'false' }}" wire:loading.attr="disabled"><i class="ph ph-clipboard-text" aria-hidden="true"></i>Solicitudes y entregas</button>
+    </nav>
+    @if($vista === 'archivos')
+        @include('identidad::livewire.identidad.documentacion-personal-coleccion')
+    @else
     @if(!$disponible)
         <x-ui.callout title="Ampliación aprobada, pendiente de instalación" variant="info">Esta base todavía no dispone de la estructura para conservar solicitudes, entregas y prórrogas. Las fichas de personal existentes siguen disponibles. No se ha emitido ninguna solicitud desde esta pantalla.</x-ui.callout>
     @else
@@ -11,6 +18,8 @@
         <x-ui.paginacion :paginator="$destinatarios" mode="livewire" label="solicitudes" />
     </x-ui.section-card>
     @endif
+    @endif
+    @include('identidad::livewire.identidad.documentacion-personal-vista-previa')
     @if($formulario)
     <x-ui.modal-livewire id="documentacion-solicitud" wire:model="formulario" title="Solicitar documentación" subtitle="Selecciona las personas y revisa el plazo antes de confirmar" max-width="lg" close-method="cerrarSolicitud" :dismiss-on-escape="false">
         <form wire:submit="emitirSolicitud" class="space-y-4">

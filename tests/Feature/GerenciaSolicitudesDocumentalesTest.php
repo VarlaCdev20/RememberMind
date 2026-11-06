@@ -314,9 +314,9 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         $otro = User::factory()->create(['nombres' => 'Otra persona', 'ap_paterno' => 'Sintética']);
         $otro->assignRole('ENFERMEROS');
         $this->actingAs($otro);
-        Livewire::test(DocumentacionPersonalPanel::class)->assertSee('Sin solicitudes en esta consulta')->call('verDetalle', $destino->getKey())->assertNotFound();
+        Livewire::test(DocumentacionPersonalPanel::class)->call('cambiarVista', 'solicitudes')->assertSee('Sin solicitudes en esta consulta')->call('verDetalle', $destino->getKey())->assertNotFound();
         $this->actingAs($this->trabajador);
-        Livewire::test(DocumentacionPersonalPanel::class)->assertSee('Constancia de prueba')->call('verDetalle', $destino->getKey())->assertSee('Adjuntar respuesta');
+        Livewire::test(DocumentacionPersonalPanel::class)->call('cambiarVista', 'solicitudes')->assertSee('Constancia de prueba')->call('verDetalle', $destino->getKey())->assertSee('Adjuntar respuesta');
     }
 
     public function test_fallo_despues_de_carga_revierte_sql_y_compensa_solo_archivo_nuevo(): void

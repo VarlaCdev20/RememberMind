@@ -102,6 +102,20 @@ if ($preparar) {
     $contacto=App\Models\Contacto::create(['nombres'=>'Contacto de prueba','apellido_paterno'=>'Identidad sintética','correo'=>'contacto@example.test','estado'=>'ACTIVO']);
     App\Models\ResidenteContacto::create(['cod_residente_contacto'=>'QA_VINCULO_FAMILIAR','cod_residente'=>$residentes[0]->getKey(),'cod_contacto'=>$contacto->getKey(),'parentesco'=>'Hija','responsable_principal'=>false,'contacto_emergencia'=>false,'autoriza_informacion'=>true,'autoriza_salida'=>false,'estado'=>'ACTIVO']);
     if (getenv('RM_GERENCIA_QA_PLANIFICACION') === '1') require __DIR__.'/PlanificacionDisenoSintetica.php';
+    if (getenv('RM_GERENCIA_QA_ARCHIVOS') === '1') {
+        $actor->forceFill(['cambio_password_pendiente' => false])->save();
+        $disk = \Illuminate\Support\Facades\Storage::build(['driver' => 'local', 'root' => $archivo.'.storage', 'throw' => true]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<h1>Constancia de prueba</h1><p>Documento sintetico para comprobar la vista previa.</p><p>No contiene informacion de personas reales.</p>')->output();
+        foreach ([['equipo1@example.test', 'Constancia profesional de ejemplo', 'CARGADO'], ['equipo2@example.test', 'Certificado de formación', 'VALIDADO'], ['equipo3@example.test', 'Currículum de prueba', 'OBSERVADO']] as $i => [$correo, $nombre, $estado]) {
+            $titular = User::where('correo', $correo)->sole();
+            $rutaDoc = 'documentos_personal_privados/archivo-prueba-'.$i.'.pdf';
+            $disk->put($rutaDoc, $pdf);
+            \App\Models\Documento::create(['cod_usuario' => $titular->getKey(), 'nombre' => $nombre, 'tipo_documento' => 'OTROS', 'tipo_archivo' => 'application/pdf', 'hash_archivo' => hash('sha256', $pdf), 'ruta_archivo' => $rutaDoc, 'estado' => $estado,
+                'fecha_hora_carga' => now()->subDays($i), 'fecha_emision' => today()->subDays(10), 'cod_usuario_carga' => $actor->getKey()]);
+        }
+    }
+
+    if (getenv('RM_GERENCIA_QA_CARPETAS') === '1') require __DIR__.'/DocumentacionCarpetasSintetica.php';
     echo 'PREPARADO'; exit;
 }
 final class AutenticarGerenciaSintetica

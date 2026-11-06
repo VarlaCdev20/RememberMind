@@ -3,11 +3,40 @@
 namespace App\Modulos\Identidad\Aplicacion\Consultas;
 
 use App\Models\DestinatarioSolicitudDocumental;
+use App\Models\Documento;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ConsultarDocumentacionPersonal
 {
+    public function archivos(User $actor): Builder
+    {
+        $actor = $actor->fresh(['roles', 'personal']);
+        abort_unless($actor?->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR'), 403);
+        $gestor = $this->esGestor($actor);
+        abort_unless($gestor || $actor->personal, 403);
+
+        $consulta = Documento::query()->whereNotNull('cod_usuario')
+            ->whereNull('cod_residente')->whereNull('cod_contacto')->whereNull('cod_preadmision')
+            ->whereHas('usuario.personal')
+            ->where(function (Builder $q) use ($actor, $gestor): void {
+                $q->where('cod_usuario', $actor->getKey());
+                if ($gestor) {
+                    $q->orWhereHas('usuario', function (Builder $u) use ($actor): void {
+                        if (! $actor->hasRole('SUPERADMINISTRADOR')) {
+                            $u->whereHas('roles')->whereDoesntHave('roles', fn ($r) => $r->whereNotIn('name', AutorizarGestionPersonal::ROLES_TRABAJADOR));
+                        }
+                    });
+                }
+            })->with(['usuario.personal', 'usuario.roles']);
+        if (app(CapacidadDocumentalPersonal::class)->disponible()) {
+            $consulta->orderByDesc('fecha_hora_carga');
+        }
+
+        return $consulta->orderBy('nombre')->orderBy('cod_documento');
+    }
+
     public function esGestor(User $actor): bool
     {
         return $actor->fresh()?->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR')
@@ -86,7 +115,7 @@ final class ConsultarDocumentacionPersonal
 
             return ['clave' => $d->getKey(), 'titulo' => $d->solicitud->nombre_documento, 'mensaje' => $s['aviso'],
                 'persona' => $gestor ? trim($d->personal->nombres.' '.$d->personal->apellido_paterno) : null,
-                'fecha' => $s['limite']?->format('d/m/Y') ?? 'Por revisar', 'url' => route('admin.personal.documentacion')];
+                'fecha' => $s['limite']?->format('d/m/Y') ?? 'Por revisar', 'url' => route('admin.personal.documentacion', ['vista' => 'solicitudes'])];
         })->filter()->values()->all();
     }
 }

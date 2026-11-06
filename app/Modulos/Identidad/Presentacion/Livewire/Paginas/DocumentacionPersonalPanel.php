@@ -12,7 +12,9 @@ use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
 use App\Modulos\Identidad\Dominio\Reglas\DocumentosPersonalInstitucional;
 use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -22,6 +24,22 @@ class DocumentacionPersonalPanel extends Component
     use WithFileUploads, WithPagination;
 
     public string $busqueda = '';
+
+    #[Url(except: 'archivos')]
+    public string $vista = 'archivos';
+
+    public string $estadoArchivo = '';
+
+    public string $personaArchivo = '';
+
+    public string $rolArchivo = '';
+
+    public string $formatoArchivo = '';
+
+    #[Locked]
+    public ?string $documentoSeleccionado = null;
+
+    public bool $vistaPreviaAbierta = false;
 
     public bool $formulario = false;
 
@@ -68,6 +86,58 @@ class DocumentacionPersonalPanel extends Component
     public function updatedBusqueda(): void
     {
         $this->resetPage();
+        $this->resetPage('archivosPage');
+    }
+
+    public function updatedEstadoArchivo(): void
+    {
+        $this->resetPage('archivosPage');
+    }
+
+    public function updatedPersonaArchivo(): void
+    {
+        $this->resetPage('archivosPage');
+    }
+
+    public function updatedRolArchivo(): void
+    {
+        $this->personaArchivo = '';
+        $this->resetPage('archivosPage');
+    }
+
+    public function updatedFormatoArchivo(): void
+    {
+        $this->resetPage('archivosPage');
+    }
+
+    public function cambiarVista(string $vista): void
+    {
+        abort_unless(in_array($vista, ['archivos', 'solicitudes'], true), 422);
+        $this->vista = $vista;
+        $this->busqueda = '';
+        $this->resetPage();
+        $this->resetPage('archivosPage');
+    }
+
+    public function limpiarFiltros(): void
+    {
+        $this->reset('busqueda', 'estadoArchivo', 'personaArchivo', 'rolArchivo', 'formatoArchivo');
+        $this->updatedBusqueda();
+    }
+
+    public function verArchivo(string $codigo): void
+    {
+        $documento = app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user())->findOrFail($codigo);
+        abort_unless(app(DocumentoLaboralPolicy::class)->view(auth()->user(), $documento), 403);
+        $this->documentoSeleccionado = $documento->getKey();
+        $this->vistaPreviaAbierta = true;
+    }
+
+    public function cerrarVistaPrevia(): void
+    {
+        $this->dispatch('personal-documento-cerrado', documento: $this->documentoSeleccionado);
+        $this->vistaPreviaAbierta = false;
+        $this->documentoSeleccionado = null;
     }
 
     public function updatedRol(): void
@@ -101,6 +171,7 @@ class DocumentacionPersonalPanel extends Component
             'origen_plazo' => $this->origenPlazo, 'fecha_limite' => $this->fechaLimite ?: null, 'clave_solicitud' => $this->claveSolicitud,
         ]);
         $this->formulario = false;
+        $this->vista = 'solicitudes';
         $this->mensaje = 'Solicitud emitida y destinatarios conservados.';
         $this->resetPage();
         $this->dispatch('documentacion-personal-actualizada');
@@ -109,6 +180,7 @@ class DocumentacionPersonalPanel extends Component
     public function verDetalle(string $codigo): void
     {
         $this->consulta()->findOrFail($codigo);
+        $this->vista = 'solicitudes';
         $this->destinatarioSeleccionado = $codigo;
         $this->detalleAbierto = true;
         $this->reset('archivo', 'fechaEmision', 'motivoRevision', 'motivoProrroga');
@@ -167,11 +239,63 @@ class DocumentacionPersonalPanel extends Component
         $gestor = $lectura->esGestor($actor);
         abort_unless($gestor || $actor->personal, 403);
         $disponible = app(CapacidadDocumentalPersonal::class)->disponible();
-        $destinatarios = $disponible ? $this->consulta()->when(trim($this->busqueda) !== '', fn ($q) => $q->whereHas('solicitud', fn ($s) => $s->whereLike('nombre_documento', '%'.trim($this->busqueda).'%')))->paginate(12) : null;
+        abort_unless(in_array($this->vista, ['archivos', 'solicitudes'], true), 422);
+        abort_unless(in_array($this->estadoArchivo, ['', 'CARGADO', 'PENDIENTE', 'VALIDADO', 'OBSERVADO', 'VENCIDO', 'ANULADO', 'ANULADA', 'REEMPLAZADO'], true), 422);
+        abort_unless(in_array($this->formatoArchivo, ['', 'PDF', 'IMAGEN', 'OTROS'], true), 422);
+        $personasArchivo = collect();
+        $rolesArchivo = collect();
+        if ($this->vista === 'archivos') {
+            $personasArchivo = \App\Models\User::query()
+                ->whereIn('cod_usuario', $lectura->archivos($actor)->reorder()->select('cod_usuario'))
+                ->with(['personal', 'roles'])->get()
+                ->sortBy(fn ($u) => trim($u->personal->nombres.' '.$u->personal->apellido_paterno));
+            $rolesArchivo = $personasArchivo->flatMap(fn ($u) => $u->roles->pluck('name'))->unique()->sort()->values();
+            abort_unless($this->rolArchivo === '' || $rolesArchivo->contains($this->rolArchivo), 422);
+            if ($this->rolArchivo !== '') {
+                $personasArchivo = $personasArchivo->filter(fn ($u) => $u->hasRole($this->rolArchivo));
+            }
+        }
+        $hayFiltrosArchivo = trim($this->busqueda) !== '' || $this->estadoArchivo !== '' || $this->personaArchivo !== '' || $this->rolArchivo !== '' || $this->formatoArchivo !== '';
+        $archivos = $this->vista === 'archivos' ? $lectura->archivos($actor)
+            ->when($this->estadoArchivo !== '', fn ($q) => $q->where('estado', $this->estadoArchivo))
+            ->when($this->personaArchivo !== '', fn ($q) => $q->where('cod_usuario', $this->personaArchivo))
+            ->when($this->rolArchivo !== '', fn ($q) => $q->whereHas('usuario.roles', fn ($r) => $r->where('name', $this->rolArchivo)))
+            ->when($this->formatoArchivo !== '', function ($q): void {
+                $extensiones = ['jpg', 'jpeg', 'png', 'webp'];
+                if ($this->formatoArchivo === 'PDF') {
+                    $q->whereLike('ruta_archivo', '%.pdf');
+                } elseif ($this->formatoArchivo === 'IMAGEN') {
+                    $q->where(function ($f) use ($extensiones): void {
+                        foreach ($extensiones as $extension) {
+                            $f->orWhereLike('ruta_archivo', '%.'.$extension);
+                        }
+                    });
+                } else {
+                    foreach (['pdf', ...$extensiones] as $extension) {
+                        $q->whereNotLike('ruta_archivo', '%.'.$extension);
+                    }
+                }
+            })
+            ->when(trim($this->busqueda) !== '', function ($q): void {
+                $palabras = array_slice(preg_split('/\s+/u', mb_substr(trim($this->busqueda), 0, 160)), 0, 12);
+                foreach ($palabras as $palabra) {
+                    $q->where(fn ($f) => $f->whereLike('nombre', '%'.$palabra.'%')
+                        ->orWhereHas('usuario.personal', fn ($p) => $p->whereLike('nombres', '%'.$palabra.'%')->orWhereLike('apellido_paterno', '%'.$palabra.'%')->orWhereLike('apellido_materno', '%'.$palabra.'%')));
+                }
+            })->paginate(12, pageName: 'archivosPage') : null;
+        $permisosArchivos = $archivos ? app(DocumentoLaboralPolicy::class)->permisosDocumentos($actor, $archivos->getCollection()) : [];
+        $documentoVisible = $this->vistaPreviaAbierta ? $lectura->archivos($actor)->findOrFail($this->documentoSeleccionado) : null;
+        $archivoDisponible = false;
+        if ($documentoVisible) {
+            abort_unless(app(DocumentoLaboralPolicy::class)->view($actor, $documentoVisible), 403);
+            $disk = str_starts_with($documentoVisible->ruta_archivo, 'documentos_personal_privados/') ? 'local' : 'public';
+            $archivoDisponible = Storage::disk($disk)->exists($documentoVisible->ruta_archivo);
+        }
+        $destinatarios = $disponible && $this->vista === 'solicitudes' ? $this->consulta()->when(trim($this->busqueda) !== '', fn ($q) => $q->whereHas('solicitud', fn ($s) => $s->whereLike('nombre_documento', '%'.trim($this->busqueda).'%')))->paginate(12) : null;
         $detalle = $disponible && $this->detalleAbierto ? $this->consulta()->findOrFail($this->destinatarioSeleccionado) : null;
-        if ($disponible) {
+        if ($destinatarios || $detalle) {
             app(\App\Modulos\Identidad\Aplicacion\Consultas\PlazoExpedienteDocumental::class)->preparar(
-                $destinatarios->getCollection()->concat($detalle ? [$detalle] : []));
+                ($destinatarios?->getCollection() ?? collect())->concat($detalle ? [$detalle] : []));
         }
         $permisosDocumentales = $detalle
             ? app(DocumentoLaboralPolicy::class)->permisosDocumentos($actor, $detalle->entregas->pluck('documento')->filter())
@@ -186,7 +310,7 @@ class DocumentacionPersonalPanel extends Component
             $tipos = DocumentosPersonalInstitucional::paraRol($this->rol);
         }
 
-        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales'))
+        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales', 'archivos', 'permisosArchivos', 'documentoVisible', 'archivoDisponible', 'personasArchivo', 'rolesArchivo', 'hayFiltrosArchivo'))
             ->layout('layouts.sistema');
     }
 }

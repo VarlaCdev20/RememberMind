@@ -1,0 +1,78 @@
+/* Documentación: tabla compartida de Personal y carpetas por tipo documental. */
+.rm-staff-documents { --rm-font-body: "Nunito", sans-serif; --rm-font-title: var(--rm-font-body); --rm-font-friendly: var(--rm-font-body); font-family: var(--rm-font-body); }
+.rm-document-library { container: document-library / inline-size; }
+.rm-document-library .rm-staff-documents__heading { padding-block: 16px; gap: 12px; }
+.rm-document-library__tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.rm-document-library__tools .rm-view-toggle__btn { min-height: 44px; }
+.rm-document-library .rm-staff-documents__filters { flex-wrap: wrap; }
+.rm-document-library .rm-staff-documents__filters > :first-child { flex-basis: 220px; }
+.rm-document-library .rm-staff-documents__filters > :not(:first-child):not(button) { flex-basis: 140px; }
+.rm-document-library .rm-staff-documents__filters :is(input,select) { font-family: var(--rm-font-body); font-size: 14px; }
+.rm-document-library__table { margin: 12px 16px 0; }
+.rm-document-library .rm-staff-directory__table-surface { overflow: hidden; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):nth-child(n) { text-align: start; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):first-child { width: 31%; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):nth-child(2) { width: 23%; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):nth-child(3) { width: 15%; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):nth-child(4) { width: 14%; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table :is(th,td):last-child { width: 17%; }
+.rm-document-library__table td { overflow-wrap: anywhere; }
+.rm-document-library__file { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.rm-document-library__file strong { display: block; font-size: 15px; line-height: 1.4; font-weight: 800; }
+.rm-document-library__file small { display: block; margin-top: 5px; color: var(--rm-text-secondary); font-size: 11px; letter-spacing: .025em; }
+.rm-document-thumb { width: 68px; height: 84px; flex: 0 0 68px; display: flex; align-items: center; justify-content: center; border-radius: 9px; background: color-mix(in srgb, var(--rm-surface-raised) 85%, transparent); border: 1px solid var(--rm-border-soft); color: var(--rm-primary-ink); overflow: hidden; box-shadow: var(--rm-shadow-sm); }
+.rm-document-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.rm-document-thumb > i { font-size: 28px; }
+.rm-document-thumb__paper { display: grid; justify-items: center; gap: 5px; width: 44px; padding: 10px 4px; border: 1px solid var(--rm-border-soft); border-radius: 4px 10px 4px 4px; background: var(--rm-surface-raised); }
+.rm-document-thumb__paper i { font-size: 25px; }
+.rm-document-thumb__paper small { font-size: 10px; font-weight: 800; }
+.rm-document-library__table .rm-document-thumb { width: 44px; height: 52px; flex-basis: 44px; }
+.rm-document-library__table .rm-document-thumb__paper { width: 34px; padding: 4px; gap: 1px; }
+.rm-document-library__table .rm-document-thumb__paper i { font-size: 20px; }
+.rm-document-folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 20px; padding: 34px 18px 18px; margin: 0; list-style: none; }
+.rm-document-folder { --rm-folder-color: color-mix(in srgb, var(--rm-mint-100) 70%, var(--rm-surface)); --rm-folder-edge: color-mix(in srgb, var(--rm-sage) 55%, var(--rm-border-soft)); position: relative; display: flex; flex-direction: column; min-width: 0; margin-top: 12px; padding-top: 14px; }
+.rm-document-folder[data-folder-tone="sky"] { --rm-folder-color: color-mix(in srgb, var(--rm-sky-100) 75%, var(--rm-surface)); --rm-folder-edge: color-mix(in srgb, var(--rm-sky-500) 40%, var(--rm-border-soft)); }
+.rm-document-folder[data-folder-tone="lavender"] { --rm-folder-color: color-mix(in srgb, var(--rm-accent-lavender-soft) 78%, var(--rm-surface)); --rm-folder-edge: color-mix(in srgb, var(--rm-accent-lavender) 45%, var(--rm-border-soft)); }
+.rm-document-folder[data-folder-tone="rose"] { --rm-folder-color: color-mix(in srgb, var(--rm-danger-soft) 65%, var(--rm-surface)); --rm-folder-edge: color-mix(in srgb, var(--rm-danger) 30%, var(--rm-border-soft)); }
+.rm-document-folder[data-folder-tone="sand"] { --rm-folder-color: var(--rm-surface-soft); --rm-folder-edge: var(--rm-border); }
+.rm-document-folder__tab { position: absolute; top: -9px; left: 16px; min-width: 115px; max-width: calc(100% - 32px); height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 14px 6px; border: 1px solid var(--rm-folder-edge); border-bottom: 0; border-radius: 12px 18px 0 0; color: var(--rm-text-primary); background: var(--rm-folder-color); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+.rm-document-folder__tab > i { font-size: 15px; }
+.rm-document-folder__body { position: relative; flex: 1; display: flex; flex-direction: column; align-items: start; gap: 14px; padding: 18px; border: 1px solid var(--rm-folder-edge); border-radius: 9px 16px 16px 16px; background: var(--rm-folder-color); box-shadow: 0 7px 12px color-mix(in srgb, var(--rm-shadow-color, #514940) 10%, transparent); }
+.rm-document-folder__cover { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: start; width: 100%; gap: 14px; }
+.rm-document-folder__identity { min-width: 0; overflow-wrap: anywhere; }
+.rm-document-folder__format { display: inline-block; margin-bottom: 8px; color: var(--rm-text-secondary); font-size: 11px; font-weight: 800; }
+.rm-document-folder__identity h3 { margin: 0; font-family: var(--rm-font-body); font-size: 17px; line-height: 1.4; font-weight: 800; }
+.rm-document-folder__identity p { display: flex; align-items: start; gap: 5px; margin: 9px 0 0; font-size: 14px; line-height: 1.4; color: var(--rm-text-secondary); }
+.rm-document-folder__dates { display: grid; gap: 6px; width: 100%; margin: 0; font-size: 13px; }
+.rm-document-folder__dates > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; }
+.rm-document-folder__dates dt { color: var(--rm-text-secondary); }
+.rm-document-folder__dates dd { margin: 0; font-variant-numeric: tabular-nums; }
+.rm-document-library .rm-document-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: start; gap: 8px; }
+.rm-document-folder .rm-document-actions { margin-top: auto; width: 100%; padding-top: 12px; border-top: 1px solid var(--rm-folder-edge); }
+.rm-document-library .rm-document-actions button { min-height: 44px; font: 800 13px/1.4 var(--rm-font-body); padding: 8px 12px; box-shadow: none; }
+.rm-document-library .rm-document-actions a { min-height: 44px; font-size: 12px; }
+.rm-document-library__table .rm-document-actions a > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.rm-document-library__footer { padding: 0 16px 14px; }
+.rm-document-library__footer > .rm-help { margin-top: 12px; font-size: 12px; line-height: 1.5; }
+.rm-document-library__footer .rm-pagination { background: transparent; box-shadow: none; border: 0; padding-inline: 0; }
+@container document-library (max-width: 1040px) { .rm-document-folders { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container document-library (max-width: 680px) { .rm-document-folders { grid-template-columns: minmax(0, 1fr); gap: 24px; } .rm-document-library .rm-staff-documents__heading { align-items: start; } .rm-document-library__tools { justify-content: space-between; width: 100%; } .rm-document-library__table .rm-document-actions a > span { position: static; width: auto; height: auto; clip-path: none; } }
+
+.rm-document-library__table .rm-document-actions { flex-wrap: nowrap; gap: 4px; }
+.rm-document-library__table .rm-document-actions button { flex: 1; min-width: 0; padding-inline: 8px; font-size: 12px; }
+.rm-document-library__table .rm-document-actions a { width: 44px; min-width: 44px; padding: 0; }
+.rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table tbody td { padding-block: 10px; }
+@container document-library (max-width: 680px) { .rm-document-library__table .rm-document-actions { flex-wrap: wrap; } .rm-document-library__table .rm-document-actions a { width: auto; padding-inline: 8px; } }
+@container document-library (max-width: 860px) {
+    .rm-document-library__table table.rm-staff-directory__table { display: block; width: 100%; table-layout: auto; }
+    .rm-document-library__table table.rm-staff-directory__table thead { display: none; }
+    .rm-document-library__table table.rm-staff-directory__table tbody { display: grid; gap: 12px; }
+    .rm-document-library__table table.rm-staff-directory__table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; background: var(--rm-surface-raised); border-radius: var(--rm-radius-lg); box-shadow: var(--rm-shadow-sm); }
+    .rm-shell [data-rm-main] .rm-document-library__table table.rm-staff-directory__table tbody td:nth-child(n) { display: block; position: static; width: auto; min-width: 0; padding: 0; border: 0; box-shadow: none; background: transparent; }
+    .rm-document-library__table table.rm-staff-directory__table td:first-child, .rm-document-library__table table.rm-staff-directory__table td:nth-child(2), .rm-document-library__table table.rm-staff-directory__table td:last-child { grid-column: 1 / -1; }
+    .rm-document-library__table td[data-label]:not(:first-child)::before { content: attr(data-label); display: block; margin-bottom: 5px; font-size: 12px; color: var(--rm-text-secondary); font-weight: 800; }
+    .rm-document-library__table .rm-document-actions { justify-content: start; }
+    .rm-document-library__table .rm-document-actions button { flex: 0 1 auto; padding-inline: 12px; }
+    .rm-document-library__table .rm-document-actions a { width: auto; padding-inline: 10px; }
+    .rm-document-library__table .rm-document-actions a > span { position: static; width: auto; height: auto; clip-path: none; }
+}
