@@ -13,7 +13,7 @@
         <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
             :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
     </x-ui.filter-bar>
-    <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" class="rm-staff-directory__panel">
+    <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" :class="'rm-staff-directory__panel'.($vistaListadoResumen === 'tabla' ? ' rm-staff-directory__panel--table' : '')">
         <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
         @if($personalResumen->isEmpty())
             <x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o limpia los filtros para ver el equipo." icono="ph-users" />

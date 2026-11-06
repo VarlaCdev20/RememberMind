@@ -207,6 +207,8 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(5),
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):last-child { width: 14%; text-align: center; }
 .rm-staff-directory .rm-staff-directory__panel { background: color-mix(in srgb, var(--rm-surface) 86%, var(--rm-primary-soft)); border-radius: var(--rm-radius-xl); box-shadow: var(--rm-shadow-card); }
+.rm-shell [data-rm-main] .rm-staff-directory .rm-staff-directory__panel--table { padding: 0; border: 0; background: transparent !important; background-image: none !important; box-shadow: none !important; backdrop-filter: none; }
+.rm-staff-directory__panel--table::before, .rm-staff-directory__panel--table::after { display: none; }
 .rm-staff-directory__heading .rm-collection-header__icon { background: var(--rm-primary-soft); color: var(--rm-primary-ink); box-shadow: var(--rm-shadow-sm); }
 .rm-staff-directory .rm-staff-directory__panel > .rm-card__section-header { padding-block: var(--rm-space-2); border-bottom: 0; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { border-collapse: separate; border-spacing: 0; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg); }
