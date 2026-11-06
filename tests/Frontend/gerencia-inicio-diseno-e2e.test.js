@@ -1,0 +1,67 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
+import { randomBytes } from 'node:crypto';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import puppeteer from 'puppeteer';
+
+test('inicio gerencial: composición compartida, enlaces y cinco anchos', { skip: process.env.RM_GERENCIA_INICIO_E2E !== '1', timeout: 240000 }, async t => {
+    const root = fileURLToPath(new URL('../../', import.meta.url));
+    const output = path.join(root, 'output', 'personal-tabla-diseno-20261105');
+    await mkdir(output, { recursive: true });
+    const db = path.join(tmpdir(), `remembermind-gerencia-${randomBytes(8).toString('hex')}_testing.sqlite`);
+    await writeFile(db, '', { flag: 'wx', mode: 0o600 });
+    const port = await new Promise(resolve => { const s = createServer().listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); }); });
+    const base = `http://127.0.0.1:${port}`;
+    const token = randomBytes(24).toString('hex');
+    const env = { ...process.env, APP_ENV: 'testing', APP_URL: base, RM_GERENCIA_QA_DB: db, RM_GERENCIA_QA_TOKEN: token, RM_GERENCIA_QA_AMPLIACION: '1', RM_GERENCIA_QA_ARCHIVOS: '1' };
+    const router = 'tests/Support/ServidorGerenciaSintetico.php';
+    const prepared = await new Promise((resolve, reject) => {
+        const c = spawn('php', [router, '--preparar'], { cwd: root, env, windowsHide: true });
+        let out = ''; c.stdout.on('data', b => out += b); c.stderr.on('data', b => out += b);
+        c.on('error', reject); c.on('close', code => code ? reject(new Error(out)) : resolve(out));
+    });
+    assert.match(prepared, /PREPARADO/);
+    const server = spawn('php', ['-S', `127.0.0.1:${port}`, '-t', 'public', router], { cwd: root, env, windowsHide: true, stdio: 'ignore' });
+    t.after(() => server.kill());
+    const executablePath = [process.env.PUPPETEER_EXECUTABLE_PATH, puppeteer.executablePath(), 'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p => typeof p === 'string' && existsSync(p));
+    const browser = await puppeteer.launch({ headless: true, executablePath, args: ['--no-sandbox'] });
+    t.after(() => browser.close());
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', r => r.url().startsWith(base + '/') ? r.continue({ headers: { ...r.headers(), 'X-RM-GERENCIA-QA': token } }) : r.url().startsWith('data:') || r.url().startsWith('blob:') ? r.continue() : r.abort());
+    await page.evaluateOnNewDocument(() => localStorage.setItem('remembermind-theme', 'light'));
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
+    await page.goto(base + '/dashboard', { waitUntil: 'networkidle0' });
+    await page.waitForSelector('.rm-manager-home');
+    const pruebas = [];
+    for (const width of [1440, 1280, 1024, 768, 390]) {
+        await page.setViewport({ width, height: 900 });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const datos = await page.evaluate(() => ({
+            overflow: document.documentElement.scrollWidth - innerWidth,
+            indicadores: document.querySelectorAll('.rm-manager-home .rm-metric-card').length,
+            imagen: document.querySelector('.rm-manager-home .rm-dashboard-header img')?.getAttribute('src'),
+            enlaces: [...document.querySelectorAll('.rm-manager-home a')].map(a => a.getAttribute('href')),
+            small: [...document.querySelectorAll('.rm-manager-home a')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
+            pending: document.querySelector('.rm-manager-home__pending').getBoundingClientRect().toJSON(),
+            planning: document.querySelector('.rm-manager-home__planning').getBoundingClientRect().toJSON(),
+        }));
+        assert.ok(datos.overflow <= 1, JSON.stringify({ width, ...datos }));
+        assert.equal(datos.indicadores, 3);
+        assert.equal(datos.small, 0);
+        if (width <= 768) assert.ok(datos.planning.top >= datos.pending.bottom, 'Paneles apilados en móvil y tablet');
+        assert.ok(datos.enlaces.some(url => url.endsWith('/admin/personal-documentacion')));
+        await page.screenshot({ path: path.join(output, 'inicio-' + width + '.png'), fullPage: true });
+        pruebas.push({ width, ...datos });
+    }
+    assert.deepEqual(errors, []);
+    await writeFile(path.join(output, 'inicio-qa.json'), JSON.stringify(pruebas, null, 2));
+});
