@@ -3,10 +3,12 @@
 namespace App\Modulos\Identidad\Presentacion\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modulos\Identidad\Aplicacion\Acciones\Fortify\UpdateUserPassword;
+use App\Compartido\Infraestructura\Notificaciones\CorreoNoConfigurado;
+use App\Compartido\Infraestructura\Notificaciones\ExigirTransporteCorreoReal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Password;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 final class CambiarPasswordInicialController extends Controller
 {
@@ -17,21 +19,32 @@ final class CambiarPasswordInicialController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('identidad::paginas.usuarios.password-inicial', ['politica' => UpdateUserPassword::passwordPolicy()]);
+        return view('identidad::paginas.usuarios.password-inicial');
     }
 
-    public function guardar(Request $request, UpdateUserPassword $accion)
+    public function guardar(Request $request)
     {
-        abort_unless($request->user()?->fresh()?->estado === 'ACTIVO' && $request->user()->cambio_password_pendiente === true, 403);
+        $usuario = $request->user()?->fresh();
+        abort_unless($usuario?->estado === 'ACTIVO' && $usuario->cambio_password_pendiente === true, 403);
         try {
-            $accion->update($request->user(), $request->only(['current_password', 'password', 'password_confirmation']));
-        } catch (ValidationException $error) {
-            $error->errorBag = 'updatePassword';
-            throw $error;
-        }
-        $request->session()->regenerate();
-        $request->session()->put('password_hash_'.Auth::getDefaultDriver(), $request->user()->getAuthPassword());
+            app(ExigirTransporteCorreoReal::class)->verificar();
+            $estado = Password::broker(config('fortify.passwords'))->sendResetLink(['correo' => $usuario->correo]);
+        } catch (CorreoNoConfigurado|TransportExceptionInterface $error) {
+            report($error);
 
-        return redirect()->route('dashboard')->with('status', 'Contraseña actualizada. Ya puedes continuar.');
+            return back()->withErrors(['correo' => 'No se pudo enviar el enlace. Inténtalo de nuevo o comunícate con Administración.']);
+        }
+        if ($estado !== Password::RESET_LINK_SENT) {
+            return back()->withErrors(['correo' => $estado === Password::RESET_THROTTLED
+                ? 'Ya solicitaste un enlace hace poco. Revisa tu correo o espera un minuto antes de intentarlo de nuevo.'
+                : 'No se pudo enviar el enlace. Comunícate con Administración.']);
+        }
+        Auth::guard('web')->logout();
+        Auth::forgetGuards();
+        Auth::shouldUse('web');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('password.request')->with('status', 'Enlace enviado a tu correo registrado. Abre el mensaje y pulsa el botón para crear tu contraseña. Después podrás iniciar sesión con tu rol.');
     }
 }

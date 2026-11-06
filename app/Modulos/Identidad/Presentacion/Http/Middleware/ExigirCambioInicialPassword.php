@@ -14,6 +14,15 @@ final class ExigirCambioInicialPassword
             return $next($request);
         }
         $nombre = $request->route()?->getName() ?? '';
+        if ($nombre === 'password.reset' && $request->isMethod('GET')) {
+            \Illuminate\Support\Facades\Auth::guard('web')->logout();
+            \Illuminate\Support\Facades\Auth::forgetGuards();
+            \Illuminate\Support\Facades\Auth::shouldUse('web');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return $next($request);
+        }
         if (in_array($nombre, ['password.inicial', 'password.inicial.guardar', 'logout'], true) || str_starts_with($nombre, 'password.')) {
             return $next($request);
         }
