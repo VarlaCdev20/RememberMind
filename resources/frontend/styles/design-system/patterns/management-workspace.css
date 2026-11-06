@@ -44,7 +44,7 @@
 .rm-manager-home > * { min-width: 0; }
 .rm-manager-home > :is(.rm-dashboard-header, .rm-management-overview, .rm-management-panels, .rm-management-secondary, .rm-help) { grid-column: 1 / -1; }
 .rm-manager-home .rm-manager-home__welcome { min-height: 180px; }
-.rm-manager-home > .rm-card { height: 100%; border-radius: var(--rm-radius-xl); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-card); padding: var(--rm-space-4); }
+.rm-manager-home > .rm-card { height: 100%; border-radius: var(--rm-radius-xl); background: var(--rm-dashboard-card-bg); box-shadow: var(--rm-dashboard-card-shadow); padding: var(--rm-space-4); }
 .rm-manager-home .rm-management-overview { gap: var(--rm-space-3); }
 .rm-manager-home .rm-metric-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--rm-space-2); padding: var(--rm-space-3) var(--rm-space-4); min-height: 88px; }
 .rm-manager-home .rm-metric-card__top { position: static; grid-column: 2; grid-row: 1; align-self: center; }
@@ -54,8 +54,18 @@
 .rm-manager-home .rm-metric-card__label { margin: 0; font-size: var(--rm-font-size-body); }
 .rm-manager-home .rm-metric-card__description { grid-column: 2; font-size: var(--rm-font-size-meta); margin-top: var(--rm-space-1); }
 .rm-manager-home .rm-management-pending { grid-template-columns: minmax(0, 1fr); gap: var(--rm-space-2); }
-.rm-manager-home .rm-management-pending-item { background: color-mix(in srgb, var(--rm-role-primary-soft) 36%, var(--rm-surface-raised)); border: 0; min-height: 64px; padding: var(--rm-space-3); }
-.rm-manager-home .rm-management-pending-item > i:first-child { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--rm-radius-md); background: var(--rm-role-primary-soft); color: var(--rm-role-ink); font-size: 22px; }
+.rm-manager-home .rm-management-pending-item { background: color-mix(in srgb, var(--rm-primary-soft) 36%, var(--rm-dashboard-card-bg)); border: 0; min-height: 64px; padding: var(--rm-space-3); }
+.rm-manager-home .rm-management-pending-item > i:first-child { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--rm-radius-md); background: var(--rm-primary-soft); color: var(--rm-primary-strong); font-size: 22px; }
+.rm-manager-home .rm-metric-card { background: var(--rm-dashboard-card-bg); box-shadow: var(--rm-dashboard-card-shadow); border-color: var(--rm-dashboard-card-border); border-radius: var(--rm-radius-xl); }
+.rm-manager-home .rm-metric-card__icon { background: var(--rm-primary-soft); color: var(--rm-action-primary-ink); }
+.rm-manager-home .rm-metric-card:nth-child(2) .rm-metric-card__icon { background: var(--rm-sky-50); color: var(--rm-info-strong); }
+.rm-manager-home .rm-metric-card__value { font-family: var(--rm-font-friendly); font-weight: 750; }
+.rm-manager-home .rm-metric-card__label { font-family: var(--rm-font-friendly); font-weight: 700; }
+.rm-manager-home .rm-management-pending-item strong { font: 700 var(--rm-font-size-body)/1.4 var(--rm-font-friendly); }
+.rm-manager-home .rm-management-pending-item small { font: 500 var(--rm-font-size-meta)/1.45 var(--rm-font-body); }
+.rm-manager-home .rm-dashboard-header { --rm-header-accent: var(--rm-role-nursing); }
+.rm-manager-home .rm-management-tabs a { background: color-mix(in srgb, var(--rm-primary-soft) 24%, var(--rm-dashboard-card-bg)); border-color: var(--rm-border-soft); color: var(--rm-text-primary); box-shadow: none; }
+.rm-manager-home .rm-management-tabs a:hover { background: var(--rm-primary-soft); }
 .rm-manager-home .rm-manager-home__planning .rm-management-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); }
 .rm-manager-home .rm-management-tabs a { display: flex; align-items: center; justify-content: flex-start; gap: var(--rm-space-2); padding: var(--rm-space-2) var(--rm-space-3); border-radius: var(--rm-radius-md); min-height: 44px; }
 .rm-manager-home__report { width: 100%; margin-block: var(--rm-space-3); justify-content: center; }

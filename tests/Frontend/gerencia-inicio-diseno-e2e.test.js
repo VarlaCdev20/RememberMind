@@ -53,9 +53,13 @@ test('inicio gerencial: composición compartida, enlaces y cinco anchos', { skip
             small: [...document.querySelectorAll('.rm-manager-home a')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
             pending: document.querySelector('.rm-manager-home__pending').getBoundingClientRect().toJSON(),
             planning: document.querySelector('.rm-manager-home__planning').getBoundingClientRect().toJSON(),
+            composicionCompartida: document.querySelector('.rm-manager-home').classList.contains('rm-dashboard-composition'),
+            fuenteTitulo: getComputedStyle(document.querySelector('.rm-manager-home .rm-section-header__title')).fontFamily,
         }));
         assert.ok(datos.overflow <= 1, JSON.stringify({ width, ...datos }));
         assert.equal(datos.indicadores, 3);
+        assert.equal(datos.composicionCompartida, true);
+        assert.match(datos.fuenteTitulo, /Nunito/);
         assert.equal(datos.small, 0);
         if (width <= 768) assert.ok(datos.planning.top >= datos.pending.bottom, 'Paneles apilados en móvil y tablet');
         assert.ok(datos.enlaces.some(url => url.endsWith('/admin/personal-documentacion')));

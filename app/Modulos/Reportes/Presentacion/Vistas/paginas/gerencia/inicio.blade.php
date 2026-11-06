@@ -4,7 +4,7 @@
     $rutas = ['personal'=>'admin.personal-institucional', 'documentacion'=>'admin.personal.documentacion', 'ocupacion'=>'admin.habitaciones.index', 'alertas'=>'admin.alertas-clinicas.index'];
     $enlaces = collect($rutas)->map(fn ($ruta) => $visibilidadGerencia->puedeVerRuta($ruta) ? route($ruta) : null)->all();
 @endphp
-<div class="rm-management-workspace rm-manager-home">
+<div class="rm-management-workspace rm-manager-home rm-dashboard-composition font-sans">
     <x-ui.dashboard-header class="rm-manager-home__welcome" :title="($saludo['saludo'] ?? 'Bienvenido').', '.mb_convert_case(mb_strtolower($saludo['nombre'] ?? 'Gerencia'), MB_CASE_TITLE, 'UTF-8')" subtitle="Una mirada al equipo, la residencia y los pendientes de hoy." role="Gerencia" scope="Dirección y planificación institucional" :date="now()->locale('es')->translatedFormat('d \\d\\e F \\d\\e Y')" :image="asset('images/dashboard/enfermera-manos.webp')" />
     @include('reportes::paginas.gerencia.partials.indicadores')
     <x-ui.section-card class="rm-manager-home__pending" title="Para revisar hoy" subtitle="Pendientes registrados para seguimiento institucional" icon="ph-clipboard-text">
