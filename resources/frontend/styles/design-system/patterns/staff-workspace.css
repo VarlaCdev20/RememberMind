@@ -228,7 +228,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-directory__table .rm-resident-directory__avatar-ornament { display: none; }
 .rm-staff-directory__table .rm-resident-directory__name { font-size: var(--rm-font-size-label); line-height: 1.3; }
 .rm-staff-directory__table .rm-resident-directory__name-wrap > span { font-size: var(--rm-font-size-meta); line-height: 1.4; margin-top: var(--rm-space-1); }
-.rm-staff-directory__role { display: inline-flex; align-items: center; gap: var(--rm-space-1); padding: 3px 6px; border-radius: var(--rm-radius-sm); background: var(--rm-info-soft); color: var(--rm-info-strong); font-size: var(--rm-font-size-label); line-height: 1.4; }
+.rm-staff-directory__role { display: inline-flex; align-items: center; gap: var(--rm-space-1); color: var(--rm-text-secondary-readable); font-size: var(--rm-font-size-label); line-height: 1.4; }
 .rm-staff-directory__role i { flex: none; font-size: 17px; }
 .rm-staff-directory .rm-staff-directory__record-button::before { background: var(--rm-role-primary-soft); border-color: transparent; border-radius: var(--rm-radius-md); }
 .rm-staff-directory .rm-staff-directory__record-button { color: var(--rm-role-ink); }
@@ -237,7 +237,6 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     .rm-staff-directory__table .rm-staff-directory__actions { justify-content: center; flex-wrap: nowrap; }
 }
 .rm-staff-directory__table-wrap { min-width: 0; }
-.rm-staff-directory__table { --rm-surface-raised: var(--rm-form-section); }
 .rm-staff-directory__results { min-width: 0; }
 .rm-staff-directory__results > .rm-section-header { padding: var(--rm-space-2) 0 var(--rm-space-3); border: 0; }
 @container management-workspace (max-width: 1099px) {

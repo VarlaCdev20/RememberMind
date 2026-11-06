@@ -38,7 +38,6 @@
                 @endforeach
             </div>
         @else
-            <div class="rm-staff-directory__table-wrap">
                 <table class="rm-table rm-staff-directory__table" role="table">
                     <caption class="sr-only">Personal institucional y acceso</caption>
                     <thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Ficha</th><th scope="col">Acciones</th></tr></thead>
@@ -59,7 +58,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
         @endif
         <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
         @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="true" />@endif
