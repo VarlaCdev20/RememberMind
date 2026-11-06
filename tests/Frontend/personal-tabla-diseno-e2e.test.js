@@ -55,6 +55,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             filtrosSeparados: !document.querySelector('.rm-staff-directory__panel').contains(document.querySelector('.rm-staff-directory__filters')),
             fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__panel')).backgroundColor,
             sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__panel')).boxShadow,
+            sinMarcoTabla: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'].every(prop => getComputedStyle(document.querySelector('.rm-staff-directory__table'))[prop] === '0px'),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
             sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
             columnasAlineadas: [...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row => [...row.cells].every((cell, index) => Math.abs(cell.getBoundingClientRect().left - document.querySelectorAll('.rm-staff-directory__table thead th')[index].getBoundingClientRect().left) < 1)),
@@ -66,6 +67,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         assert.equal(medidas.filtrosSeparados, true);
         assert.equal(medidas.fondoPanel, 'rgba(0, 0, 0, 0)');
         assert.equal(medidas.sombraPanel, 'none');
+        assert.equal(medidas.sinMarcoTabla, true);
         assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
         if (width >= 1280) assert.equal(medidas.columnasAlineadas, true);
