@@ -14,7 +14,6 @@
             :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
     </x-ui.filter-bar>
     <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" class="rm-staff-directory__panel">
-        <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
         <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
         @if($personalResumen->isEmpty())
             <x-ui.empty-state titulo="Sin coincidencias" texto="Prueba otra búsqueda o limpia los filtros para ver el equipo." icono="ph-users" />
@@ -61,6 +60,7 @@
                 </table>
             </div>
         @endif
+        <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
         @if($personalResumen->isNotEmpty())<x-ui.paginacion class="rm-pagination--compact" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="true" />@endif
     </x-ui.section-card>
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')

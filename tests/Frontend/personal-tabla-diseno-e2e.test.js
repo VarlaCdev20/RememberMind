@@ -54,6 +54,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             smallDetails: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).map(el => ({ label: el.innerText, height: el.getBoundingClientRect().height, style: getComputedStyle(el).minHeight })),
             filtrosSeparados: !document.querySelector('.rm-staff-directory__panel').contains(document.querySelector('.rm-staff-directory__filters')),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
+            sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
             columnasAlineadas: [...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row => [...row.cells].every((cell, index) => Math.abs(cell.getBoundingClientRect().left - document.querySelectorAll('.rm-staff-directory__table thead th')[index].getBoundingClientRect().left) < 1)),
         }));
         assert.ok(medidas.overflow <= 1, JSON.stringify({ width, ...medidas }));
@@ -61,9 +62,10 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         assert.equal(medidas.small, 0, JSON.stringify(medidas.smallDetails));
         assert.equal(medidas.filtrosSeparados, true);
+        assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
         if (width >= 1280) assert.equal(medidas.columnasAlineadas, true);
-        if (width >= 1280) assert.ok(medidas.firstRowHeight < 110, 'Fila compacta');
+        if (width >= 1280) assert.ok(medidas.firstRowHeight <= 56, `Fila compacta: ${medidas.firstRowHeight}`);
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         const trigger = await page.$('.rm-staff-directory__actions button[aria-expanded]');
         await trigger.evaluate(el => el.scrollIntoView({ block: 'center' }));
