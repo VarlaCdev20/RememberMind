@@ -16,7 +16,7 @@ html:not(.dark):not([data-theme="dark"]) .rm-shell:is([data-role="manager"], [da
     --rm-bg-app: var(--rm-app-bg);
 }
 html:not(.dark):not([data-theme="dark"]) .rm-shell[data-role="manager"] {
-    --rm-shell-chrome-bg: var(--rm-palette-capuchino);
+    --rm-shell-chrome-bg: color-mix(in srgb, var(--rm-palette-capuchino) 55%, var(--rm-palette-surface));
     --rm-header-bg: var(--rm-shell-chrome-bg);
     --rm-app-bg: var(--rm-shell-chrome-bg);
     --rm-bg-app: var(--rm-app-bg);
