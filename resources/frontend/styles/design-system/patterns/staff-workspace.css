@@ -238,6 +238,9 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 .rm-staff-directory__table-wrap { min-width: 0; }
 .rm-staff-directory__results { min-width: 0; }
+.rm-staff-directory__table-surface { min-width: 0; border-radius: var(--rm-radius-xl); background: var(--rm-surface-raised); box-shadow: var(--rm-shadow-card); }
+.rm-shell [data-rm-main] .rm-staff-directory .rm-staff-directory__table-surface table.rm-staff-directory__table { box-shadow: none; }
+.rm-staff-directory .rm-staff-directory__table-surface > .rm-staff-directory__pagination { margin: 0; padding: var(--rm-space-2) var(--rm-space-3); }
 .rm-staff-directory .rm-staff-directory__pagination { grid-template-columns: minmax(0, 1fr) auto; gap: var(--rm-space-3); margin-top: var(--rm-space-3); padding-block: var(--rm-space-1); border: 0; }
 .rm-staff-directory__pagination .rm-pagination__pages { justify-self: end; gap: var(--rm-space-1); }
 .rm-staff-directory__pagination .rm-pagination__numbers::before { display: none; }

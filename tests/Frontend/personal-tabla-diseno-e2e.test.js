@@ -85,6 +85,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).boxShadow,
             sinContenedorCard: !document.querySelector('.rm-staff-directory__results').classList.contains('rm-card'),
             paginacionContenida: [...document.querySelectorAll('.rm-staff-directory__pagination .rm-pagination__page')].every(el => el.getBoundingClientRect().left >= 0 && el.getBoundingClientRect().right <= innerWidth + 1),
+            pieIntegrado: !!document.querySelector('.rm-staff-directory__table-surface > .rm-staff-directory__pagination'),
             sinMarcoTabla: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'].every(prop => getComputedStyle(document.querySelector('.rm-staff-directory__table'))[prop] === '0px'),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
             sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
@@ -99,6 +100,7 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         assert.equal(medidas.sombraPanel, 'none');
         assert.equal(medidas.sinContenedorCard, true);
         assert.equal(medidas.paginacionContenida, true);
+        assert.equal(medidas.pieIntegrado, true);
         assert.equal(medidas.sinMarcoTabla, true);
         assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
