@@ -61,7 +61,11 @@ class AreasInstitucionalesPanel extends Component
     {
         abort_unless($this->usuarioAutorizado('areas.ver'), 403);
         if (auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
-            $areas = Area::query()->when(trim($this->search) !== '', fn ($q) => $q->whereLike('nombre', '%'.trim($this->search).'%'))
+            $resumen = Area::query()->get(['estado']);
+            $totalAreas = $resumen->count();
+            $areasActivas = $resumen->whereIn('estado', ['ACTIVO','ACTIVA'])->count();
+            $areasInactivas = $totalAreas - $areasActivas;
+            $areas = Area::query()->when(trim($this->search) !== '', fn ($q) => $q->where(fn ($buscar) => $buscar->whereLike('nombre', '%'.trim($this->search).'%')->orWhereLike('cod_area', '%'.trim($this->search).'%')))
                 ->when($this->filtroEstado, fn ($q) => $q->whereIn('estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO','ACTIVA'] : ['INACTIVO','INACTIVA']))->orderBy('nombre')->get();
             $equipo = null;
             $areaActual = $this->mostrarFicha && $this->areaSeleccionada ? Area::findOrFail($this->areaSeleccionada->getKey()) : null;
@@ -69,7 +73,7 @@ class AreasInstitucionalesPanel extends Component
                 $equipo = app(\App\Modulos\Institucion\Aplicacion\Consultas\ConsultarCoberturaEquipo::class)->consultar(auth()->user(), ['area'=>$areaActual->getKey(),'fecha'=>$this->fechaEquipo]);
             }
 
-            return view('institucion::livewire.gerencia.areas-equipo', compact('areas','areaActual','equipo'));
+            return view('institucion::livewire.gerencia.areas-equipo', compact('areas','areaActual','equipo','totalAreas','areasActivas','areasInactivas'));
         }
         $reporte = app(AreasReportDataService::class)->getGeneralReportData();
         $areas = $reporte['areas']

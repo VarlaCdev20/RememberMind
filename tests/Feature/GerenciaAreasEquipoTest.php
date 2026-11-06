@@ -129,4 +129,23 @@ class GerenciaAreasEquipoTest extends TestCase
         $this->assertNull($panel->viewData('equipo'));
         $this->assertDatabaseCount('asignaciones_personal', 1);
     }
+    public function test_gerencia_reutiliza_tarjetas_y_filtros_de_superadmin_sin_exponer_su_ficha_o_reportes(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $actor = User::factory()->create(); $actor->assignRole('GERENTE'); $this->actingAs($actor);
+        $area = Area::create(['nombre'=>'Área de tarjetas', 'estado'=>'ACTIVA']);
+        Area::create(['nombre'=>'Área histórica', 'estado'=>'INACTIVA']);
+        $panel = Livewire::test(AreasInstitucionalesPanel::class)->assertSeeHtml('id="areas-buscar"')
+            ->assertSee('Total áreas')->assertSee('Equipo consultable por fecha y jornada')->assertSee('Ver área y equipo')
+            ->assertDontSee('Sin Responsable')->assertDontSeeHtml('wire:click="abrirReportes"');
+        $panel->set('search',$area->getKey())->assertSee('Área de tarjetas')->assertDontSee('Área histórica')
+            ->call('limpiarFiltros')->set('filtroEstado','INACTIVO')->assertSee('Área histórica')->assertDontSee('Área de tarjetas');
+        $actor->syncPermissions(['areas.ver']); $actor->removeRole('GERENTE');
+        Livewire::test(AreasInstitucionalesPanel::class)->assertDontSeeHtml('wire:click="crearArea"')
+            ->call('crearArea')->assertSet('mostrarFormulario',false);
+        $superadmin = User::factory()->create(); $superadmin->assignRole('SUPERADMINISTRADOR'); $this->actingAs($superadmin);
+        Livewire::test(AreasInstitucionalesPanel::class)->assertSee('Áreas institucionales')->assertSeeHtml('id="areas-buscar"')
+            ->assertSee('Ver ficha')->assertSeeHtml('wire:click="abrirReportes"');
+    }
+
 }
