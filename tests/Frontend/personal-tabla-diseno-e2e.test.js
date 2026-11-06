@@ -82,13 +82,16 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             small: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
             smallDetails: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).map(el => ({ label: el.innerText, height: el.getBoundingClientRect().height, style: getComputedStyle(el).minHeight })),
             filtrosSeparados: !document.querySelector('.rm-staff-directory__results').contains(document.querySelector('.rm-staff-directory__filters')),
-            filtrosSinRecuadro: getComputedStyle(document.querySelector('.rm-staff-directory__filters')).borderTopWidth === '0px' && getComputedStyle(document.querySelector('.rm-staff-directory__filters')).backgroundColor === 'rgba(0, 0, 0, 0)',
+            filtrosDiferenciados: getComputedStyle(document.querySelector('.rm-staff-directory__filters')).borderTopWidth === '0px' && getComputedStyle(document.querySelector('.rm-staff-directory__filters')).backgroundColor !== 'rgba(0, 0, 0, 0)',
             tablaConRelieve: getComputedStyle(document.querySelector('.rm-staff-directory__table-surface')).boxShadow !== 'none',
             fondoPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).backgroundColor,
             sombraPanel: getComputedStyle(document.querySelector('.rm-staff-directory__results')).boxShadow,
             sinContenedorCard: !document.querySelector('.rm-staff-directory__results').classList.contains('rm-card'),
             paginacionContenida: [...document.querySelectorAll('.rm-staff-directory__pagination .rm-pagination__page')].every(el => el.getBoundingClientRect().left >= 0 && el.getBoundingClientRect().right <= innerWidth + 1),
             pieIntegrado: !!document.querySelector('.rm-staff-directory__table-surface > .rm-staff-directory__pagination'),
+            tituloMayusculas: getComputedStyle(document.querySelector('.rm-staff-directory__heading h1')).textTransform === 'uppercase',
+            encabezadoDiferenciado: getComputedStyle(document.querySelector('.rm-staff-directory__heading')).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(document.querySelector('.rm-staff-directory__heading')).backgroundColor !== getComputedStyle(document.querySelector('[data-rm-main]')).backgroundColor,
+            columnasCentradas: [...document.querySelectorAll('.rm-staff-directory__table th')].every(el => getComputedStyle(el).textAlign === 'center' && getComputedStyle(el).textTransform === 'uppercase'),
             sinMarcoTabla: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'].every(prop => getComputedStyle(document.querySelector('.rm-staff-directory__table'))[prop] === '0px'),
             encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
             sinDivisores: [...document.querySelectorAll('.rm-staff-directory__table tbody td')].every(el => getComputedStyle(el).borderBottomWidth === '0px' && getComputedStyle(el).borderRightWidth === '0px'),
@@ -99,13 +102,16 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         assert.equal(medidas.small, 0, JSON.stringify(medidas.smallDetails));
         assert.equal(medidas.filtrosSeparados, true);
-        assert.equal(medidas.filtrosSinRecuadro, true);
+        assert.equal(medidas.filtrosDiferenciados, true);
         assert.equal(medidas.tablaConRelieve, true);
         assert.equal(medidas.fondoPanel, 'rgba(0, 0, 0, 0)');
         assert.equal(medidas.sombraPanel, 'none');
         assert.equal(medidas.sinContenedorCard, true);
         assert.equal(medidas.paginacionContenida, true);
         assert.equal(medidas.pieIntegrado, true);
+        assert.equal(medidas.tituloMayusculas, true);
+        assert.equal(medidas.encabezadoDiferenciado, true);
+        assert.equal(medidas.columnasCentradas, true);
         assert.equal(medidas.sinMarcoTabla, true);
         assert.equal(medidas.sinDivisores, true);
         assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
