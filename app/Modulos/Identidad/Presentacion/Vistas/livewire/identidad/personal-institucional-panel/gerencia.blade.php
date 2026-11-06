@@ -6,16 +6,14 @@
         </x-slot:actions>
     </x-ui.collection-header>
     @error('recuperacion')<p role="alert" class="rm-alert rm-alert-danger">{{ $message }}</p>@enderror
+    <x-ui.filter-bar class="rm-staff-directory__filters" aria-label="Filtrar personal institucional">
+        <x-ui.field label="Buscar trabajador" for="gerencia-personal-buscar"><x-ui.filter-search model="busquedaResumen" input-id="gerencia-personal-buscar" label="" placeholder="Nombre o correo" :show-clear="false" /></x-ui.field>
+        <x-ui.field label="Estado de acceso" for="gerencia-personal-estado"><select id="gerencia-personal-estado" class="rm-input" wire:model.live="estadoResumen"><option value="">Todos los accesos</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></x-ui.field>
+        <x-ui.action-button variant="ghost" wire:click="limpiarFiltrosResumen" icono="ph-arrow-counter-clockwise">Limpiar</x-ui.action-button>
+        <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
+            :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
+    </x-ui.filter-bar>
     <x-ui.section-card title="Equipo institucional" icon="ph-users-three" :count="$personalResumenTotal" class="rm-staff-directory__panel">
-        <x-slot:actions>
-            <x-ui.collection-view-switch mode="livewire" change-method="cambiarVistaListadoResumen" :value="$vistaListadoResumen" label="Presentación del personal"
-                :options="[['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'],['value'=>'tarjetas','label'=>'Tarjetas','icon'=>'ph-squares-four']]" />
-        </x-slot:actions>
-        <x-ui.filter-bar class="rm-staff-directory__filters" aria-label="Filtrar personal institucional">
-            <x-ui.field label="Buscar trabajador" for="gerencia-personal-buscar"><x-ui.filter-search model="busquedaResumen" input-id="gerencia-personal-buscar" label="" placeholder="Nombre o correo" :show-clear="false" /></x-ui.field>
-            <x-ui.field label="Estado de acceso" for="gerencia-personal-estado"><select id="gerencia-personal-estado" class="rm-input" wire:model.live="estadoResumen"><option value="">Todos los accesos</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></x-ui.field>
-            <x-ui.action-button variant="ghost" wire:click="limpiarFiltrosResumen" icono="ph-arrow-counter-clockwise">Limpiar</x-ui.action-button>
-        </x-ui.filter-bar>
         <p class="rm-help rm-staff-directory__context">El estado laboral y el acceso a la cuenta son independientes.</p>
         <div wire:loading.delay wire:target="busquedaResumen,estadoResumen,cambiarVistaListadoResumen,limpiarFiltrosResumen" class="rm-help" role="status">Actualizando personal…</div>
         @if($personalResumen->isEmpty())
@@ -52,7 +50,7 @@
                             @endphp
                             <tr wire:key="personal-row-{{ $usuario->getKey() }}">
                                 <td data-label="Trabajador"><x-ui.resident-card-identity :name="$nombre" :code="$usuario->getKey()" :secondary="$usuario->correo" mode="row" /></td>
-                                <td data-label="Función">{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</td>
+                                <td data-label="Función"><span class="rm-staff-directory__role"><i class="ph ph-identification-badge" aria-hidden="true"></i>{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</span></td>
                                 <td data-label="Estado laboral"><x-ui.status-badge :estado="$usuario->personal?->estado ?? ''" :label="$usuario->personal ? null : 'Sin registrar'" /></td>
                                 <td data-label="Acceso"><x-ui.status-badge :estado="$usuario->estado" /></td>
                                 <td data-label="Acciones">@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')</td>
