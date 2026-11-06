@@ -1,9 +1,10 @@
 @php $puedeGestionar = !$usuario->hasAnyRole(['GERENTE','SUPERADMINISTRADOR']) && auth()->user()->can('personal.gestionar'); @endphp
 <div class="rm-staff-directory__actions">
-    @if($puedeGestionar)
+    @if(!$puedeGestionar && ($modoAcciones ?? 'completo') === 'ficha')<span aria-label="Ficha no disponible para esta cuenta">—</span>@endif
+    @if($puedeGestionar && ($modoAcciones ?? 'completo') !== 'menu')
         <x-ui.action-button variant="secondary" size="sm" class="rm-staff-directory__record-button" wire:click="abrirModalEdicion('{{ $usuario->getKey() }}')" aria-label="Ver ficha y documentos" icono="ph-identification-card">Ver ficha</x-ui.action-button>
     @endif
-    @if($puedeGestionar || auth()->user()->can('asignaciones_personal.ver'))
+    @if(($modoAcciones ?? 'completo') !== 'ficha' && ($puedeGestionar || auth()->user()->can('asignaciones_personal.ver')))
     <x-dropdown align="right" width="60" dropdownClasses="rm-staff-directory__menu" contentClasses="rm-staff-directory__menu-content">
         <x-slot name="trigger">
             <x-ui.action-button variant="ghost" icono="ph-dots-three" x-bind:aria-expanded="open" aria-label="Acciones de {{ $usuario->name }}">Acciones</x-ui.action-button>

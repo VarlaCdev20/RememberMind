@@ -200,22 +200,25 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { width: 100%; min-width: 0; table-layout: fixed; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody tr { height: auto; min-height: 0; max-height: none; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td) { white-space: normal; overflow-wrap: anywhere; vertical-align: middle; padding: var(--rm-space-2); }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):first-child { width: 35%; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(2) { width: 14%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):first-child { width: 31%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(2) { width: 17%; }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(3),
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(4) { width: 12%; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):last-child { width: 27%; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):nth-child(5),
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table :is(th,td):last-child { width: 14%; text-align: center; }
 .rm-staff-directory .rm-staff-directory__panel { background: color-mix(in srgb, var(--rm-surface) 86%, var(--rm-primary-soft)); border-radius: var(--rm-radius-xl); box-shadow: var(--rm-shadow-card); }
 .rm-staff-directory__heading .rm-collection-header__icon { background: var(--rm-primary-soft); color: var(--rm-primary-ink); box-shadow: var(--rm-shadow-sm); }
 .rm-staff-directory .rm-staff-directory__panel > .rm-card__section-header { padding-block: var(--rm-space-2); }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { border-collapse: separate; border-spacing: 0 7px; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table thead th { background: color-mix(in srgb, var(--rm-primary-soft) 72%, var(--rm-surface)); color: var(--rm-primary-ink); font-size: var(--rm-font-size-label); font-weight: 700; padding-block: var(--rm-space-3); border: 0; text-transform: none; letter-spacing: normal; }
-.rm-staff-directory__table thead th:first-child { border-radius: var(--rm-radius-lg) 0 0 var(--rm-radius-lg); }
-.rm-staff-directory__table thead th:last-child { border-radius: 0 var(--rm-radius-lg) var(--rm-radius-lg) 0; }
-.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody td { background: var(--rm-surface-raised); border-block: 1px solid var(--rm-border-soft); padding: var(--rm-space-2) var(--rm-space-3); transition: background-color var(--rm-duration-fast), border-color var(--rm-duration-fast); }
-.rm-staff-directory__table tbody td:first-child { border-inline-start: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg) 0 0 var(--rm-radius-lg); }
-.rm-staff-directory__table tbody td:last-child { border-inline-end: 1px solid var(--rm-border-soft); border-radius: 0 var(--rm-radius-lg) var(--rm-radius-lg) 0; }
-.rm-staff-directory__table tbody tr { filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--rm-text-primary) 6%, transparent)); }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { border-collapse: separate; border-spacing: 0; border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg); }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table thead th { background: color-mix(in srgb, var(--rm-primary-soft) 72%, var(--rm-surface)); color: var(--rm-primary-ink); font-size: var(--rm-font-size-label); font-weight: 700; padding: var(--rm-space-3); border: 0; text-transform: none; letter-spacing: normal; }
+.rm-staff-directory__table thead th:first-child { border-radius: var(--rm-radius-lg) 0 0 0; }
+.rm-staff-directory__table thead th:last-child { border-radius: 0 var(--rm-radius-lg) 0 0; }
+.rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody td { background: var(--rm-surface-raised); border: 0; border-bottom: 1px solid var(--rm-border-soft); padding: var(--rm-space-2) var(--rm-space-3); transition: background-color var(--rm-duration-fast), border-color var(--rm-duration-fast); }
+
+
+.rm-staff-directory__table tbody tr:last-child td { border-bottom: 0; }
+.rm-staff-directory__table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--rm-radius-lg); }
+.rm-staff-directory__table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--rm-radius-lg); }
 .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody tr:is(:hover, :focus-within) td { background: color-mix(in srgb, var(--rm-primary-soft) 24%, var(--rm-surface-raised)); border-block-color: var(--rm-selected-border); }
 .rm-staff-directory__table .rm-resident-directory__identity { gap: var(--rm-space-3); }
 .rm-staff-directory__table :is(.rm-resident-directory__avatar-button, .rm-resident-directory__avatar) { width: 38px; height: 38px; min-width: 38px; border-radius: var(--rm-radius-md); }
@@ -228,13 +231,14 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-directory .rm-staff-directory__record-button::before { background: var(--rm-primary-soft); border-color: var(--rm-selected-border); border-radius: var(--rm-radius-md); }
 .rm-staff-directory .rm-staff-directory__record-button { color: var(--rm-primary-ink); }
 @container management-workspace (min-width: 850px) {
-    .rm-staff-directory__table .rm-staff-directory__actions { justify-content: flex-start; }
+    .rm-staff-directory__table .rm-staff-directory__actions { justify-content: center; flex-wrap: nowrap; }
 }
 .rm-staff-directory__table-wrap { min-width: 0; }
 @container management-workspace (max-width: 1099px) {
     .rm-staff-directory__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @container management-workspace (max-width: 849px) {
+    .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table { border: 0; }
     html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .rm-staff-directory__filters .rm-view-toggle { justify-self: end; }
     .rm-staff-directory .rm-staff-directory__heading { grid-template-columns: minmax(0, 1fr); gap: var(--rm-space-3); }
@@ -246,8 +250,9 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     .rm-staff-directory__table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); padding: var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-lg); background: var(--rm-surface); }
     .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody td:nth-child(n) { display: block; position: static; width: auto; min-width: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
     .rm-shell [data-rm-main] .rm-staff-directory table.rm-staff-directory__table tbody tr:is(:hover, :focus-within) td:nth-child(n) { background: transparent; border: 0; }
-    .rm-staff-directory__table td:first-child, .rm-staff-directory__table td:last-child { grid-column: 1 / -1; }
-    .rm-staff-directory__table td[data-label]:not(:first-child):not(:last-child)::before { content: attr(data-label); display: block; margin-bottom: var(--rm-space-2); color: var(--rm-text-secondary-readable); font-size: var(--rm-font-size-label); }
+    .rm-staff-directory__table td:first-child, .rm-staff-directory__table td:nth-child(2) { grid-column: 1 / -1; }
+    .rm-staff-directory__table .rm-staff-directory__actions { justify-content: flex-start; }
+    .rm-staff-directory__table td[data-label]:not(:first-child)::before { content: attr(data-label); display: block; margin-bottom: var(--rm-space-2); color: var(--rm-text-secondary-readable); font-size: var(--rm-font-size-label); }
 }
 @container management-workspace (max-width: 419px) {
     .rm-staff-directory__heading .rm-collection-header__actions { grid-template-columns: minmax(0, 1fr); }

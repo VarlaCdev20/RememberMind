@@ -53,19 +53,24 @@ test('tabla de personal: filas compactas, acciones y adaptación responsive', { 
             small: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).length,
             smallDetails: [...document.querySelectorAll('.rm-staff-directory__actions button')].filter(el => el.getClientRects().length && el.getBoundingClientRect().height < 44).map(el => ({ label: el.innerText, height: el.getBoundingClientRect().height, style: getComputedStyle(el).minHeight })),
             filtrosSeparados: !document.querySelector('.rm-staff-directory__panel').contains(document.querySelector('.rm-staff-directory__filters')),
+            encabezados: [...document.querySelectorAll('.rm-staff-directory__table thead th')].map(el => el.textContent.trim()),
+            columnasAlineadas: [...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row => [...row.cells].every((cell, index) => Math.abs(cell.getBoundingClientRect().left - document.querySelectorAll('.rm-staff-directory__table thead th')[index].getBoundingClientRect().left) < 1)),
         }));
         assert.ok(medidas.overflow <= 1, JSON.stringify({ width, ...medidas }));
         assert.ok(medidas.rows > 0);
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         assert.equal(medidas.small, 0, JSON.stringify(medidas.smallDetails));
         assert.equal(medidas.filtrosSeparados, true);
+        assert.deepEqual(medidas.encabezados, ['Trabajador', 'Función', 'Estado laboral', 'Acceso', 'Ficha', 'Acciones']);
+        if (width >= 1280) assert.equal(medidas.columnasAlineadas, true);
         if (width >= 1280) assert.ok(medidas.firstRowHeight < 110, 'Fila compacta');
         await page.screenshot({ path: path.join(output, 'tabla-' + width + '.png'), fullPage: true });
         const trigger = await page.$('.rm-staff-directory__actions button[aria-expanded]');
         await trigger.evaluate(el => el.scrollIntoView({ block: 'center' }));
         await trigger.click();
         await page.waitForSelector('.rm-staff-directory__menu', { visible: true });
-        assert.ok(await page.$eval('.rm-staff-directory__menu', el => el.getBoundingClientRect().left >= 0 && el.getBoundingClientRect().right <= innerWidth + 1));
+        const menu = await page.$eval('.rm-staff-directory__menu', el => ({ left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right, viewport: innerWidth }));
+        assert.ok(menu.left >= 0 && menu.right <= menu.viewport + 1, JSON.stringify({ width, ...menu }));
         await page.keyboard.press('Escape');
         matrix.push({ width, ...medidas });
     }
