@@ -165,6 +165,8 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__filters:focus-within { box-shadow: none; }
 .rm-staff-directory .rm-filter-search__input { height: 44px; min-height: 44px; padding-inline: 2.5rem var(--rm-space-3); border-radius: var(--rm-radius-input); background: var(--rm-input-bg); color: var(--rm-text-primary); font-size: var(--rm-font-size-body); box-shadow: none; }
 .rm-staff-directory__filters > * { min-width: 0; }
+.rm-shell [data-rm-main] .rm-staff-directory .rm-staff-directory__filters :is(.rm-filter-search__input, select.rm-input) { background: color-mix(in srgb, var(--rm-role-primary-soft) 78%, var(--rm-surface-raised)); border-color: color-mix(in srgb, var(--rm-role-primary) 35%, var(--rm-border-soft)); color: var(--rm-text-primary); }
+.rm-shell [data-rm-main] .rm-staff-directory .rm-staff-directory__filters :is(.rm-filter-search__input, select.rm-input):focus { background: color-mix(in srgb, var(--rm-role-primary-soft) 60%, var(--rm-surface-raised)); border-color: var(--rm-role-primary); outline-color: var(--rm-role-primary); }
 .rm-staff-directory__filters > .rm-btn { white-space: nowrap; }
 .rm-staff-directory__context { margin-block: var(--rm-space-1) var(--rm-space-2); }
 .rm-staff-directory .rm-view-toggle { width: auto; border: 0; background: transparent; box-shadow: none; }
