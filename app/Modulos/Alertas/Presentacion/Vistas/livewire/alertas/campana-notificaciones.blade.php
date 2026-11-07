@@ -4,6 +4,34 @@
     <aside x-cloak x-show="avisos.length > 0" class="rm-notification-popup" :class="{ 'is-critical': ['CRITICO','CRITICA'].includes(avisos[0]?.nivel) }" role="status" aria-live="polite"><strong x-text="avisos[0]?.titulo"></strong><p x-text="avisos[0]?.mensaje"></p><span x-show="avisos.length > 1" x-text="(avisos.length - 1) + ' aviso(s) más'"></span><div><button type="button" class="rm-btn rm-btn-primary" @click="abierto = true; avisos.shift()">Revisar avisos</button><button type="button" class="rm-btn rm-btn-secondary" @click="avisos.shift()">Ocultar aviso</button></div><small>Ocultar no atiende ni cierra el registro.</small></aside>
     <section x-cloak x-show="abierto" id="notification-list-{{ $this->getId() }}" class="rm-notification-list" aria-label="Avisos y pendientes autorizados">
         <header><h2 x-ref="tituloAvisos" tabindex="-1">Avisos y pendientes</h2><p>Actualizado {{ now()->format('d/m/Y H:i:s T') }} · {{ $previsualizacion ? 'Previsualización de solo lectura; actualiza la página para consultar cambios.' : 'Revisión cada 60 s mientras esta pantalla permanece activa.' }}</p></header>
+        @isset($visitasFamiliares)
+            <h3>Próximas visitas</h3>
+            @forelse($visitasFamiliares as $visita)
+                <div class="rm-notification-item">
+                    <strong>{{ $visita->estado === 'AUTORIZADA' ? 'Visita autorizada' : 'Visita programada' }}</strong>
+                    <span>{{ $visita->nombres }} {{ $visita->apellido_paterno }}</span>
+                    <time>{{ \Illuminate\Support\Carbon::parse($visita->fecha_hora_programada)->format('d/m/Y H:i') }}</time>
+                </div>
+            @empty
+                <p>No tienes visitas próximas.</p>
+            @endforelse
+        @else
+        @if($fallosCorreo > 0)
+            <a class="rm-notification-item" href="{{ route('admin.usuarios.correos.index') }}">
+                <strong>Envíos documentales fallidos</strong>
+                <span>{{ $fallosCorreo }} en tu historial de correo</span>
+            </a>
+        @endif
+        @if($derivacionesRecibidas->isNotEmpty())
+            <h3>Derivaciones recibidas</h3>
+            @foreach($derivacionesRecibidas as $derivacion)
+                <div class="rm-notification-item">
+                    <strong>Derivación {{ $derivacion->getKey() }}</strong>
+                    <span>Prioridad {{ mb_strtolower($derivacion->prioridad) }}</span>
+                    <time>{{ $derivacion->fecha_hora?->format('d/m/Y H:i') }}</time>
+                </div>
+            @endforeach
+        @endif
         @if($avisosDocumentales)<h3>Documentación del personal</h3><p>{{ count($avisosDocumentales) }} solicitudes requieren consulta. Cada solicitud/persona aparece una sola vez.</p>@foreach(array_slice($avisosDocumentales,0,10) as $aviso)<a class="rm-notification-item" href="{{ $aviso['url'] }}"><strong>{{ $aviso['titulo'] }}</strong>@if($aviso['persona'])<span>{{ $aviso['persona'] }}</span>@endif<span>{{ $aviso['mensaje'] }}</span><time>Límite: {{ $aviso['fecha'] }}</time></a>@endforeach<a class="rm-notification-item" href="{{ route('admin.personal.documentacion') }}">Ver documentación y seguimiento</a>@endif
         @if($cambiosLaborales)<h3>Cambios laborales y planificación</h3>@foreach(array_slice($cambiosLaborales,0,10) as $cambio)<a class="rm-notification-item" href="{{ $cambio['url'] }}"><strong>{{ $cambio['persona'] }}</strong><span>{{ $cambio['mensaje'] }}</span><time>{{ $cambio['fecha'] }}</time></a>@endforeach<p>Consultar el aviso no acredita revisión ni modifica las asignaciones.</p>@endif
         @if(app(\App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas::class)->paraUsuario(auth()->user())['foco'] === 'supervision')
@@ -20,5 +48,6 @@
         @forelse($recordatoriosMedicacion as $recordatorio)<a class="rm-notification-item" href="{{ route(auth()->user()?->hasRole('ENFERMEROS') ? 'admin.enfermeria.medicacion' : 'admin.salud-seguimiento.administracion', ['adulto'=>$recordatorio['medicacion']->cod_residente]) }}"><strong>{{ $recordatorio['estado'] === 'VENCIDA' ? 'Vencida · comprobar registro' : 'Próxima dosis · revisar orden' }}</strong><span>{{ $recordatorio['adulto']?->nombre_completo }} · {{ $recordatorio['medicacion']->nombre_medicamento }}</span><time datetime="{{ $recordatorio['programada']->toIso8601String() }}">Programada: {{ $recordatorio['programada']->format('H:i') }} · {{ $recordatorio['programada']->format('d/m/Y H:i:s T') }}</time><span>{{ abs($recordatorio['minutos']) }} min {{ $recordatorio['minutos'] < 0 ? 'desde el horario programado' : 'para el horario programado' }}</span></a>@empty<p>Sin recordatorios de medicación en esta consulta.</p>@endforelse
         <p>Los avisos informan; el historial de eventos conserva las actuaciones. Revisar avisos no documenta atención ni administración. Confirma cada intervención en su módulo.</p>
         @endif
+        @endisset
     </section>
 </div>

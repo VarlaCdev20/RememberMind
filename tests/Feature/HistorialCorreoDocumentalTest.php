@@ -47,6 +47,20 @@ class HistorialCorreoDocumentalTest extends TestCase
         return $solicitud;
     }
 
+    public function test_campana_tecnica_cuenta_solo_fallos_vigentes_del_historial_autorizado(): void
+    {
+        $this->actor->assignRole(\Spatie\Permission\Models\Role::findOrCreate('SUPERADMINISTRADOR', 'web'));
+        $this->actor->givePermissionTo(Permission::findOrCreate('alertas.ver', 'web'));
+        $recuperado = $this->registrar('FALLIDO');
+        $this->registrar('ACEPTADO', solicitud: $recuperado);
+        $this->registrar('FALLIDO');
+        $this->registrar('FALLIDO', actor: User::factory()->create());
+
+        Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones::class)
+            ->assertSet('conteoAbiertas', 1)->assertSee('Envíos documentales fallidos')->assertSee('1 en tu historial');
+        Queue::assertNothingPushed();
+    }
+
     public function test_http_historial_y_accesos_desde_usuarios_renderizan_sin_enviar(): void
     {
         $this->registrar('ACEPTADO');

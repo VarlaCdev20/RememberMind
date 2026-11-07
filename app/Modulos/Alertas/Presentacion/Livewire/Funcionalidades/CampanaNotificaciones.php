@@ -4,6 +4,9 @@ namespace App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades;
 
 use App\Models\Alerta;
 use App\Models\Residente;
+use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarDerivacionesRecibidas;
+use App\Modulos\Identidad\Aplicacion\Consultas\HistorialCorreoDocumental;
+use App\Modulos\Social\Aplicacion\Consultas\ConsultarAvisosVisitasFamiliar;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
 use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
@@ -68,8 +71,11 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        if (!$user || $user->fresh()?->estado !== 'ACTIVO' || $user->hasRole('FAMILIAR')) {
+        if (! $user || $user->fresh()?->estado !== 'ACTIVO') {
             return false;
+        }
+        if ($user->hasRole('FAMILIAR')) {
+            return $user->can('visitas.ver');
         }
         return $user->canAny(['alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver'])
             || (app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible()
@@ -245,6 +251,19 @@ class CampanaNotificaciones extends Component
             return '<div></div>';
         }
 
+        $actor = auth()->user();
+        if ($actor->hasRole('FAMILIAR')) {
+            $visitas = app(ConsultarAvisosVisitasFamiliar::class)->consultar($actor);
+            $this->conteoAbiertas = $visitas->count();
+
+            return view('livewire.alertas.campana-notificaciones', ['visitasFamiliares' => $visitas->take(10)]);
+        }
+
+        $derivaciones = app(ConsultarDerivacionesRecibidas::class)->consultar($actor);
+        $fallosCorreo = $actor->hasRole('SUPERADMINISTRADOR') && $actor->can('usuarios.ver')
+            && ! app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->isActive($actor)
+            ? app(HistorialCorreoDocumental::class)->ultimos($actor, ['estado' => 'FALLIDO'])->count() : 0;
+
         $alertas = $this->consultaPendientes()->with(['residente.cama.habitacion', 'responsable'])
             ->tap(fn ($q) => OrdenAlertas::aplicar($q))
             ->take(15)
@@ -257,10 +276,12 @@ class CampanaNotificaciones extends Component
         $cambiosLaborales=app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarCambiosLaboralesPendientes::class)->consultar($user);
         $this->conteoDocumentales=count($avisosDocumentales);
         $this->conteoLaborales=count($cambiosLaborales);
-        $this->conteoAbiertas=$this->conteoAlertas+$this->conteoRecordatorios+$this->conteoDocumentales+$this->conteoLaborales;
+        $this->conteoAbiertas=$this->conteoAlertas+$this->conteoRecordatorios+$this->conteoDocumentales+$this->conteoLaborales+$derivaciones->count()+$fallosCorreo;
 
         return view('livewire.alertas.campana-notificaciones', [
             'alertas' => $alertas,
+            'derivacionesRecibidas' => $derivaciones->take(10),
+            'fallosCorreo' => $fallosCorreo,
             'recordatoriosMedicacion' => $this->recordatoriosMedicacion(),
             'puedeAtender' => $puedeAtender && $user->hasRole('ENFERMEROS'),
             'puedeConsultarAlertas' => $user->can('alertas.ver'),

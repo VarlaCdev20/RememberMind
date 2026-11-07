@@ -9,6 +9,8 @@ use App\Modulos\Reportes\Aplicacion\Consultas\RoleDashboardDataService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
+use App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones;
 use Tests\TestCase;
 
 class RoleDashboardDataTest extends TestCase
@@ -76,7 +78,9 @@ class RoleDashboardDataTest extends TestCase
 
     public function test_familiar_solo_recibe_residentes_autorizados_y_sus_propias_visitas(): void
     {
+        $this->seed(RolesAndPermissionsSeeder::class);
         $familiar = User::factory()->create();
+        $familiar->assignRole('FAMILIAR');
         $otroUsuario = User::factory()->create();
         $residenteAutorizado = Residente::factory()->create(['nombres' => 'Rosa', 'apellido_paterno' => 'Autorizada']);
         $residenteSinPermiso = Residente::factory()->create(['nombres' => 'Eva', 'apellido_paterno' => 'Reservada']);
@@ -103,6 +107,12 @@ class RoleDashboardDataTest extends TestCase
         $this->assertSame(['Rosa Autorizada'], array_column($panels['Tu familiar']['items'], 'label'));
         $this->assertSame(['Rosa'], array_column($panels['Próximas visitas']['items'], 'label'));
         $this->assertSame([], $panels['Documentos compartidos']['items']);
+
+        $this->actingAs($familiar)->get('/dashboard')->assertOk()->assertSee('Consultar avisos y alertas pendientes');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 1)
+            ->assertSee('Rosa Autorizada')->assertDontSee('Eva Reservada')->assertDontSee('Ver todas las alertas');
+        DB::table('residentes_contactos')->where('cod_residente_contacto', 'RCO_FAM_1')->update(['autoriza_informacion' => false]);
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0)->assertDontSee('Rosa Autorizada');
     }
 
     public function test_especialista_sin_personal_activo_no_consulta_registros_globales(): void

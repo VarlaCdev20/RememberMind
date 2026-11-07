@@ -173,6 +173,34 @@ class AlertasRolesConsistenciaTest extends TestCase
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
 
+    public function test_derivaciones_solo_avisan_al_receptor_o_area_con_permiso(): void
+    {
+        $medico = $this->actor('MEDICO GENERAL/GERIATRA');
+        $otro = $this->actor('MEDICO GENERAL/GERIATRA');
+        $residente = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $this->asignarTurno($medico, $residente);
+        $area = $medico->personal->asignaciones()->firstOrFail()->cod_area;
+        foreach ([[null, 'SOLICITADA'], [$otro->personal->getKey(), 'SOLICITADA'], [null, 'CERRADA']] as [$receptor, $estado]) {
+            $derivacion = new \App\Models\Derivacion;
+            $derivacion->forceFill([
+                'cod_residente' => $residente->getKey(),
+                'cod_area_solicitante' => $area,
+                'cod_area_receptora' => $area,
+                'cod_personal_solicitante' => $otro->personal->getKey(),
+                'cod_personal_receptor' => $receptor,
+                'motivo' => 'Derivación sintética de prueba.',
+                'prioridad' => 'MEDIA',
+                'fecha_hora' => now(),
+                'estado' => $estado,
+            ])->save();
+        }
+
+        $this->actingAs($medico);
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 1)->assertSee('Derivaciones recibidas');
+        $this->actor('PSICOLOGO/A');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0)->assertDontSee('Derivaciones recibidas');
+    }
+
     public function test_enfermeria_registra_actuacion_y_cierra_con_eventos_sin_perder_historia(): void
     {
         $actor = $this->actor('ENFERMEROS');

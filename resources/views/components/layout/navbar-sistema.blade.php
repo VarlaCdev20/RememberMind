@@ -77,7 +77,8 @@
 
 
         {{-- Campana de Notificaciones / Alertas --}}
-        @if(auth()->user()?->canAny(['alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver']))
+        @if(auth()->user()?->canAny(['alertas.ver', 'alertas.gestionar', 'prescripciones.ver', 'administraciones_medicacion.ver'])
+            || (auth()->user()?->hasRole('FAMILIAR') && auth()->user()->can('visitas.ver')))
             <livewire:alertas.campana-notificaciones />
         @endif
 
