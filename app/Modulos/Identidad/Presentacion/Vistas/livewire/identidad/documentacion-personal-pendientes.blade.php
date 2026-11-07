@@ -1,11 +1,11 @@
 <section class="rm-document-library__pending" aria-labelledby="pendientes-expediente-titulo">
-    <h3 id="pendientes-expediente-titulo">Pendientes de entrega</h3>
+    <h3 id="pendientes-expediente-titulo"><i class="ph-bold ph-note" aria-hidden="true"></i>Pendientes de entrega @if($pendientesCarpeta)<span class="rm-badge rm-badge-neutral">{{ $pendientesCarpeta->total() }}</span>@endif</h3>
     @if(!$disponible)
         <p class="rm-help">El seguimiento documental todavía no está disponible en esta base.</p>
     @elseif($pendientesCarpeta->isEmpty())
         <p class="rm-help">No hay solicitudes pendientes de entrega. Los archivos recibidos pueden seguir pendientes de revisión.</p>
     @else
-        <p class="rm-help">Solicitudes registradas para este trabajador. Los filtros de archivos no ocultan estos pendientes.</p>
+        <p class="rm-help">Documentos solicitados que faltan entregar o corregir.</p>
         <ul class="rm-document-library__pending-list" aria-label="Documentos que faltan entregar">
             @foreach($pendientesCarpeta as $fila)
                 @php($destinoPendiente = $fila['destinatario'])
@@ -22,6 +22,6 @@
                 </li>
             @endforeach
         </ul>
-        <x-ui.paginacion :paginator="$pendientesCarpeta" mode="livewire" label="pendientes" :show-per-page="false" />
+        @if($pendientesCarpeta->hasPages())<x-ui.paginacion :paginator="$pendientesCarpeta" mode="livewire" label="pendientes" :show-per-page="false" />@endif
     @endif
 </section>

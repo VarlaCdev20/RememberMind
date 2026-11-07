@@ -58,6 +58,9 @@ test('Documentación: tabla compartida, carpetas, miniaturas privadas y cinco an
         await page.waitForFunction(()=>document.getElementById('archivos-personal-titulo')===document.activeElement);
         assert.equal(await page.$$eval('[data-documento-fila]',e=>e.length),2,'Misma persona contiene sus dos archivos');
         assert.match(await page.$eval('#archivos-personal-titulo',e=>e.innerText),/Profesional de prueba 1/);
+        assert.match(await page.$eval('.rm-document-library__files-title', e => e.innerText), /Archivos entregados/);
+        assert.equal(await page.$$eval('.rm-document-library__personal-table thead th', e => e.some(th => th.innerText === 'Trabajador')), false, 'Titular en encabezado, sin repetirlo por archivo');
+        if (width === 1440) assert.ok(await page.evaluate(() => document.querySelector('.rm-document-library__pending').getBoundingClientRect().left > document.querySelector('.rm-document-library__files').getBoundingClientRect().left), 'Pendientes a un costado del expediente');
         assert.equal(await page.$$eval('[data-pendiente-documental]',e=>e.length),1,'Recibido para revisión no se confunde con pendiente de entrega');
         assert.ok(await page.$eval('.rm-document-pending-note', e => e.getBoundingClientRect().width <= 301), 'Pendiente en nota compacta');
         assert.equal(await page.$eval('.rm-document-pending-note', e => getComputedStyle(e, '::after').width), '20px', 'Esquina de nota doblada');

@@ -2,16 +2,19 @@
     x-on:personal-carpeta-abierta.window="$nextTick(() => $refs.tituloExpediente?.focus())"
     x-on:personal-carpeta-cerrada.window="$nextTick(() => { const origen = Array.from($el.querySelectorAll('[data-carpeta-usuario]')).find(el => el.dataset.carpetaUsuario === $event.detail.usuario); (origen ?? $refs.tituloExpediente)?.focus(); })" aria-labelledby="archivos-personal-titulo">
     <header class="rm-staff-documents__heading">
-        <div>@if($carpetaActual)<button type="button" class="rm-document-library__back" wire:click="cerrarCarpetaUsuario"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Volver a carpetas</button>@endif<h2 id="archivos-personal-titulo" x-ref="tituloExpediente" tabindex="-1">{{ $carpetaActual ? trim($carpetaActual->personal->nombres.' '.$carpetaActual->personal->apellido_paterno.' '.$carpetaActual->personal->apellido_materno) : 'Archivos del expediente' }}</h2>@if($carpetaActual)<p class="rm-help">Expediente documental del trabajador</p>@endif</div>
-        <div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span>@unless($carpetaActual)<x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
+        <div>@if($carpetaActual)<button type="button" class="rm-document-library__back" wire:click="cerrarCarpetaUsuario"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Volver a carpetas</button>@endif@if($carpetaActual)<span class="rm-document-library__eyebrow"><i class="ph-bold ph-folder-user" aria-hidden="true"></i> EXPEDIENTE PERSONAL</span>@endif<h2 id="archivos-personal-titulo" x-ref="tituloExpediente" tabindex="-1">{{ $carpetaActual ? trim($carpetaActual->personal->nombres.' '.$carpetaActual->personal->apellido_paterno.' '.$carpetaActual->personal->apellido_materno) : 'Archivos del expediente' }}</h2>@if($carpetaActual)<p class="rm-help">Expediente documental del trabajador</p>@endif</div>
+        @unless($carpetaActual)<div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span>@unless($carpetaActual)<x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
     ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'], ['value'=>'carpetas','label'=>'Carpetas','icon'=>'ph-folders']
-]" />@endunless</div>
+]" />@endunless</div>@endunless
     </header>
+    <div @class(['rm-document-library__contents', 'rm-document-library__contents--expediente' => $carpetaActual])>
     @if($carpetaActual)
         @include('identidad::livewire.identidad.documentacion-personal-pendientes')
     @endif
+    <div class="rm-document-library__files">
+    @if($carpetaActual)<h3 class="rm-document-library__files-title"><i class="ph-bold ph-files" aria-hidden="true"></i>Archivos entregados <span class="rm-badge rm-badge-neutral">{{ $archivos->total() }}</span></h3>@endif
     <div class="rm-staff-documents__filters">
-        <x-ui.field label="Buscar por documento o persona" for="documentacion-buscar"><div class="rm-staff-documents__search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="documentacion-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="Buscar documento o persona" autocomplete="off"></div></x-ui.field>
+        <x-ui.field label="Buscar por documento o persona" for="documentacion-buscar"><div class="rm-staff-documents__search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="documentacion-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="{{ $carpetaActual ? 'Buscar documento en este expediente' : 'Buscar documento o persona' }}" autocomplete="off"></div></x-ui.field>
         <x-ui.field label="Estado del documento" for="documentacion-estado"><select id="documentacion-estado" class="rm-select" wire:model.live="estadoArchivo"><option value="">Estado: todos</option><option value="CARGADO">Cargado</option><option value="PENDIENTE">Pendiente de revisión</option><option value="VALIDADO">Validado</option><option value="OBSERVADO">Observado</option><option value="VENCIDO">Vencido registrado</option><option value="ANULADO">Anulado</option><option value="ANULADA">Anulada</option><option value="REEMPLAZADO">Reemplazado</option></select></x-ui.field>
         @if($gestor && ! $carpetaActual)
         <x-ui.field label="Rol del personal" for="documentacion-rol"><select id="documentacion-rol" class="rm-select" wire:model.live="rolArchivo"><option value="">Rol: todos</option>@foreach($rolesArchivo as $nombreRol)<option value="{{ $nombreRol }}">{{ $nombreRol }}</option>@endforeach</select></x-ui.field>
@@ -26,7 +29,7 @@
         <x-ui.empty-state :title="$hayFiltrosArchivo ? 'No hay archivos con estos filtros' : 'Todavía no hay archivos disponibles'" :description="$hayFiltrosArchivo ? 'Prueba con otra selección o limpia los filtros.' : 'Aquí aparecerán los documentos del personal que puedes consultar.'" icon="ph-folder-open" />
     @else
     <div class="rm-staff-directory rm-document-library__table">
-        <div class="rm-staff-directory__table-surface"><table class="rm-staff-directory__table rm-data-table rm-table"><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th><th scope="col">Trabajador</th><th scope="col">Estado</th><th scope="col">Fecha de carga</th><th scope="col">Acciones</th></tr></thead><tbody>
+        <div class="rm-staff-directory__table-surface"><table @class(['rm-staff-directory__table rm-data-table rm-table', 'rm-document-library__personal-table' => $carpetaActual])><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th>@unless($carpetaActual)<th scope="col">Trabajador</th>@endunless<th scope="col">Estado</th><th scope="col">Fecha de carga</th><th scope="col">Acciones</th></tr></thead><tbody>
         @foreach($archivos as $documento)
         @if($permisosArchivos[$documento->getKey()]['ver'] ?? false)
         @php
@@ -41,7 +44,7 @@
 @endphp
         <tr wire:key="documento-tabla-{{ $documento->getKey() }}" data-documento-fila="{{ $documento->getKey() }}">
             <td data-label="Documento"><div class="rm-document-library__file">@include('identidad::livewire.identidad.documentacion-personal-miniatura')<div><strong>{{ $documento->nombre ?: 'Documento sin nombre' }}</strong><small>{{ $claseDocumento }} · {{ mb_strtoupper($documento->extension) ?: 'ARCHIVO' }}</small></div></div></td>
-            <td data-label="Trabajador">{{ trim($titular->nombres.' '.$titular->apellido_paterno.' '.$titular->apellido_materno) }}</td>
+            @unless($carpetaActual)<td data-label="Trabajador">{{ trim($titular->nombres.' '.$titular->apellido_paterno.' '.$titular->apellido_materno) }}</td>@endunless
             <td data-label="Estado"><span class="rm-badge rm-badge-{{ $tonoDocumento }}">{{ $estadoVisible }}</span></td>
             <td data-label="Carga"><time>{{ $documento->fecha_hora_carga?->format('d/m/Y H:i') ?? 'Sin fecha conservada' }}</time></td>
             <td data-label="Acciones">@include('identidad::livewire.identidad.documentacion-personal-acciones')</td>
@@ -71,4 +74,6 @@
     @endif
     @endunless
     <div class="rm-document-library__footer">@if($carpetaActual)<x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" />@else<div x-show="modoArchivos === 'tabla'"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /></div><div x-show="modoArchivos === 'carpetas'"><x-ui.paginacion :paginator="$carpetasUsuarios" mode="livewire" label="expedientes" :show-per-page="false" :show-jump="true" /></div>@endif<p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
+    </div>
+    </div>
 </section>
