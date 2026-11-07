@@ -63,6 +63,9 @@
         @endif
         @if($personalResumen->isNotEmpty() && $vistaListadoResumen === 'tarjetas')<x-ui.paginacion class="rm-pagination--compact rm-staff-directory__pagination" :paginator="$personalResumen" mode="livewire" label="trabajadores" :show-per-page="false" :show-jump="false" />@endif
     </section>
+    @if($fichaPersonal)
+        @include('identidad::livewire.identidad.personal-institucional-panel.modales.ficha-resumen')
+    @endif
     @include('livewire.identidad.personal-institucional-panel.modales.gestion')
     @if($modalLaboral)
     <x-ui.modal-livewire id="gerencia-estado-laboral" wire:model="modalLaboral" title="Cambiar situación laboral" :subtitle="$nombreLaboral" close-method="cerrarEstadoLaboral" :dismiss-on-escape="false">

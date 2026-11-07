@@ -206,7 +206,22 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertFalse($foto['conflicto']);
         $this->assertSame('FOTO_DOC', $foto['documento']->tipo_documento);
         $this->assertSame($antes, \App\Models\Documento::where('cod_usuario', $usuario->getKey())->orderBy('cod_documento')->get()->map->getAttributes()->all());
+        Livewire::test(PersonalInstitucionalPanel::class)
+            ->assertSee('Editar ficha')->call('abrirFichaPersonal', $usuario->getKey())
+            ->assertSee('Ficha del trabajador')->assertSee('DIRECCIÓN DE PRUEBA')->assertSee('45678910')
+            ->assertSee('3 archivos registrados')->assertDontSee('Pasos del registro')
+            ->call('cerrarFichaPersonal')->assertSet('usuarioFichaId', null)->assertDontSee('Ficha del trabajador');
         Mail::assertSent(PersonalInstitucionalBienvenidaMail::class, fn ($mail) => $mail->documentos_pendientes === [] && $mail->fecha_limite === '');
+    }
+
+    public function test_ficha_resumen_de_gerencia_rechaza_cuentas_fuera_de_su_alcance(): void
+    {
+        $this->gerente();
+        $superadmin = User::factory()->create();
+        $superadmin->assignRole('SUPERADMINISTRADOR');
+
+        Livewire::test(PersonalInstitucionalPanel::class)
+            ->call('abrirFichaPersonal', $superadmin->getKey())->assertForbidden();
     }
 
     public function test_scope_rechaza_roles_excluidos_multirrol_y_cambios_de_rol_sin_efectos(): void

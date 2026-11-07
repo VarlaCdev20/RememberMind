@@ -6,6 +6,10 @@ use App\Models\AsignacionPersonal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\CambiarEstadoPersonal;
 use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
+use App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal;
+use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
+use App\Modulos\Identidad\Aplicacion\Consultas\PlazoExpedienteDocumental;
+use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -42,6 +46,11 @@ class PersonalInstitucionalPanel extends Component
 
     public bool $modalGestionAbierto = false;
 
+    public bool $modalFichaAbierto = false;
+
+    #[Locked]
+    public ?string $usuarioFichaId = null;
+
     public ?string $usuarioSeleccionadoId = null;
 
     public string $modalTabInicial = 'informacion';
@@ -72,7 +81,8 @@ class PersonalInstitucionalPanel extends Component
             $payload = $this->obtenerPersonalResumenPayload();
             return view('livewire.identidad.personal-institucional-panel', [
                 'personalResumen' => $payload['items'], 'personalResumenTotal' => $payload['total'],
-                'ampliacionDisponible' => app(\App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal::class)->disponible(),
+                'ampliacionDisponible' => app(CapacidadDocumentalPersonal::class)->disponible(),
+                'fichaPersonal' => $this->modalFichaAbierto && $this->usuarioFichaId ? $this->consultarFichaPersonal() : null,
             ])->layout('layouts.sistema');
         }
         $estadisticas = $this->obtenerEstadisticas();
@@ -180,6 +190,51 @@ class PersonalInstitucionalPanel extends Component
         $this->modalTabInicial = 'informacion';
         $this->abrirFormularioHorarioInicial = false;
         $this->modalGestionAbierto = true;
+    }
+
+    public function abrirFichaPersonal(string $usuarioId): void
+    {
+        $actor = auth()->user();
+        abort_unless($actor && app(AutorizarGestionPersonal::class)->esGerencia($actor), 403);
+        $this->usuarioFichaId = $usuarioId;
+        $this->modalFichaAbierto = true;
+    }
+
+    public function cerrarFichaPersonal(): void
+    {
+        $this->modalFichaAbierto = false;
+        $this->usuarioFichaId = null;
+    }
+
+    public function abrirHorariosDesdeFicha(): void
+    {
+        abort_unless($this->modalFichaAbierto && $this->usuarioFichaId && auth()->user()?->can('asignaciones_personal.ver'), 403);
+        $this->abrirHorariosPersonal($this->usuarioFichaId);
+        $this->cerrarFichaPersonal();
+    }
+
+    private function consultarFichaPersonal(): array
+    {
+        $usuario = $this->baseUsuariosInstitucionales()->with(['personal', 'roles'])->findOrFail($this->usuarioFichaId);
+        $actor = app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $usuario);
+        $horario = $actor->can('asignaciones_personal.ver')
+            ? app(UsuarioFichaService::class)->obtenerHorariosActivos($usuario) : null;
+        $lectura = app(ConsultarDocumentacionPersonal::class);
+        $archivos = $lectura->archivos($actor)->where('cod_usuario', $usuario->getKey())->toBase()->get(['nombre', 'estado']);
+        $pendientes = collect();
+
+        if ($usuario->personal && app(CapacidadDocumentalPersonal::class)->disponible()) {
+            $solicitudes = $lectura->solicitudesEnCarpetas($actor)->where('cod_personal', $usuario->personal->getKey())->get();
+            app(PlazoExpedienteDocumental::class)->preparar($solicitudes);
+            $pendientes = $solicitudes->map(function ($destino) use ($lectura) {
+                $estado = $lectura->situacion($destino);
+
+                return ['nombre' => $destino->solicitud->nombre_documento, 'estado' => $estado['situacion'],
+                    'limite' => $estado['limite']?->format('d/m/Y'), 'requiere_entrega' => $estado['requiere_entrega']];
+            })->where('requiere_entrega', true);
+        }
+
+        return compact('usuario', 'horario', 'archivos', 'pendientes');
     }
 
     public function abrirModalEdicion(string $usuarioId): void

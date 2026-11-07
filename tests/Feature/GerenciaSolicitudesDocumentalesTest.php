@@ -15,6 +15,7 @@ use App\Modulos\Identidad\Aplicacion\Acciones\RegistrarArchivoSolicitudDocumenta
 use App\Modulos\Identidad\Aplicacion\Acciones\RegistrarMovimientoLaboral;
 use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
 use App\Modulos\Identidad\Presentacion\Livewire\Paginas\DocumentacionPersonalPanel;
+use App\Modulos\Identidad\Presentacion\Livewire\Paginas\PersonalInstitucionalPanel;
 use App\Modulos\Identidad\Presentacion\Policies\DocumentoLaboralPolicy;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -67,6 +68,16 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
     private function emitir(array $cambios = []): DestinatarioSolicitudDocumental
     {
         return app(GestionarSolicitudesDocumentales::class)->emitir($this->actor, $this->entrada($cambios))->destinatarios->sole();
+    }
+
+    public function test_ficha_personal_muestra_documento_pendiente_y_su_plazo(): void
+    {
+        $this->emitir();
+
+        Livewire::test(PersonalInstitucionalPanel::class)
+            ->call('abrirFichaPersonal', $this->trabajador->getKey())
+            ->assertSee('1 pendiente de entrega')->assertSee('Constancia de prueba')
+            ->assertSee('Plazo 02/11/2026');
     }
 
     public function test_emision_idempotente_conserva_membresia_y_limite_sin_recalcular_rol_actual(): void
