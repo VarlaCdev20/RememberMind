@@ -301,12 +301,24 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 .rm-staff-record-dialog .rm-modal-panel { border-radius: var(--rm-staff-record-radius); }
 .rm-staff-record-dialog .rm-modal-header {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: var(--rm-space-2);
     background: color-mix(in srgb, var(--rm-staff-record-accent) 12%, var(--rm-surface));
     border-bottom-color: color-mix(in srgb, var(--rm-staff-record-accent) 18%, transparent);
 }
-.rm-staff-record-dialog .rm-modal-panel .rm-modal-panel__title {
-    font: 800 calc(var(--rm-font-size-section) + 3px)/1.3 var(--rm-font-friendly);
+.rm-staff-record-dialog .rm-modal-header__heading { grid-column: 2; display: block; }
+.rm-staff-record-dialog .rm-modal-header__actions { grid-column: 3; grid-row: 1; }
+.rm-modal-shell.rm-modal-shell--reading.rm-staff-record-dialog .rm-modal-panel .rm-modal-panel__title {
+    display: block;
+    margin: 0;
+    font: 800 clamp(19px, 1.8vw, 24px)/1.25 var(--rm-font-friendly);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
+.rm-staff-record-dialog .rm-modal-panel__title > i { display: none; }
 .rm-staff-record-dialog .rm-modal-footer { border-top-color: var(--rm-border-soft); }
 .rm-staff-record-dialog .rm-modal-footer .rm-btn {
     border-radius: var(--rm-radius-pill);
