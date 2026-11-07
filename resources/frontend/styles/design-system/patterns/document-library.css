@@ -107,12 +107,13 @@
 .rm-document-library__files-title, .rm-document-library__pending h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 15px; font-weight: 800; line-height: 1.4; }
 .rm-document-library__files-title { padding: 16px 16px 0; }
 .rm-document-library .rm-staff-documents__filters--compact { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
-.rm-document-library .rm-staff-documents__filters--compact > :first-child { flex: 1 1 180px; max-width: 360px; }
-.rm-document-library .rm-staff-documents__filters--compact > .rm-document-filter-menu { position: relative; flex: 0 0 auto; }
-.rm-document-filter-menu > summary { display: inline-flex; gap: 8px; cursor: pointer; list-style: none; }
-.rm-document-filter-menu > summary::-webkit-details-marker { display: none; }
-.rm-document-filter-menu[open] > summary { border-color: var(--rm-primary-ink); color: var(--rm-primary-ink); background: var(--rm-sage-soft); }
-.rm-document-filter-menu__panel { position: absolute; inset-inline-end: 0; top: calc(100% + 8px); z-index: 20; width: min(300px, calc(100vw - 64px)); display: grid; gap: 12px; padding: 16px; background: var(--rm-surface-raised); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg); box-shadow: var(--rm-shadow-md); }
+.rm-document-library .rm-staff-documents__filters--compact > :first-child { flex: 1 1 180px; max-width: 300px; }
+.rm-document-library .rm-staff-documents__filters--compact > .rm-field:not(:first-child) { flex: 0 1 150px; max-width: 180px; }
+.rm-document-library .rm-staff-documents__filters--compact select { appearance: auto; padding-inline-end: 12px; cursor: pointer; }
+@container document-library (max-width: 520px) {
+    .rm-document-library .rm-staff-documents__filters--compact > :first-child { flex-basis: 100%; max-width: none; }
+    .rm-document-library .rm-staff-documents__filters--compact > .rm-field:not(:first-child) { flex: 1 1 120px; max-width: none; }
+}
 .rm-document-library__pending { padding: 16px; border-bottom: 1px solid var(--rm-border-soft); }
 .rm-document-library__pending h3 { margin-bottom: 8px; }
 .rm-document-library__table .rm-document-actions button { white-space: nowrap; }

@@ -76,3 +76,9 @@ La búsqueda interna se limita a 360px y usa «Buscar archivo», abreviado para 
 La biblioteca general mantiene los controles de persona, rol, estado y formato existentes. Sin cambios de BDD, permisos o backend.
 
 Verificación: 15 pruebas / 153 aserciones aprobadas y E2E aprobado en cinco anchos, incluyendo aplicación de formato PDF, contador activo, limpieza, cierre por Escape con retorno de foco, panel dentro de pantalla y navegación del expediente. Capturas del panel abierto revisadas en escritorio y móvil; se abrevia después el placeholder móvil sin cambiar la interacción. Build aprobado. Evidencia: `output/documentacion-filtros-compactos-{build,focal}-20261106.txt`, `output/documentacion-filtros-compactos-e2e-final-20261106.txt`; capturas `filtros-expediente-*` del directorio de QA indicado.
+
+## Preferencia posterior: elegir desde desplegables visibles
+
+La propietaria pide elegir directamente en un desplegable. Estado y formato vuelven a ser selectores nativos visibles, con ancho acotado, junto a la búsqueda corta; se elimina el botón/panel «Filtrar» y sus estilos e interacción. En móvil la búsqueda ocupa una línea y los dos selectores comparten la siguiente. «Limpiar» conserva su operación. Se mantienen los componentes y opciones originales, la columna de pendientes y las mejoras del expediente. Sin cambios de consultas, permisos o BDD.
+
+Se hace visible la flecha nativa de selección. Build y E2E aprobados en cinco anchos: selectores visibles, filtrado PDF, limpieza, visor, foco y espacio de pendientes conservado; sin errores JavaScript ni desbordamiento horizontal. Capturas actuales inspeccionadas en escritorio y móvil. Evidencia: `output/documentacion-selectores-build-final-20261106.txt` y `output/documentacion-selectores-e2e-final-20261106.txt`. No se repiten pruebas de persistencia para este cambio de presentación.

@@ -27,18 +27,12 @@
     @if($carpetaActual)<h3 class="rm-document-library__files-title"><i class="ph-bold ph-files" aria-hidden="true"></i>Archivos entregados <span class="rm-badge rm-badge-neutral">{{ $archivos->total() }}</span></h3>@endif
     <div @class(['rm-staff-documents__filters', 'rm-staff-documents__filters--compact' => $carpetaActual])>
         <x-ui.field label="Buscar por documento o persona" for="documentacion-buscar"><div class="rm-staff-documents__search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="documentacion-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="{{ $carpetaActual ? 'Buscar archivo' : 'Buscar documento o persona' }}" autocomplete="off"></div></x-ui.field>
-        @if($carpetaActual)
-            <details class="rm-document-filter-menu" x-on:click.outside="$el.open = false" x-on:keydown.escape.stop.prevent="$el.open = false; $el.querySelector('summary').focus()">
-                <summary class="rm-btn rm-btn-secondary"><i class="ph-bold ph-funnel" aria-hidden="true"></i>Filtrar @if($estadoArchivo !== '' || $formatoArchivo !== '')<span class="rm-badge rm-badge-neutral">{{ (int)($estadoArchivo !== '') + (int)($formatoArchivo !== '') }}<span class="sr-only"> filtros activos</span></span>@endif</summary>
-                <div class="rm-document-filter-menu__panel">
-        @endif
         <x-ui.field label="Estado del documento" for="documentacion-estado"><select id="documentacion-estado" class="rm-select" wire:model.live="estadoArchivo"><option value="">Estado: todos</option><option value="CARGADO">Cargado</option><option value="PENDIENTE">Pendiente de revisión</option><option value="VALIDADO">Validado</option><option value="OBSERVADO">Observado</option><option value="VENCIDO">Vencido registrado</option><option value="ANULADO">Anulado</option><option value="ANULADA">Anulada</option><option value="REEMPLAZADO">Reemplazado</option></select></x-ui.field>
         @if($gestor && ! $carpetaActual)
         <x-ui.field label="Rol del personal" for="documentacion-rol"><select id="documentacion-rol" class="rm-select" wire:model.live="rolArchivo"><option value="">Rol: todos</option>@foreach($rolesArchivo as $nombreRol)<option value="{{ $nombreRol }}">{{ $nombreRol }}</option>@endforeach</select></x-ui.field>
         <x-ui.field label="Trabajador" for="documentacion-persona"><select id="documentacion-persona" class="rm-select" wire:model.live="personaArchivo"><option value="">Personal: todos</option>@foreach($personasArchivo as $personaOpcion)<option value="{{ $personaOpcion->getKey() }}">{{ trim($personaOpcion->personal->nombres.' '.$personaOpcion->personal->apellido_paterno.' '.$personaOpcion->personal->apellido_materno) }}</option>@endforeach</select></x-ui.field>
         @endif
         <x-ui.field label="Formato del archivo" for="documentacion-formato"><select id="documentacion-formato" class="rm-select" wire:model.live="formatoArchivo"><option value="">Formato: todos</option><option value="PDF">PDF</option><option value="IMAGEN">Imágenes (JPG, PNG, WebP)</option><option value="OTROS">Otros formatos</option></select></x-ui.field>
-        @if($carpetaActual)</div></details>@endif
         @if($hayFiltrosArchivo)<button type="button" class="rm-btn rm-btn-secondary" wire:click="limpiarFiltros" wire:loading.attr="disabled">{{ $carpetaActual ? 'Limpiar' : 'Limpiar filtros' }}</button>@endif
     </div>
     <p class="rm-staff-documents__loading" wire:loading wire:target="busqueda,estadoArchivo,rolArchivo,personaArchivo,formatoArchivo,cambiarVista,limpiarFiltros,gotoPage" role="status">Consultando archivos…</p>
