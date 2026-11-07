@@ -29,7 +29,7 @@
         <x-ui.empty-state :title="$hayFiltrosArchivo ? 'No hay archivos con estos filtros' : 'Todavía no hay archivos disponibles'" :description="$hayFiltrosArchivo ? 'Prueba con otra selección o limpia los filtros.' : 'Aquí aparecerán los documentos del personal que puedes consultar.'" icon="ph-folder-open" />
     @else
     <div class="rm-staff-directory rm-document-library__table">
-        <div class="rm-staff-directory__table-surface"><table @class(['rm-staff-directory__table rm-data-table rm-table', 'rm-document-library__personal-table' => $carpetaActual])><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th>@unless($carpetaActual)<th scope="col">Trabajador</th>@endunless<th scope="col">Estado</th><th scope="col">Fecha de carga</th><th scope="col">Acciones</th></tr></thead><tbody>
+        <div class="rm-staff-directory__table-surface"><table @class(['rm-staff-directory__table rm-data-table rm-table', 'rm-document-library__personal-table' => $carpetaActual])><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th>@unless($carpetaActual)<th scope="col">Trabajador</th>@endunless<th scope="col">Estado</th><th scope="col">{{ $carpetaActual ? 'Fecha' : 'Fecha de carga' }}</th><th scope="col">@if($carpetaActual)<span class="sr-only">Acciones del documento</span>@else Acciones @endif</th></tr></thead><tbody>
         @foreach($archivos as $documento)
         @if($permisosArchivos[$documento->getKey()]['ver'] ?? false)
         @php
@@ -46,7 +46,7 @@
             <td data-label="Documento"><div class="rm-document-library__file">@include('identidad::livewire.identidad.documentacion-personal-miniatura')<div><strong>{{ $documento->nombre ?: 'Documento sin nombre' }}</strong><small>{{ $claseDocumento }} · {{ mb_strtoupper($documento->extension) ?: 'ARCHIVO' }}</small></div></div></td>
             @unless($carpetaActual)<td data-label="Trabajador">{{ trim($titular->nombres.' '.$titular->apellido_paterno.' '.$titular->apellido_materno) }}</td>@endunless
             <td data-label="Estado"><span class="rm-badge rm-badge-{{ $tonoDocumento }}">{{ $estadoVisible }}</span></td>
-            <td data-label="Carga"><time>{{ $documento->fecha_hora_carga?->format('d/m/Y H:i') ?? 'Sin fecha conservada' }}</time></td>
+            <td data-label="Carga"><time aria-label="Fecha de carga: {{ $documento->fecha_hora_carga?->format('d/m/Y H:i') ?? 'Sin fecha conservada' }}">{{ $documento->fecha_hora_carga?->format('d/m/Y H:i') ?? 'Sin fecha conservada' }}</time></td>
             <td data-label="Acciones">@include('identidad::livewire.identidad.documentacion-personal-acciones')</td>
         </tr>
         @endif
@@ -73,7 +73,7 @@
     </ul>
     @endif
     @endunless
-    <div class="rm-document-library__footer">@if($carpetaActual)<x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" />@else<div x-show="modoArchivos === 'tabla'"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /></div><div x-show="modoArchivos === 'carpetas'"><x-ui.paginacion :paginator="$carpetasUsuarios" mode="livewire" label="expedientes" :show-per-page="false" :show-jump="true" /></div>@endif<p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
+    <div class="rm-document-library__footer">@if($carpetaActual)<x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" />@else<div x-show="modoArchivos === 'tabla'"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /></div><div x-show="modoArchivos === 'carpetas'"><x-ui.paginacion :paginator="$carpetasUsuarios" mode="livewire" label="expedientes" :show-per-page="false" :show-jump="true" /></div>@endif@unless($carpetaActual)<p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p>@endunless</div>
     </div>
     </div>
 </section>
