@@ -116,6 +116,7 @@ if ($preparar) {
     }
 
     if (getenv('RM_GERENCIA_QA_CARPETAS') === '1') require __DIR__.'/DocumentacionCarpetasSintetica.php';
+    if (getenv('RM_GERENCIA_QA_RED_APOYO') === '1') require __DIR__.'/RedApoyoVisualSintetica.php';
     echo 'PREPARADO'; exit;
 }
 final class AutenticarGerenciaSintetica

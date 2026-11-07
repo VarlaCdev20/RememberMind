@@ -167,6 +167,7 @@ class GerenciaContactosTest extends TestCase
     {
         $a = app(GestionarRedApoyo::class);
         $c = $this->contacto();
+        $c->update(['correo' => 'contacto-reservado@example.test']);
         $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
         $a->vincular($this->gerente, $this->residente->getKey(), $c->getKey(), $this->datos());
         $a->vincular($this->gerente, $otro->getKey(), $c->getKey(), $this->datos());
@@ -178,6 +179,7 @@ class GerenciaContactosTest extends TestCase
         $this->assertCount(1, $fila->vinculos);
         $this->assertSame($this->residente->getKey(), $fila->vinculos->first()->cod_residente);
         $this->assertNull($fila->usuario);
+        $panel->assertDontSee('contacto-reservado@example.test')->assertDontSee('Gestionar contacto y vínculo');
         $panel->call('cambiarVista','personas')->assertForbidden();
     }
 
@@ -193,4 +195,18 @@ class GerenciaContactosTest extends TestCase
         catch(\Symfony\Component\HttpKernel\Exception\HttpException $error){$this->assertSame(422,$error->getStatusCode());}
         $this->assertDatabaseCount('residentes_contactos',0);$this->assertDatabaseCount('versiones_vinculo_contacto',0);
     }
+    public function test_lector_de_contactos_no_confunde_cuenta_restringida_con_cuenta_ausente(): void
+    {
+        $c = $this->contacto();
+        $cuenta = User::factory()->create(['estado' => 'ACTIVO']);
+        $cuenta->assignRole('FAMILIAR');
+        $c->update(['cod_usuario' => $cuenta->getKey()]);
+        $lector = User::factory()->create(['estado' => 'ACTIVO']);
+        $lector->givePermissionTo(['residentes.ver', 'residentes_contactos.ver', 'contactos.ver']);
+        $this->actingAs($lector);
+        Livewire::test(RedApoyoPanel::class)->call('cambiarVista', 'personas')
+            ->assertSee('Acceso de cuenta restringido')->assertDontSee('Sin cuenta de acceso')->assertDontSee('Acceso activo');
+        $this->assertSame($cuenta->getKey(), $c->fresh()->cod_usuario);
+    }
+
 }
