@@ -57,7 +57,6 @@
             <x-ui.paginacion :paginator="$contactos" mode="livewire" label="contactos" />
         </x-ui.section-card>
     @endif
-    <p class="rm-help">El parentesco, el contacto de emergencia y la cuenta de acceso no conceden autorización clínica ni de salida.</p>
     @if(!$historiaDisponible)<p class="rm-help">La corrección y los cambios de vigencia se habilitarán cuando esté instalada la conservación histórica de vínculos. La consulta y el registro de relaciones nuevas siguen disponibles.</p>@endif
     @if($modalCuenta)
     <x-ui.modal-livewire id="familia-cuenta" wire:model="modalCuenta" :title="$editarCorreoAcceso ? 'Editar correo de acceso' : 'Crear cuenta Familiar'" subtitle="La persona elige su contraseña mediante un enlace seguro" max-width="md" close-method="cerrarCuenta" :show-validation="false" alpine-close="if (window.confirm('¿Cerrar sin guardar los cambios pendientes?')) $wire.cerrarCuenta()">
