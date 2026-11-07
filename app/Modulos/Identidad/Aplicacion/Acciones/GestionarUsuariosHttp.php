@@ -44,6 +44,7 @@ final class GestionarUsuariosHttp
     public function update(User $actor, array $entrada, User $usuario): mixed
     {
         abort_unless($actor->can('usuarios.editar'), 403);
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         try {
             DB::beginTransaction();
             $data = Arr::only($entrada, ['nombres', 'ap_paterno', 'ap_materno', 'correo', 'telefono', 'estado', 'pais_documento', 'tipo_documento', 'numero_documento', 'expedido', 'pais_telefono', 'codigo_telefono', 'genero', 'fecha_nacimiento', 'acceso_sistema', 'observaciones']);
@@ -82,6 +83,7 @@ final class GestionarUsuariosHttp
     public function activar(User $actor, array $entrada, User $usuario): mixed
     {
         abort_unless($actor->can('usuarios.cambiar_estado'), 403);
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         $usuario->update(['estado' => 'ACTIVO']);
         app(DashboardService::class)->limpiarCache($actor->getKey());
 

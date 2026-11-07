@@ -9,8 +9,10 @@ use App\Models\Alerta;
 use App\Models\Atencion;
 use App\Models\EjecucionCuidado;
 use App\Models\Residente;
+use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 class DeteccionAlertasService
@@ -26,13 +28,7 @@ class DeteccionAlertasService
 
         AdministracionMedicacion::query()->whereIn('cod_residente', $ids)->where('resultado', 'OMITIDA')->whereNotIn('estado', ['ANULADA', 'ANULADO'])->orderBy('cod_administracion')->chunk(100, function ($registros) use (&$creadas) {
             foreach ($registros as $r) {
-                $creadas += $this->registrar(
-                    $r,
-                    'MEDICACION',
-                    'MEDICACIÓN OMITIDA',
-                    'ALTO',
-                    'Omisión de medicación: '.($r->motivo_omision ?: 'Sin motivo registrado').'. Requiere reevaluación clínica.'
-                );
+                $creadas += $this->registrarOmision($r);
             }
         });
 
@@ -69,6 +65,39 @@ class DeteccionAlertasService
                     );
                 }
             });
+
+        return $creadas;
+    }
+
+    public function vigilarOmisiones(CarbonImmutable $desde): int
+    {
+        abort_unless(app()->runningInConsole() && $this->contexto->usuario() === null, 403);
+        $actor = User::where('correo', User::CORREO_VIGILANCIA_ALERTAS)->first();
+        abort_unless($actor?->esCuentaTecnicaVigilancia(), 403, 'La identidad técnica de vigilancia no está preparada.');
+        $hasta = now();
+        $creadas = 0;
+
+        AdministracionMedicacion::query()
+            ->where('resultado', 'OMITIDA')->whereIn('estado', ['REGISTRADA', 'OMITIDA', 'FINALIZADO'])
+            ->whereBetween('fecha_hora_programada', [$desde, $hasta])
+            ->whereHas('residente', fn ($q) => $q->where('estado', 'ADMITIDO'))
+            ->chunkById(100, function ($registros) use (&$creadas, $actor, $desde, $hasta) {
+                foreach ($registros as $registro) {
+                    $creadas += DB::transaction(function () use ($registro, $actor, $desde, $hasta) {
+                        $residente = Residente::whereKey($registro->cod_residente)->lockForUpdate()->firstOrFail();
+                        if ($residente->estado !== 'ADMITIDO') {
+                            return 0;
+                        }
+
+                        $vigente = AdministracionMedicacion::whereKey($registro->getKey())
+                            ->where('cod_residente', $residente->getKey())
+                            ->where('resultado', 'OMITIDA')->whereIn('estado', ['REGISTRADA', 'OMITIDA', 'FINALIZADO'])
+                            ->whereBetween('fecha_hora_programada', [$desde, $hasta])->lockForUpdate()->first();
+
+                        return $vigente ? $this->registrarOmision($vigente, $actor) : 0;
+                    }, 3);
+                }
+            }, 'cod_administracion');
 
         return $creadas;
     }
@@ -213,22 +242,30 @@ class DeteccionAlertasService
         });
     }
 
-    private function registrar($registro, string $origen, string $tipo, string $nivel, string $texto): int
+    private function registrarOmision(AdministracionMedicacion $registro, ?User $actorTecnico = null): int
+    {
+        return $this->registrar($registro, 'MEDICACION', 'MEDICACIÓN OMITIDA', 'ALTO',
+            'Omisión de medicación: '.($registro->motivo_omision ?: 'Sin motivo registrado').'. Requiere reevaluación clínica.',
+            $actorTecnico);
+    }
+
+    private function registrar($registro, string $origen, string $tipo, string $nivel, string $texto, ?User $actorTecnico = null): int
     {
         $motivo = '['.$registro->getTable().':'.$registro->getKey().'] '.$texto;
 
-        return DB::transaction(function () use ($registro, $origen, $tipo, $nivel, $motivo, $texto) {
+        return DB::transaction(function () use ($registro, $origen, $tipo, $nivel, $motivo, $texto, $actorTecnico) {
             Residente::whereKey($registro->cod_residente)->lockForUpdate()->firstOrFail();
             $referencia = '['.$registro->getTable().':'.$registro->getKey().'] ';
 
             // 1. Idempotencia por referencia de entidad
             if (Alerta::where('cod_residente', $registro->cod_residente)->where('modulo', $origen)
-                ->where('descripcion', 'like', $referencia.'%')->exists()) {
+                ->where(fn ($q) => $q->where('cod_registro', $registro->getKey())
+                    ->orWhereRaw('substr(descripcion, 1, ?) = ?', [strlen($referencia), $referencia]))->exists()) {
                 return 0;
             }
 
             // 2. Idempotencia por tipo y condición activa (ABIERTA o EN_ATENCION)
-            $alertaEquivalente = Alerta::where('cod_residente', $registro->cod_residente)
+            $alertaEquivalente = $origen !== 'MEDICACION' && Alerta::where('cod_residente', $registro->cod_residente)
                 ->where('modulo', $origen)
                 ->where('tipo', $tipo)
                 ->abiertas()
@@ -254,7 +291,11 @@ class DeteccionAlertasService
                 'generacion' => 'AUTOMATICA',
                 'estado' => 'ABIERTA',
             ]);
-            app(AlertasService::class)->registrarCreacionAutomatica($alerta, $this->contexto->usuario());
+            if ($actorTecnico) {
+                app(AlertasService::class)->registrarEventoVigilanciaOmision($alerta, $actorTecnico);
+            } else {
+                app(AlertasService::class)->registrarCreacionAutomatica($alerta, $this->contexto->usuario());
+            }
 
             return 1;
         });

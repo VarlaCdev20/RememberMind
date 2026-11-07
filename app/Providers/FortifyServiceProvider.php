@@ -216,7 +216,7 @@ class FortifyServiceProvider extends ServiceProvider
                 |
                 */
 
-                if (! $user) {
+                if (! $user || $user->esIdentidadTecnicaVigilancia()) {
                     return null;
                 }
 

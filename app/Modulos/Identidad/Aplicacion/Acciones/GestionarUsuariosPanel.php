@@ -20,6 +20,7 @@ final class GestionarUsuariosPanel
     {
         if (($entrada['rol'] ?? '')==='FAMILIAR') throw \Illuminate\Validation\ValidationException::withMessages(['rol'=>'Gestiona la cuenta desde Familiares y contactos, sobre la identidad y el vínculo existentes.']);
         abort_unless($actor->can($entrada['isEdit'] ? 'usuarios.editar' : 'usuarios.crear'), 403);
+        abort_if($entrada['isEdit'] && User::find($entrada['usuarioId'])?->esIdentidadTecnicaVigilancia(), 403);
         if ($entrada['isEdit'] && User::find($entrada['usuarioId'])?->esCuentaPrincipal()) {
             $estadoGuardado = 'ACTIVO';
             $accesoGuardado = 'HABILITADO';
@@ -104,6 +105,7 @@ final class GestionarUsuariosPanel
     public function toggleEstado(User $actor, User $usuario): string
     {
         abort_unless($actor->can('usuarios.cambiar_estado'), 403);
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         abort_if($usuario->esCuentaPrincipal(), 422, 'No puedes cambiar el estado del Administrador Principal.');
         abort_if($usuario->cod_usuario === $actor->getKey(), 422, 'No puedes cambiar tu propio estado.');
         if ($usuario->estado === 'ACTIVO' && $usuario->hasRole('SUPERADMINISTRADOR')) {
@@ -126,6 +128,7 @@ final class GestionarUsuariosPanel
 
     public function restablecerPasswordUsuario(User $actor, User $usuario): array
     {
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         abort_unless($actor->can('usuarios.editar'), 403);
         abort_if($usuario->esCuentaPrincipal() && ! $actor->esCuentaPrincipal(), 403, 'No tienes permisos para restablecer la contraseña del Administrador Principal.');
         $entrada = [];

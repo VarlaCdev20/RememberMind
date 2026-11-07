@@ -17,6 +17,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    public const CORREO_VIGILANCIA_ALERTAS = 'vigilancia-alertas@remembermind.invalid';
+
     use HasApiTokens, HasFactory, HasProfilePhoto, LogsActivity, Notifiable;
     use HasRoles {
         checkPermissionTo as private spatieCheckPermissionTo;
@@ -43,6 +45,10 @@ class User extends Authenticatable
         protected static function booted(): void
     {
         static::creating(function (self $user): void {
+            if ($user->esIdentidadTecnicaVigilancia() && (! app()->runningInConsole()
+                || $user->correo !== self::CORREO_VIGILANCIA_ALERTAS || $user->estado !== 'INACTIVO')) {
+                throw new \LogicException('La identidad de vigilancia se prepara únicamente desde consola y sin acceso.');
+            }
             if (empty($user->cod_usuario)) {
                 $user->cod_usuario = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('usuarios', $user->getConnectionName());
             }
@@ -52,11 +58,20 @@ class User extends Authenticatable
             app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->registrarExplicito('usuarios', (string) $user->getKey(), $user->getConnectionName());
         });
         static::updating(function (self $user): void {
+            if ($user->isDirty() && ($user->esIdentidadTecnicaVigilancia()
+                || mb_strtolower((string) $user->getOriginal('correo')) === self::CORREO_VIGILANCIA_ALERTAS)) {
+                throw new \LogicException('La identidad técnica de vigilancia no admite edición.');
+            }
             if ($user->isDirty($user->getKeyName())) {
                 throw new \LogicException('La identidad de una cuenta no se modifica mediante una edición.');
             }
             if (config('auth.remember_enabled') && $user->isDirty(['contrasena', 'estado'])) {
                 $user->setRememberToken(\Illuminate\Support\Str::random(60));
+            }
+        });
+        static::deleting(function (self $user): void {
+            if ($user->esIdentidadTecnicaVigilancia()) {
+                throw new \LogicException('La identidad técnica de vigilancia debe conservar su trazabilidad.');
             }
         });
     }
@@ -81,6 +96,21 @@ class User extends Authenticatable
     public function getAuthIdentifierName(): string
     {
         return 'cod_usuario';
+    }
+
+    public function esIdentidadTecnicaVigilancia(): bool
+    {
+        return mb_strtolower((string) $this->correo) === self::CORREO_VIGILANCIA_ALERTAS;
+    }
+
+    public function esCuentaTecnicaVigilancia(): bool
+    {
+        return $this->correo === self::CORREO_VIGILANCIA_ALERTAS
+            && $this->estado === 'INACTIVO'
+            && ! $this->roles()->exists()
+            && ! $this->permissions()->exists()
+            && ! $this->personal()->exists()
+            && ! $this->contactos()->exists();
     }
 
     public function esCuentaPrincipal(): bool
@@ -137,6 +167,10 @@ class User extends Authenticatable
 
     public function getNameAttribute(): string
     {
+        if ($this->esIdentidadTecnicaVigilancia()) {
+            return 'Vigilancia automática de RememberMind';
+        }
+
         $persona = $this->personal ?: $this->contactos()->first();
 
         return $persona

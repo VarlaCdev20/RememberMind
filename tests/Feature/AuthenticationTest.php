@@ -69,6 +69,23 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_identidad_tecnica_de_vigilancia_no_admite_login_aunque_se_manipule_su_estado(): void
+    {
+        DB::table('usuarios')->insert([
+            'cod_usuario' => 'COD_USU_999999',
+            'correo' => User::CORREO_VIGILANCIA_ALERTAS,
+            'contrasena' => Hash::make('ClaveSinteticaVigilancia123!'),
+            'estado' => 'ACTIVO',
+        ]);
+
+        $this->post('/login', [
+            'correo' => User::CORREO_VIGILANCIA_ALERTAS,
+            'password' => 'ClaveSinteticaVigilancia123!',
+        ]);
+
+        $this->assertGuest();
+    }
+
     public function test_known_legacy_passwords_do_not_bypass_authentication(): void
     {
         $user = User::factory()->create([

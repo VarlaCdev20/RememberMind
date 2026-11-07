@@ -389,9 +389,10 @@ class AlertasRolesConsistenciaTest extends TestCase
         $this->assertDatabaseCount('eventos_alerta', 1);
     }
 
-    public function test_el_diagnostico_programado_declara_bloqueo_sin_cuenta_ficticia(): void
+    public function test_la_vigilancia_sin_fecha_de_inicio_no_crea_una_cuenta_ni_alertas(): void
     {
-        $this->artisan('alertas:verificar-vigilancia')->expectsOutputToContain('falta aprobar la autoría')->assertExitCode(1);
+        config(['vigilancia_alertas.desde' => null]);
+        $this->artisan('alertas:verificar-vigilancia')->expectsOutputToContain('Configura una fecha de inicio')->assertExitCode(1);
         $this->assertDatabaseCount('alertas', 0);
         $this->assertDatabaseCount('eventos_alerta', 0);
         $this->assertDatabaseCount('usuarios', 0);

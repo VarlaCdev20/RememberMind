@@ -142,7 +142,11 @@
     @endif
     @endif</div>
     @if($perfil['foco'] === 'auditoria')
-        <section class="rm-alert-trace"><h3>Vigilancia automática</h3><span class="rm-badge">Pendiente de habilitación</span><p class="rm-help">La ejecución sin sesión requiere una autoría institucional aprobada. La detección manual autorizada sigue disponible. No se confirma vigilancia automática activa.</p></section>
+        <section class="rm-alert-trace">
+            <h3>Vigilancia automática</h3>
+            <span class="rm-badge">{{ filled(config('vigilancia_alertas.desde')) ? 'Inicio configurado' : 'Inicio sin configurar' }}</span>
+            <p class="rm-help">El proceso programado revisa omisiones de medicación registradas. La revisión de cada alerta corresponde al equipo autorizado.</p>
+        </section>
     @endif
     @php($alertaActiva = $detalle)
     @include('livewire.alertas.modales.detalle')

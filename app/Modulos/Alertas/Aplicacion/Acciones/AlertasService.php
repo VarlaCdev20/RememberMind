@@ -311,6 +311,18 @@ class AlertasService
         $this->accion($alerta, 'CREACION', 'Detección '.$alerta->modulo.' / '.$alerta->tipo, $usuario, null);
     }
 
+    public function registrarEventoVigilanciaOmision(Alerta $alerta, User $actor): void
+    {
+        abort_unless(app()->runningInConsole() && $this->contexto->usuario() === null
+            && $actor->fresh()?->esCuentaTecnicaVigilancia()
+            && DB::transactionLevel() > 0 && $alerta->wasRecentlyCreated
+            && $alerta->generacion === 'AUTOMATICA' && $alerta->estado === 'ABIERTA'
+            && $alerta->modulo === 'MEDICACION' && $alerta->tipo === 'MEDICACIÓN OMITIDA'
+            && filled($alerta->cod_registro), 403);
+
+        $this->accion($alerta, 'CREACION', 'Vigilancia programada: omisión de medicación registrada.', $actor, null);
+    }
+
     /** El llamador ya confirmó el origen y conserva su transacción institucional. */
     public function registrarEventoOrigen(Alerta $alerta, User $usuario): void
     {

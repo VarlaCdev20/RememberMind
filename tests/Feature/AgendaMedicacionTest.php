@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AdministracionMedicacion;
+use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
@@ -21,6 +22,7 @@ use App\Modulos\Medicacion\Presentacion\Livewire\Paginas\SaludMedicacionPanel;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -152,6 +154,52 @@ class AgendaMedicacionTest extends TestCase
 
         $this->assertDatabaseCount('alertas', 0);
         $this->assertDatabaseCount('administraciones_medicacion', 0);
+    }
+
+    public function test_vigilancia_programada_firma_solo_omisiones_vigentes_y_conserva_la_autoria_original(): void
+    {
+        Carbon::setTestNow('2026-09-10 12:00:00');
+        $prescripcion = $this->crearMedicacion('08:00');
+        $personal = $this->usuario->personal->getKey();
+        $registros = collect([
+            ['07:00:00', 'REGISTRADA', 'OMITIDA'],
+            ['08:00:00', 'REGISTRADA', 'OMITIDA'],
+            ['09:00:00', 'REGISTRADA', 'OMITIDA'],
+            ['10:00:00', 'ANULADA', 'OMITIDA'],
+            ['11:00:00', 'REGISTRADA', 'ADMINISTRADA'],
+        ])->map(fn ($datos) => AdministracionMedicacion::create([
+            'cod_prescripcion' => $prescripcion->getKey(),
+            'cod_residente' => $this->adulto->getKey(),
+            'cod_jornada' => $this->jornada->getKey(),
+            'cod_personal' => $personal,
+            'fecha_hora_programada' => '2026-09-10 '.$datos[0],
+            'fecha_hora_administracion' => $datos[2] === 'ADMINISTRADA' ? '2026-09-10 '.$datos[0] : null,
+            'dosis_administrada' => $datos[2] === 'ADMINISTRADA' ? 50 : null,
+            'resultado' => $datos[2],
+            'estado' => $datos[1],
+        ]));
+        config(['vigilancia_alertas.desde' => '2026-09-10 08:00:00']);
+        Auth::forgetGuards();
+
+        $this->artisan('alertas:verificar-vigilancia')->assertFailed();
+        $this->assertDatabaseCount('alertas', 0);
+        $this->artisan('alertas:verificar-vigilancia', ['--preparar-cuenta' => true])->assertSuccessful();
+        $this->artisan('alertas:verificar-vigilancia', ['--preparar-cuenta' => true])->assertSuccessful();
+        $actor = User::where('correo', User::CORREO_VIGILANCIA_ALERTAS)->sole();
+        $this->assertTrue($actor->esCuentaTecnicaVigilancia());
+        $this->assertMatchesRegularExpression('/^COD_USU_[0-9]{6,12}$/', $actor->getKey());
+
+        $this->artisan('alertas:verificar-vigilancia')->expectsOutputToContain('creadas: 2')->assertSuccessful();
+        $this->assertEqualsCanonicalizing([$registros[1]->getKey(), $registros[2]->getKey()], Alerta::pluck('cod_registro')->all());
+        foreach (Alerta::all() as $alerta) {
+            $evento = $alerta->eventos()->sole();
+            $this->assertSame($actor->getKey(), $evento->cod_usuario);
+            $this->assertSame('CREACION', $evento->tipo_evento);
+        }
+        $this->assertSame($personal, $registros[1]->fresh()->cod_personal);
+        Alerta::where('cod_registro', $registros[1]->getKey())->sole()->update(['estado' => 'CERRADA']);
+        $this->artisan('alertas:verificar-vigilancia')->expectsOutputToContain('creadas: 0')->assertSuccessful();
+        $this->assertDatabaseCount('eventos_alerta', 2);
     }
 
     public function test_varios_horarios_v2_generan_todas_las_dosis_del_dia(): void

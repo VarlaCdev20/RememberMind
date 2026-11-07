@@ -10,6 +10,7 @@ final class GestionarSeguridadCuenta
 {
     public function restablecerPassword(User $actor, User $usuario): string
     {
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         $actor = $this->autorizar($actor);
         $usuario = User::findOrFail($usuario->getKey());
         abort_if($usuario->esCuentaPrincipal() && ! $actor->esCuentaPrincipal(), 403);
@@ -30,6 +31,7 @@ final class GestionarSeguridadCuenta
 
     public function toggleAcceso(User $actor, User $usuario): string
     {
+        abort_if($usuario->esIdentidadTecnicaVigilancia(), 403);
         $actor = $this->autorizar($actor);
 
         return DB::transaction(function () use ($actor, $usuario) {

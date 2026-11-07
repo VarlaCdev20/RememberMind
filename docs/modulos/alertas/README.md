@@ -18,6 +18,12 @@ related_modules: [alertas]
 
 # Alertas
 
+## Vigilancia programada de omisiones de medicación
+
+La propietaria autorizó una cuenta técnica institucional el 07/11/2026. La primera regla habilitada revisa omisiones ya registradas de residentes admitidos. Conserva la prioridad existente, enlaza cada alerta al registro de administración y firma su creación con la cuenta técnica. El registro de medicación mantiene su autoría profesional. Repetir la vigilancia no duplica la alerta aunque ya se haya cerrado.
+
+Para habilitar una instalación, ejecutar `php artisan alertas:verificar-vigilancia --preparar-cuenta` y configurar `VIGILANCIA_ALERTAS_DESDE` con la fecha y hora local de inicio (`YYYY-MM-DD HH:MM:SS`). La revisión toma las dosis programadas desde ese corte. El programador de Laravel invoca `alertas:verificar-vigilancia` cada cinco minutos. En desarrollo se puede usar `php artisan schedule:work`; en un servidor se requiere su programador operativo. Quitar la configuración de inicio detiene la revisión y conserva el historial.
+
 Implementación de presentación por especialidad, 22 de octubre de 2026: [representaciones funcionales, campos, integración y verificación](REPRESENTACIONES_FUNCIONALES_2026_10_22.md). Este informe acotado no sustituye el contrato ni aprueba nuevas reglas clínicas.
 
 Compilación vigente, no aprobación de reglas nuevas. **APPROVED CONTRACT**: [AGENTS](../../../AGENTS.md), [baseline](../../../docs/base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md), [diccionario](../../../docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md), [roles](../../../docs/arquitectura/REMEMBERMIND_ROLES_BASELINE_CONGELADO.md). Descripciones de entradas, estados, clases y efectos son **OBSERVED IMPLEMENTATION**, sin certificar cumplimiento en todas las variantes. **CONFLICT** y **TECHNICAL DEBT** señalan discrepancias; **OPEN DECISION** no autoriza cambiar contrato.
