@@ -35,3 +35,9 @@ Contacto, vínculo y cuenta mantienen estados distintos. Información/salidas se
 Evidencia: `output/red-apoyo-visual-seguridad-20261107.txt`, `output/red-apoyo-visual-cuenta-restringida-20261107.txt`, `output/red-apoyo-visual-build-20261107.txt`, `output/red-apoyo-visual-e2e-20261107.txt`; capturas sintéticas en `output/red-apoyo-visual-20261106/` (directorio conservado desde el inicio de la tarea).
 
 El router privado de pruebas solo incorpora una inclusión condicionada de la nueva muestra, manteniendo sus guardas de entorno, token y base desechable. Sus cambios previos de otras tareas quedan fuera de este commit. No se añade compatibilidad V1 ni un módulo paralelo. El árbol no representa una genealogía multigeneracional que la fuente actual no conserva.
+
+## Ajuste del acceso y densidad — 07/11/2026
+
+Se destaca «Ver red de apoyo» en cada tarjeta con el estilo compartido de botón secundario salvia y una superficie de al menos 44px, conservando un único enlace semántico por tarjeta. La identidad y el acceso se distribuyen horizontalmente. Dentro de la red se añade «Cambiar residente» junto a la acción existente de vinculación y se reducen los espacios del nodo central, conectores y tarjetas. No cambian datos, consultas, permisos ni persistencia.
+
+Verificación del ajuste: build Vite aprobado; E2E aprobado en 1440/1280/1024/768/390px, incluyendo regreso a la lista, reapertura del residente, acceso táctil, red/tabla, edición cancelada y estados vacíos. Inspección visual de las capturas de escritorio y móvil sin superposición o desbordamiento observado. Evidencia: `output/red-apoyo-acceso-build-20261107.txt`, `output/red-apoyo-acceso-e2e-20261107.txt` y capturas sintéticas en `output/gerencia-residentes-conexion-20261107/`. No se ejecutó CI completa ni PostgreSQL para este ajuste de presentación y navegación.

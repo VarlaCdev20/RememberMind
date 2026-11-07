@@ -23,7 +23,10 @@
                     <x-ui.collection-view-switch model="modoRed" label="Presentación de vínculos" :options="[
                         ['value'=>'red','label'=>'Red de apoyo','icon'=>'ph-tree-structure'], ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table']
                     ]" />
-                    @can('residentes_contactos.gestionar')<button type="button" class="rm-btn rm-btn-secondary" wire:click="nuevoVinculo"><i class="ph-bold ph-user-plus" aria-hidden="true"></i>Vincular contacto existente</button>@endcan
+                    <div class="rm-support-view-actions">
+                        <a class="rm-btn rm-btn-secondary" data-cambiar-residente href="{{ route('admin.familia-social.red-apoyo') }}"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Cambiar residente</a>
+                        @can('residentes_contactos.gestionar')<button type="button" class="rm-btn rm-btn-secondary" wire:click="nuevoVinculo"><i class="ph-bold ph-user-plus" aria-hidden="true"></i>Vincular contacto existente</button>@endcan
+                    </div>
                 </div>
                 <div x-show="modoRed === 'red'">@include('social::livewire.residentes.red-apoyo-arbol')</div>
                 <div class="rm-support-table" x-show="modoRed === 'tabla'" x-cloak>

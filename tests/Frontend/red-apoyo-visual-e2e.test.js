@@ -50,11 +50,18 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
         await page.goto(base+'/admin/familia-social/red-apoyo',{waitUntil:'networkidle0'});
         await page.waitForSelector('[data-residente-red]', {visible:true});
         assert.equal(await page.$$eval('[data-residente-red]', e=>e.length),3,'Residentes existentes visibles sin selección');
+        assert.ok(await page.$$eval('.rm-support-picker__open', e=>e.every(a=>a.getBoundingClientRect().height>=44)), 'Acceso a la red claramente visible y táctil');
         await page.screenshot({path:path.join(output,'residentes-disponibles-'+width+'.png'),fullPage:true});
         await page.type('#familia-buscar','Persona de prueba Primer apellido');
         await page.waitForFunction(()=>document.querySelectorAll('[data-residente-red]').length===1);
         await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}), page.click('[data-residente-red="'+first+'"]')]);
         await page.waitForSelector('.rm-support-network',{visible:true});
+        if (width === 1440) {
+            await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}), page.click('[data-cambiar-residente]')]);
+            await page.waitForSelector('[data-residente-red]', {visible:true});
+            await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}), page.click('[data-residente-red="'+first+'"]')]);
+            await page.waitForSelector('.rm-support-network',{visible:true});
+        }
         assert.equal(await page.$$eval('[data-vinculo-nodo]',e=>e.length),3);
         const text=await page.$eval('.rm-support-network',e=>e.innerText);
         for(const label of ['Hija','Hijo','Amistad','Responsable principal','Contacto de emergencia','Vínculo inactivo','No acreditada']) assert.ok(text.includes(label),label);

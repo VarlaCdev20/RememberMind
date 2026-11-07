@@ -10,7 +10,7 @@
             @foreach($residentes as $persona)
                 <li><a class="rm-card rm-support-picker__resident" data-residente-red="{{ $persona->getKey() }}" href="{{ route('admin.familia-social.red-apoyo', ['residente' => $persona->getKey()]) }}" aria-label="Ver red de apoyo de {{ $persona->nombre_completo }}">
                     <span class="rm-support-contact__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr((string)$persona->nombres,0,1).mb_substr((string)$persona->apellido_paterno,0,1)) }}</span>
-                    <div><h3>{{ $persona->nombre_completo }}</h3><p>{{ $persona->vinculos_contacto_count }} {{ (int)$persona->vinculos_contacto_count === 1 ? 'vínculo registrado' : 'vínculos registrados' }}</p><span>Ver red de apoyo <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span></div>
+                    <div><h3>{{ $persona->nombre_completo }}</h3><p>{{ $persona->vinculos_contacto_count }} {{ (int)$persona->vinculos_contacto_count === 1 ? 'vínculo registrado' : 'vínculos registrados' }}</p><span class="rm-btn rm-btn-secondary rm-support-picker__open"><i class="ph-bold ph-tree-structure" aria-hidden="true"></i>Ver red de apoyo <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span></div>
                 </a></li>
             @endforeach
         </ul>
