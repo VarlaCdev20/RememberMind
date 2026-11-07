@@ -116,10 +116,18 @@ class AlertasEspecialidadesTest extends TestCase
     {
         $admin = User::factory()->create();
         $admin->assignRole('ADMINISTRADOR');
-        $this->actingAs($admin)->get(route('admin.enfermeria.alertas'))->assertOk()
+        $this->actingAs($admin)->get(route('admin.enfermeria.alertas'))->assertForbidden();
+        $this->get(route('admin.enfermeria.incidentes'))->assertForbidden();
+        $this->get(route('admin.alertas-clinicas.por-rol'))->assertForbidden();
+        Livewire::test(CompararAlertasRoles::class)->assertForbidden();
+        $this->get(route('admin.administracion.alertas'))->assertOk()->assertDontSee('Vistas por rol');
+        $this->get(route('admin.alertas-clinicas.index'))->assertOk()
+            ->assertDontSee('Vistas por rol')
             ->assertSee('Coordinación de alertas')->assertDontSee('class="rm-shell rm-nursing-shell', false)
             ->assertDontSee("has('fechaDesde')", false)->assertDontSee("has('fechaHasta')", false);
-        $panel = Livewire::actingAs($admin)->test(CompararAlertasRoles::class)->assertSee('Comparación sin datos de residentes');
+        $superadmin = User::factory()->create();
+        $superadmin->assignRole('SUPERADMINISTRADOR');
+        $panel = Livewire::actingAs($superadmin)->test(CompararAlertasRoles::class)->assertSee('Comparación sin datos de residentes');
         foreach (['ENFERMEROS', 'MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A', 'NUTRICIONISTA', 'FISIOTERAPEUTA', 'PEDAGOGO', 'GERENTE', 'ADMINISTRADOR', 'SUPERADMINISTRADOR', 'FAMILIAR'] as $rol) {
             $panel->call('seleccionarRol', $rol)->assertSet('rol', $rol)->assertDispatched('alertas-rol-seleccionado');
             if ($rol === 'FAMILIAR') {
@@ -132,7 +140,7 @@ class AlertasEspecialidadesTest extends TestCase
         $panel->assertSee('No accede al centro de alertas clínicas');
         $r = Residente::factory()->create();
         $alerta = Alerta::create(['cod_residente' => $r->getKey(), 'tipo' => 'SEGUIMIENTO', 'prioridad' => 'MEDIA', 'estado' => 'ABIERTA']);
-        Livewire::test(AlertasPanel::class)->call('abrirRegistroEspecialidad', $alerta->getKey())->assertForbidden();
+        Livewire::actingAs($admin)->test(AlertasPanel::class)->call('abrirRegistroEspecialidad', $alerta->getKey())->assertForbidden();
         $this->assertDatabaseCount('notas_clinicas', 0);
         $this->assertDatabaseCount('valoraciones_nutricionales', 0);
         $this->assertDatabaseCount('eventos_alerta', 0);

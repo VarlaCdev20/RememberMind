@@ -4,7 +4,7 @@
         @include('alertas::livewire.alertas.gerencia')
     @else
     <x-ui.page-header :title="$perfil['titulo']" :subtitle="$perfil['descripcion']" overline="Alertas · espacio de trabajo" :icon="$perfil['icono']" class="rm-alert-workspace-heading">
-        @if(auth()->user()->hasAnyRole(['SUPERADMINISTRADOR','ADMINISTRADOR']))<a href="{{ route('admin.alertas-clinicas.por-rol') }}" class="rm-btn rm-btn-secondary"><i class="ph-bold ph-users-three" aria-hidden="true"></i>Vistas por rol</a>@endif
+        @if(auth()->user()->hasRole('SUPERADMINISTRADOR'))<a href="{{ route('admin.alertas-clinicas.por-rol') }}" class="rm-btn rm-btn-secondary"><i class="ph-bold ph-users-three" aria-hidden="true"></i>Vistas por rol</a>@endif
         @if($preview && in_array($perfil['foco'],['turno','coordinacion','auditoria'],true) && auth()->user()->can('alertas.gestionar'))<x-ui.action-button variant="secondary" wire:click="abrirCrear" loading="abrirCrear" icono="ph-eye">Consultar formulario de aviso</x-ui.action-button>@endif
         @if(!$preview && auth()->user()->can('alertas.gestionar') && ($puedeIntervenir || $puedeCoordinar))
             <x-ui.action-button wire:click="abrirCrear" loading="abrirCrear" icono="ph-plus">Registrar alerta</x-ui.action-button>

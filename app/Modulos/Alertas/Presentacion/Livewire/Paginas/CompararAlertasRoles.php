@@ -22,7 +22,7 @@ class CompararAlertasRoles extends Component
     private function autorizar(): void
     {
         abort_unless(auth()->user()?->estado === 'ACTIVO' && auth()->user()->can('alertas.ver')
-            && auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'ADMINISTRADOR']), 403);
+            && auth()->user()->hasRole('SUPERADMINISTRADOR'), 403);
     }
 
     public function render()

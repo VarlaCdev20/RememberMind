@@ -3986,6 +3986,7 @@
       "cuenta.activa",
       "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
       "verified",
+      "role:ENFERMEROS|SUPERADMINISTRADOR",
       "permission:enfermeria.ver_dashboard|incidentes.ver|atenciones.ver"
     ],
     "domain": null,
@@ -4134,6 +4135,7 @@
       "cuenta.activa",
       "Laravel\\Jetstream\\Http\\Middleware\\AuthenticateSession",
       "verified",
+      "role:ENFERMEROS|SUPERADMINISTRADOR",
       "permission:alertas.ver|alertas.gestionar"
     ],
     "domain": null,

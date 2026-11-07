@@ -296,7 +296,7 @@ class AlertasFlujoTest extends TestCase
 
     public function test_drawers_de_graficos_y_ubicacion_no_modifican_datos(): void
     {
-        [, $adulto] = $this->preparar(['alertas.ver', 'signos_vitales.ver'], true);
+        [, $adulto] = $this->preparar(['alertas.ver', 'residentes.ver', 'signos_vitales.ver'], true);
         $nombreOriginal = $adulto->nombres;
         $estadoOriginal = $adulto->cod_est_adul;
 

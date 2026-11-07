@@ -20,12 +20,12 @@ return [
     },
     'ruta_146' => static function (): void {
         Route::get('/incidentes', IncidentesPanel::class)
-            ->middleware('permission:enfermeria.ver_dashboard|incidentes.ver|atenciones.ver')
+            ->middleware(['role:ENFERMEROS|SUPERADMINISTRADOR', 'permission:enfermeria.ver_dashboard|incidentes.ver|atenciones.ver'])
             ->name('incidentes');
     },
     'ruta_153' => static function (): void {
         Route::get('/alertas', AlertasPanel::class)
-            ->middleware('permission:alertas.ver|alertas.gestionar')
+            ->middleware(['role:ENFERMEROS|SUPERADMINISTRADOR', 'permission:alertas.ver|alertas.gestionar'])
             ->name('alertas');
     },
     'ruta_169' => static function (): void {
