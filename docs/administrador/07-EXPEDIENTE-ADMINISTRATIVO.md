@@ -29,6 +29,8 @@ La cuenta existente y los datos operativos permanecen intactos. Los ejemplos de 
 
 ## Pendientes de gestión
 
-Esta entrega acredita consulta, conteos y presentación. Quedan pendientes la revisión completa de altas/ediciones, validación documental, revocación y otros procesos sensibles. En particular, el endpoint previo de consentimiento necesita comprobar pertenencia del documento al mismo residente; la respuesta previa de relaciones de contacto debe separar permisos de visitas, consentimientos y ocupación. No se conectan estas rutas como nuevas acciones seguras en la interfaz.
+Esta entrega acredita consulta, conteos y presentación. El servidor comprueba que el documento vinculado a un consentimiento y el documento anterior de una nueva versión pertenezcan al expediente del mismo residente.
+
+Quedan pendientes la revisión completa de altas y ediciones, la validación documental y la revocación. La respuesta de relaciones del residente debe separar los permisos de visitas, consentimientos y ocupación.
 
 Las pruebas cubren contacto sin duplicación, múltiples vínculos, Policy denegada, ausencia de permiso general de residente, archivo inexistente, privacidad de rutas/hashes y categorías numéricas. Los resultados y límites finales están en [Seguimiento y reportes](08-SEGUIMIENTO-Y-REPORTES.md).

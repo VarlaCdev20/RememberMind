@@ -7,6 +7,7 @@ use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Consentimiento;
 use App\Models\Contacto;
+use App\Models\Documento;
 use App\Models\Habitacion;
 use App\Models\HistorialEstadoResidente;
 use App\Models\OcupacionCama;
@@ -18,7 +19,9 @@ use App\Models\SignoVital;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Activitylog\Models\Activity;
@@ -47,6 +50,50 @@ class Fase3AdmisionAtomicidadTest extends TestCase
         }
         $this->assertDatabaseCount('consentimientos', 0);
         $this->assertDatabaseCount('residentes_contactos', 1);
+    }
+
+    public function test_expediente_solo_vincula_documentos_del_mismo_residente(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $usuario = User::factory()->create(['estado' => 'ACTIVO']);
+        $usuario->assignRole('ADMINISTRADOR');
+        $this->actingAs($usuario);
+        Storage::fake('local');
+
+        $residente = Residente::factory()->create();
+        $otro = Residente::factory()->create();
+        Admision::create([
+            'cod_residente' => $residente->getKey(), 'cod_usuario_registro' => $usuario->getKey(),
+            'fecha_hora_admision' => now(), 'motivo_ingreso' => 'Ingreso sintético', 'estado' => 'ACTIVA',
+        ]);
+        $datosDocumento = [
+            'nombre' => 'Documento sintético', 'tipo_documento' => 'ADMINISTRATIVO',
+            'ruta_archivo' => 'documentos/sintetico.pdf', 'tipo_archivo' => 'application/pdf',
+            'hash_archivo' => str_repeat('a', 64), 'estado' => 'PENDIENTE',
+        ];
+        $propio = Documento::create($datosDocumento + ['cod_residente' => $residente->getKey()]);
+        $ajeno = Documento::create($datosDocumento + ['cod_residente' => $otro->getKey()]);
+
+        $consentimientos = route('admin.residentes.consentimientos.store', $residente);
+        $firma = ['tipo_consentimiento' => 'ADMISION', 'firma_residente' => true];
+        $this->postJson($consentimientos, $firma + ['cod_documento' => $ajeno->getKey()])
+            ->assertUnprocessable()->assertJsonValidationErrors('cod_documento');
+        $this->assertDatabaseCount('consentimientos', 0);
+        $this->postJson($consentimientos, $firma + ['cod_documento' => $propio->getKey()])
+            ->assertCreated()->assertJsonPath('cod_documento', $propio->getKey());
+
+        $documentos = route('admin.documentos.store', $residente);
+        $carga = ['nombre' => 'Nueva versión', 'tipo_documento' => 'ADMINISTRATIVO'];
+        $this->postJson($documentos, $carga + ['archivo' => UploadedFile::fake()->create('ajeno.pdf'),
+            'cod_documento_anterior' => $ajeno->getKey()])
+            ->assertUnprocessable()->assertJsonValidationErrors('cod_documento_anterior');
+        $this->assertDatabaseCount('documentos', 2);
+        $this->assertSame([], Storage::disk('local')->allFiles());
+        $nuevo = $this->postJson($documentos, $carga + ['archivo' => UploadedFile::fake()->create('propio.pdf'),
+            'cod_documento_anterior' => $propio->getKey()])
+            ->assertCreated()->assertJsonPath('cod_documento_anterior', $propio->getKey());
+        Storage::disk('local')->assertExists($nuevo->json('ruta_archivo'));
+        $this->assertSame('PENDIENTE', $propio->fresh()->estado);
     }
 
     public function test_borrado_ordinario_de_signo_preserva_historia(): void

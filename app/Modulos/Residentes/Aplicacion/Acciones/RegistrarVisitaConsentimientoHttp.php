@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Visita;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 final class RegistrarVisitaConsentimientoHttp
 {
@@ -28,7 +28,15 @@ final class RegistrarVisitaConsentimientoHttp
         Gate::forUser($usuario)->authorize('view', $residente);
         abort_unless($usuario->can('consentimientos.gestionar'), 403);
         $admision = $residente->admisiones()->where('estado', 'ACTIVA')->latest('fecha_hora_admision')->firstOrFail();
-        $datos = Validator::make($entrada, ['cod_residente_contacto' => ['nullable', 'exists:residentes_contactos,cod_residente_contacto'], 'cod_documento' => ['nullable', 'exists:documentos,cod_documento'], 'tipo_consentimiento' => ['required', 'string', 'max:80'], 'firma_residente' => ['required', 'boolean'], 'fecha_consentimiento' => ['nullable', 'date'], 'observacion' => ['nullable', 'string']])->validate();
+        $datos = Validator::make($entrada, [
+            'cod_residente_contacto' => ['nullable', 'exists:residentes_contactos,cod_residente_contacto'],
+            'cod_documento' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento')
+                ->where('cod_residente', $residente->getKey())],
+            'tipo_consentimiento' => ['required', 'string', 'max:80'],
+            'firma_residente' => ['required', 'boolean'],
+            'fecha_consentimiento' => ['nullable', 'date'],
+            'observacion' => ['nullable', 'string'],
+        ], ['cod_documento.exists' => 'Selecciona un documento del expediente de este residente.'])->validate();
         if (isset($datos['cod_residente_contacto'])) {
             abort_unless(ResidenteContacto::query()->whereKey($datos['cod_residente_contacto'])->where('cod_residente', $residente->cod_residente)->where('estado', 'ACTIVO')->exists(), 422, 'El firmante no está vinculado al residente.');
         }
