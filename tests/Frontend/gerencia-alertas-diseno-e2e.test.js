@@ -47,13 +47,13 @@ test('Alertas de Gerencia: filtros, detalle y cinco anchos', { timeout: 240000 }
     for (const width of [1440,1280,1024,768,390]) {
         await page.setViewport({width,height:1000});
         await page.goto(base+'/admin/alertas-clinicas',{waitUntil:'networkidle0'});
-        await page.waitForSelector('.rm-manager-alerts__list tbody tr',{visible:true});
-        assert.equal(await page.$$eval('[data-alert-summary]',e=>e.length),3);
+        await page.waitForSelector('.rm-manager-alerts__item',{visible:true});
+        assert.equal(await page.$$eval('[data-alert-summary]',e=>e.length),4);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Listado sin desbordamiento');
-        assert.ok(await page.$$eval('.rm-manager-alerts__list tbody tr',e=>e.every(r=>r.scrollHeight<=r.clientHeight+2)),'Filas sin superposición');
+        assert.ok(await page.$$eval('.rm-manager-alerts__item',e=>e.every(r=>r.scrollHeight<=r.clientHeight+2)),'Filas sin superposición');
         await page.screenshot({path:path.join(output,'alertas-'+width+'.png'),fullPage:true});
-        await click('[data-alert-summary="urgentes"]');
-        await page.waitForFunction(()=>document.querySelector('#gerencia-alertas-prioridad').value==='PRIORITARIAS');
+        await click('[data-alert-summary="altas"]');
+        await page.waitForFunction(()=>document.querySelector('#gerencia-alertas-prioridad').value==='ALTO');
         await click('button[wire\\:click="limpiarFiltros"]');
         await page.waitForFunction(()=>document.querySelector('#gerencia-alertas-estado').value==='' && document.querySelector('#gerencia-alertas-prioridad').value==='');
         await click('.rm-manager-alerts__advanced summary');
@@ -63,11 +63,19 @@ test('Alertas de Gerencia: filtros, detalle y cinco anchos', { timeout: 240000 }
         await page.type('#gerencia-alertas-buscar','Sin coincidencia sintética');
         await page.waitForFunction(()=>document.querySelector('.rm-manager-alerts__list').innerText.includes('No hay alertas en esta consulta'));
         await click('button[wire\\:click="limpiarFiltros"]');
-        await page.waitForSelector('.rm-manager-alerts__list tbody tr',{visible:true});
+        await page.waitForSelector('.rm-manager-alerts__item',{visible:true});
         await click('.rm-manager-alerts__list button[wire\\:click^="verDetalle("]');
         await page.waitForSelector('[role="dialog"]',{visible:true});
         assert.ok((await page.$eval('[role="dialog"]',e=>e.innerText)).includes('Situación registrada'),'Detalle conectado al registro');
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Detalle sin desbordamiento');
+        if (width >= 1280) {
+            assert.equal(await page.$eval('[role="dialog"]',e=>e.getAttribute('aria-modal')), 'false');
+            assert.ok(await page.evaluate(()=>{
+                const list=document.querySelector('.rm-manager-alerts__list').getBoundingClientRect();
+                const detail=document.querySelector('[role="dialog"]').getBoundingClientRect();
+                return list.right <= detail.left + 1;
+            }), 'El detalle deja visible la lista');
+        }
         await page.screenshot({path:path.join(output,'detalle-'+width+'.png'),fullPage:true});
         await click('[role="dialog"] button[aria-label="Cerrar panel"]');
         await page.waitForFunction(()=>![...document.querySelectorAll('[role="dialog"]')].some(e=>e.getClientRects().length));

@@ -28,3 +28,9 @@ El ensayo E2E usa el servidor sintético protegido existente, token local y base
 Se comprobó en el navegador de la propietaria que la ruta de Gerencia carga la nueva composición; no se realizaron mutaciones ni comunicaciones. Las capturas de entrega utilizan datos sintéticos.
 
 Build de Vite y prueba E2E aprobados en 1440, 1280, 1024, 768 y 390 px. Revisión visual de la bandeja en escritorio y móvil y del detalle en móvil con datos sintéticos. Evidencia en `output/gerencia-alertas-diseno-20261107/`.
+
+## Ajuste a la referencia visual
+
+La bandeja usa cuatro indicadores que filtran la consulta por prioridad crítica, alta o media activa y por estado cerrado. Las tarjetas muestran el tipo de alerta, residente, responsable, fecha, estado y prioridad registrada. Los acentos del sistema distinguen rojo crítico, ámbar alto, azul medio y verde cerrado. Los filtros de responsabilidad y límite siguen disponibles en la barra. El detalle usa el panel lateral compartido y deja visible la lista desde 1280 px. En pantallas menores se abre como panel superpuesto.
+
+Build aprobado. E2E aprobado en cinco anchos con verificación del detalle lateral sin superposición en 1280 y 1440 px. Las dos pruebas funcionales del recorrido y acceso por rol pasaron con 125 aserciones. Capturas de escritorio y móvil revisadas con datos sintéticos.

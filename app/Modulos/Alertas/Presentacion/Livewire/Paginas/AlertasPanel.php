@@ -228,15 +228,22 @@ class AlertasPanel extends Component
 
     public function filtrarResumen(string $resumen): void
     {
-        abort_unless(in_array($resumen, ['urgentes', 'por_atender', 'en_atencion', 'cerradas', 'anteriores', 'todas', 'sin_responsable', 'fuera_plazo'], true), 422);
+        abort_unless(in_array($resumen, ['urgentes', 'criticas', 'altas', 'medias', 'por_atender', 'en_atencion', 'cerradas', 'anteriores', 'todas', 'sin_responsable', 'fuera_plazo'], true), 422);
         $residente = $this->filtroAdulto;
         $this->limpiarFiltros();
         $this->filtroAdulto = $residente;
         $this->filtroEstado = match ($resumen) {
+            'criticas', 'altas', 'medias' => 'ACTIVAS',
             'por_atender' => 'POR_ATENDER', 'en_atencion' => 'EN_ATENCION', 'cerradas' => 'CERRADA', 'anteriores' => 'ANTERIORES', 'sin_responsable' => 'ACTIVAS', 'fuera_plazo' => 'CON_LIMITE_SUPERADO', default => '',
         };
         $this->filtroResponsabilidad = $resumen === 'sin_responsable' ? 'SIN_RESPONSABLE' : '';
-        $this->filtroNivel = $resumen === 'urgentes' ? 'PRIORITARIAS' : '';
+        $this->filtroNivel = match ($resumen) {
+            'urgentes' => 'PRIORITARIAS',
+            'criticas' => 'CRITICO',
+            'altas' => 'ALTO',
+            'medias' => 'MEDIO',
+            default => '',
+        };
     }
 
     public function seleccionarTraza(string $id): void
@@ -656,6 +663,7 @@ class AlertasPanel extends Component
             'anteriores' => array_sum($estadosHistoricos),
             'criticas' => (int) (($statsNivel['CRITICO'] ?? 0) + ($statsNivel['CRITICA'] ?? 0)),
             'altas' => (int) (($statsNivel['ALTO'] ?? 0) + ($statsNivel['ALTA'] ?? 0)),
+            'medias' => (int) (($statsNivel['MEDIO'] ?? 0) + ($statsNivel['MEDIA'] ?? 0)),
             'abiertas' => (int) ($statsEstado['ABIERTA'] ?? 0),
             'por_atender' => array_sum(array_intersect_key($statsEstado, array_flip(array_diff(Alerta::ESTADOS_ACTIVOS, ['EN_ATENCION'])))),
             'pendientes' => array_sum(array_intersect_key($statsEstado, array_flip(Alerta::ESTADOS_ACTIVOS))),

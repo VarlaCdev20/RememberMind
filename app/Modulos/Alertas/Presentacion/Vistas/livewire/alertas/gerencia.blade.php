@@ -1,12 +1,21 @@
 @use('App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta')
 <div class="rm-management-workspace rm-manager-alerts space-y-4">
+    <div class="rm-manager-alerts__main space-y-4">
     <x-ui.collection-header title="Alertas" subtitle="Supervisión de pendientes y seguimiento del equipo" icon="ph-bell-ringing" />
-    <div class="rm-management-overview rm-manager-alerts__overview" aria-label="Alertas pendientes en el ámbito autorizado">
-        @foreach([['urgentes','Prioridad alta o crítica',$conteos['criticas']+$conteos['altas']],['sin_responsable','Sin responsable registrado',$conteos['sin_responsable']],['fuera_plazo','Con límite registrado superado',$conteos['vencidas']]] as [$filtro,$nombre,$cantidad])
-        <button type="button" class="rm-card rm-manager-alerts__metric" data-alert-summary="{{ $filtro }}" wire:click="filtrarResumen('{{ $filtro }}')" wire:loading.attr="disabled"><span class="rm-manager-alerts__metric-icon" aria-hidden="true"><i class="ph-bold {{ match($filtro) { 'urgentes'=>'ph-warning-circle', 'sin_responsable'=>'ph-user-circle-dashed', default=>'ph-clock-countdown' } }}"></i></span><span class="rm-manager-alerts__metric-copy"><span>{{ $nombre }}</span><strong>{{ $cantidad }}</strong></span><i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i><span class="sr-only">Ver alertas</span></button>
+    <div class="rm-management-overview rm-manager-alerts__overview" aria-label="Resumen de alertas">
+        @foreach([
+            ['criticas', 'Críticas activas', 'ph-warning', 'critical'],
+            ['altas', 'Altas activas', 'ph-warning-circle', 'high'],
+            ['medias', 'Medias activas', 'ph-info', 'medium'],
+            ['cerradas', 'Cerradas', 'ph-check-circle', 'closed'],
+        ] as [$filtro, $nombre, $icono, $tono])
+            <button type="button" class="rm-card rm-manager-alerts__metric" data-alert-summary="{{ $filtro }}" data-tone="{{ $tono }}" wire:click="filtrarResumen('{{ $filtro }}')" wire:loading.attr="disabled">
+                <span class="rm-manager-alerts__metric-icon" aria-hidden="true"><i class="ph-bold {{ $icono }}"></i></span>
+                <span class="rm-manager-alerts__metric-copy"><span>{{ $nombre }}</span><strong>{{ $conteos[$filtro] }}</strong></span>
+                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+            </button>
         @endforeach
     </div>
-    <p class="rm-help">Los tres conteos consideran alertas activas de tu ámbito antes de los filtros de lista. Pueden referirse a la misma alerta; no se suman.</p>
     <x-ui.filter-bar>
         <div class="rm-manager-alerts__filters">
             <x-ui.field label="Buscar alertas" for="gerencia-alertas-buscar"><input id="gerencia-alertas-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="search" placeholder="Residente, habitación o motivo" maxlength="250"></x-ui.field>
@@ -26,20 +35,47 @@
     <section class="rm-card rm-manager-alerts__list" aria-labelledby="gerencia-alertas-listado" x-ref="contextoCaso" tabindex="-1">
         <header class="rm-manager-alerts__list-heading"><div><h2 id="gerencia-alertas-listado" class="rm-section-title">Alertas de la consulta <span class="rm-badge rm-badge-neutral">{{ $alertas->total() }}</span></h2><p class="rm-help">Gerencia consulta y supervisa el seguimiento del equipo.</p></div><span class="rm-badge rm-badge-neutral"><i class="ph ph-eye" aria-hidden="true"></i>Consulta</span></header>
         @if($alertas->isEmpty())<x-ui.empty-state title="No hay alertas en esta consulta" description="Puedes cambiar los filtros para revisar otros estados. No se crean alertas para completar el resumen." />
-        @else<div class="rm-table-scroll"><table class="rm-table"><caption class="sr-only">Alertas, responsables y seguimiento</caption>
-            <thead><tr><th scope="col">Residente y alerta</th><th scope="col">Seguimiento</th><th scope="col">Responsable</th><th scope="col">Fecha registrada</th><th scope="col"><span class="sr-only">Acción</span></th></tr></thead>
-            <tbody>@foreach($alertas as $alerta)
-                <tr wire:key="gerencia-alerta-{{ $alerta->getKey() }}">
-                    <th scope="row"><strong>{{ $alerta->residente?->nombre_completo ?: 'Sin residente identificado' }}</strong><small>{{ LenguajeAlerta::tipo($alerta->tipo) }}</small></th>
-                    <td data-label="Seguimiento"><div class="rm-manager-alerts__tracking"><x-ui.status-badge :label="LenguajeAlerta::prioridad($alerta->prioridad)" :variant="in_array($alerta->prioridad, ['CRITICO','CRITICA','ALTO','ALTA'], true) ? 'danger' : 'neutral'" /><span>{{ LenguajeAlerta::estado($alerta->estado) }}</span></div></td>
-                    <td data-label="Responsable">@if(!$alerta->responsable)<span class="rm-manager-alerts__unassigned"><i class="ph ph-user-circle-dashed" aria-hidden="true"></i>Sin responsable asignado</span>@else{{ LenguajeAlerta::responsable($alerta->responsable) }}@endif</td>
-                    <td data-label="Fecha registrada"><span class="rm-manager-alerts__date">{{ $alerta->fecha_hora?->format('d/m/Y') ?: 'Sin registrar' }}</span>@if($alerta->fecha_hora)<small>{{ $alerta->fecha_hora->format('H:i') }}</small>@endif</td>
-                    <td><button type="button" class="rm-btn rm-btn-secondary" wire:click="verDetalle('{{ $alerta->getKey() }}')" wire:loading.attr="disabled"><i class="ph ph-arrow-up-right" aria-hidden="true"></i>Ver detalle<span class="sr-only"> de {{ $alerta->residente?->nombre_completo }}</span></button></td>
-                </tr>
-            @endforeach</tbody></table></div>@endif
+        @else
+            <ul class="rm-manager-alerts__items" aria-label="Resultados de alertas">
+                @foreach($alertas as $alerta)
+                    @php
+                        $tonoPrioridad = match ($alerta->prioridad) {
+                            'CRITICO', 'CRITICA' => 'critical',
+                            'ALTO', 'ALTA' => 'high',
+                            'MEDIO', 'MEDIA' => 'medium',
+                            default => 'neutral',
+                        };
+                        $tonoTarjeta = match ($alerta->estado) {
+                            'CERRADA' => 'closed',
+                            'ANULADA' => 'neutral',
+                            default => $tonoPrioridad,
+                        };
+                    @endphp
+                    <li class="rm-manager-alerts__item" data-tone="{{ $tonoTarjeta }}" wire:key="gerencia-alerta-{{ $alerta->getKey() }}">
+                        <span class="rm-manager-alerts__metric-icon" aria-hidden="true"><i class="ph-bold {{ match ($tonoTarjeta) { 'closed' => 'ph-check-circle', 'critical', 'high' => 'ph-warning', default => 'ph-bell' } }}"></i></span>
+                        <div class="rm-manager-alerts__identity">
+                            <h3>{{ LenguajeAlerta::tipo($alerta->tipo) }}</h3>
+                            <p>{{ $alerta->residente?->nombre_completo ?: 'Sin residente identificado' }}</p>
+                            <div class="rm-manager-alerts__meta">
+                                <span><i class="ph ph-user" aria-hidden="true"></i> {{ LenguajeAlerta::responsable($alerta->responsable) }}</span>
+                                <span><i class="ph ph-calendar" aria-hidden="true"></i> {{ $alerta->fecha_hora?->format('d/m/Y H:i') ?: 'Fecha sin registrar' }}</span>
+                            </div>
+                        </div>
+                        <div class="rm-manager-alerts__tracking">
+                            <x-ui.status-badge :label="LenguajeAlerta::estado($alerta->estado)" :variant="$tonoTarjeta === 'closed' ? 'success' : 'neutral'" />
+                            <span class="rm-manager-alerts__priority" data-tone="{{ $tonoPrioridad }}">{{ LenguajeAlerta::prioridad($alerta->prioridad) }}</span>
+                        </div>
+                        <button type="button" class="rm-btn rm-btn-secondary" wire:click="verDetalle('{{ $alerta->getKey() }}')" wire:loading.attr="disabled">
+                            <i class="ph ph-eye" aria-hidden="true"></i>Ver detalle<span class="sr-only"> de {{ $alerta->residente?->nombre_completo }}</span>
+                        </button>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
         <x-ui.paginacion :paginator="$alertas" mode="livewire" label="alertas" />
     </section>
-    @include('livewire.alertas.modales.detalle')
+    </div>
+    @include('livewire.alertas.modales.detalle', ['detalleAcoplado' => true])
     @include('livewire.alertas.modales.drawer-ubicacion')
     @include('livewire.alertas.modales.drawer-graficos')
 </div>
