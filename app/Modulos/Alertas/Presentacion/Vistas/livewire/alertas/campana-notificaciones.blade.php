@@ -6,6 +6,9 @@
         <header><h2 x-ref="tituloAvisos" tabindex="-1">Avisos y pendientes</h2><p>Actualizado {{ now()->format('d/m/Y H:i:s T') }} · {{ $previsualizacion ? 'Previsualización de solo lectura; actualiza la página para consultar cambios.' : 'Revisión cada 60 s mientras esta pantalla permanece activa.' }}</p></header>
         @if($avisosDocumentales)<h3>Documentación del personal</h3><p>{{ count($avisosDocumentales) }} solicitudes requieren consulta. Cada solicitud/persona aparece una sola vez.</p>@foreach(array_slice($avisosDocumentales,0,10) as $aviso)<a class="rm-notification-item" href="{{ $aviso['url'] }}"><strong>{{ $aviso['titulo'] }}</strong>@if($aviso['persona'])<span>{{ $aviso['persona'] }}</span>@endif<span>{{ $aviso['mensaje'] }}</span><time>Límite: {{ $aviso['fecha'] }}</time></a>@endforeach<a class="rm-notification-item" href="{{ route('admin.personal.documentacion') }}">Ver documentación y seguimiento</a>@endif
         @if($cambiosLaborales)<h3>Cambios laborales y planificación</h3>@foreach(array_slice($cambiosLaborales,0,10) as $cambio)<a class="rm-notification-item" href="{{ $cambio['url'] }}"><strong>{{ $cambio['persona'] }}</strong><span>{{ $cambio['mensaje'] }}</span><time>{{ $cambio['fecha'] }}</time></a>@endforeach<p>Consultar el aviso no acredita revisión ni modifica las asignaciones.</p>@endif
+        @if(app(\App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas::class)->paraUsuario(auth()->user())['foco'] === 'supervision')
+            <a class="rm-notification-item" href="{{ route('admin.alertas-clinicas.index') }}">Ver avisos administrativos</a>
+        @else
         <p>{{ $conteoAlertas }} alertas persistidas · {{ $conteoRecordatorios }} recordatorios de medicación</p>
         @if($puedeConsultarAlertas)
         <h3>Alertas registradas · Prioridad primero</h3>
@@ -16,5 +19,6 @@
         <h3>Medicación · Programación de hoy</h3><p>Un horario vencido no indica por sí solo una emergencia clínica.</p>
         @forelse($recordatoriosMedicacion as $recordatorio)<a class="rm-notification-item" href="{{ route(auth()->user()?->hasRole('ENFERMEROS') ? 'admin.enfermeria.medicacion' : 'admin.salud-seguimiento.administracion', ['adulto'=>$recordatorio['medicacion']->cod_residente]) }}"><strong>{{ $recordatorio['estado'] === 'VENCIDA' ? 'Vencida · comprobar registro' : 'Próxima dosis · revisar orden' }}</strong><span>{{ $recordatorio['adulto']?->nombre_completo }} · {{ $recordatorio['medicacion']->nombre_medicamento }}</span><time datetime="{{ $recordatorio['programada']->toIso8601String() }}">Programada: {{ $recordatorio['programada']->format('H:i') }} · {{ $recordatorio['programada']->format('d/m/Y H:i:s T') }}</time><span>{{ abs($recordatorio['minutos']) }} min {{ $recordatorio['minutos'] < 0 ? 'desde el horario programado' : 'para el horario programado' }}</span></a>@empty<p>Sin recordatorios de medicación en esta consulta.</p>@endforelse
         <p>Los avisos informan; el historial de eventos conserva las actuaciones. Revisar avisos no documenta atención ni administración. Confirma cada intervención en su módulo.</p>
+        @endif
     </section>
 </div>

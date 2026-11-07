@@ -20,11 +20,10 @@ final class BandejaAlertas
             return $query->whereRaw('1 = 0');
         }
 
-        if ($usuario->hasRole('GERENTE') && ! $usuario->hasRole('SUPERADMINISTRADOR')) {
-            // El tipo histórico puede estar guardado con o sin tildes.
-            $query->whereRaw("UPPER(TRIM(REPLACE(REPLACE(REPLACE(REPLACE(tipo, 'ó', 'o'), 'Ó', 'O'), 'é', 'e'), 'É', 'E'))) <> ?", [
-                'EVALUACION MEDICA REQUERIDA',
-            ]);
+        // Las alertas persistidas pertenecen a los flujos clínicos y de cuidado.
+        // Los avisos administrativos se consultan desde sus fuentes institucionales.
+        if (app(ExperienciaAlertas::class)->paraUsuario($usuario)['foco'] === 'supervision') {
+            return $query->whereRaw('1 = 0');
         }
 
         return $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])

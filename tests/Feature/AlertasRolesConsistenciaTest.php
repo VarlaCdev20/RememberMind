@@ -126,20 +126,18 @@ class AlertasRolesConsistenciaTest extends TestCase
     {
         $this->actor('GERENTE');
         $residente = Residente::factory()->create();
-        $visible = $this->alerta($residente);
+        $this->alerta($residente, 'ABIERTA', 'MEDICACION');
         $medica = $this->alerta($residente, 'ABIERTA', 'SOLICITUD_MEDICA');
         $medica->update(['tipo' => 'EVALUACION MEDICA REQUERIDA']);
         $acentuada = $this->alerta($residente, 'ABIERTA', 'SOLICITUD_MEDICA');
         $acentuada->update(['tipo' => 'Evaluación médica requerida']);
 
         Livewire::test(AlertasPanel::class)
-            ->assertViewHas('alertas', fn ($alertas) => $alertas->pluck('cod_alerta')->all() === [$visible->getKey()])
-            ->assertSet('conteos.altas', 1)
+            ->assertSee('Avisos administrativos')->assertDontSee('Evaluación médica requerida')
             ->call('verDetalle', $medica->getKey())->assertForbidden();
-        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 1);
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 0);
         $this->get(route('admin.alertas-clinicas.index', ['alerta' => $medica->getKey()]))->assertForbidden();
-        $this->getJson(route('admin.alertas.index'))->assertOk()->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.cod_alerta', $visible->getKey());
+        $this->getJson(route('admin.alertas.index'))->assertOk()->assertJsonCount(0, 'data');
 
         $this->actor('MEDICO GENERAL/GERIATRA');
         Livewire::test(AlertasPanel::class)->call('verDetalle', $medica->getKey())->assertSet('modalDetalle', true);

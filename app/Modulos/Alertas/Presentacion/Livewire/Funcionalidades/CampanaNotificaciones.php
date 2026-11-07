@@ -286,7 +286,9 @@ class CampanaNotificaciones extends Component
     {
         $user = auth()->user();
 
-        if (! $this->puedeVer() || ! $user || ! $user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
+        if (! $this->puedeVer() || ! $user
+            || app(\App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas::class)->paraUsuario($user)['foco'] === 'supervision'
+            || ! $user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
             return collect();
         }
 

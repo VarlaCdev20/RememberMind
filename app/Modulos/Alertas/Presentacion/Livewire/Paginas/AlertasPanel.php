@@ -644,11 +644,18 @@ class AlertasPanel extends Component
     public function render()
     {
         $this->comprobarPermiso('ver');
+        $usuario = auth()->user();
+        $perfil = app(ExperienciaAlertas::class)->paraUsuario($usuario);
+        if ($perfil['foco'] === 'supervision') {
+            return view('alertas::livewire.alertas.gerencia', [
+                'avisosDocumentales' => app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->avisos($usuario),
+            ])->layout('layouts.sistema');
+        }
+
         if (($this->drawerGrafico || $this->drawerUbicacion) && $this->adultoDrawerId) {
             $this->adultoDrawer = app(ConsultarPanelResidenteAlerta::class)->consultar(auth()->user(), $this->adultoDrawerId, $this->drawerGrafico ? 'graficos' : 'ubicacion');
             $this->signosDrawer = $this->drawerGrafico ? $this->adultoDrawer->signosVitales : [];
         }
-        $usuario = auth()->user();
         $bandeja = app(BandejaAlertas::class);
         $turnoService = app(TurnoEnfermeriaService::class);
         $ambito = $bandeja->consulta($usuario)
@@ -733,7 +740,6 @@ class AlertasPanel extends Component
             && ($puedeIntervenir || $puedeCoordinar);
         $puedeRegistrarNuevaMedicion = $detalle?->estado === 'EN_ATENCION' && $puedeIntervenir && $usuario->can('signos_vitales.crear')
             && $turnoService->esPacienteAsignado($detalle->cod_residente, $usuario);
-        $perfil = app(ExperienciaAlertas::class)->paraUsuario($usuario);
         $definicionEspecialidad = app(CamposRegistroEspecialidad::class)->paraRol($perfil['rol']);
         $areaEspecialidad = null;
         $errorContextoEspecialidad = '';

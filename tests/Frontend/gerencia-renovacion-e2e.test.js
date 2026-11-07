@@ -488,9 +488,8 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.keyboard.press('Escape');
     await page.waitForFunction(()=>![...document.querySelectorAll('[role="dialog"]')].some(e=>e.getClientRects().length));
     await go('/admin/alertas-clinicas');
-    await page.click('button[wire\\:click^="verDetalle("]');
-    await page.waitForFunction(()=>[...document.querySelectorAll('[role="dialog"]')].some(e=>e.getClientRects().length && e.innerText.includes('Situación registrada')));
-    await page.screenshot({path:join(out,'alertas-detalle-390.png'),fullPage:true});
+    assert.match(await page.$eval('main',e=>e.innerText),/Avisos administrativos/i);
+    await page.screenshot({path:join(out,'avisos-administrativos-390.png'),fullPage:true});
     await go('/admin/residentes?vista=tabla&buscar=SinCoincidencia');
     assert.match(await page.$eval('main',e=>e.innerText),/No hay residentes en esta consulta/);
     await go('/admin/reportes/institucional');
