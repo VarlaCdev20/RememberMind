@@ -294,10 +294,22 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-record-dialog {
     --rm-font-body: "Nunito", sans-serif;
     --rm-font-friendly: var(--rm-font-body);
+    --rm-staff-record-accent: var(--rm-palette-mint);
+    --rm-staff-record-radius: calc(var(--rm-radius-2xl) + var(--rm-space-2));
     /* La separación del directorio no debe desplazar la ventana fija. */
     margin-block: 0 !important;
 }
+.rm-staff-record-dialog .rm-modal-panel { border-radius: var(--rm-staff-record-radius); }
+.rm-staff-record-dialog .rm-modal-header {
+    background: color-mix(in srgb, var(--rm-staff-record-accent) 26%, var(--rm-surface));
+    border-bottom-color: color-mix(in srgb, var(--rm-staff-record-accent) 25%, transparent);
+}
 .rm-staff-record-dialog .rm-modal-panel__title { font-family: var(--rm-font-friendly); }
+.rm-staff-record-dialog .rm-modal-footer { border-top-color: var(--rm-border-soft); }
+.rm-staff-record-dialog .rm-modal-footer .rm-btn {
+    border-radius: var(--rm-radius-pill);
+    padding-inline: var(--rm-space-5);
+}
 .rm-staff-record {
     --rm-font-body: "Nunito", sans-serif;
     --rm-font-friendly: var(--rm-font-body);
@@ -314,18 +326,26 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--rm-space-4);
-    padding: var(--rm-space-4);
-    border: 1px solid var(--rm-border-soft);
-    border-inline-start: 3px solid var(--rm-primary);
-    border-radius: var(--rm-radius-card);
-    background: var(--rm-sage-soft);
+    padding: var(--rm-space-5);
+    border: 1px solid color-mix(in srgb, var(--rm-staff-record-accent) 45%, var(--rm-border-soft));
+    border-radius: var(--rm-staff-record-radius);
+    background: linear-gradient(120deg,
+        color-mix(in srgb, var(--rm-staff-record-accent) 56%, var(--rm-surface)),
+        color-mix(in srgb, var(--rm-staff-record-accent) 20%, var(--rm-surface)));
 }
 
 .rm-staff-record__profile .rm-resident-directory__identity { flex: 1 1 16rem; min-width: 0; }
 .rm-staff-record__profile :is(.rm-resident-directory__avatar-button, .rm-resident-directory__avatar) {
-    inline-size: 56px;
-    block-size: 56px;
+    inline-size: 64px;
+    block-size: 64px;
     flex-shrink: 0;
+    border-radius: var(--rm-radius-pill);
+}
+.rm-staff-record__profile .rm-resident-directory__avatar {
+    background: var(--rm-staff-record-accent);
+    color: var(--rm-palette-petroleum-950);
+    border: 3px solid color-mix(in srgb, var(--rm-surface) 75%, transparent);
+    font-size: var(--rm-font-size-section);
 }
 .rm-staff-record__profile .rm-resident-directory__name {
     font: 800 var(--rm-font-size-page)/1.15 var(--rm-font-friendly);
@@ -337,6 +357,11 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     flex-wrap: wrap;
     gap: var(--rm-space-3) var(--rm-space-5);
 }
+.rm-staff-record__statuses > div {
+    padding: var(--rm-space-2) var(--rm-space-3);
+    border-radius: var(--rm-radius-xl);
+    background: color-mix(in srgb, var(--rm-surface) 62%, transparent);
+}
 .rm-staff-record__statuses dd { margin-top: var(--rm-space-1); }
 .rm-staff-record__sections {
     display: grid;
@@ -344,7 +369,24 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     align-items: start;
     gap: var(--rm-space-3);
 }
-.rm-staff-record__sections > .rm-card { min-width: 0; box-shadow: none; }
+.rm-staff-record__sections > .rm-card {
+    min-width: 0;
+    border-radius: var(--rm-staff-record-radius);
+    border-color: color-mix(in srgb, var(--rm-border-soft) 55%, transparent);
+    box-shadow: none;
+    background-image: none;
+    padding: var(--rm-space-4);
+}
+.rm-staff-record .rm-section-header {
+    border-bottom: 0;
+    padding-bottom: var(--rm-space-2);
+    gap: var(--rm-space-2);
+}
+.rm-staff-record .rm-section-header__icon {
+    border-radius: var(--rm-radius-pill);
+    background: color-mix(in srgb, var(--rm-staff-record-accent) 65%, var(--rm-surface));
+    color: var(--rm-palette-petroleum-950);
+}
 .rm-staff-record__fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -353,7 +395,6 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-record__fields > div {
     min-width: 0;
     padding-block-end: var(--rm-space-2);
-    border-block-end: 1px solid var(--rm-border-soft);
 }
 .rm-staff-record__field--wide { grid-column: 1 / -1; }
 .rm-staff-record :is(dt, .rm-staff-record__counts) {
@@ -383,7 +424,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     gap: var(--rm-space-2);
     padding: var(--rm-space-2) var(--rm-space-3);
     border-inline-start: 3px solid var(--rm-warning);
-    border-radius: var(--rm-radius-sm);
+    border-radius: var(--rm-radius-xl);
     background: var(--rm-warning-soft);
 }
 .rm-staff-record__pending > i, .rm-staff-record__deadline { color: var(--rm-warning-strong); }
@@ -395,17 +436,29 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     justify-content: space-between;
     gap: var(--rm-space-2);
     padding-bottom: var(--rm-space-2);
-    border-bottom: 1px solid var(--rm-border-soft);
+    border-bottom: 1px solid color-mix(in srgb, var(--rm-border-soft) 55%, transparent);
 }
-.rm-staff-record__action { margin-top: var(--rm-space-3); min-height: 44px; }
+.rm-staff-record .rm-staff-record__action {
+    margin-top: var(--rm-space-3);
+    min-height: 44px;
+    padding-inline: var(--rm-space-4);
+    border-radius: var(--rm-radius-pill);
+    background: color-mix(in srgb, var(--rm-staff-record-accent) 32%, var(--rm-surface));
+    border-color: color-mix(in srgb, var(--rm-staff-record-accent) 65%, var(--rm-border));
+    color: var(--rm-text-primary);
+    box-shadow: none;
+}
+.rm-staff-record .rm-staff-record__action:hover {
+    background: color-mix(in srgb, var(--rm-staff-record-accent) 48%, var(--rm-surface));
+}
 
 @media (max-width: 767px) {
     .rm-staff-record :is(.rm-staff-record__sections, .rm-staff-record__document-lists) { grid-template-columns: minmax(0, 1fr); }
-    .rm-staff-record__profile { padding: var(--rm-space-3); }
+    .rm-staff-record__profile { padding: var(--rm-space-4); }
     .rm-staff-record__statuses {
         flex-basis: 100%;
         padding-top: var(--rm-space-2);
-        border-top: 1px solid var(--rm-border-soft);
+        border-top: 0;
     }
 }
 
