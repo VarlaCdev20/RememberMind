@@ -122,6 +122,30 @@ class AlertasRolesConsistenciaTest extends TestCase
         Livewire::test(CampanaNotificaciones::class)->call('verUbicacion', $residente->getKey())->assertForbidden();
     }
 
+    public function test_solicitud_de_evaluacion_medica_queda_fuera_de_gerencia_en_todas_las_entradas(): void
+    {
+        $this->actor('GERENTE');
+        $residente = Residente::factory()->create();
+        $visible = $this->alerta($residente);
+        $medica = $this->alerta($residente, 'ABIERTA', 'SOLICITUD_MEDICA');
+        $medica->update(['tipo' => 'EVALUACION MEDICA REQUERIDA']);
+        $acentuada = $this->alerta($residente, 'ABIERTA', 'SOLICITUD_MEDICA');
+        $acentuada->update(['tipo' => 'Evaluación médica requerida']);
+
+        Livewire::test(AlertasPanel::class)
+            ->assertViewHas('alertas', fn ($alertas) => $alertas->pluck('cod_alerta')->all() === [$visible->getKey()])
+            ->assertSet('conteos.altas', 1)
+            ->call('verDetalle', $medica->getKey())->assertForbidden();
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 1);
+        $this->get(route('admin.alertas-clinicas.index', ['alerta' => $medica->getKey()]))->assertForbidden();
+        $this->getJson(route('admin.alertas.index'))->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.cod_alerta', $visible->getKey());
+
+        $this->actor('MEDICO GENERAL/GERIATRA');
+        Livewire::test(AlertasPanel::class)->call('verDetalle', $medica->getKey())->assertSet('modalDetalle', true);
+        $this->assertDatabaseCount('alertas', 3);
+    }
+
     public function test_enfermeria_registra_actuacion_y_cierra_con_eventos_sin_perder_historia(): void
     {
         $actor = $this->actor('ENFERMEROS');

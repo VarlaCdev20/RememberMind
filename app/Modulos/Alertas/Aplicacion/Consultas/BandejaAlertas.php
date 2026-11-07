@@ -20,6 +20,13 @@ final class BandejaAlertas
             return $query->whereRaw('1 = 0');
         }
 
+        if ($usuario->hasRole('GERENTE') && ! $usuario->hasRole('SUPERADMINISTRADOR')) {
+            // El tipo histórico puede estar guardado con o sin tildes.
+            $query->whereRaw("UPPER(TRIM(REPLACE(REPLACE(REPLACE(REPLACE(tipo, 'ó', 'o'), 'Ó', 'O'), 'é', 'e'), 'É', 'E'))) <> ?", [
+                'EVALUACION MEDICA REQUERIDA',
+            ]);
+        }
+
         return $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])
             ? $query : $this->turnos->acotarAlertasQuery($query, $usuario);
     }
