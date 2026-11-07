@@ -52,6 +52,29 @@
 .rm-support-picker__resident .rm-support-picker__open { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; min-height: 44px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: var(--rm-primary-ink); background: var(--rm-sage-soft); border-color: var(--rm-border); box-shadow: none; }
 .rm-support-picker__resident:hover { border-color: var(--rm-primary-ink); }
 .rm-support-picker__resident:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
+/* Las acciones se revelan en la propia fila, sin menús flotantes recortados. */
+.rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table tbody tr { height: auto; }
+.rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table :is(td,th) { vertical-align: top; }
+.rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table small { margin-top: 4px; font-weight: 400; color: var(--rm-text-secondary); }
+.rm-support-table__manage { margin: 0; border: 0; padding: 0; }
+.rm-support-table__manage summary { justify-content: flex-start; }
+/* Prevalece sobre la reducción global de controles de rm-depth-canvas. */
+.rm-support-workspace .rm-table .rm-support-table__manage button { min-height: 44px !important; height: auto; }
+.rm-support-workspace .rm-support-table__manage .rm-management-actions { display: grid; gap: 8px; }
+@media (min-width: 901px) {
+    .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table tbody tr { border-bottom: 1px solid var(--rm-table-border); }
+    .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table tbody :is(td,th) { padding: var(--rm-table-cell-padding-y) var(--rm-table-cell-padding-x); }
+    .rm-support-table .rm-table thead th:nth-child(1) { width: 26%; }
+    .rm-support-table .rm-table thead th:nth-child(2) { width: 22%; }
+    .rm-support-table .rm-table thead th:nth-child(3) { width: 24%; }
+    .rm-support-table .rm-table thead th:nth-child(4) { width: 10%; }
+    .rm-support-table .rm-table thead th:nth-child(5) { width: 18%; }
+    .rm-support-people-table .rm-table thead th:nth-child(1) { width: 23%; }
+    .rm-support-people-table .rm-table thead th:nth-child(2) { width: 23%; }
+    .rm-support-people-table .rm-table thead th:nth-child(3) { width: 23%; }
+    .rm-support-people-table .rm-table thead th:nth-child(4) { width: 15%; }
+    .rm-support-people-table .rm-table thead th:nth-child(5) { width: 16%; }
+}
 @media (max-width: 900px) {
     .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) table.rm-table { display: block; width: 100%; min-width: 0; }
     .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table thead { display: none; }

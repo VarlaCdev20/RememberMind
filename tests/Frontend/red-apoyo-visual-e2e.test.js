@@ -72,6 +72,15 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Tabla sin desbordamiento');
         assert.ok(await page.$$eval('.rm-support-table tbody tr', rows => rows.every(r => r.scrollHeight <= r.clientHeight + 2)), 'Filas de vínculos sin contenido superpuesto');
         await page.screenshot({path:path.join(output,'tabla-'+width+'.png'),fullPage:true});
+        if (width === 1440 || width === 390) {
+            assert.equal(await page.$eval('.rm-support-table__manage', e=>e.open), false, 'Acciones recogidas al abrir la tabla');
+            await click('.rm-support-table__manage summary');
+            await page.waitForFunction(()=>document.querySelector('.rm-support-table__manage')?.open === true);
+            const actionBox = await page.$eval('.rm-support-table__manage button', e=>({height:e.getBoundingClientRect().height, min:getComputedStyle(e).minHeight}));
+            assert.ok(actionBox.height>=44, 'Acciones desplegadas accesibles: '+JSON.stringify(actionBox));
+            assert.ok(await page.$$eval('.rm-support-table tbody tr', rows=>rows.every(r=>r.scrollHeight<=r.clientHeight+2)), 'Acciones abiertas sin solapamiento');
+            await click('.rm-support-table__manage summary');
+        }
         await click('.rm-support-view-tools .rm-view-toggle button:first-child');
         await click('.rm-support-contact__manage summary');
         await click('.rm-support-network button[wire\\:click^="editarContacto("]');
