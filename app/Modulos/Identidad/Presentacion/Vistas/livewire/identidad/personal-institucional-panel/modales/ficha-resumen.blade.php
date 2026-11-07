@@ -8,13 +8,13 @@
         'identidad' => ['titulo' => 'Identidad y contacto', 'icono' => 'ph-identification-card', 'datos' => [
             'Correo' => $titular->correo,
             'Celular' => $personal?->telefono,
-            'Fecha de nacimiento' => $personal?->fecha_nacimiento?->format('d/m/Y'),
-            'Género' => match ($personal?->genero) {'F' => 'Femenino', 'M' => 'Masculino', default => $personal?->genero},
+            'Dirección' => $personal?->direccion,
             'Número de documento' => $personal?->numero_documento,
             'Tipo de documento' => $personal?->tipo_documento,
+            'Fecha de nacimiento' => $personal?->fecha_nacimiento?->format('d/m/Y'),
+            'Género' => match ($personal?->genero) {'F' => 'Femenino', 'M' => 'Masculino', default => $personal?->genero},
             'País emisor' => $personal?->pais_documento,
             'Expedido en' => $personal?->expedicion_documento,
-            'Dirección' => $personal?->direccion,
         ]],
         'laboral' => ['titulo' => 'Información laboral', 'icono' => 'ph-briefcase', 'datos' => [
             'Profesión o función' => $personal?->profesion,
@@ -27,7 +27,7 @@
 @endphp
 
 <x-ui.modal-livewire id="gerencia-personal-resumen" wire:model="modalFichaAbierto"
-    title="Ficha del trabajador" icon="ph-identification-card" max-width="xl" surface="reading" class="rm-staff-record-dialog"
+    title="Ficha del trabajador" icon="ph-identification-card" max-width="5xl" surface="reading" class="rm-staff-record-dialog"
     close-method="cerrarFichaPersonal" :show-validation="false">
     <div class="rm-staff-record">
         <header class="rm-staff-record__profile">
@@ -43,7 +43,10 @@
                 <x-ui.section-card :title="$seccion['titulo']" :icon="$seccion['icono']">
                     <dl class="rm-staff-record__fields">
                         @foreach($seccion['datos'] as $etiqueta => $valor)
-                            <div @class(['rm-staff-record__field--wide' => in_array($etiqueta, ['Correo', 'Dirección', 'Observaciones'], true)])>
+                            <div @class([
+                                'rm-staff-record__field--wide' => in_array($etiqueta, ['Dirección', 'Profesión o función', 'Observaciones'], true),
+                                'rm-staff-record__field--primary' => in_array($etiqueta, ['Correo', 'Celular', 'Número de documento', 'Profesión o función'], true),
+                            ])>
                                 <dt>{{ $etiqueta }}</dt>
                                 <dd @class(['rm-staff-record__empty' => blank($valor)])>{{ filled($valor) ? $valor : 'Sin registrar' }}</dd>
                             </div>
