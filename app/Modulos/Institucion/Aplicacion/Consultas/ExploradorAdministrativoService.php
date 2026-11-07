@@ -257,7 +257,7 @@ class ExploradorAdministrativoService
         } elseif ($modulo === 'visitas') {
             match ($tab) {
                 'hoy' => $query->where(fn ($q) => $q->whereDate('registro.programada', today())->orWhereDate('registro.ingreso', today())),
-                'programadas' => $query->whereNull('registro.ingreso')->whereNotNull('registro.programada'),
+                'programadas' => $query->whereNull('registro.ingreso')->whereNotNull('registro.programada')->where('registro.estado', '<>', 'CANCELADA'),
                 'dentro' => $query->whereNotNull('registro.ingreso')->whereNull('registro.salida'),
                 'finalizadas' => $query->whereNotNull('registro.salida'),
                 default => null,

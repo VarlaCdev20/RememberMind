@@ -10,6 +10,7 @@ use App\Models\Visita;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 final class RegistrarVisitaConsentimientoHttp
 {
@@ -18,7 +19,9 @@ final class RegistrarVisitaConsentimientoHttp
         Gate::forUser($usuario)->authorize('view', $residente);
         abort_unless($usuario->can('visitas.gestionar'), 403);
         $datos = Validator::make($entrada, ['cod_contacto' => ['required', 'exists:contactos,cod_contacto'], 'fecha_hora_programada' => ['nullable', 'date'], 'fecha_hora_ingreso' => ['nullable', 'date'], 'fecha_hora_salida' => ['nullable', 'date', 'after_or_equal:fecha_hora_ingreso'], 'motivo' => ['nullable', 'string', 'max:160'], 'estado' => ['required', 'in:PROGRAMADA,AUTORIZADA,EN_CURSO,FINALIZADA,CANCELADA'], 'observacion' => ['nullable', 'string']])->validate();
-        abort_unless(ResidenteContacto::query()->where('cod_residente', $residente->cod_residente)->where('cod_contacto', $datos['cod_contacto'])->where('estado', 'ACTIVO')->exists(), 422, 'El contacto no está vinculado al residente.');
+        if (! $residente->vinculosContacto()->where('cod_contacto', $datos['cod_contacto'])->where('estado', 'ACTIVO')->exists()) {
+            throw ValidationException::withMessages(['cod_contacto' => 'El contacto no tiene un vínculo activo con el residente.']);
+        }
 
         return Visita::query()->create(['cod_visita' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('visitas'), 'cod_residente' => $residente->cod_residente, 'cod_usuario_autorizacion' => $usuario->cod_usuario, ...$datos]);
     }

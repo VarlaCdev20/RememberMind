@@ -29,13 +29,15 @@ El resumen y los gráficos se calculan antes de aplicar la bandeja, estado o cat
 
 Un rango invertido, fecha inválida, estado inventado, vista incompatible o tamaño de página no admitido se rechaza en el servidor. El formulario conserva valores corregibles, muestra mensajes accesibles y mantiene la última consulta válida. Los estados y categorías proceden de los registros reales; no se agregan catálogos ni reglas a la base congelada.
 
-Esta entrega habilita consulta y navegación. No incorpora botones de creación, cierre de jornada, asignación profesional, inscripción de participantes ni registro de entrada/salida mientras sus operaciones existentes no tengan una revisión completa. Los endpoints previos no quedan certificados por este rediseño: siguen pendientes, entre otros, turno activo/duplicidad de jornada, jornada abierta/personal activo/área coherente, autorización contextual de participantes y transiciones de visita. No cambia responsabilidades profesionales.
+La entrega original habilitó consulta y navegación. El recorrido de visitas permite ahora a Administración programar con un contacto vinculado desde **Expediente del residente → Visitas**. Una visita pendiente admite entrada o cancelación. Tras la entrada, admite salida y conserva las horas reales. Cada cambio registra al responsable en auditoría. Las canceladas se conservan en **Todas** y salen de **Programadas**.
+
+La revisión de los endpoints anteriores y de la inscripción de participantes queda fuera de este recorrido.
 
 ## Implementación y autorización
 
 `ExploradorAdministrativoService` coordina consultas, metadatos de vistas, gráficos, filtros, paginación y detalle; `ConsultaOperativaService` conserva las fuentes V2. `OperacionController` valida entradas y exige cuenta activa, permiso explícito y ausencia de rol familiar. Las visitas requieren además autorización general de lectura de residentes y Policy del residente al abrir su ficha. Jornadas/Asignaciones/Actividades consultan su información operativa con su permiso específico.
 
-Presentación: `operacion.blade.php`, parciales de tarjetas/campos/detalle, `operaciones-interactivas.js` y `operaciones-interactivas.css`. Reutiliza selector, calendario, cabecera, paginación y gestor de tema existentes. No agrega dependencias, tablas, columnas ni escrituras; los conteos de asignados/participantes sin relaciones muestran cero.
+Presentación: `operacion.blade.php`, parciales de tarjetas/campos/detalle, `operaciones-interactivas.js` y `operaciones-interactivas.css`. Reutiliza selector, calendario, cabecera, paginación y gestor de tema existentes. Los cambios de visita usan las tablas y los permisos existentes. Los conteos de asignados o participantes sin relaciones muestran cero.
 
 ## Verificación
 

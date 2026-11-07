@@ -39,6 +39,8 @@
                 <div><dt>Responsable</dt><dd>{{ $responsable ? $responsable->nombres.' '.$responsable->apellido_paterno : 'Sin registrar' }}</dd></div>
                 <div><dt>Fecha de nacimiento</dt><dd>{{ $persona->fecha_nacimiento ? \Carbon\Carbon::parse($persona->fecha_nacimiento)->format('d/m/Y') : 'Sin registrar' }}</dd></div>
             </dl>
+        @elseif($tab === 'visitas' && auth()->user()->hasRole('ADMINISTRADOR') && !auth()->user()->hasRole('FAMILIAR') && auth()->user()->hasAllPermissions(['visitas.ver', 'visitas.gestionar']) && !app(\App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService::class)->isActive(auth()->user()))
+            @livewire(App\Modulos\Residentes\Presentacion\Livewire\Paginas\VisitasResidente::class, ['residente' => $persona])
         @elseif($filas->isEmpty())
             <x-ui.empty-state icono="ph-folder-open" :titulo="'Sin registros de '.mb_strtolower($tabs[$tab])" texto="No hay información administrativa en esta sección." />
         @else

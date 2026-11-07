@@ -22,11 +22,13 @@ use App\Models\User;
 use App\Models\Visita;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Modulos\Institucion\Aplicacion\Consultas\ExploradorAdministrativoService;
+use App\Modulos\Residentes\Presentacion\Livewire\Paginas\VisitasResidente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -52,6 +54,36 @@ class ExploradorAdministrativoTest extends TestCase
 
                 return true;
             });
+    }
+
+    public function test_administracion_programa_visitas_y_registra_entrada_salida_o_cancelacion(): void
+    {
+        $this->usuario->givePermissionTo(Permission::findOrCreate('visitas.gestionar', 'web'));
+        $this->get(route('admin.administracion.visitas', ['detalle' => 'VIS_OP']))
+            ->assertOk()->assertSee('Gestionar visitas del residente');
+        $this->get(route('admin.administracion.residentes.show', [$this->residente, 'tab' => 'visitas']))
+            ->assertOk()->assertSee('Programar visita');
+        $panel = Livewire::test(VisitasResidente::class, ['residente' => $this->residente]);
+        $panel->call('cambiar', 'VIS_OP', 'salida')->assertHasErrors('visita');
+        $sinVinculo = Contacto::create(['nombres' => 'Contacto sin vínculo', 'apellido_paterno' => 'Prueba', 'estado' => 'ACTIVO']);
+        $panel->set('contacto', $sinVinculo->getKey())->set('fecha', '2026-10-06T14:00')
+            ->call('programar')->assertHasErrors('cod_contacto');
+        $this->assertDatabaseCount('visitas', 1);
+        $panel->set('contacto', 'CTO_OP')->set('fecha', '2026-10-06T14:00')->set('motivo', 'Encuentro familiar')
+            ->call('programar')->assertHasNoErrors()->assertSee('Visita programada.');
+        $programada = Visita::where('motivo', 'Encuentro familiar')->sole();
+        $this->assertNull($programada->fecha_hora_ingreso);
+        $panel->call('cambiar', $programada->getKey(), 'entrada')->assertHasNoErrors()->assertSee('Entrada registrada.');
+        $panel->call('cambiar', $programada->getKey(), 'entrada')->assertHasErrors('visita');
+        $this->travel(5)->minutes();
+        $panel->call('cambiar', $programada->getKey(), 'salida')->assertHasNoErrors()->assertSee('Salida registrada.');
+        $this->assertSame('FINALIZADA', $programada->fresh()->estado);
+        $this->assertTrue($programada->fresh()->fecha_hora_salida->gt($programada->fresh()->fecha_hora_ingreso));
+        $panel->call('cambiar', 'VIS_OP', 'cancelar')->assertHasNoErrors()->assertSee('Visita cancelada.');
+        $this->assertDatabaseHas('visitas', ['cod_visita' => 'VIS_OP', 'estado' => 'CANCELADA', 'fecha_hora_ingreso' => null]);
+        $this->assertSame(0, $this->datos('visitas', ['tab' => 'programadas'])['registros']->total());
+        $this->usuario->revokePermissionTo('visitas.gestionar');
+        $panel->call('cambiar', 'VIS_OP', 'entrada')->assertForbidden();
     }
 
     protected function setUp(): void

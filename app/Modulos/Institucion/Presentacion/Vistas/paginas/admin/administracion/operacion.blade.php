@@ -21,6 +21,9 @@
 <div class="rm-residents rm-operations rm-operations--{{ $modulo }}" x-data="rmOperaciones(@js($modulo))" :aria-busy="loading" x-on:livewire:navigated.window="finalizarNavegacion()">
     <x-ui.collection-header :title="$definicion['titulo']" :subtitle="$presentacion['ayuda']" :icon="$definicion['icono']" eyebrow="Administración / Coordinación" :date="now()->locale('es')">
         <x-slot:actions>
+            @if($modulo === 'visitas' && auth()->user()->hasRole('ADMINISTRADOR') && auth()->user()->can('visitas.gestionar'))
+                <a class="rm-btn-secondary" href="{{ route('admin.administracion.residentes') }}">Elegir residente para programar</a>
+            @endif
             <button type="button" class="rm-btn-secondary" @click="alternarGraficos()" :aria-expanded="graficos" aria-controls="operacion-graficos"><i class="ph-bold ph-chart-bar" aria-hidden="true"></i><span x-text="graficos ? 'Ocultar gráficos' : 'Mostrar gráficos'"></span></button>
             <button type="button" class="rm-btn-icon" aria-label="Ayuda de {{ mb_strtolower($definicion['titulo']) }}" @click="abrirAyuda($event)"><i class="ph-bold ph-question" aria-hidden="true"></i></button>
             <button type="button" class="rm-btn-icon" @click="actualizar()" :disabled="loading" aria-label="Actualizar {{ mb_strtolower($definicion['titulo']) }}"><i class="ph-bold ph-arrow-clockwise" aria-hidden="true"></i></button>
