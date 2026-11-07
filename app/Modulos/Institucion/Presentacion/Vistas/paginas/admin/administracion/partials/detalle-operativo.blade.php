@@ -6,5 +6,8 @@
     @if($modulo === 'visitas' && auth()->user()->hasRole('ADMINISTRADOR') && auth()->user()->can('visitas.gestionar'))
         <p class="mt-4"><a class="rm-btn-secondary" href="{{ route('admin.administracion.residentes.show', [$detalle->_cod_residente, 'tab' => 'visitas']) }}">Gestionar visitas del residente</a></p>
     @endif
+    @if($modulo === 'alertas' && auth()->user()->hasRole('ADMINISTRADOR') && auth()->user()->canAny(['alertas.reconocer', 'alertas.asignar', 'alertas.seguimiento', 'alertas.cerrar']))
+        <p class="mt-4"><a class="rm-btn-secondary" href="{{ route('admin.alertas-clinicas.index', ['alerta' => $detalle->codigo]) }}">Abrir coordinación de esta alerta</a></p>
+    @endif
     @if(in_array($modulo,['alertas','incidentes'],true))<p class="rm-alert rm-alert--info mt-4">Esta ficha permite consulta administrativa. La prioridad, gravedad e intervenciones proceden del registro profesional.</p>@endif
     </div><footer class="rm-modal-footer"><a class="rm-btn-secondary" href="{{ $cerrar }}" @click.prevent="cerrarFicha()">Volver a la bandeja</a>@if($modulo === 'documentacion' && $descarga)<a class="rm-btn-primary" href="{{ route('admin.documentos.descargar',['documento'=>$detalle->codigo]) }}"><i class="ph-bold ph-download-simple" aria-hidden="true"></i> Descargar archivo</a>@endif</footer></section></div>

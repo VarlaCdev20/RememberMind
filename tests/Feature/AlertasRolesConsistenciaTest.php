@@ -252,6 +252,36 @@ class AlertasRolesConsistenciaTest extends TestCase
             ->assertSee('Seguimiento de coordinación')->assertDontSee('Registrar intervención');
     }
 
+    public function test_administracion_continua_desde_consulta_hasta_cierre_con_historial(): void
+    {
+        $administrador = $this->actor('ADMINISTRADOR');
+        $alerta = $this->alerta(Residente::factory()->create());
+        $responsable = User::factory()->create(['nombres' => 'Enfermera sintética', 'apellido_paterno' => 'Prueba']);
+        $responsable->assignRole('ENFERMEROS');
+        $this->asignarTurno($responsable, $alerta->residente);
+
+        $this->get(route('admin.administracion.alertas', ['detalle' => $alerta->getKey()]))
+            ->assertOk()->assertSee('Abrir coordinación de esta alerta')
+            ->assertSee(route('admin.alertas-clinicas.index', ['alerta' => $alerta->getKey()]));
+        $this->get(route('admin.alertas-clinicas.index', ['alerta' => $alerta->getKey()]))->assertOk();
+        $panel = Livewire::test(AlertasPanel::class)->call('verDetalle', $alerta->getKey())
+            ->call('reconocer', $alerta->getKey())
+            ->set('responsableId', $responsable->getKey())->call('asignarResponsable')
+            ->set('accion', 'Se coordinó la revisión con Enfermería.')->call('guardarAccion')->assertHasNoErrors();
+        $this->assertSame('ASIGNADA', $alerta->fresh()->estado);
+        $this->assertSame($responsable->personal->getKey(), $alerta->fresh()->cod_personal_responsable);
+        $this->assertSame(['CAMBIO_ESTADO', 'ASIGNACION', 'SEGUIMIENTO'], $alerta->eventos()->get()->pluck('tipo_evento')->all());
+        $panel->call('cerrarModales')->call('cerrarAlerta', $alerta->getKey())
+            ->set('observacionCierre', 'Coordinación concluida y entrega documentada.')
+            ->call('confirmarCierre')->assertHasNoErrors();
+        $this->assertSame('CERRADA', $alerta->fresh()->estado);
+        $cierre = $alerta->eventos()->where('tipo_evento', 'CIERRE')->sole();
+        $this->assertSame($administrador->getKey(), $cierre->cod_usuario);
+        $this->assertStringContainsString('Cierre de coordinación', $cierre->descripcion);
+        $this->get(route('admin.administracion.alertas', ['detalle' => $alerta->getKey(), 'tab' => 'todas']))
+            ->assertOk()->assertSee('Coordinación concluida y entrega documentada.');
+    }
+
     public function test_cierre_desde_estados_admitidos_y_reintento_no_duplica_eventos(): void
     {
         $actor = $this->actor('ADMINISTRADOR');

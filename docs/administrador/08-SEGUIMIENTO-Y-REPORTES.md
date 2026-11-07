@@ -8,7 +8,9 @@ Alertas ofrece Lista/Tarjetas/Tabla, bandejas por estado registrado y selector d
 
 Incidentes ofrece Cronología/Lista/Tabla, gravedad registrada y meses. La ficha amplía descripción, medida inmediata y observación. La gravedad y las medidas proceden del registro profesional; el diseño no calcula severidad clínica ni propone intervenciones. Las tarjetas combinan icono, texto y estado; colores semánticos y foco no dependen solo del color.
 
-Ambas requieren permiso específico, cuenta activa, exclusión de familiares, autorización general de lectura de residentes y Policy contextual al abrir un detalle. El rediseño no concede escritura clínica. La actualización de alertas existente requiere revisión de contexto y naturaleza de la alerta antes de exponerse como nueva acción administrativa; esa tarea queda pendiente.
+Ambas requieren permiso específico, cuenta activa, exclusión de familiares, autorización general de lectura de residentes y Policy contextual al abrir un detalle.
+
+Desde la ficha de consulta de una alerta, Administración puede abrir **Coordinación de esta alerta**. La pantalla operativa existente permite reconocer el aviso, asignar un profesional autorizado, registrar seguimiento y cerrar la coordinación según los permisos de cada acción. El historial conserva la secuencia, el autor y el resultado. El cierre administrativo se identifica expresamente como cierre de coordinación. Las intervenciones clínicas mantienen su autorización profesional.
 
 ## Reportes administrativos
 
