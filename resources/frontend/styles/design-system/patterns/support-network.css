@@ -94,3 +94,14 @@
     .rm-support-network__branch::before { top: 24px; left: -18px; right: auto; width: 18px; }
     .rm-support-network__branch::after { display: none; }
 }
+
+/* Un solo contacto: tarjeta centrada y conector directo, sin marco lateral. */
+.rm-support-network--single .rm-support-network__branches { grid-template-columns: minmax(0,1fr); max-width: 560px; margin-inline: auto; padding: 24px 0 0; gap: 0; }
+.rm-support-network--single .rm-support-network__branches::before { left: 50%; top: 0; width: 0; height: 24px; border: 0; border-left: 2px solid var(--rm-border); }
+.rm-support-network--single .rm-support-network__branch { padding-top: 0; }
+.rm-support-network--single .rm-support-network__branch::before,
+.rm-support-network--single .rm-support-network__branch::after { display: none; }
+.rm-support-network--single .rm-support-contact { padding: var(--rm-space-4); gap: var(--rm-space-3); }
+.rm-support-network--single .rm-support-contact__channels { grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); gap: var(--rm-space-2); }
+.rm-support-network--single .rm-support-contact__manage { margin-top: 0; }
+.rm-support-network--single .rm-support-network__help { max-width: 560px; margin-inline: auto; }

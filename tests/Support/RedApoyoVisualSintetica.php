@@ -10,3 +10,7 @@ foreach ([['Familiar de prueba', 'Identidad sintética', 'Hijo', 'ACTIVO', true]
         'parentesco' => $parentesco, 'responsable_principal' => $responsable, 'contacto_emergencia' => $responsable,
         'autoriza_informacion' => false, 'autoriza_salida' => false, 'estado' => $estado]);
 }
+
+\App\Models\ResidenteContacto::create(['cod_residente_contacto' => 'QA_RED_UNICO', 'cod_residente' => $residentes[2]->getKey(), 'cod_contacto' => $contacto->getKey(),
+    'parentesco' => 'Hija', 'responsable_principal' => true, 'contacto_emergencia' => true,
+    'autoriza_informacion' => true, 'autoriza_salida' => false, 'estado' => 'ACTIVO']);

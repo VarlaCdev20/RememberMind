@@ -44,6 +44,7 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
 
     const click = async selector => { await page.$eval(selector,e=>e.scrollIntoView({block:'center'})); await page.click(selector); await page.waitForNetworkIdle({idleTime:300}); };
     const first = await page.$eval('#familia-residente', e => [...e.options].find(o=>o.textContent.includes('Persona de prueba')).value);
+    const single = await page.$eval('#familia-residente', e => [...e.options].find(o=>o.textContent.includes('Verificación')).value);
     const empty = await page.$eval('#familia-residente', e => [...e.options].find(o=>o.value && !o.textContent.includes('Persona de prueba')).value);
     for(const width of [1440,1280,1024,768,390]) {
         await page.setViewport({width,height:1000});
@@ -92,6 +93,13 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
         await page.select('#familia-residente',empty);
         await page.waitForFunction(()=>document.querySelector('.rm-support-network')?.innerText.includes('Sin vínculos registrados'));
         await page.screenshot({path:path.join(output,'sin-vinculos-'+width+'.png'),fullPage:true});
+        await page.select('#familia-residente',single);
+        await page.waitForSelector('.rm-support-network--single',{visible:true});
+        assert.equal(await page.$$eval('[data-vinculo-nodo]',e=>e.length),1);
+        const singleGeometry = await page.$eval('.rm-support-network--single',e=>{const a=e.querySelector('.rm-support-network__resident').getBoundingClientRect(),b=e.querySelector('.rm-support-contact').getBoundingClientRect();return {width:b.width,offset:Math.abs((a.left+a.width/2)-(b.left+b.width/2))}});
+        assert.ok(singleGeometry.width<=561 && singleGeometry.offset<2,'Contacto único acotado y centrado');
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Contacto único sin desbordamiento');
+        await page.screenshot({path:path.join(output,'red-un-contacto-'+width+'.png'),fullPage:true});
         await click("button[wire\\:click=\"cambiarVista('personas')\"]");
         await page.waitForFunction(()=>!document.querySelector('#familia-residente'));
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Personas sin desbordamiento');

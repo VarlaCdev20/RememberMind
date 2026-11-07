@@ -1,4 +1,4 @@
-<section class="rm-support-network" aria-label="Red de apoyo del residente seleccionado">
+<section @class(['rm-support-network', 'rm-support-network--single' => $vinculos->count() === 1]) aria-label="Red de apoyo del residente seleccionado">
     <div class="rm-support-network__resident">
         <span class="rm-support-network__resident-icon" aria-hidden="true"><i class="ph-bold ph-user-circle"></i></span>
         <div><span class="rm-support-network__eyebrow">RESIDENTE</span><h2>{{ $residente->nombre_completo }}</h2><p>{{ $vinculos->count() }} {{ $vinculos->count() === 1 ? 'vínculo registrado' : 'vínculos registrados' }}</p></div>
