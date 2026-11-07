@@ -84,3 +84,11 @@ Resultado de esta entrega: suite relacionada **61 pruebas / 516 aserciones**; de
 `AlojamientoBloqueoPostgresTest` comprueba el bloqueo de una cama entre dos conexiones PostgreSQL. Está omitido por defecto; requiere `RM_POSTGRES_CONCURRENCIA=1`, conexión `pgsql` y una base ya migrada cuyo nombre termine en `_testing`. Crea únicamente habitación/cama sintéticas y las elimina al terminar. No ejecuta migraciones ni seeders. Esta prueba del bloqueo tampoco sustituye una carrera completa entre dos traslados.
 
 **Siguiente alcance:** mantenimiento completo de Habitaciones y camas, cierre de estancia y expediente administrativo se revisan por separado; sus pantallas existentes no equivalen a procesos ya certificados.
+
+## Egreso del residente
+
+Las acciones existentes de [archivo](../../app/Modulos/Residentes/Aplicacion/Acciones/AdultoMayorService.php#L340) y [cambio de estado](../../app/Modulos/Residentes/Aplicacion/Acciones/CambiarEstadoResidenteHttp.php#L15) actualizan al residente y su historial. Dejan intactas la admisión y la ocupación de cama. Si la ocupación sigue activa, la plaza continúa ocupada en el sistema.
+
+El [modelo congelado](../base-de-datos/REMEMBERMIND_BDD_BASELINE_CONGELADO.md#2-residentes-residentesestado) contempla conservar fecha y motivo en el historial de estado y finalizar la ocupación con fecha de liberación. La [admisión](../base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md#11-admisiones--transaccional) tiene estado propio y carece de un campo específico para la fecha de egreso.
+
+Propuesta pendiente de decisión institucional. Registrar el egreso definitivo como una sola operación que cierre la admisión y la ocupación, actualice el estado del residente y conserve fecha, motivo y autor en el historial existente. Falta definir si Administración confirma el egreso directamente o si Gerencia debe autorizarlo antes. El traslado interno conserva su recorrido de alojamiento.
