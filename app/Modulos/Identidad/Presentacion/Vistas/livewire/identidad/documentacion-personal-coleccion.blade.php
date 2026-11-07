@@ -1,14 +1,16 @@
-<section class="rm-card rm-staff-documents__library rm-document-library" x-data="{ modoArchivos: 'carpetas' }" aria-labelledby="archivos-personal-titulo">
+<section class="rm-card rm-staff-documents__library rm-document-library" x-data="{ modoArchivos: 'carpetas' }"
+    x-on:personal-carpeta-abierta.window="$nextTick(() => $refs.tituloExpediente?.focus())"
+    x-on:personal-carpeta-cerrada.window="$nextTick(() => { const origen = Array.from($el.querySelectorAll('[data-carpeta-usuario]')).find(el => el.dataset.carpetaUsuario === $event.detail.usuario); (origen ?? $refs.tituloExpediente)?.focus(); })" aria-labelledby="archivos-personal-titulo">
     <header class="rm-staff-documents__heading">
-        <div><h2 id="archivos-personal-titulo">Archivos del expediente</h2></div>
-        <div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span><x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
+        <div>@if($carpetaActual)<button type="button" class="rm-document-library__back" wire:click="cerrarCarpetaUsuario"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Volver a carpetas</button>@endif<h2 id="archivos-personal-titulo" x-ref="tituloExpediente" tabindex="-1">{{ $carpetaActual ? trim($carpetaActual->personal->nombres.' '.$carpetaActual->personal->apellido_paterno.' '.$carpetaActual->personal->apellido_materno) : 'Archivos del expediente' }}</h2>@if($carpetaActual)<p class="rm-help">Expediente documental del trabajador</p>@endif</div>
+        <div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span>@unless($carpetaActual)<x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
     ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'], ['value'=>'carpetas','label'=>'Carpetas','icon'=>'ph-folders']
-]" /></div>
+]" />@endunless</div>
     </header>
     <div class="rm-staff-documents__filters">
         <x-ui.field label="Buscar por documento o persona" for="documentacion-buscar"><div class="rm-staff-documents__search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="documentacion-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="Buscar documento o persona" autocomplete="off"></div></x-ui.field>
         <x-ui.field label="Estado del documento" for="documentacion-estado"><select id="documentacion-estado" class="rm-select" wire:model.live="estadoArchivo"><option value="">Estado: todos</option><option value="CARGADO">Cargado</option><option value="PENDIENTE">Pendiente de revisión</option><option value="VALIDADO">Validado</option><option value="OBSERVADO">Observado</option><option value="VENCIDO">Vencido registrado</option><option value="ANULADO">Anulado</option><option value="ANULADA">Anulada</option><option value="REEMPLAZADO">Reemplazado</option></select></x-ui.field>
-        @if($gestor)
+        @if($gestor && ! $carpetaActual)
         <x-ui.field label="Rol del personal" for="documentacion-rol"><select id="documentacion-rol" class="rm-select" wire:model.live="rolArchivo"><option value="">Rol: todos</option>@foreach($rolesArchivo as $nombreRol)<option value="{{ $nombreRol }}">{{ $nombreRol }}</option>@endforeach</select></x-ui.field>
         <x-ui.field label="Trabajador" for="documentacion-persona"><select id="documentacion-persona" class="rm-select" wire:model.live="personaArchivo"><option value="">Personal: todos</option>@foreach($personasArchivo as $personaOpcion)<option value="{{ $personaOpcion->getKey() }}">{{ trim($personaOpcion->personal->nombres.' '.$personaOpcion->personal->apellido_paterno.' '.$personaOpcion->personal->apellido_materno) }}</option>@endforeach</select></x-ui.field>
         @endif
@@ -19,7 +21,7 @@
     @if($archivos->isEmpty())
         <x-ui.empty-state :title="$hayFiltrosArchivo ? 'No hay archivos con estos filtros' : 'Todavía no hay archivos disponibles'" :description="$hayFiltrosArchivo ? 'Prueba con otra selección o limpia los filtros.' : 'Aquí aparecerán los documentos del personal que puedes consultar.'" icon="ph-folder-open" />
     @else
-    <div class="rm-staff-directory rm-document-library__table" x-show="modoArchivos === 'tabla'" x-cloak>
+    <div class="rm-staff-directory rm-document-library__table" x-show="modoArchivos === 'tabla' || $wire.carpetaUsuario !== null" x-cloak>
         <div class="rm-staff-directory__table-surface"><table class="rm-staff-directory__table rm-data-table rm-table"><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th><th scope="col">Trabajador</th><th scope="col">Estado</th><th scope="col">Fecha de carga</th><th scope="col">Acciones</th></tr></thead><tbody>
         @foreach($archivos as $documento)
         @if($permisosArchivos[$documento->getKey()]['ver'] ?? false)
@@ -44,31 +46,20 @@
         @endforeach
         </tbody></table></div>
     </div>
-    <ul class="rm-document-folders" x-show="modoArchivos === 'carpetas'" aria-label="Carpetas de documentos autorizados">
-        @foreach($archivos as $documento)
-        @if($permisosArchivos[$documento->getKey()]['ver'] ?? false)
-        @php
-    $titular = $documento->usuario->personal;
-    $imagenDocumento = in_array(mb_strtolower($documento->extension), ['jpg','jpeg','png','webp'], true);
-    $estadoVisible = ['CARGADO'=>'Cargado','PENDIENTE'=>'Pendiente de revisión','VALIDADO'=>'Validado','OBSERVADO'=>'Observado','VENCIDO'=>'Vencido registrado','ANULADO'=>'Anulado','ANULADA'=>'Anulada','REEMPLAZADO'=>'Reemplazado'][$documento->estado] ?? 'Estado por revisar';
-    $tonoDocumento = match ($documento->estado) { 'VALIDADO'=>'success', 'OBSERVADO','VENCIDO'=>'warning', 'ANULADO','ANULADA','REEMPLAZADO'=>'neutral', default=>'info' };
-    $claseDocumento = match ($documento->tipo_documento) {
-        'CI','FOTO_DOC'=>'IDENTIDAD', 'CV','EXP_LABORAL'=>'TRAYECTORIA',
-        'TITULO','MATRICULA','CERT_ESP','CAPACITACION'=>'FORMACIÓN',
-        'DOMICILIO'=>'DOMICILIO', 'ANTECEDENTES'=>'ANTECEDENTES', default=>'DOCUMENTO' };
-@endphp
-        <li class="rm-document-folder" wire:key="documento-carpeta-{{ $documento->getKey() }}" data-documento-carpeta="{{ $documento->getKey() }}">
-            <span class="rm-document-folder__tab"><i class="ph-bold ph-folder" aria-hidden="true"></i>{{ $claseDocumento }}</span>
-            <div class="rm-document-folder__body">
-                <div class="rm-document-folder__cover">@include('identidad::livewire.identidad.documentacion-personal-miniatura')<div class="rm-document-folder__identity"><span class="rm-document-folder__format">{{ mb_strtoupper($documento->extension) ?: 'ARCHIVO' }}</span><h3>{{ $documento->nombre ?: 'Documento sin nombre' }}</h3><p><i class="ph-bold ph-user" aria-hidden="true"></i>{{ trim($titular->nombres.' '.$titular->apellido_paterno.' '.$titular->apellido_materno) }}</p></div></div>
-                <span class="rm-badge rm-badge-{{ $tonoDocumento }}">{{ $estadoVisible }}</span>
-                <dl class="rm-document-folder__dates"><div><dt>Carga</dt><dd>{{ $documento->fecha_hora_carga?->format('d/m/Y H:i') ?? 'Sin fecha conservada' }}</dd></div><div><dt>Emisión</dt><dd>{{ $documento->fecha_emision?->format('d/m/Y') ?? 'No consta' }}</dd></div>@if($documento->fecha_vencimiento)<div><dt>Vencimiento</dt><dd>{{ $documento->fecha_vencimiento->format('d/m/Y') }}</dd></div>@endif</dl>
-                @include('identidad::livewire.identidad.documentacion-personal-acciones')
-            </div>
+    @unless($carpetaActual)
+    <ul class="rm-document-folders rm-document-user-folders" x-show="modoArchivos === 'carpetas'" aria-label="Expedientes documentales por trabajador">
+        @foreach($carpetasUsuarios as $personaCarpeta)
+        <li class="rm-document-folder rm-document-user-folder" wire:key="carpeta-persona-{{ $personaCarpeta->getKey() }}">
+            <span class="rm-document-folder__tab"><i class="ph-bold ph-folder-user" aria-hidden="true"></i>EXPEDIENTE PERSONAL</span>
+            <button type="button" class="rm-document-folder__body rm-document-user-folder__open" wire:click="abrirCarpetaUsuario(@js($personaCarpeta->getKey()))" wire:loading.attr="disabled" data-carpeta-usuario="{{ $personaCarpeta->getKey() }}" aria-label="Abrir expediente de {{ trim($personaCarpeta->personal->nombres.' '.$personaCarpeta->personal->apellido_paterno.' '.$personaCarpeta->personal->apellido_materno) }}">
+                <span class="rm-document-user-folder__icon" aria-hidden="true"><i class="ph-bold ph-folder-simple"></i></span>
+                <span class="rm-document-user-folder__identity"><strong>{{ trim($personaCarpeta->personal->nombres.' '.$personaCarpeta->personal->apellido_paterno.' '.$personaCarpeta->personal->apellido_materno) }}</strong><span>{{ $personaCarpeta->total_documentos }} {{ $personaCarpeta->total_documentos == 1 ? 'archivo' : 'archivos' }}{{ $hayFiltrosArchivo ? ' en esta consulta' : '' }}</span></span>
+                <span class="rm-document-user-folder__arrow" aria-hidden="true"><i class="ph-bold ph-caret-right"></i></span>
+            </button>
         </li>
-        @endif
         @endforeach
     </ul>
+    @endunless
     @endif
-    <div class="rm-document-library__footer"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /><p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
+    <div class="rm-document-library__footer">@if($carpetaActual)<x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" />@else<div x-show="modoArchivos === 'tabla'"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /></div><div x-show="modoArchivos === 'carpetas'"><x-ui.paginacion :paginator="$carpetasUsuarios" mode="livewire" label="expedientes" :show-per-page="false" :show-jump="true" /></div>@endif<p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
 </section>

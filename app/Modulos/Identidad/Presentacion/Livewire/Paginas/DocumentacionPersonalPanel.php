@@ -28,6 +28,8 @@ class DocumentacionPersonalPanel extends Component
     #[Url(except: 'archivos')]
     public string $vista = 'archivos';
 
+    #[Locked] public ?string $carpetaUsuario = null;
+
     public string $estadoArchivo = '';
 
     public string $personaArchivo = '';
@@ -87,36 +89,43 @@ class DocumentacionPersonalPanel extends Component
     {
         $this->resetPage();
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function updatedEstadoArchivo(): void
     {
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function updatedPersonaArchivo(): void
     {
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function updatedRolArchivo(): void
     {
         $this->personaArchivo = '';
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function updatedFormatoArchivo(): void
     {
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function cambiarVista(string $vista): void
     {
         abort_unless(in_array($vista, ['archivos', 'solicitudes'], true), 422);
         $this->vista = $vista;
+        $this->carpetaUsuario = null;
         $this->busqueda = '';
         $this->resetPage();
         $this->resetPage('archivosPage');
+        $this->resetPage('carpetasPage');
     }
 
     public function limpiarFiltros(): void
@@ -125,9 +134,31 @@ class DocumentacionPersonalPanel extends Component
         $this->updatedBusqueda();
     }
 
+    public function abrirCarpetaUsuario(string $codigo): void
+    {
+        abort_unless(app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user())->where('cod_usuario', $codigo)->exists(), 404);
+        $this->carpetaUsuario = $codigo;
+        $this->documentoSeleccionado = null;
+        $this->vistaPreviaAbierta = false;
+        $this->resetPage('archivosPage');
+        $this->dispatch('personal-carpeta-abierta');
+    }
+
+    public function cerrarCarpetaUsuario(): void
+    {
+        app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user());
+        $codigo = $this->carpetaUsuario;
+        $this->carpetaUsuario = null;
+        $this->documentoSeleccionado = null;
+        $this->vistaPreviaAbierta = false;
+        $this->resetPage('archivosPage');
+        $this->dispatch('personal-carpeta-cerrada', usuario: $codigo);
+    }
+
     public function verArchivo(string $codigo): void
     {
-        $documento = app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user())->findOrFail($codigo);
+        $documento = app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user())
+            ->when($this->carpetaUsuario, fn ($q) => $q->where('cod_usuario', $this->carpetaUsuario))->findOrFail($codigo);
         abort_unless(app(DocumentoLaboralPolicy::class)->view(auth()->user(), $documento), 403);
         $this->documentoSeleccionado = $documento->getKey();
         $this->vistaPreviaAbierta = true;
@@ -256,7 +287,7 @@ class DocumentacionPersonalPanel extends Component
             }
         }
         $hayFiltrosArchivo = trim($this->busqueda) !== '' || $this->estadoArchivo !== '' || $this->personaArchivo !== '' || $this->rolArchivo !== '' || $this->formatoArchivo !== '';
-        $archivos = $this->vista === 'archivos' ? $lectura->archivos($actor)
+        $consultaArchivos = $this->vista === 'archivos' ? $lectura->archivos($actor)
             ->when($this->estadoArchivo !== '', fn ($q) => $q->where('estado', $this->estadoArchivo))
             ->when($this->personaArchivo !== '', fn ($q) => $q->where('cod_usuario', $this->personaArchivo))
             ->when($this->rolArchivo !== '', fn ($q) => $q->whereHas('usuario.roles', fn ($r) => $r->where('name', $this->rolArchivo)))
@@ -282,7 +313,24 @@ class DocumentacionPersonalPanel extends Component
                     $q->where(fn ($f) => $f->whereLike('nombre', '%'.$palabra.'%')
                         ->orWhereHas('usuario.personal', fn ($p) => $p->whereLike('nombres', '%'.$palabra.'%')->orWhereLike('apellido_paterno', '%'.$palabra.'%')->orWhereLike('apellido_materno', '%'.$palabra.'%')));
                 }
-            })->paginate(12, pageName: 'archivosPage') : null;
+            }) : null;
+        $carpetaActual = null;
+        if ($this->vista === 'archivos' && $this->carpetaUsuario) {
+            abort_unless($lectura->archivos($actor)->where('cod_usuario', $this->carpetaUsuario)->exists(), 404);
+            $carpetaActual = \App\Models\User::with('personal')->findOrFail($this->carpetaUsuario);
+        }
+        $carpetasUsuarios = null;
+        if ($consultaArchivos && ! $carpetaActual) {
+            $totales = (clone $consultaArchivos)->reorder()->select('cod_usuario')
+                ->selectRaw('COUNT(*) as total_documentos')->groupBy('cod_usuario');
+            $carpetasUsuarios = \App\Models\User::query()->joinSub($totales, 'archivos_autorizados', 'usuarios.cod_usuario', '=', 'archivos_autorizados.cod_usuario')
+                ->join('personal as titular_carpeta', 'titular_carpeta.cod_usuario', '=', 'usuarios.cod_usuario')
+                ->select('usuarios.*', 'archivos_autorizados.total_documentos')->with('personal')
+                ->orderBy('titular_carpeta.apellido_paterno')->orderBy('titular_carpeta.nombres')->orderBy('usuarios.cod_usuario')
+                ->paginate(12, pageName: 'carpetasPage');
+        }
+        $archivos = $consultaArchivos ? $consultaArchivos->when($this->carpetaUsuario, fn ($q) => $q->where('cod_usuario', $this->carpetaUsuario))
+            ->paginate(12, pageName: 'archivosPage') : null;
         $permisosArchivos = $archivos ? app(DocumentoLaboralPolicy::class)->permisosDocumentos($actor, $archivos->getCollection()) : [];
         $documentoVisible = $this->vistaPreviaAbierta ? $lectura->archivos($actor)->findOrFail($this->documentoSeleccionado) : null;
         $archivoDisponible = false;
@@ -310,7 +358,7 @@ class DocumentacionPersonalPanel extends Component
             $tipos = DocumentosPersonalInstitucional::paraRol($this->rol);
         }
 
-        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales', 'archivos', 'permisosArchivos', 'documentoVisible', 'archivoDisponible', 'personasArchivo', 'rolesArchivo', 'hayFiltrosArchivo'))
+        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales', 'archivos', 'permisosArchivos', 'documentoVisible', 'archivoDisponible', 'personasArchivo', 'rolesArchivo', 'hayFiltrosArchivo', 'carpetasUsuarios', 'carpetaActual'))
             ->layout('layouts.sistema');
     }
 }

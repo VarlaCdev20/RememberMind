@@ -176,4 +176,43 @@ class DocumentacionPersonalArchivosTest extends TestCase
             $this->assertTrue($documento->usuario->relationLoaded('personal'));
         }
     }
+    public function test_carpeta_agrupa_todos_los_documentos_de_la_persona_y_pagina_el_expediente(): void
+    {
+        foreach (range(1,13) as $n) $this->documento($this->titular, 'Archivo '.$n);
+        $otro = $this->persona('PSICOLOGO/A','Otra','Persona'); $ajeno = $this->documento($otro,'Documento de otra persona');
+        $panel = Livewire::test(DocumentacionPersonalPanel::class)
+            ->assertViewHas('carpetasUsuarios',fn ($p)=>$p->total()===2 && (int)$p->firstWhere('cod_usuario',$this->titular->getKey())->total_documentos===13)
+            ->call('abrirCarpetaUsuario',$this->titular->getKey())->assertSet('carpetaUsuario',$this->titular->getKey())
+            ->assertViewHas('archivos',fn ($p)=>$p->total()===13 && $p->count()===12 && $p->every(fn ($d)=>$d->cod_usuario===$this->titular->getKey()))
+            ->assertSee('Volver a carpetas')->assertDontSee('Documento de otra persona')
+            ->call('gotoPage',2,'archivosPage')->assertViewHas('archivos',fn ($p)=>$p->count()===1)
+            ->call('cerrarCarpetaUsuario')->assertSet('carpetaUsuario',null)->assertDispatched('personal-carpeta-cerrada');
+        $this->assertDatabaseCount('documentos',14);
+        Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario',$this->titular->getKey())
+            ->call('verArchivo',$ajeno->getKey())->assertNotFound();
+    }
+
+    public function test_carpeta_de_otro_trabajador_y_permiso_revocado_no_se_pueden_consultar(): void
+    {
+        $this->documento($this->titular); $otro = $this->persona('ENFERMEROS','Otro','Trabajador'); $this->documento($otro);
+        $this->actingAs($this->titular);
+        Livewire::test(DocumentacionPersonalPanel::class)->assertViewHas('carpetasUsuarios',fn ($p)=>$p->total()===1)
+            ->call('abrirCarpetaUsuario',$otro->getKey())->assertNotFound();
+        $this->actingAs($this->gerente);
+        $panel = Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario',$this->titular->getKey());
+        $this->gerente->forceFill(['estado'=>'SUSPENDIDO'])->save();
+        $panel->call('abrirCarpetaUsuario',$otro->getKey())->assertForbidden();
+        $this->assertDatabaseCount('documentos',2);
+    }
+
+    public function test_filtro_de_documentos_se_aplica_al_conteo_y_contenido_de_las_carpetas(): void
+    {
+        $this->documento($this->titular,'Certificado aprobado','VALIDADO'); $this->documento($this->titular,'Documento cargado');
+        $otro = $this->persona('ENFERMEROS','Otro','Trabajador'); $this->documento($otro);
+        Livewire::test(DocumentacionPersonalPanel::class)->set('estadoArchivo','VALIDADO')
+            ->assertViewHas('carpetasUsuarios',fn ($p)=>$p->total()===1 && (int)$p->first()->total_documentos===1)
+            ->call('abrirCarpetaUsuario',$this->titular->getKey())->assertViewHas('archivos',fn ($p)=>$p->total()===1)
+            ->assertSee('Certificado aprobado')->assertDontSee('Documento cargado');
+    }
+
 }

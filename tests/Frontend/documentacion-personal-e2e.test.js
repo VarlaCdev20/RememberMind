@@ -41,7 +41,9 @@ test('documentación del personal: biblioteca, filtros y vista previa responsive
     t.after(async () => { await writeFile(path.join(output, 'browser-errors.json'), JSON.stringify(errors)); });
     const response = await page.goto(base + '/admin/personal-documentacion', { waitUntil: 'networkidle0' });
     assert.equal(response.status(), 200);
-    assert.equal(await page.$eval('.rm-document-folders', el => el.children.length), 3);
+    await page.click('.rm-document-library .rm-view-toggle button:first-child');
+    await page.waitForSelector('.rm-document-library__table',{visible:true});
+    assert.equal(await page.$$eval('[data-documento-fila]', el => el.length), 3);
     const personas = await page.$$eval('#documentacion-persona option', options => options.map(o => ({ value: o.value, text: o.textContent })));
     const personaDos = personas.find(o => o.text.includes('Profesional de prueba 2'));
     assert.ok(personaDos);
@@ -59,7 +61,7 @@ test('documentación del personal: biblioteca, filtros y vista previa responsive
         if (width === 390) assert.equal(filtros.rows, 3, 'Búsqueda y dos filas compactas en móvil');
         assert.ok(filtros.fields.every(f => f.width >= 120 && f.height >= 44), `Campos legibles y táctiles: ${width} ${JSON.stringify(filtros)}`);
         await page.screenshot({ path: path.join(output, `biblioteca-${width}.png`), fullPage: true });
-        await click('.rm-document-folders .rm-document-actions button');
+        await click('.rm-document-library__table .rm-document-actions button');
         await page.waitForSelector('#personal-documento-vista-previa [role="dialog"]', { visible: true });
         await page.waitForFunction(() => !!document.activeElement?.closest('#personal-documento-vista-previa'));
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
@@ -73,19 +75,19 @@ test('documentación del personal: biblioteca, filtros y vista previa responsive
         matrix.push({ width, overflow, preview: true, keyboard: true });
     }
     await page.type('#documentacion-buscar', 'Profesional de prueba 2');
-    await page.waitForFunction(() => document.querySelectorAll('.rm-document-folder').length === 1);
-    assert.match(await page.$eval('.rm-document-folder', el => el.innerText), /Certificado de formación/);
+    await page.waitForFunction(() => document.querySelectorAll('.rm-document-library__table [data-documento-fila]').length === 1);
+    assert.match(await page.$eval('.rm-document-library__table [data-documento-fila]', el => el.innerText), /Certificado de formación/);
     await page.select('#documentacion-estado', 'OBSERVADO');
     await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('No hay archivos con estos filtros'));
     await click('button[wire\\:click="limpiarFiltros"]');
-    await page.waitForFunction(() => document.querySelectorAll('.rm-document-folder').length === 3);
+    await page.waitForFunction(() => document.querySelectorAll('.rm-document-library__table [data-documento-fila]').length === 3);
     await page.select('#documentacion-persona', personaDos.value);
-    await page.waitForFunction(() => document.querySelectorAll('.rm-document-folder').length === 1);
-    assert.match(await page.$eval('.rm-document-folder', el => el.innerText), /Certificado de formación/);
+    await page.waitForFunction(() => document.querySelectorAll('.rm-document-library__table [data-documento-fila]').length === 1);
+    assert.match(await page.$eval('.rm-document-library__table [data-documento-fila]', el => el.innerText), /Certificado de formación/);
     await page.select('#documentacion-formato', 'IMAGEN');
     await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('No hay archivos con estos filtros'));
     await click('button[wire\\:click="limpiarFiltros"]');
-    await page.waitForFunction(() => document.querySelectorAll('.rm-document-folder').length === 3);
+    await page.waitForFunction(() => document.querySelectorAll('.rm-document-library__table [data-documento-fila]').length === 3);
     assert.equal(await page.$eval('#documentacion-persona', el => el.value), '');
     assert.equal(await page.$eval('#documentacion-formato', el => el.value), '');
     await click('button[wire\\:click="cambiarVista(\'solicitudes\')"]');

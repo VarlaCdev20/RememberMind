@@ -79,3 +79,17 @@
 .rm-document-folder .rm-document-actions a { min-width: 44px; width: 44px; padding: 0; }
 .rm-document-folder .rm-document-actions a > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @container document-library (max-width: 520px) { .rm-document-folders { grid-template-columns: minmax(0, 1fr); } }
+/* Carpetas anchas por persona; el contenido se consulta dentro del expediente. */
+.rm-document-user-folders { grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 24px 20px; }
+.rm-document-user-folder .rm-document-folder__tab { min-width: 170px; }
+.rm-document-user-folder__open { width: 100%; min-height: 116px; display: flex; flex-direction: row; align-items: center; gap: 16px; padding: 20px 18px; font-family: var(--rm-font-body); text-align: start; color: var(--rm-text-primary); cursor: pointer; }
+.rm-document-user-folder__open:hover { border-color: var(--rm-primary-ink); }
+.rm-document-user-folder__open:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
+.rm-document-user-folder__icon { width: 48px; height: 58px; flex: 0 0 48px; display: grid; place-items: center; border-radius: 8px; background: var(--rm-surface-raised); color: var(--rm-text-secondary); border: 1px solid var(--rm-border-soft); }
+.rm-document-user-folder__icon > i { font-size: 32px; }
+.rm-document-user-folder__identity { display: grid; gap: 8px; min-width: 0; flex: 1; }
+.rm-document-user-folder__identity strong { font: 800 16px/1.4 var(--rm-font-body); overflow-wrap: anywhere; }
+.rm-document-user-folder__identity > span { font-size: 13px; color: var(--rm-text-secondary); }
+.rm-document-user-folder__arrow { display: grid; place-items: center; width: 24px; flex: 0 0 24px; color: var(--rm-text-secondary); }
+.rm-document-library__back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 6px; font: 700 13px/1.4 var(--rm-font-body); color: var(--rm-primary-ink); }
+@container document-library (max-width: 520px) { .rm-document-user-folders { grid-template-columns: minmax(0, 1fr); } .rm-document-user-folder__open { gap: 12px; padding: 18px 14px; } }
