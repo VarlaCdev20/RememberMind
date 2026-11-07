@@ -109,10 +109,17 @@ class RoleDashboardDataTest extends TestCase
         $this->assertSame([], $panels['Documentos compartidos']['items']);
 
         $this->actingAs($familiar)->get('/dashboard')->assertOk()->assertSee('Consultar avisos y alertas pendientes');
-        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 1)
+        $campana = Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 1)
             ->assertSee('Rosa Autorizada')->assertDontSee('Eva Reservada')->assertDontSee('Ver todas las alertas');
+        DB::table('visitas')->where('cod_visita', 'VIS_FAM_1')->update(['fecha_hora_programada' => now()->addDays(2)]);
+        DB::table('visitas')->where('cod_visita', 'VIS_FAM_3')->update(['fecha_hora_programada' => now()->addDays(3)]);
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 1)->assertDispatched('avisos-retirados')
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['titulo'] === 'Visita autorizada'
+                && $params[0]['mensaje'] === now()->addDays(2)->format('d/m/Y · H:i'))
+            ->assertNotDispatched('alerta-nueva', fn ($name, $params) => $params[0]['mensaje'] === now()->addDays(3)->format('d/m/Y · H:i'));
         DB::table('residentes_contactos')->where('cod_residente_contacto', 'RCO_FAM_1')->update(['autoriza_informacion' => false]);
-        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0)->assertDontSee('Rosa Autorizada');
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 0)->assertDontSee('Rosa Autorizada')
+            ->assertDispatched('avisos-retirados')->assertNotDispatched('alerta-nueva');
     }
 
     public function test_especialista_sin_personal_activo_no_consulta_registros_globales(): void

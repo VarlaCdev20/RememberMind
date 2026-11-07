@@ -89,6 +89,19 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         }
     }
 
+    public function test_campana_gerencia_anuncia_un_nuevo_pendiente_documental_una_vez(): void
+    {
+        $campana = Livewire::test(CampanaNotificaciones::class)->assertNotDispatched('alerta-nueva');
+        $this->emitir();
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 0)->assertNotDispatched('alerta-nueva');
+        $this->travelTo(Carbon::parse('2026-10-31 10:00:00'));
+
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 1)
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['categoria'] === 'Documentación'
+                && $params[0]['titulo'] === 'Constancia de prueba' && $params[0]['url'] === route('admin.personal.documentacion', ['vista' => 'solicitudes']));
+        $campana->call('verificarAlertas')->assertNotDispatched('alerta-nueva');
+    }
+
     public function test_no_emite_para_rol_ajeno_o_minimo_inmediato_postergado(): void
     {
         try {

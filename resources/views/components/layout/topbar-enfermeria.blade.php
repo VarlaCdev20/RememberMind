@@ -45,9 +45,7 @@
 
         {{-- Campana de Notificaciones / Alertas --}}
         @auth
-            @if(app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.enfermeria.alertas'))
             <livewire:alertas.campana-notificaciones />
-            @endif
         @endauth
 
         <x-layout.topbar-settings />

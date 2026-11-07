@@ -376,15 +376,17 @@ class AlertasFlujoTest extends TestCase
             ->set('filtroEstado', 'CERRADA')->assertViewHas('prioritarias', fn ($items) => $items->contains('cod_alerta', $critica->cod_alerta));
     }
 
-    public function test_primera_novedad_desde_lista_vacia_y_varias_alertas_se_anuncian_agrupadas(): void
+    public function test_primera_novedad_desde_lista_vacia_y_varias_alertas_conservan_sus_accesos(): void
     {
         [, $residente] = $this->preparar(['alertas.ver']);
         $campana = Livewire::test(CampanaNotificaciones::class)->assertNotDispatched('alerta-nueva');
         foreach (['BAJO', 'CRITICO'] as $nivel) {
             Alerta::create(['cod_residente' => $residente->cod_residente, 'modulo' => 'MANUAL', 'tipo' => 'Revisión sintética', 'descripcion' => 'Aviso de prueba', 'estado' => 'ABIERTA', 'prioridad' => $nivel, 'fecha_hora' => now()]);
         }
-        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 2)->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'CRITICO' && str_contains($params[0]['titulo'], '2 aviso'));
-        $campana->call('verificarAlertas')->assertCount('alertaIdsConocidos', 2)->assertNotDispatched('alerta-nueva');
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 2)
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'CRITICO' && str_contains($params[0]['url'], 'alerta='))
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'BAJO' && str_contains($params[0]['url'], 'alerta='));
+        $campana->call('verificarAlertas')->assertNotDispatched('alerta-nueva');
     }
 
     public function test_campana_no_expone_residentes_a_familiar_con_permiso_generico(): void

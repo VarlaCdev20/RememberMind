@@ -276,9 +276,10 @@ class AgendaMedicacionTest extends TestCase
         $this->asignarResidente($this->entrarComoEnfermero());
         $campana = Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0);
         Carbon::setTestNow('2026-09-10 07:30:00');
-        $campana->call('verificarAlertas')->assertDispatched('alerta-nueva', fn ($name, $params) => str_contains($params[0]['mensaje'], 'PROXIMA'));
+        $campana->call('verificarAlertas')->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'PROXIMA');
         Carbon::setTestNow('2026-09-10 08:01:00');
-        $campana->call('verificarAlertas')->assertDispatched('alerta-nueva', fn ($name, $params) => str_contains($params[0]['mensaje'], 'VENCIDA'));
+        $campana->call('verificarAlertas')->assertDispatched('avisos-retirados')
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['nivel'] === 'VENCIDA');
         $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 

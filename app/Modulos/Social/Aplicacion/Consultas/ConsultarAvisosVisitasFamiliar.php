@@ -27,6 +27,6 @@ final class ConsultarAvisosVisitasFamiliar
                 ->whereColumn('rc.cod_contacto', 'v.cod_contacto')->whereColumn('rc.cod_residente', 'v.cod_residente')
                 ->where('rc.estado', 'ACTIVO')->where('rc.autoriza_informacion', true))
             ->orderBy('v.fecha_hora_programada')->orderBy('v.cod_visita')
-            ->get(['r.nombres', 'r.apellido_paterno', 'v.fecha_hora_programada', 'v.estado']);
+            ->get(['r.nombres', 'r.apellido_paterno', 'v.cod_visita', 'v.fecha_hora_programada', 'v.estado']);
     }
 }

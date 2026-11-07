@@ -54,10 +54,16 @@ class HistorialCorreoDocumentalTest extends TestCase
         $recuperado = $this->registrar('FALLIDO');
         $this->registrar('ACEPTADO', solicitud: $recuperado);
         $this->registrar('FALLIDO');
-        $this->registrar('FALLIDO', actor: User::factory()->create());
 
-        Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones::class)
+        $campana = Livewire::test(\App\Modulos\Alertas\Presentacion\Livewire\Funcionalidades\CampanaNotificaciones::class)
             ->assertSet('conteoAbiertas', 1)->assertSee('Envíos documentales fallidos')->assertSee('1 en tu historial');
+        $this->registrar('FALLIDO', actor: User::factory()->create());
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 1)->assertNotDispatched('alerta-nueva');
+        $nuevo = $this->registrar('FALLIDO');
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 2)
+            ->assertDispatched('alerta-nueva', fn ($name, $params) => $params[0]['url'] === route('admin.usuarios.correos.index'));
+        $this->registrar('ACEPTADO', solicitud: $nuevo);
+        $campana->call('verificarAlertas')->assertSet('conteoAbiertas', 1)->assertDispatched('avisos-retirados');
         Queue::assertNothingPushed();
     }
 
