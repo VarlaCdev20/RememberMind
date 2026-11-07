@@ -136,4 +136,24 @@ class AsignacionesJornadaPlanificadaTest extends TestCase
             $this->assertSame(1, Activity::where('log_name', 'asignaciones_jornada')->count());
         }
     }
+
+    public function test_hoy_no_crea_jornada_ni_asigna_a_profesional_sin_cobertura(): void
+    {
+        $entrada = array_replace($this->entrada(), ['fechaInicio' => today()->toDateString()]);
+        $this->actingAs($this->actor);
+        $panel = Livewire::test(AsignacionTurnoPanel::class)->call('abrirCrear');
+        foreach ($entrada as $key => $value) {
+            $panel->set($key, $value);
+        }
+        $panel->call('guardar')->assertHasErrors('fechaInicio');
+        $this->assertDatabaseCount('jornadas', 1);
+
+        $this->jornada->update(['fecha_jornada' => today()]);
+        AsignacionPersonal::whereKey('ASP_PLAN')->update(['estado' => 'INACTIVA']);
+        $panel->call('guardar')->assertHasErrors('codEnfermero');
+
+        $this->jornada->update(['estado' => 'CERRADA']);
+        $panel->call('guardar')->assertHasErrors('fechaInicio');
+        $this->assertDatabaseCount('asignaciones_residente_jornada', 0);
+    }
 }

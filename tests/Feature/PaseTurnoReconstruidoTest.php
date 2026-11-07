@@ -12,6 +12,7 @@ use App\Models\Residente;
 use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Cuidados\Aplicacion\Acciones\PaseTurnoService;
+use App\Modulos\Institucion\Aplicacion\Acciones\GestionarAsignacionesJornada;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -898,6 +899,22 @@ class PaseTurnoReconstruidoTest extends TestCase
 
     public function test_livewire_panel_flujo_completo(): void
     {
+        $administrador = User::factory()->create(['estado' => 'ACTIVO']);
+        $administrador->assignRole(Role::findOrCreate('ADMINISTRADOR', 'web'));
+        $administrador->givePermissionTo(Permission::findOrCreate('turnos.asignar', 'web'));
+        $this->jornadaEntrante->update(['estado' => 'ABIERTA']);
+        AsignacionPersonal::whereKey('ASP_ENT_001')->update(['estado' => 'ACTIVA']);
+        AsignacionResidenteJornada::query()->where('cod_jornada', $this->jornadaEntrante->getKey())
+            ->where('cod_residente', $this->residente1->getKey())->delete();
+        app(GestionarAsignacionesJornada::class)->guardar($administrador, [
+            'codResidente' => $this->residente1->getKey(),
+            'codTurno' => $this->turnoTarde->getKey(),
+            'codEnfermero' => $this->userEntrante1->getKey(),
+            'fechaInicio' => $this->jornadaEntrante->fecha_jornada->toDateString(),
+            'nivelSupervision' => 'ESTANDAR',
+            'motivoAsignacion' => 'Continuidad del cuidado en el turno entrante.',
+        ]);
+
         // Actuamos como Rosa (Saliente)
         $this->actingAs($this->userSaliente);
 
@@ -918,6 +935,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->assertSet('modalPreparar', true)
             ->assertSet('codResidenteSeleccionado', $this->residente1->cod_residente)
             ->set('resumenTurno', 'Paciente tranquilo, medicación completada')
+            ->set('pendientesTurno', 'Revisar el registro de hidratación en el turno entrante.')
             ->set('estadoGeneral', 'Estable')
             ->call('confirmarEntrega')
             ->assertHasNoErrors()
@@ -942,6 +960,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->assertSee('Rosa Mamani')
             ->call('abrirRevisarPase', $pase->cod_pase)
             ->assertSet('modalRevisar', true)
+            ->assertSee('Revisar el registro de hidratación en el turno entrante.')
             ->set('observacionRecepcion', 'Recibido en buen estado general')
             ->call('confirmarRecepcion')
             ->assertHasNoErrors()

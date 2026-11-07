@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Area;
+use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Jornada;
 use App\Models\Personal;
@@ -97,6 +99,11 @@ class EnfermeriaV2Test extends TestCase
     {
         [$enfermera, , $turno] = $this->escenarioAsignado();
         $admin = User::query()->where('correo', 'administracion@remembermind.com')->firstOrFail();
+        $area = Area::create(['nombre' => 'Área de prueba para el relevo', 'estado' => 'ACTIVA']);
+        AsignacionPersonal::create([
+            'cod_jornada' => 'JOR_ENF_TEST', 'cod_personal' => $enfermera->personal->getKey(),
+            'cod_area' => $area->getKey(), 'estado' => 'ACTIVA',
+        ]);
         $residente = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_ASIGNACION_PANEL',
             'nombres' => 'Julia',
@@ -125,6 +132,8 @@ class EnfermeriaV2Test extends TestCase
             'estado' => 'ACTIVA',
         ]);
         $this->assertSame($ocupacionesAntes, $residente->fresh()->ocupacionesCama()->count());
+        $this->actingAs($enfermera)->get(route('admin.enfermeria.pacientes'))
+            ->assertOk()->assertSee('Julia Flores');
     }
 
     private function escenarioAsignado(): array

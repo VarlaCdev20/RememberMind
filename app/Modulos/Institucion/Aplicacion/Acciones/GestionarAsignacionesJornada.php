@@ -10,7 +10,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -30,14 +29,9 @@ final class GestionarAsignacionesJornada
         ])->validate();
 
         DB::transaction(function () use ($entrada, $usuario): void {
-            $personal = Personal::query()->where('cod_usuario', $entrada['codEnfermero'])->lockForUpdate()->firstOrFail();
-            $futura = Carbon::parse($entrada['fechaInicio'])->startOfDay()->gt(today());
-            $jornada = $futura ? $this->jornadaPlanificada($entrada, $personal) : Jornada::query()->firstOrCreate(
-                ['cod_turno' => $entrada['codTurno'], 'fecha_jornada' => $entrada['fechaInicio']],
-                ['cod_jornada' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('jornadas'), 'estado' => 'ABIERTA']
-            );
-
-            $jornada = Jornada::query()->lockForUpdate()->findOrFail($jornada->cod_jornada);
+            $personal = Personal::query()->where('cod_usuario', $entrada['codEnfermero'])->lockForUpdate()->first();
+            $fecha = Carbon::parse($entrada['fechaInicio'])->startOfDay();
+            $jornada = $this->jornadaParaAsignar($entrada, $personal, $fecha);
             if (AsignacionResidenteJornada::query()
                 ->where('cod_residente', $entrada['codResidente'])
                 ->where('cod_jornada', $jornada->cod_jornada)
@@ -57,23 +51,23 @@ final class GestionarAsignacionesJornada
             ]);
 
             activity('asignaciones_jornada')->causedBy($usuario)->performedOn($asignacion)
-                ->withProperties(['cod_jornada' => $jornada->cod_jornada, 'planificada' => $futura])
+                ->withProperties(['cod_jornada' => $jornada->cod_jornada, 'planificada' => $fecha->gt(today())])
                 ->log('Residente asignado a jornada');
         });
 
     }
 
-    private function jornadaPlanificada(array $entrada, Personal $personal): Jornada
+    private function jornadaParaAsignar(array $entrada, ?Personal $personal, Carbon $fecha): Jornada
     {
-        $enfermero = $personal->usuario;
-        if ($personal->estado !== 'ACTIVO' || $enfermero?->estado !== 'ACTIVO' || ! $enfermero->hasRole('ENFERMEROS')) {
-            throw ValidationException::withMessages(['codEnfermero' => 'La planificación requiere una cuenta y un perfil de Enfermería activos.']);
+        $enfermero = $personal?->usuario;
+        if ($personal?->estado !== 'ACTIVO' || $enfermero?->estado !== 'ACTIVO' || ! $enfermero->hasRole('ENFERMEROS')) {
+            throw ValidationException::withMessages(['codEnfermero' => 'Seleccione un profesional de Enfermería con cuenta y perfil activos.']);
         }
 
         $jornada = Jornada::query()->where('cod_turno', $entrada['codTurno'])
-            ->whereDate('fecha_jornada', $entrada['fechaInicio'])->lockForUpdate()->first();
+            ->whereDate('fecha_jornada', $fecha->toDateString())->lockForUpdate()->first();
         if (! $jornada || ! in_array($jornada->estado, ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'], true)) {
-            throw ValidationException::withMessages(['fechaInicio' => 'Seleccione una jornada futura existente y abierta a planificación.']);
+            throw ValidationException::withMessages(['fechaInicio' => 'Seleccione una jornada existente que admita asignaciones.']);
         }
         if (! $personal->asignaciones()->where('cod_jornada', $jornada->cod_jornada)->whereIn('estado', ['ACTIVA', 'ACTIVO'])
             ->whereHas('area', fn ($query) => $query->whereIn('estado', ['ACTIVA', 'ACTIVO']))->lockForUpdate()->first()) {
