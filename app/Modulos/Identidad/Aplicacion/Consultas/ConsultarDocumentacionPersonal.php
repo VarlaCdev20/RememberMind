@@ -43,6 +43,33 @@ final class ConsultarDocumentacionPersonal
             && $actor->hasAnyRole(['GERENTE', 'SUPERADMINISTRADOR']) && $actor->can('personal_institucional.ver');
     }
 
+    /** Solicitudes consultables desde el mismo alcance de titulares de la biblioteca. */
+    public function solicitudesEnCarpetas(User $actor): Builder
+    {
+        $consulta = $this->consulta($actor);
+
+        return $consulta->whereHas('personal.usuario', function (Builder $u) use ($actor): void {
+            $u->where('cod_usuario', $actor->getKey());
+            if ($this->esGestor($actor)) {
+                $u->orWhere(function (Builder $equipo) use ($actor): void {
+                    if (! $actor->hasRole('SUPERADMINISTRADOR')) {
+                        $equipo->whereHas('roles')->whereDoesntHave('roles', fn ($r) => $r->whereNotIn('name', AutorizarGestionPersonal::ROLES_TRABAJADOR));
+                    } else {
+                        $equipo->whereNotNull('cod_usuario');
+                    }
+                });
+            }
+        });
+    }
+
+    public function exigirCarpeta(User $actor, string $codigo): void
+    {
+        $hayArchivos = $this->archivos($actor)->where('cod_usuario', $codigo)->exists();
+        $haySolicitudes = ! $hayArchivos && app(CapacidadDocumentalPersonal::class)->disponible()
+            && $this->solicitudesEnCarpetas($actor)->whereHas('personal', fn ($p) => $p->where('cod_usuario', $codigo))->exists();
+        abort_unless($hayArchivos || $haySolicitudes, 404);
+    }
+
     public function consulta(User $actor): Builder
     {
         app(CapacidadDocumentalPersonal::class)->exigir();

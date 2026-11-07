@@ -136,11 +136,12 @@ class DocumentacionPersonalPanel extends Component
 
     public function abrirCarpetaUsuario(string $codigo): void
     {
-        abort_unless(app(ConsultarDocumentacionPersonal::class)->archivos(auth()->user())->where('cod_usuario', $codigo)->exists(), 404);
+        app(ConsultarDocumentacionPersonal::class)->exigirCarpeta(auth()->user(), $codigo);
         $this->carpetaUsuario = $codigo;
         $this->documentoSeleccionado = null;
         $this->vistaPreviaAbierta = false;
         $this->resetPage('archivosPage');
+        $this->resetPage('pendientesPage');
         $this->dispatch('personal-carpeta-abierta');
     }
 
@@ -226,6 +227,17 @@ class DocumentacionPersonalPanel extends Component
         $this->resetValidation();
     }
 
+    public function verPendienteCarpeta(string $codigo): void
+    {
+        abort_unless($this->carpetaUsuario, 404);
+        $lectura = app(ConsultarDocumentacionPersonal::class);
+        $lectura->exigirCarpeta(auth()->user(), $this->carpetaUsuario);
+        $lectura->solicitudesEnCarpetas(auth()->user())
+            ->whereHas('personal', fn ($p) => $p->where('cod_usuario', $this->carpetaUsuario))->findOrFail($codigo);
+        $this->verDetalle($codigo);
+        $this->vista = 'archivos';
+    }
+
     public function guardarEntrega(): void
     {
         $this->consulta()->findOrFail($this->destinatarioSeleccionado);
@@ -277,7 +289,12 @@ class DocumentacionPersonalPanel extends Component
         $rolesArchivo = collect();
         if ($this->vista === 'archivos') {
             $personasArchivo = \App\Models\User::query()
-                ->whereIn('cod_usuario', $lectura->archivos($actor)->reorder()->select('cod_usuario'))
+                ->where(function ($u) use ($lectura, $actor, $disponible): void {
+                    $u->whereIn('cod_usuario', $lectura->archivos($actor)->reorder()->select('cod_usuario'));
+                    if ($disponible) {
+                        $u->orWhereHas('personal', fn ($p) => $p->whereIn('cod_personal', $lectura->solicitudesEnCarpetas($actor)->reorder()->select('cod_personal')));
+                    }
+                })
                 ->with(['personal', 'roles'])->get()
                 ->sortBy(fn ($u) => trim($u->personal->nombres.' '.$u->personal->apellido_paterno));
             $rolesArchivo = $personasArchivo->flatMap(fn ($u) => $u->roles->pluck('name'))->unique()->sort()->values();
@@ -316,18 +333,48 @@ class DocumentacionPersonalPanel extends Component
             }) : null;
         $carpetaActual = null;
         if ($this->vista === 'archivos' && $this->carpetaUsuario) {
-            abort_unless($lectura->archivos($actor)->where('cod_usuario', $this->carpetaUsuario)->exists(), 404);
+            $lectura->exigirCarpeta($actor, $this->carpetaUsuario);
             $carpetaActual = \App\Models\User::with('personal')->findOrFail($this->carpetaUsuario);
         }
         $carpetasUsuarios = null;
         if ($consultaArchivos && ! $carpetaActual) {
             $totales = (clone $consultaArchivos)->reorder()->select('cod_usuario')
                 ->selectRaw('COUNT(*) as total_documentos')->groupBy('cod_usuario');
-            $carpetasUsuarios = \App\Models\User::query()->joinSub($totales, 'archivos_autorizados', 'usuarios.cod_usuario', '=', 'archivos_autorizados.cod_usuario')
-                ->join('personal as titular_carpeta', 'titular_carpeta.cod_usuario', '=', 'usuarios.cod_usuario')
-                ->select('usuarios.*', 'archivos_autorizados.total_documentos')->with('personal')
+            $usuarios = \App\Models\User::query()->join('personal as titular_carpeta', 'titular_carpeta.cod_usuario', '=', 'usuarios.cod_usuario')
+                ->leftJoinSub($totales, 'archivos_autorizados', 'usuarios.cod_usuario', '=', 'archivos_autorizados.cod_usuario');
+            if ($disponible) {
+                $solicitudes = $lectura->solicitudesEnCarpetas($actor)->reorder()->select('cod_personal')
+                    ->selectRaw('COUNT(*) as total_solicitudes')->groupBy('cod_personal');
+                foreach (array_slice(preg_split('/\s+/u', mb_substr(trim($this->busqueda), 0, 160)), 0, 12) as $palabra) {
+                    if ($palabra === '') continue;
+                    $solicitudes->where(fn ($q) => $q->whereHas('solicitud', fn ($s) => $s->whereLike('nombre_documento', '%'.$palabra.'%'))
+                        ->orWhereHas('personal', fn ($p) => $p->whereLike('nombres', '%'.$palabra.'%')->orWhereLike('apellido_paterno', '%'.$palabra.'%')->orWhereLike('apellido_materno', '%'.$palabra.'%')));
+                }
+                $usuarios->leftJoinSub($solicitudes, 'solicitudes_autorizadas', 'titular_carpeta.cod_personal', '=', 'solicitudes_autorizadas.cod_personal');
+            }
+            $carpetasUsuarios = $usuarios
+                ->where(function ($q) use ($disponible): void {
+                    $q->whereNotNull('archivos_autorizados.total_documentos');
+                    // Los filtros de estado/formato describen archivos ya cargados.
+                    if ($disponible && $this->estadoArchivo === '' && $this->formatoArchivo === '') {
+                        $q->orWhereNotNull('solicitudes_autorizadas.total_solicitudes');
+                    }
+                })
+                ->when($this->personaArchivo !== '', fn ($q) => $q->where('usuarios.cod_usuario', $this->personaArchivo))
+                ->when($this->rolArchivo !== '', fn ($q) => $q->whereHas('roles', fn ($r) => $r->where('name', $this->rolArchivo)))
+                ->select('usuarios.*')->selectRaw('COALESCE(archivos_autorizados.total_documentos, 0) as total_documentos')->with('personal')
                 ->orderBy('titular_carpeta.apellido_paterno')->orderBy('titular_carpeta.nombres')->orderBy('usuarios.cod_usuario')
                 ->paginate(12, pageName: 'carpetasPage');
+        }
+        $pendientesCarpeta = null;
+        if ($disponible && $carpetaActual) {
+            $solicitudesCarpeta = $lectura->solicitudesEnCarpetas($actor)
+                ->where('cod_personal', $carpetaActual->personal->getKey())->get();
+            app(\App\Modulos\Identidad\Aplicacion\Consultas\PlazoExpedienteDocumental::class)->preparar($solicitudesCarpeta);
+            $pendientes = $solicitudesCarpeta->map(fn ($d) => ['destinatario' => $d, 'estado' => $lectura->situacion($d)])
+                ->filter(fn ($fila) => $fila['estado']['requiere_entrega'])->values();
+            $pagina = $this->getPage('pendientesPage');
+            $pendientesCarpeta = new \Illuminate\Pagination\LengthAwarePaginator($pendientes->forPage($pagina, 12)->values(), $pendientes->count(), 12, $pagina, ['pageName' => 'pendientesPage']);
         }
         $archivos = $consultaArchivos ? $consultaArchivos->when($this->carpetaUsuario, fn ($q) => $q->where('cod_usuario', $this->carpetaUsuario))
             ->paginate(12, pageName: 'archivosPage') : null;
@@ -358,7 +405,7 @@ class DocumentacionPersonalPanel extends Component
             $tipos = DocumentosPersonalInstitucional::paraRol($this->rol);
         }
 
-        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales', 'archivos', 'permisosArchivos', 'documentoVisible', 'archivoDisponible', 'personasArchivo', 'rolesArchivo', 'hayFiltrosArchivo', 'carpetasUsuarios', 'carpetaActual'))
+        return view('identidad::livewire.identidad.documentacion-personal-panel', compact('destinatarios', 'detalle', 'elegibles', 'tipos', 'gestor', 'disponible', 'lectura', 'permisosDocumentales', 'archivos', 'permisosArchivos', 'documentoVisible', 'archivoDisponible', 'personasArchivo', 'rolesArchivo', 'hayFiltrosArchivo', 'carpetasUsuarios', 'carpetaActual', 'pendientesCarpeta'))
             ->layout('layouts.sistema');
     }
 }

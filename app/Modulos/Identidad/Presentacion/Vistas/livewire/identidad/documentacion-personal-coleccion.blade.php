@@ -7,6 +7,9 @@
     ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'], ['value'=>'carpetas','label'=>'Carpetas','icon'=>'ph-folders']
 ]" />@endunless</div>
     </header>
+    @if($carpetaActual)
+        @include('identidad::livewire.identidad.documentacion-personal-pendientes')
+    @endif
     <div class="rm-staff-documents__filters">
         <x-ui.field label="Buscar por documento o persona" for="documentacion-buscar"><div class="rm-staff-documents__search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="documentacion-buscar" class="rm-input" type="search" wire:model.live.debounce.300ms="busqueda" maxlength="160" placeholder="Buscar documento o persona" autocomplete="off"></div></x-ui.field>
         <x-ui.field label="Estado del documento" for="documentacion-estado"><select id="documentacion-estado" class="rm-select" wire:model.live="estadoArchivo"><option value="">Estado: todos</option><option value="CARGADO">Cargado</option><option value="PENDIENTE">Pendiente de revisión</option><option value="VALIDADO">Validado</option><option value="OBSERVADO">Observado</option><option value="VENCIDO">Vencido registrado</option><option value="ANULADO">Anulado</option><option value="ANULADA">Anulada</option><option value="REEMPLAZADO">Reemplazado</option></select></x-ui.field>
@@ -18,10 +21,11 @@
         @if($hayFiltrosArchivo)<button type="button" class="rm-btn rm-btn-secondary" wire:click="limpiarFiltros" wire:loading.attr="disabled">Limpiar filtros</button>@endif
     </div>
     <p class="rm-staff-documents__loading" wire:loading wire:target="busqueda,estadoArchivo,rolArchivo,personaArchivo,formatoArchivo,cambiarVista,limpiarFiltros,gotoPage" role="status">Consultando archivos…</p>
+    <div x-show="modoArchivos === 'tabla' || $wire.carpetaUsuario !== null" x-cloak>
     @if($archivos->isEmpty())
         <x-ui.empty-state :title="$hayFiltrosArchivo ? 'No hay archivos con estos filtros' : 'Todavía no hay archivos disponibles'" :description="$hayFiltrosArchivo ? 'Prueba con otra selección o limpia los filtros.' : 'Aquí aparecerán los documentos del personal que puedes consultar.'" icon="ph-folder-open" />
     @else
-    <div class="rm-staff-directory rm-document-library__table" x-show="modoArchivos === 'tabla' || $wire.carpetaUsuario !== null" x-cloak>
+    <div class="rm-staff-directory rm-document-library__table">
         <div class="rm-staff-directory__table-surface"><table class="rm-staff-directory__table rm-data-table rm-table"><caption class="sr-only">Documentos del personal autorizados para esta cuenta</caption><thead><tr><th scope="col">Documento</th><th scope="col">Trabajador</th><th scope="col">Estado</th><th scope="col">Fecha de carga</th><th scope="col">Acciones</th></tr></thead><tbody>
         @foreach($archivos as $documento)
         @if($permisosArchivos[$documento->getKey()]['ver'] ?? false)
@@ -46,7 +50,12 @@
         @endforeach
         </tbody></table></div>
     </div>
+    @endif
+    </div>
     @unless($carpetaActual)
+    @if($carpetasUsuarios->isEmpty())
+        <div x-show="modoArchivos === 'carpetas'"><x-ui.empty-state title="Sin expedientes en esta consulta" description="Aquí aparecerán los trabajadores con archivos o solicitudes documentales registradas." icon="ph-folder-open" /></div>
+    @else
     <ul class="rm-document-folders rm-document-user-folders" x-show="modoArchivos === 'carpetas'" aria-label="Expedientes documentales por trabajador">
         @foreach($carpetasUsuarios as $personaCarpeta)
         <li class="rm-document-folder rm-document-user-folder" wire:key="carpeta-persona-{{ $personaCarpeta->getKey() }}">
@@ -59,7 +68,7 @@
         </li>
         @endforeach
     </ul>
-    @endunless
     @endif
+    @endunless
     <div class="rm-document-library__footer">@if($carpetaActual)<x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" />@else<div x-show="modoArchivos === 'tabla'"><x-ui.paginacion :paginator="$archivos" mode="livewire" label="archivos" :show-per-page="false" :show-jump="true" /></div><div x-show="modoArchivos === 'carpetas'"><x-ui.paginacion :paginator="$carpetasUsuarios" mode="livewire" label="expedientes" :show-per-page="false" :show-jump="true" /></div>@endif<p class="rm-help">La carga no equivale a su validación; los anulados o reemplazados conservan su historia.</p></div>
 </section>

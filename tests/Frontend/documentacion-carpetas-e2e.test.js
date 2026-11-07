@@ -58,6 +58,9 @@ test('Documentación: tabla compartida, carpetas, miniaturas privadas y cinco an
         await page.waitForFunction(()=>document.getElementById('archivos-personal-titulo')===document.activeElement);
         assert.equal(await page.$$eval('[data-documento-fila]',e=>e.length),2,'Misma persona contiene sus dos archivos');
         assert.match(await page.$eval('#archivos-personal-titulo',e=>e.innerText),/Profesional de prueba 1/);
+        assert.equal(await page.$$eval('[data-pendiente-documental]',e=>e.length),1,'Recibido para revisión no se confunde con pendiente de entrega');
+        assert.match(await page.$eval('.rm-document-library__pending',e=>e.innerText),/Certificado pendiente de prueba/);
+        assert.match(await page.$eval('.rm-document-library__pending',e=>e.innerText),/Fecha límite: \d{2}\/\d{2}\/\d{4}/);
         const image=await page.waitForSelector('.rm-document-library__table .rm-document-thumb img',{visible:true});
         await page.waitForFunction(()=>[...document.querySelectorAll('.rm-document-library__table img')].every(i=>i.complete&&i.naturalWidth>0));
         assert.match(await image.evaluate(e=>e.src),/personal-documentacion\/archivos\//);

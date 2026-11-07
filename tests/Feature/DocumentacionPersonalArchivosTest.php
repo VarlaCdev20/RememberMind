@@ -215,4 +215,72 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->assertSee('Certificado aprobado')->assertDontSee('Documento cargado');
     }
 
+    private function instalarSeguimiento(): void
+    {
+        (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        $this->titular->forceFill(['fecha_hora_alta' => now()])->save();
+    }
+
+    private function solicitud(User $titular, string $nombre): \App\Models\DestinatarioSolicitudDocumental
+    {
+        return app(\App\Modulos\Identidad\Aplicacion\Acciones\GestionarSolicitudesDocumentales::class)->emitir($this->gerente, [
+            'rol' => $titular->roles->sole()->name, 'tipo_documento' => 'OTROS', 'nombre_documento' => $nombre,
+            'motivo' => 'Seguimiento sintético de carpeta', 'personas' => [$titular->personal->getKey()],
+            'origen_plazo' => 'ALTA', 'clave_solicitud' => (string) \Illuminate\Support\Str::uuid(),
+        ])->destinatarios->sole();
+    }
+
+    public function test_carpeta_sin_archivos_muestra_pendiente_plazo_y_seguimiento_sin_cambiar_de_vista(): void
+    {
+        $this->instalarSeguimiento();
+        $destino = $this->solicitud($this->titular, 'Certificado solicitado');
+        Livewire::test(DocumentacionPersonalPanel::class)
+            ->assertViewHas('carpetasUsuarios', fn ($p) => $p->total() === 1 && (int) $p->first()->total_documentos === 0)
+            ->call('abrirCarpetaUsuario', $this->titular->getKey())
+            ->assertSee('Pendientes de entrega')->assertSee('Certificado solicitado')->assertSee('Pendiente de entrega')
+            ->assertSee(today()->addDays(7)->format('d/m/Y'))
+            ->set('estadoArchivo', 'VALIDADO')->assertSee('Certificado solicitado')
+            ->call('verPendienteCarpeta', $destino->getKey())->assertSet('vista', 'archivos')->assertSet('detalleAbierto', true)
+            ->call('cerrarDetalle')->assertSet('carpetaUsuario', $this->titular->getKey());
+        $this->assertDatabaseCount('documentos', 0);
+        $this->assertDatabaseCount('entregas_solicitud_documental', 0);
+    }
+
+    public function test_pendientes_usan_plazo_prorrogado_y_no_confunden_entrega_con_revision(): void
+    {
+        $this->instalarSeguimiento();
+        $pendiente = $this->solicitud($this->titular, 'Respaldo sin entregar');
+        app(\App\Modulos\Identidad\Aplicacion\Acciones\GestionarSolicitudesDocumentales::class)
+            ->prorrogar($this->gerente, $pendiente->getKey(), 'Ampliación sintética del expediente');
+        foreach (['CARGADO', 'PENDIENTE', 'VALIDADO', 'OBSERVADO', 'ANULADO', 'REEMPLAZADO'] as $estado) {
+            $destino = $this->solicitud($this->titular, 'Solicitud '.$estado);
+            $documento = $this->documento($this->titular, 'Archivo '.$estado, $estado);
+            \App\Models\EntregaSolicitudDocumental::create(['cod_destinatario_documental' => $destino->getKey(),
+                'cod_documento' => $documento->getKey(), 'cod_usuario_registro' => $this->gerente->getKey(), 'fecha_hora_registro' => now()]);
+        }
+        Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario', $this->titular->getKey())
+            ->assertViewHas('pendientesCarpeta', fn ($p) => $p->total() === 4 && $p->every(fn ($f) => $f['estado']['limite']->toDateString() === today()->addDays(14)->toDateString()))
+            ->assertSee('Plazo prorrogado')->assertSee('Pendiente de corrección')
+            ->assertDontSee('Solicitud CARGADO')->assertDontSee('Solicitud PENDIENTE')->assertDontSee('Solicitud VALIDADO');
+        $this->assertNull($destino->fresh()->fecha_limite_prorrogada);
+    }
+
+    public function test_carpeta_pendiente_no_expone_otro_titular_ni_cuentas_fuera_de_alcance(): void
+    {
+        $this->instalarSeguimiento();
+        $propio = $this->solicitud($this->titular, 'Solicitud propia');
+        $otro = $this->persona('ENFERMEROS', 'Otra', 'Persona');
+        $otro->forceFill(['fecha_hora_alta' => now()])->save();
+        $ajeno = $this->solicitud($otro, 'Solicitud ajena');
+        $otro->assignRole('GERENTE');
+        Livewire::test(DocumentacionPersonalPanel::class)->assertViewHas('carpetasUsuarios', fn ($p) => $p->total() === 1)
+            ->call('abrirCarpetaUsuario', $otro->getKey())->assertNotFound();
+        $this->actingAs($this->titular);
+        Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario', $this->titular->getKey())
+            ->assertSee('Solicitud propia')->assertDontSee('Solicitud ajena')
+            ->call('verPendienteCarpeta', $ajeno->getKey())->assertNotFound();
+        Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario', $otro->getKey())->assertNotFound();
+        $this->assertDatabaseCount('destinatarios_solicitud_documental', 2);
+    }
+
 }
