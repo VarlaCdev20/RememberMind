@@ -24,3 +24,9 @@ El código del usuario seleccionado está bloqueado en Livewire. Abrir una carpe
 - E2E anterior adaptado a la tabla general: filtros/visor y Solicitudes aprobado. Build Vite aprobado. No se ejecuta CI completa ni una auditoría global de accesibilidad.
 
 Evidencia local: `output/documentacion-expedientes-*20261106*` y capturas `usuarios-*`/`expediente-*` en `output/documentacion-carpetas-20261106/`. Todas las personas de las capturas son sintéticas.
+
+## Ajuste posterior de proporciones
+
+Por indicación de la propietaria («no tan largos»), las carpetas pasan a una cuadrícula con base de 250px y ancho máximo de 280px por carpeta, evitando que se estiren cuando hay pocas personas. Se reducen el espacio interior y el icono; se conserva el expediente por trabajador. Este ajuste sustituye las dimensiones descritas arriba.
+
+Build aprobado y E2E aprobado en 1440/1280/1024/768/390px, comprobando ancho limitado, ausencia de desbordamiento y apertura del expediente. Evidencia: `output/documentacion-carpetas-proporcionadas-build-20261106.txt` y `output/documentacion-carpetas-proporcionadas-e2e-20261106.txt`.

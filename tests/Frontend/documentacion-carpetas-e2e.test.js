@@ -49,7 +49,7 @@ test('Documentación: tabla compartida, carpetas, miniaturas privadas y cinco an
         await page.waitForSelector('[data-carpeta-usuario]',{visible:true});
         assert.equal(await page.$$eval('[data-carpeta-usuario]',e=>e.length),3,'Una carpeta por persona, no por archivo');
         assert.equal(await page.$$eval('.rm-document-folder__body',e=>new Set(e.map(e=>getComputedStyle(e).backgroundColor)).size),1,'Carpetas neutras');
-        if(width===1440)assert.ok(await page.$eval('.rm-document-folder',e=>e.getBoundingClientRect().width)>=330,'Carpetas anchas');
+        assert.ok(await page.$eval('.rm-document-folder',e=>e.getBoundingClientRect().width)<=281,'Carpetas sin estirarse');
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
         await page.screenshot({path:path.join(output,'usuarios-'+width+'.png'),fullPage:true});
         const id=await page.$eval('[data-carpeta-usuario]',e=>e.dataset.carpetaUsuario);
