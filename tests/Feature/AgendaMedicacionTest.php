@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AdministracionMedicacion;
 use App\Models\Area;
+use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\HorarioPrescripcion;
 use App\Models\Jornada;
@@ -132,16 +133,25 @@ class AgendaMedicacionTest extends TestCase
         $this->assertSame('ADMINISTRADA', $agenda->first()['estado']);
     }
 
-    public function test_campana_muestra_y_cuenta_una_dosis_vencida(): void
+    public function test_campana_avisa_dosis_vencida_a_enfermeria_asignada(): void
     {
         Carbon::setTestNow('2026-09-10 09:00:00');
         $this->crearMedicacion('08:00');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoRecordatorios', 0)->assertDontSee('Losartán');
+
+        $enfermero = $this->entrarComoEnfermero();
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoRecordatorios', 0);
+
+        $this->asignarResidente($enfermero);
 
         Livewire::test(CampanaNotificaciones::class)
-            ->assertSet('conteoAbiertas', 1)
+            ->assertSet('conteoRecordatorios', 1)
             ->assertSee('Losartán')
             ->assertSee('Vencida')
             ->assertSee('Programada: 08:00');
+
+        $this->assertDatabaseCount('alertas', 0);
+        $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 
     public function test_varios_horarios_v2_generan_todas_las_dosis_del_dia(): void
@@ -263,11 +273,34 @@ class AgendaMedicacionTest extends TestCase
     {
         Carbon::setTestNow('2026-09-10 06:00:00');
         $this->crearMedicacion('08:00');
+        $this->asignarResidente($this->entrarComoEnfermero());
         $campana = Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAbiertas', 0);
         Carbon::setTestNow('2026-09-10 07:30:00');
         $campana->call('verificarAlertas')->assertDispatched('alerta-nueva', fn ($name, $params) => str_contains($params[0]['mensaje'], 'PROXIMA'));
         Carbon::setTestNow('2026-09-10 08:01:00');
         $campana->call('verificarAlertas')->assertDispatched('alerta-nueva', fn ($name, $params) => str_contains($params[0]['mensaje'], 'VENCIDA'));
         $this->assertDatabaseCount('administraciones_medicacion', 0);
+    }
+
+    private function entrarComoEnfermero(): User
+    {
+        $enfermero = User::factory()->create(['nombres' => 'Enfermero de prueba', 'estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        $this->actingAs($enfermero);
+
+        return $enfermero;
+    }
+
+    private function asignarResidente(User $enfermero): void
+    {
+        $this->jornada->update(['fecha_jornada' => today()]);
+        AsignacionResidenteJornada::create([
+            'cod_residente' => $this->adulto->getKey(),
+            'cod_personal' => $enfermero->personal->getKey(),
+            'cod_jornada' => $this->jornada->getKey(),
+            'nivel_supervision' => 'DIRECTA',
+            'fecha_hora' => now(),
+            'estado' => 'ACTIVA',
+        ]);
     }
 }

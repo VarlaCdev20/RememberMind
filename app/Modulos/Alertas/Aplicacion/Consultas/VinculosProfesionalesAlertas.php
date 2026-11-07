@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 /** Organización de lectura por vínculos guardados, nunca triaje ni autorización. */
 final class VinculosProfesionalesAlertas
 {
+    public const ROL_MEDICO = 'MEDICO GENERAL/GERIATRA';
+
     public const ESPECIALIDADES = [
         'ENFERMEROS' => 'Enfermería', 'MEDICO GENERAL/GERIATRA' => 'Medicina y geriatría',
         'PSICOLOGO/A' => 'Psicología', 'NUTRICIONISTA' => 'Nutrición',
@@ -36,6 +38,10 @@ final class VinculosProfesionalesAlertas
     private function condicion(Builder $q, User $usuario, array $roles): void
     {
         $q->whereHas('responsable.usuario.roles', fn ($r) => $r->whereIn('name', $roles));
+        if (in_array(self::ROL_MEDICO, $roles, true)) {
+            $q->orWhereRaw("UPPER(TRIM(modulo)) = ?", ['SOLICITUD_MEDICA']);
+        }
+
         foreach ($this->fuentes($usuario) as $fuente) {
             $modelo = new $fuente['modelo'];
             $tabla = $modelo->getTable();
@@ -61,6 +67,13 @@ final class VinculosProfesionalesAlertas
         $resultado = [];
         foreach ($alertas as $alerta) {
             $resultado[$alerta->getKey()] = [];
+            if (mb_strtoupper(trim((string) $alerta->modulo)) === 'SOLICITUD_MEDICA') {
+                $resultado[$alerta->getKey()][self::ROL_MEDICO] = [
+                    'rol' => self::ROL_MEDICO,
+                    'nombre' => self::ESPECIALIDADES[self::ROL_MEDICO],
+                    'motivos' => ['Destino registrado de la solicitud médica'],
+                ];
+            }
             $this->agregar($resultado[$alerta->getKey()], $alerta->responsable?->usuario?->roles ?? collect(), 'Responsable del seguimiento');
         }
         foreach ($this->fuentes($usuario) as $fuente) {

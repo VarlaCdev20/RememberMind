@@ -22,12 +22,39 @@ final class BandejaAlertas
 
         // Las alertas persistidas pertenecen a los flujos clínicos y de cuidado.
         // Los avisos administrativos se consultan desde sus fuentes institucionales.
-        if (app(ExperienciaAlertas::class)->paraUsuario($usuario)['foco'] === 'supervision') {
+        $perfil = app(ExperienciaAlertas::class)->paraUsuario($usuario);
+        if ($perfil['foco'] === 'supervision') {
             return $query->whereRaw('1 = 0');
+        }
+
+        if (in_array($perfil['foco'], ['psicologia', 'nutricion', 'funcional', 'pedagogia'], true)) {
+            $this->sinSolicitudesMedicas($query);
         }
 
         return $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])
             ? $query : $this->turnos->acotarAlertasQuery($query, $usuario);
+    }
+
+    /** La campana avisa al destinatario; la bandeja conserva el seguimiento autorizado. */
+    public function notificacionesPendientes(User $usuario): Builder
+    {
+        $consulta = $this->pendientes($usuario);
+        $rol = app(ExperienciaAlertas::class)->paraUsuario($usuario)['rol'];
+
+        if ($rol !== VinculosProfesionalesAlertas::ROL_MEDICO) {
+            $this->sinSolicitudesMedicas($consulta);
+        }
+
+        if (isset(VinculosProfesionalesAlertas::ESPECIALIDADES[$rol]) && $rol !== 'ENFERMEROS') {
+            app(VinculosProfesionalesAlertas::class)->aplicar($consulta, $usuario, $rol);
+        }
+
+        return $consulta;
+    }
+
+    private function sinSolicitudesMedicas(Builder $consulta): void
+    {
+        $consulta->whereRaw("COALESCE(UPPER(TRIM(modulo)), '') <> ?", ['SOLICITUD_MEDICA']);
     }
 
     public function pendientes(?User $usuario): Builder

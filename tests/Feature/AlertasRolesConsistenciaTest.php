@@ -144,6 +144,35 @@ class AlertasRolesConsistenciaTest extends TestCase
         $this->assertDatabaseCount('alertas', 3);
     }
 
+    public function test_solicitud_medica_avisa_a_medicina_y_enfermeria_conserva_seguimiento_asignado(): void
+    {
+        $enfermero = $this->actor('ENFERMEROS');
+        $residente = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $this->asignarTurno($enfermero, $residente);
+        $solicitud = $this->alerta($residente, 'ABIERTA', 'SOLICITUD_MEDICA');
+        $solicitud->update(['cod_personal_responsable' => $enfermero->personal->getKey()]);
+        $this->alerta($residente);
+
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 1);
+        Livewire::test(AlertasPanel::class)->call('verDetalle', $solicitud->getKey())
+            ->assertSet('modalDetalle', true);
+
+        $this->actor('MEDICO GENERAL/GERIATRA');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 1)
+            ->assertViewHas('alertas', fn ($alertas) => $alertas->modelKeys() === [$solicitud->getKey()]);
+        Livewire::test(AlertasPanel::class)
+            ->assertViewHas('alertas', fn ($alertas) => $alertas->getCollection()->modelKeys() === [$solicitud->getKey()]);
+
+        $this->actor('PSICOLOGO/A');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 0);
+        $this->get(route('admin.alertas-clinicas.index', ['alerta' => $solicitud->getKey()]))->assertForbidden();
+
+        $this->actor('ADMINISTRADOR');
+        Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 1);
+        $this->assertSame('ABIERTA', $solicitud->fresh()->estado);
+        $this->assertDatabaseCount('eventos_alerta', 0);
+    }
+
     public function test_enfermeria_registra_actuacion_y_cierra_con_eventos_sin_perder_historia(): void
     {
         $actor = $this->actor('ENFERMEROS');

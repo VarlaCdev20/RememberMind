@@ -272,7 +272,7 @@ class CampanaNotificaciones extends Component
 
     private function consultaPendientes(): Builder
     {
-        return app(BandejaAlertas::class)->pendientes(auth()->user())
+        return app(BandejaAlertas::class)->notificacionesPendientes(auth()->user())
             ->tap(fn ($query) => OrdenAlertas::aplicar($query));
     }
 
@@ -287,8 +287,9 @@ class CampanaNotificaciones extends Component
         $user = auth()->user();
 
         if (! $this->puedeVer() || ! $user
-            || app(\App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas::class)->paraUsuario($user)['foco'] === 'supervision'
-            || ! $user->canAny(['prescripciones.ver', 'administraciones_medicacion.ver'])) {
+            || app(\App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas::class)->paraUsuario($user)['foco'] !== 'turno'
+            || ! $user->hasRole('ENFERMEROS')
+            || ! $user->can('administraciones_medicacion.ver')) {
             return collect();
         }
 
@@ -296,9 +297,8 @@ class CampanaNotificaciones extends Component
             return collect();
         }
 
-        $codigos = ! $user->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])
-            ? app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosIds($user)
-            : Residente::query()->pluck('cod_residente')->all();
+        $codigos = app(TurnoEnfermeriaService::class)->obtenerAsignacionesConsulta($user)
+            ->distinct()->pluck('cod_residente')->all();
 
         return app(AgendaMedicacionService::class)->recordatorios($codigos);
     }
