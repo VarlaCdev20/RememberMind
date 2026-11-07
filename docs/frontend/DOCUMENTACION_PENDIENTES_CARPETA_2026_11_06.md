@@ -32,3 +32,9 @@ Los pendientes representan solicitudes registradas; no se deducen obligaciones h
 - Build Vite aprobado. No se ejecutó CI completa ni se modificó el esquema operativo.
 
 Evidencia local: `output/documentacion-pendientes-{sqlite,postgres,build,e2e}-20261106.txt`; capturas sintéticas `output/documentacion-carpetas-20261106/expediente-{1440,1280,1024,768,390}.png`. Revisión acotada de seguridad sin hallazgos en las nuevas entradas: alcance, identidad del titular y ausencia de escrituras comprobados por los negativos descritos. Se reutilizan la Policy y el visor privados existentes.
+
+## Ajuste posterior: notas adhesivas
+
+La propietaria pide que los pendientes se distingan como notas adhesivas. Se sustituyen las filas por notas compactas (máximo 300px), fondo salvia claro, cinta superior y esquina doblada, conservando nombre, estado, fecha y seguimiento. Se reutilizan los tokens existentes; no cambian consultas, plazos ni permisos.
+
+Build aprobado; tres pruebas focales / 25 aserciones aprobadas y E2E aprobado en los cinco anchos, incluyendo comprobación de la nota y ausencia de desbordamiento. Capturas actuales de escritorio y móvil inspeccionadas. Evidencia: `output/documentacion-notas-{build,focal,e2e}-20261106.txt`. La verificación PostgreSQL anterior sigue correspondiendo al mismo backend, que este ajuste no modifica.
