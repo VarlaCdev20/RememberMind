@@ -1,13 +1,25 @@
 <section class="rm-card rm-staff-documents__library rm-document-library" x-data="{ modoArchivos: 'carpetas' }"
     x-on:personal-carpeta-abierta.window="$nextTick(() => $refs.tituloExpediente?.focus())"
     x-on:personal-carpeta-cerrada.window="$nextTick(() => { const origen = Array.from($el.querySelectorAll('[data-carpeta-usuario]')).find(el => el.dataset.carpetaUsuario === $event.detail.usuario); (origen ?? $refs.tituloExpediente)?.focus(); })" aria-labelledby="archivos-personal-titulo">
-    <header class="rm-staff-documents__heading">
-        <div>@if($carpetaActual)<button type="button" class="rm-document-library__back" wire:click="cerrarCarpetaUsuario"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Volver a carpetas</button>@endif@if($carpetaActual)<span class="rm-document-library__eyebrow"><i class="ph-bold ph-folder-user" aria-hidden="true"></i> EXPEDIENTE PERSONAL</span>@endif<h2 id="archivos-personal-titulo" x-ref="tituloExpediente" tabindex="-1">{{ $carpetaActual ? trim($carpetaActual->personal->nombres.' '.$carpetaActual->personal->apellido_paterno.' '.$carpetaActual->personal->apellido_materno) : 'Archivos del expediente' }}</h2>@if($carpetaActual)<p class="rm-help">Expediente documental del trabajador</p>@endif</div>
-        @unless($carpetaActual)<div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span>@unless($carpetaActual)<x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
-    ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'], ['value'=>'carpetas','label'=>'Carpetas','icon'=>'ph-folders']
-]" />@endunless</div>@endunless
+    <header @class(['rm-staff-documents__heading', 'rm-document-library__heading--expediente' => $carpetaActual])>
+        <div class="rm-document-library__identity">
+            @if($carpetaActual)<span class="rm-document-library__identity-icon" aria-hidden="true"><i class="ph-bold ph-folder-user"></i></span>@endif
+            <div>
+                @if($carpetaActual)<span class="rm-document-library__eyebrow">EXPEDIENTE PERSONAL</span>@endif
+                <h2 id="archivos-personal-titulo" x-ref="tituloExpediente" tabindex="-1">{{ $carpetaActual ? trim($carpetaActual->personal->nombres.' '.$carpetaActual->personal->apellido_paterno.' '.$carpetaActual->personal->apellido_materno) : 'Archivos del expediente' }}</h2>
+            </div>
+        </div>
+        @if($carpetaActual)
+            <button type="button" class="rm-btn rm-btn-secondary rm-document-library__back" wire:click="cerrarCarpetaUsuario"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Volver a carpetas</button>
+        @else
+            <div class="rm-document-library__tools"><span class="rm-badge rm-badge-info" aria-live="polite">{{ $archivos->total() }} {{ $archivos->total() === 1 ? 'archivo' : 'archivos' }}</span>
+                <x-ui.collection-view-switch model="modoArchivos" label="Presentación de documentos" :options="[
+                    ['value'=>'tabla','label'=>'Tabla','icon'=>'ph-table'], ['value'=>'carpetas','label'=>'Carpetas','icon'=>'ph-folders']
+                ]" />
+            </div>
+        @endif
     </header>
-    <div @class(['rm-document-library__contents', 'rm-document-library__contents--expediente' => $carpetaActual])>
+    <div @class(['rm-document-library__contents', 'rm-document-library__contents--expediente' => $carpetaActual, 'rm-document-library__contents--sin-pendientes' => $carpetaActual && !($pendientesCarpeta?->total())])>
     @if($carpetaActual)
         @include('identidad::livewire.identidad.documentacion-personal-pendientes')
     @endif

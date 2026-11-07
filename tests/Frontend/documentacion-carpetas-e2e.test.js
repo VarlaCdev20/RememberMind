@@ -81,6 +81,13 @@ test('Documentación: tabla compartida, carpetas, miniaturas privadas y cinco an
         await click('.rm-document-library__back');
         await page.waitForSelector('[data-carpeta-usuario]',{visible:true});
         await page.waitForFunction(id=>document.activeElement?.dataset.carpetaUsuario===id,{},id);
+        await click('.rm-document-user-folder:nth-child(2) [data-carpeta-usuario]');
+        await page.waitForSelector('.rm-document-library__contents--sin-pendientes', { visible: true });
+        assert.ok(await page.evaluate(() => document.querySelector('.rm-document-library__files').getBoundingClientRect().width >= document.querySelector('.rm-document-library__contents').getBoundingClientRect().width - 2), 'Sin pendientes no se reserva columna vacía');
+        if (width >= 1280) assert.ok(await page.$eval('.rm-document-library__heading--expediente', e => e.getBoundingClientRect().height < 100), 'Encabezado compacto');
+        await page.screenshot({path:path.join(output,'expediente-sin-pendientes-'+width+'.png'),fullPage:true});
+        await click('.rm-document-library__back');
+        await page.waitForSelector('[data-carpeta-usuario]', { visible: true });
         await click('.rm-document-library .rm-view-toggle button:first-child');
         await page.waitForSelector('.rm-document-library__table',{visible:true});
         assert.equal(await page.$$eval('[data-documento-fila]',e=>e.length),4,'Tabla global conserva todos los archivos autorizados');

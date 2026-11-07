@@ -54,3 +54,11 @@ Por petición de la propietaria se eliminan los rótulos repetidos «Acciones»,
 Los botones «Ver archivo» y «Abrir original» se agrupan a la derecha, con el mismo sistema de botones y áreas táctiles de 44px. Se reducen los espacios internos y se mantienen el visor y la apertura autorizada del original. Sin cambios de backend, permisos o persistencia.
 
 Build aprobado, tres pruebas focales / 25 aserciones aprobadas y E2E aprobado en cinco anchos, incluyendo ausencia de rótulos y texto redundante, visor y retorno de foco. Capturas actuales de escritorio y móvil inspeccionadas. Evidencia: `output/documentacion-botones-build-final-20261106.txt`, `output/documentacion-botones-focal-20261106.txt`, `output/documentacion-botones-e2e-final-20261106.txt`.
+
+## Ajuste posterior: encabezado y espacios señalados
+
+Las capturas anotadas por la propietaria muestran un encabezado alto por el apilamiento del retorno, etiqueta, nombre y subtítulo, una fila adicional de botones bajo cada archivo y una columna reservada con cero pendientes. Se conserva la composición cálida, Nunito, miniaturas, botones y notas aprobados; se corrige la geometría señalada.
+
+El encabezado reúne icono, etiqueta y nombre a la izquierda y retorno a la derecha, suprimiendo el subtítulo redundante. En fichas de ancho intermedio, documento, estado/fecha y botones comparten una fila, sin fila inferior reservada a acciones; en móvil se apilan sin truncar los nombres. Cuando no hay pendientes, la información se presenta como franja breve y el listado utiliza todo el ancho, sin columna lateral vacía. Esto no afirma que los archivos estén validados.
+
+Verificación: 15 pruebas / 153 aserciones aprobadas; build y E2E aprobados en cinco anchos, incluyendo expediente con y sin pendientes, encabezado inferior a 100px en escritorio, ancho completo sin pendientes, filtros, visor y retorno de foco. Capturas actuales de los cinco tamaños revisadas y comparación adicional de ambos estados en escritorio y móvil. Sin cambios de backend, BDD o permisos. Evidencia: `output/documentacion-espacios-{focal,build,e2e}-20261106.txt`; capturas `expediente-sin-pendientes-*` y `expediente-*` del directorio de QA ya indicado.
