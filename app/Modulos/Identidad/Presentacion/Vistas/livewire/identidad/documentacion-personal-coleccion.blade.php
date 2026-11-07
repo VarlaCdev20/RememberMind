@@ -19,7 +19,7 @@
             </div>
         @endif
     </header>
-    <div @class(['rm-document-library__contents', 'rm-document-library__contents--expediente' => $carpetaActual, 'rm-document-library__contents--sin-pendientes' => $carpetaActual && !($pendientesCarpeta?->total())])>
+    <div @class(['rm-document-library__contents', 'rm-document-library__contents--expediente' => $carpetaActual])>
     @if($carpetaActual)
         @include('identidad::livewire.identidad.documentacion-personal-pendientes')
     @endif

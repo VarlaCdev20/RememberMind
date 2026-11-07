@@ -62,3 +62,9 @@ Las capturas anotadas por la propietaria muestran un encabezado alto por el apil
 El encabezado reúne icono, etiqueta y nombre a la izquierda y retorno a la derecha, suprimiendo el subtítulo redundante. En fichas de ancho intermedio, documento, estado/fecha y botones comparten una fila, sin fila inferior reservada a acciones; en móvil se apilan sin truncar los nombres. Cuando no hay pendientes, la información se presenta como franja breve y el listado utiliza todo el ancho, sin columna lateral vacía. Esto no afirma que los archivos estén validados.
 
 Verificación: 15 pruebas / 153 aserciones aprobadas; build y E2E aprobados en cinco anchos, incluyendo expediente con y sin pendientes, encabezado inferior a 100px en escritorio, ancho completo sin pendientes, filtros, visor y retorno de foco. Capturas actuales de los cinco tamaños revisadas y comparación adicional de ambos estados en escritorio y móvil. Sin cambios de backend, BDD o permisos. Evidencia: `output/documentacion-espacios-{focal,build,e2e}-20261106.txt`; capturas `expediente-sin-pendientes-*` y `expediente-*` del directorio de QA ya indicado.
+
+## Corrección de preferencia: conservar el espacio de pendientes
+
+La propietaria aclara que el espacio de los documentos faltantes estaba bien. Se conserva de nuevo la columna lateral de pendientes en escritorio aunque el conteo sea cero, y su sección apilada en pantallas pequeñas. Se retira únicamente la variante que expandía los archivos cuando no había pendientes. El encabezado compacto y los botones en la misma fila permanecen. Esta indicación sustituye el ajuste anterior de ancho completo sin pendientes.
+
+Build y E2E aprobados en los cinco anchos, comprobando que se conserva la columna lateral sin pendientes en escritorio, el visor y la navegación. Captura de escritorio sin pendientes inspeccionada. Evidencia: `output/documentacion-espacio-pendientes-{build,e2e}-20261106.txt`. Sin cambios de backend, BDD o permisos.
