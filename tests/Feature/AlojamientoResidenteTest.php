@@ -4,11 +4,14 @@ namespace Tests\Feature;
 
 use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarEgresoResidente;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\EgresoResidente;
 use App\Models\Admision;
 use App\Models\Cama;
 use App\Models\Contacto;
 use App\Models\Habitacion;
+use App\Models\HistorialEstadoResidente;
 use App\Models\OcupacionCama;
 use App\Models\Preadmision;
 use App\Models\Residente;
@@ -32,10 +35,72 @@ class AlojamientoResidenteTest extends TestCase
     {
         parent::setUp();
         Gate::policy(Residente::class, ResidentePolicy::class);
-        foreach (['admisiones.formalizar', 'ocupaciones_cama.gestionar', 'residentes.ver'] as $permiso) {
+        foreach (['admisiones.formalizar', 'ocupaciones_cama.gestionar', 'residentes.ver', 'residentes.gestionar'] as $permiso) {
             Permission::findOrCreate($permiso, 'web');
         }
         Role::findOrCreate('ADMINISTRADOR', 'web');
+    }
+
+    public function test_administracion_confirma_egreso_desde_el_expediente(): void
+    {
+        ['residente' => $residente, 'usuario' => $usuario, 'origen' => $cama] = $this->escenario();
+        $usuario->givePermissionTo(['residentes.gestionar', Permission::findOrCreate('admisiones.ver_dashboard', 'web')->name]);
+        $cama->update(['estado' => 'OCUPADA']);
+        $habitacion = $cama->habitacion;
+        $habitacion->update(['estado' => 'OCUPADA']);
+        $ocupacion = $residente->ocupacionActiva;
+        $ficha = route('admin.administracion.residentes.show', $residente);
+        $this->get($ficha)->assertOk()->assertSee('Registrar egreso');
+
+        $formulario = Livewire::test(EgresoResidente::class, ['residente' => $residente])->call('abrir');
+        $formulario->call('confirmar')->assertHasErrors('motivo');
+        $this->assertSame('ACTIVA', $ocupacion->fresh()->estado);
+        $formulario->set('motivo', 'Retiro definitivo confirmado.')->call('confirmar')->assertRedirect($ficha);
+
+        $this->assertSame('FINALIZADA', $ocupacion->admision()->firstOrFail()->estado);
+        $this->assertSame('FINALIZADA', $ocupacion->fresh()->estado);
+        $this->assertSame('DISPONIBLE', $cama->fresh()->estado);
+        $this->assertSame('DISPONIBLE', $habitacion->fresh()->estado);
+        $this->assertSame('INACTIVO', $residente->fresh()->estado);
+        $historial = HistorialEstadoResidente::where('estado_nuevo', 'INACTIVO')->sole();
+        $this->assertSame($usuario->getKey(), $historial->cod_usuario_registro);
+        $this->assertSame('Retiro definitivo confirmado.', $historial->motivo);
+        $this->assertEquals($ocupacion->fresh()->fecha_hora_liberacion, $historial->fecha_hora);
+        $this->get($ficha)->assertSee('Sin ocupación vigente')->assertDontSee('Registrar egreso');
+        $formulario->call('confirmar')->assertHasErrors('egreso');
+        $this->assertDatabaseCount('historial_estados_residente', 2);
+    }
+
+    public function test_egreso_revalida_permiso_y_ocupacion_antes_de_guardar(): void
+    {
+        $datos = $this->escenario();
+        $datos['usuario']->givePermissionTo('residentes.gestionar');
+        $formulario = Livewire::test(EgresoResidente::class, ['residente' => $datos['residente']])->call('abrir');
+        $nueva = $this->cambiar($datos);
+        $formulario->set('motivo', 'Retiro definitivo confirmado.')->call('confirmar')->assertHasErrors('egreso');
+        $datos['usuario']->revokePermissionTo('residentes.gestionar');
+        $formulario->call('confirmar')->assertForbidden();
+        $this->assertSame('ACTIVA', $nueva->fresh()->estado);
+        $this->assertSame('ACTIVA', $nueva->admision()->firstOrFail()->estado);
+        $this->assertDatabaseCount('historial_estados_residente', 1);
+    }
+
+    public function test_egreso_revierte_la_liberacion_si_falla_el_historial(): void
+    {
+        ['residente' => $residente, 'usuario' => $usuario] = $this->escenario();
+        $usuario->givePermissionTo('residentes.gestionar');
+        $ocupacion = $residente->ocupacionActiva;
+        HistorialEstadoResidente::creating(fn () => throw new \RuntimeException('Fallo sintético del historial.'));
+
+        try {
+            app(RegistrarEgresoResidente::class)->ejecutar($residente, $usuario, 'Retiro confirmado.', $ocupacion->cod_admision, $ocupacion->getKey());
+            $this->fail('El egreso debía revertirse.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Fallo sintético del historial.', $error->getMessage());
+        }
+        $this->assertSame('ACTIVA', $ocupacion->fresh()->estado);
+        $this->assertSame('ACTIVA', $ocupacion->admision()->firstOrFail()->estado);
+        $this->assertSame($residente->estado, $residente->fresh()->estado);
     }
 
     public function test_traslado_preserva_admision_historial_autoria_y_auditoria(): void

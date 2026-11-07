@@ -11,7 +11,15 @@
             <p class="rm-body-sm">{{ $persona->fecha_nacimiento ? \Carbon\Carbon::parse($persona->fecha_nacimiento)->age.' años · ' : '' }}Documento: {{ $persona->numero_documento ?: 'Sin registrar' }}</p>
             <x-ui.status-badge :estado="$persona->estado" />
         </div>
+        @if(auth()->user()->hasRole('ADMINISTRADOR') && in_array($persona->estado, ['ACTIVO', 'ADMITIDO'], true))
+            @can('residentes.gestionar')
+                @livewire(App\Modulos\Admisiones\Presentacion\Livewire\Paginas\EgresoResidente::class, ['residente' => $persona])
+            @endcan
+        @endif
     </x-ui.card>
+    @if(session('egreso_registrado'))
+        <p class="rm-alert rm-alert--success" role="status">{{ session('egreso_registrado') }}</p>
+    @endif
     <div class="rm-admin-resident__facts">
         <x-ui.card><x-ui.section-header title="Ubicación actual" icon="ph-bed" level="2" /><p>{{ $ocupacion ? 'Habitación '.$ocupacion->habitacion.' · Cama '.$ocupacion->cama : 'Sin ocupación vigente' }}</p></x-ui.card>
         <x-ui.card><x-ui.section-header title="Responsable principal" icon="ph-address-book" level="2" /><p>{{ $responsable ? $responsable->nombres.' '.$responsable->apellido_paterno : 'Sin responsable registrado' }}</p>@if($responsable)<small>{{ $responsable->parentesco }} · {{ $responsable->celular ?: $responsable->telefono ?: 'Sin teléfono' }}</small>@endif</x-ui.card>
