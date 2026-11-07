@@ -119,3 +119,5 @@
 @import './patterns/auth-access.css';
 @import './patterns/nursing-reports.css';
 @import './patterns/operational-design.css';
+
+@import './patterns/manager-alerts.css';
