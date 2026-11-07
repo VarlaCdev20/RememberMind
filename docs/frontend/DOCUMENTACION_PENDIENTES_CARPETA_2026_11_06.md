@@ -68,3 +68,11 @@ Verificación: 15 pruebas / 153 aserciones aprobadas; build y E2E aprobados en c
 La propietaria aclara que el espacio de los documentos faltantes estaba bien. Se conserva de nuevo la columna lateral de pendientes en escritorio aunque el conteo sea cero, y su sección apilada en pantallas pequeñas. Se retira únicamente la variante que expandía los archivos cuando no había pendientes. El encabezado compacto y los botones en la misma fila permanecen. Esta indicación sustituye el ajuste anterior de ancho completo sin pendientes.
 
 Build y E2E aprobados en los cinco anchos, comprobando que se conserva la columna lateral sin pendientes en escritorio, el visor y la navegación. Captura de escritorio sin pendientes inspeccionada. Evidencia: `output/documentacion-espacio-pendientes-{build,e2e}-20261106.txt`. Sin cambios de backend, BDD o permisos.
+
+## Ajuste posterior: filtros compactos dentro de la carpeta
+
+La búsqueda interna se limita a 360px y usa «Buscar archivo», abreviado para evitar recortes en móvil. Estado y formato se agrupan en el desplegable «Filtrar», cerrado inicialmente, con contador de selectores activos. «Limpiar» aparece al aplicar filtros y reutiliza la acción existente. Los selectores mantienen sus etiquetas y opciones; no cambia la consulta. El panel se cierra al pulsar fuera o Escape, devolviendo el foco al botón en este último caso. El espacio de pendientes se conserva.
+
+La biblioteca general mantiene los controles de persona, rol, estado y formato existentes. Sin cambios de BDD, permisos o backend.
+
+Verificación: 15 pruebas / 153 aserciones aprobadas y E2E aprobado en cinco anchos, incluyendo aplicación de formato PDF, contador activo, limpieza, cierre por Escape con retorno de foco, panel dentro de pantalla y navegación del expediente. Capturas del panel abierto revisadas en escritorio y móvil; se abrevia después el placeholder móvil sin cambiar la interacción. Build aprobado. Evidencia: `output/documentacion-filtros-compactos-{build,focal}-20261106.txt`, `output/documentacion-filtros-compactos-e2e-final-20261106.txt`; capturas `filtros-expediente-*` del directorio de QA indicado.
