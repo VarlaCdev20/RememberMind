@@ -16,7 +16,7 @@ final class ConsultarPanelResidenteAlerta
     {
         $actor = $actor ? User::query()->find($actor->getKey()) : null;
         abort_unless($actor?->estado === 'ACTIVO'
-            && $actor->canAny(['alertas.ver', 'alertas.gestionar']) && ! $actor->hasRole('FAMILIAR'), 403);
+            && $actor->can('alertas.ver') && $actor->can('residentes.ver') && ! $actor->hasRole('FAMILIAR'), 403);
         if ($actor->hasRole('ENFERMEROS')) {
             $this->turnos->autorizarConsultaResidente($codigo, $actor);
         } elseif (! $actor->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {

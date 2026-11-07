@@ -89,6 +89,39 @@ class AlertasRolesConsistenciaTest extends TestCase
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
 
+    public function test_pendientes_por_fuente_distingue_gerencia_administracion_y_lectura_clinica(): void
+    {
+        Residente::factory()->create();
+        $ruta = route('admin.adultos-mayores.alertas-pendientes');
+
+        $this->actor('GERENTE');
+        $this->get($ruta)->assertOk()
+            ->assertSeeText('No cuenta con ningún familiar vinculado')
+            ->assertDontSeeText('No cuenta con ningún documento digitalizado')
+            ->assertDontSeeText('Sin atención clínica inicial registrada')
+            ->assertDontSeeText('Sin evaluación de instrumentos registrada');
+
+        $this->actor('ADMINISTRADOR');
+        $this->get($ruta)->assertOk()
+            ->assertSeeText('No cuenta con ningún documento digitalizado')
+            ->assertDontSeeText('Sin atención clínica inicial registrada');
+
+        $this->actor('MEDICO GENERAL/GERIATRA');
+        $this->get($ruta)->assertOk()
+            ->assertSeeText('Sin atención clínica inicial registrada')
+            ->assertDontSeeText('No cuenta con ningún documento digitalizado');
+    }
+
+    public function test_gestionar_sin_permiso_de_lectura_no_abre_bandeja_ni_panel_lateral(): void
+    {
+        $actor = $this->actor('GERENTE');
+        $actor->removeRole('GERENTE')->givePermissionTo(['alertas.gestionar', 'residentes.ver']);
+        $residente = Residente::factory()->create();
+
+        Livewire::test(AlertasPanel::class)->assertForbidden();
+        Livewire::test(CampanaNotificaciones::class)->call('verUbicacion', $residente->getKey())->assertForbidden();
+    }
+
     public function test_enfermeria_registra_actuacion_y_cierra_con_eventos_sin_perder_historia(): void
     {
         $actor = $this->actor('ENFERMEROS');

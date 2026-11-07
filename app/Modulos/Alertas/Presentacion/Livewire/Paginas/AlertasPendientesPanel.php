@@ -18,23 +18,29 @@ class AlertasPendientesPanel extends Component
     public function render()
     {
         Gate::authorize('viewAny', Residente::class);
-        $adultos = Residente::with([
-            'contactos',
-            'documentos',
-            'atenciones',
-            'prescripciones',
-            'signosVitales',
-            'valoracionesFuncionales',
-            'observaciones',
-            'actividades',
-        ])->when(! auth()->user()->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente',
-            app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery(auth()->user())->select('cod_residente')))->get();
+        $actor = auth()->user()->fresh();
+        abort_unless($actor?->estado === 'ACTIVO' && ! $actor->hasRole('FAMILIAR') && $actor->can('alertas.ver'), 403);
 
-        $evaluaciones = AplicacionInstrumento::with('instrumento')
-            ->whereIn('cod_residente', $adultos->modelKeys())
-            ->where('estado', 'ACTIVO')
-            ->get()
-            ->groupBy('cod_residente');
+        $fuentes = array_filter([
+            'contactos' => 'residentes_contactos.ver',
+            'documentos' => 'documentos.ver',
+            'atenciones' => 'atenciones.ver',
+            'signosVitales' => 'signos_vitales.ver',
+            'observaciones' => 'notas_clinicas.ver',
+        ], fn (string $permiso) => $actor->can($permiso));
+
+        $adultos = Residente::with(array_keys($fuentes))
+            ->when(! $actor->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR']), fn ($q) => $q->whereIn('cod_residente',
+                app(TurnoEnfermeriaService::class)->obtenerPacientesAsignadosQuery($actor)->select('cod_residente')))
+            ->get();
+
+        $evaluaciones = $actor->can('aplicaciones_instrumento.ver')
+            ? AplicacionInstrumento::with('instrumento')
+                ->whereIn('cod_residente', $adultos->modelKeys())
+                ->where('estado', 'ACTIVO')
+                ->get()
+                ->groupBy('cod_residente')
+            : null;
 
         $todasLasAlertas = [];
 
@@ -43,8 +49,8 @@ class AlertasPendientesPanel extends Component
             $codRes = $adulto->cod_residente;
 
             // ── 1. RED DE APOYO ──────────────────────────────────────
-            $contactos = $adulto->contactos;
-            if ($contactos->isEmpty()) {
+            $contactos = isset($fuentes['contactos']) ? $adulto->contactos : null;
+            if ($contactos?->isEmpty()) {
                 $todasLasAlertas[] = [
                     'adulto_id' => $codRes,
                     'nombre' => $nombreCompleto,
@@ -58,7 +64,7 @@ class AlertasPendientesPanel extends Component
                     'color_bg' => 'bg-red-50',
                     'color_border' => 'border-red-200/50',
                 ];
-            } else {
+            } elseif ($contactos !== null) {
                 $tieneResponsable = $contactos->contains(function ($c) {
                     return isset($c->pivot) && $c->pivot->responsable_principal;
                 });
@@ -80,8 +86,7 @@ class AlertasPendientesPanel extends Component
             }
 
             // ── 2. DOCUMENTACIÓN ─────────────────────────────────────
-            $documentos = $adulto->documentos;
-            if ($documentos->isEmpty()) {
+            if (isset($fuentes['documentos']) && $adulto->documentos->isEmpty()) {
                 $todasLasAlertas[] = [
                     'adulto_id' => $codRes,
                     'nombre' => $nombreCompleto,
@@ -98,7 +103,7 @@ class AlertasPendientesPanel extends Component
             }
 
             // ── 3. SALUD Y CUIDADOS ──────────────────────────────────
-            if ($adulto->atenciones->isEmpty()) {
+            if (isset($fuentes['atenciones']) && $adulto->atenciones->isEmpty()) {
                 $todasLasAlertas[] = [
                     'adulto_id' => $codRes,
                     'nombre' => $nombreCompleto,
@@ -114,7 +119,7 @@ class AlertasPendientesPanel extends Component
                 ];
             }
 
-            if ($adulto->signosVitales->isEmpty()) {
+            if (isset($fuentes['signosVitales']) && $adulto->signosVitales->isEmpty()) {
                 $todasLasAlertas[] = [
                     'adulto_id' => $codRes,
                     'nombre' => $nombreCompleto,
@@ -131,8 +136,8 @@ class AlertasPendientesPanel extends Component
             }
 
             // ── 4. EVALUACIONES GERIÁTRICAS ──────────────────────────
-            $evalsAdulto = $evaluaciones->get($codRes, collect());
-            if ($evalsAdulto->isEmpty()) {
+            $evalsAdulto = $evaluaciones?->get($codRes, collect());
+            if ($evalsAdulto?->isEmpty()) {
                 $todasLasAlertas[] = [
                     'adulto_id' => $codRes,
                     'nombre' => $nombreCompleto,
@@ -146,7 +151,7 @@ class AlertasPendientesPanel extends Component
                     'color_bg' => 'bg-red-50',
                     'color_border' => 'border-red-200/50',
                 ];
-            } else {
+            } elseif ($evalsAdulto !== null) {
                 foreach ($evalsAdulto as $eval) {
                     $alertaVal = strtoupper(trim($eval->clasificacion ?? ''));
                     if (in_array($alertaVal, ['ALTO', 'MEDIO', 'CRITICO', 'PREVENTIVO'])) {
@@ -169,7 +174,7 @@ class AlertasPendientesPanel extends Component
             }
 
             // ── 5. SEGUIMIENTO ───────────────────────────────────────
-            foreach ($adulto->observaciones as $obs) {
+            foreach (isset($fuentes['observaciones']) ? $adulto->observaciones : [] as $obs) {
                 if ($obs->tipo_nota === 'URGENCIA') {
                     $todasLasAlertas[] = [
                         'adulto_id' => $codRes,
@@ -187,7 +192,7 @@ class AlertasPendientesPanel extends Component
                 }
             }
 
-            foreach ($adulto->atenciones as $aten) {
+            foreach (isset($fuentes['atenciones']) ? $adulto->atenciones : [] as $aten) {
                 if (in_array($aten->estado, ['PENDIENTE', 'PROGRAMADA'])) {
                     $todasLasAlertas[] = [
                         'adulto_id' => $codRes,
@@ -249,7 +254,18 @@ class AlertasPendientesPanel extends Component
             'estado_institucional' => collect($todasLasAlertas)->where('categoria', 'estado_institucional')->count(),
         ];
 
+        $categoriasDisponibles = array_keys(array_filter([
+            'todas' => true,
+            'red_de_apoyo' => isset($fuentes['contactos']),
+            'documentacion' => isset($fuentes['documentos']),
+            'salud_y_cuidados' => isset($fuentes['atenciones']) || isset($fuentes['signosVitales']),
+            'evaluaciones' => $evaluaciones !== null,
+            'seguimiento' => isset($fuentes['atenciones']) || isset($fuentes['observaciones']),
+            'estado_institucional' => true,
+        ]));
+
         return view('livewire.alertas.alertas-pendientes-panel', [
+            'categoriasDisponibles' => $categoriasDisponibles,
             'alertas' => $alertasFiltradas,
             'conteos' => $conteos,
         ])->layout('layouts.sistema');

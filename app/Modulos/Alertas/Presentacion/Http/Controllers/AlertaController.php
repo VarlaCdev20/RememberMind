@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Modulos\Alertas\Aplicacion\Acciones\AlertasService;
+use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,10 +19,7 @@ class AlertaController extends Controller
     {
         $usuario = $request->user();
         abort_unless($usuario->estado === 'ACTIVO' && $usuario->can('alertas.ver') && ! $usuario->hasRole('FAMILIAR'), 403);
-        $query = Alerta::query();
-        if (! $usuario->hasAnyRole(['SUPERADMINISTRADOR', 'GERENTE', 'ADMINISTRADOR'])) {
-            $query = $this->turnos->acotarAlertasQuery($query, $usuario);
-        }
+        $query = app(BandejaAlertas::class)->consulta($usuario);
 
         return response()->json($query->with('eventos')->latest('fecha_hora')->paginate(25));
     }

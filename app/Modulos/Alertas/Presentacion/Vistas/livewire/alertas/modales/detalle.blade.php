@@ -103,8 +103,10 @@
         @if($definicionEspecialidad)<button type="button" class="rm-btn rm-btn-primary" wire:click="abrirRegistroEspecialidad('{{ $detalle->getKey() }}')">{{ $preview ? 'Ver campos: ' : 'Registrar: ' }}{{ mb_strtolower($definicionEspecialidad['titulo']) }}</button>@endif
         @if($puedeIntervenir && in_array($detalle->estado, \App\Models\Alerta::ESTADOS_ACTIVOS, true))<button type="button" class="rm-btn rm-btn-primary" wire:click="atenderAlerta('{{ $detalle->getKey() }}')">Registrar intervención</button>@endif
         @if($puedeCerrar && $detalle->puedeCerrarse())<button type="button" class="rm-btn rm-btn-secondary" wire:click="cerrarAlerta('{{ $detalle->getKey() }}')">{{ $puedeIntervenir ? 'Preparar cierre justificado' : 'Preparar cierre de coordinación' }}</button>@endif
+        @can('residentes.ver')
         @can('signos_vitales.ver')<button type="button" class="rm-btn rm-btn-secondary" wire:click="verGraficos('{{ $detalle->cod_residente }}')">Ver evolución</button>@endcan
         <button type="button" class="rm-btn rm-btn-secondary" wire:click="verUbicacion('{{ $detalle->cod_residente }}')">Ver ubicación</button>
+        @endcan
         <button type="button" class="rm-btn rm-btn-secondary" wire:click="solicitarCerrarModales">Volver a la bandeja</button>
     </div></div></x-slot:footer>
 </x-ui.drawer-livewire>

@@ -173,7 +173,7 @@ class AlertasPanel extends Component
             'cerrar' => 'alertas.cerrar',
             default => 'alertas.gestionar',
         };
-        abort_unless($user->canAny([$permiso, 'alertas.gestionar']), 403);
+        abort_unless($accion === 'ver' ? $user->can($permiso) : $user->canAny([$permiso, 'alertas.gestionar']), 403);
     }
 
     public function updated($campo): void
@@ -386,7 +386,9 @@ class AlertasPanel extends Component
     public function verDetalle(string $id): void
     {
         $this->comprobarPermiso('ver');
-        $alerta = $this->obtenerAlertaAutorizada($id);
+        $alerta = app(BandejaAlertas::class)->consulta(auth()->user())->find($id);
+        abort_unless($alerta, 403);
+        $this->autorizarLecturaResidente($alerta->cod_residente);
         $this->cerrarModales();
         $this->alertaId = $id;
         $this->responsableId = $alerta->responsable?->cod_usuario ?? '';

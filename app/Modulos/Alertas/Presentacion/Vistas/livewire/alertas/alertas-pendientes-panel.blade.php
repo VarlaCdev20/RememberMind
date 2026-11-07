@@ -15,12 +15,24 @@
  {{-- TARJETAS DE INDICADORES REALES --}}
     <section class="grid gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
         <x-ui.metric-card label="Total Alertas" :value="$conteos['total']" icon="ph-bell" :variant="$conteos['total'] > 0 ? 'coral' : 'neutral'" />
+        @if(in_array('red_de_apoyo', $categoriasDisponibles, true))
         <x-ui.metric-card label="Red de Apoyo" :value="$conteos['red_de_apoyo']" icon="ph-users-three" variant="neutral" />
+        @endif
+        @if(in_array('documentacion', $categoriasDisponibles, true))
         <x-ui.metric-card label="Documentos" :value="$conteos['documentacion']" icon="ph-files" variant="neutral" />
+        @endif
+        @if(in_array('salud_y_cuidados', $categoriasDisponibles, true))
         <x-ui.metric-card label="Salud y Cuidados" :value="$conteos['salud_y_cuidados']" icon="ph-first-aid" variant="sky" />
+        @endif
+        @if(in_array('evaluaciones', $categoriasDisponibles, true))
         <x-ui.metric-card label="Evaluaciones" :value="$conteos['evaluaciones']" icon="ph-clipboard-text" variant="neutral" />
+        @endif
+        @if(in_array('seguimiento', $categoriasDisponibles, true))
         <x-ui.metric-card label="Seguimiento" :value="$conteos['seguimiento']" icon="ph-activity" variant="mint" />
+        @endif
+        @if(in_array('estado_institucional', $categoriasDisponibles, true))
         <x-ui.metric-card label="Institucional" :value="$conteos['estado_institucional']" icon="ph-buildings" variant="neutral" />
+        @endif
     </section>
 
      {{-- BARRA DE FILTROS Y BÚSQUEDA FORMATO ALERTAS (DESPLAZABLE Y CON COLORCITOS) --}}
@@ -45,6 +57,7 @@
 
                 <div class="rm-alert-shortcuts flex-1">
                     @foreach($filtros as $f)
+                        @continue(!in_array($f['valor'], $categoriasDisponibles, true))
                         <button
                             type="button"
                             wire:click="$set('filtroCategoria', '{{ $f['valor'] }}')"
