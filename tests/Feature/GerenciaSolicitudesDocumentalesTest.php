@@ -78,6 +78,43 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
             ->call('abrirFichaPersonal', $this->trabajador->getKey())
             ->assertSee('1 pendiente de entrega')->assertSee('Constancia de prueba')
             ->assertSee('Plazo 02/11/2026');
+        $this->get(route('admin.personal.documentacion', ['carpeta' => $this->trabajador->getKey()]))
+            ->assertOk()->assertSee('Constancia de prueba')->assertSee('Volver a carpetas');
+        $this->actingAs($this->trabajador);
+        $this->get(route('admin.personal.documentacion', ['carpeta' => $this->actor->getKey()]))->assertNotFound();
+    }
+
+    public function test_ficha_personal_incluye_edad_especialidad_planificacion_y_cambio_laboral_propio(): void
+    {
+        $personal = $this->trabajador->personal;
+        $personal->update(['fecha_nacimiento' => '1990-01-01', 'fecha_ingreso' => '2024-10-01',
+            'especialidad' => 'GESTIÓN INSTITUCIONAL']);
+        $area = \App\Models\Area::create(['nombre' => 'Recepción sintética', 'estado' => 'ACTIVA']);
+        $turno = \App\Models\Turno::create(['nombre' => 'Mañana', 'hora_inicio' => '08:00:00',
+            'hora_cierre' => '16:00:00', 'estado' => 'ACTIVO', 'orden' => 1]);
+        foreach ([-1, 0, 1] as $dia) {
+            $jornada = \App\Models\Jornada::create(['cod_turno' => $turno->getKey(),
+                'fecha_jornada' => today()->addDays($dia), 'estado' => 'ABIERTA']);
+            \App\Models\AsignacionPersonal::create(['cod_personal' => $personal->getKey(),
+                'cod_jornada' => $jornada->getKey(), 'cod_area' => $area->getKey(),
+                'funcion' => 'Coordinación de recepción', 'estado' => 'ACTIVA']);
+        }
+        app(RegistrarMovimientoLaboral::class)->ejecutar($this->actor, $personal->getKey(), [
+            'estado_esperado' => 'ACTIVO', 'estado_nuevo' => 'INACTIVO',
+            'fecha_hora_efecto' => now()->toDateTimeString(), 'motivo' => 'Cambio laboral sintético para ficha',
+        ]);
+
+        $panel = Livewire::test(PersonalInstitucionalPanel::class)->call('abrirFichaPersonal', $this->trabajador->getKey())
+            ->assertSee('36 años')->assertSee('GESTIÓN INSTITUCIONAL')->assertSee('2 años')
+            ->assertSee('08:00–16:00')->assertSee('Coordinación de recepción')
+            ->assertSee('Cambio laboral sintético para ficha')->assertSee('Requisitos del perfil')
+            ->assertViewHas('fichaPersonal', fn ($ficha) => $ficha['totalAsignaciones'] === 2
+                && $ficha['faltantesObligatorios'] === 3 && $ficha['porRevisar'] === 0);
+
+        $this->actor->revokePermissionTo('asignaciones_personal.ver');
+        $this->actor->roles->first()->revokePermissionTo('asignaciones_personal.ver');
+        $panel->call('$refresh')->assertViewHas('fichaPersonal', fn ($ficha) => $ficha['asignaciones']->isEmpty())
+            ->assertDontSee('08:00–16:00')->assertDontSee('Coordinación de recepción');
     }
 
     public function test_emision_idempotente_conserva_membresia_y_limite_sin_recalcular_rol_actual(): void

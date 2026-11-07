@@ -85,6 +85,17 @@ class DocumentacionPersonalPanel extends Component
         return app(ConsultarDocumentacionPersonal::class)->consulta(auth()->user());
     }
 
+    public function mount(): void
+    {
+        $carpeta = request()->query('carpeta');
+        if ($carpeta !== null) {
+            abort_unless(auth()->user()?->fresh()?->estado === 'ACTIVO', 403);
+            abort_unless(is_string($carpeta) && preg_match('/^[A-Za-z0-9_-]{1,20}$/D', $carpeta), 404);
+            $this->vista = 'archivos';
+            $this->abrirCarpetaUsuario($carpeta);
+        }
+    }
+
     public function updatedBusqueda(): void
     {
         $this->resetPage();

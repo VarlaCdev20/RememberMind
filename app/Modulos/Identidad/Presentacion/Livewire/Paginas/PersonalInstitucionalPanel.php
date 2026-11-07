@@ -7,8 +7,6 @@ use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\CambiarEstadoPersonal;
 use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
 use App\Modulos\Identidad\Aplicacion\Consultas\CapacidadDocumentalPersonal;
-use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
-use App\Modulos\Identidad\Aplicacion\Consultas\PlazoExpedienteDocumental;
 use App\Modulos\Identidad\Aplicacion\Consultas\UsuarioFichaService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -215,26 +213,9 @@ class PersonalInstitucionalPanel extends Component
 
     private function consultarFichaPersonal(): array
     {
-        $usuario = $this->baseUsuariosInstitucionales()->with(['personal', 'roles'])->findOrFail($this->usuarioFichaId);
-        $actor = app(AutorizarGestionPersonal::class)->autorizar(auth()->user(), $usuario);
-        $horario = $actor->can('asignaciones_personal.ver')
-            ? app(UsuarioFichaService::class)->obtenerHorariosActivos($usuario) : null;
-        $lectura = app(ConsultarDocumentacionPersonal::class);
-        $archivos = $lectura->archivos($actor)->where('cod_usuario', $usuario->getKey())->toBase()->get(['nombre', 'estado']);
-        $pendientes = collect();
+        $usuario = $this->baseUsuariosInstitucionales()->findOrFail($this->usuarioFichaId);
 
-        if ($usuario->personal && app(CapacidadDocumentalPersonal::class)->disponible()) {
-            $solicitudes = $lectura->solicitudesEnCarpetas($actor)->where('cod_personal', $usuario->personal->getKey())->get();
-            app(PlazoExpedienteDocumental::class)->preparar($solicitudes);
-            $pendientes = $solicitudes->map(function ($destino) use ($lectura) {
-                $estado = $lectura->situacion($destino);
-
-                return ['nombre' => $destino->solicitud->nombre_documento, 'estado' => $estado['situacion'],
-                    'limite' => $estado['limite']?->format('d/m/Y'), 'requiere_entrega' => $estado['requiere_entrega']];
-            })->where('requiere_entrega', true);
-        }
-
-        return compact('usuario', 'horario', 'archivos', 'pendientes');
+        return app(UsuarioFichaService::class)->obtenerResumenGerencia(auth()->user(), $usuario);
     }
 
     public function abrirModalEdicion(string $usuarioId): void

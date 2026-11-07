@@ -4,12 +4,70 @@ namespace App\Modulos\Identidad\Aplicacion\Consultas;
 
 use App\Models\AsignacionPersonal;
 use App\Models\Documento;
+use App\Models\MovimientoLaboralPersonal;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
 use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
 use Spatie\Activitylog\Models\Activity;
 
 class UsuarioFichaService
 {
+    public function obtenerResumenGerencia(User $actor, User $usuario): array
+    {
+        $actor = app(AutorizarGestionPersonal::class)->autorizar($actor, $usuario);
+        abort_unless(app(AutorizarGestionPersonal::class)->esGerencia($actor)
+            && $actor->can('personal_institucional.ver'), 403);
+        $usuario->load(['personal', 'roles']);
+        $personal = $usuario->personal;
+        $lectura = app(ConsultarDocumentacionPersonal::class);
+        $archivos = $lectura->archivos($actor)->where('cod_usuario', $usuario->getKey())->toBase()->get(['nombre', 'estado']);
+        $pendientes = collect();
+        $movimientos = collect();
+        $asignaciones = collect();
+        $totalAsignaciones = 0;
+        $hayCarpeta = $archivos->isNotEmpty();
+
+        if ($personal && $actor->can('asignaciones_personal.ver')) {
+            $query = $personal->asignaciones()->whereIn('estado', ['ACTIVA', 'ACTIVO'])
+                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', '>=', today())
+                    ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO']))
+                ->with(['area', 'jornada.turno'])
+                ->orderBy(\App\Models\Jornada::select('fecha_jornada')->whereColumn('jornadas.cod_jornada', 'asignaciones_personal.cod_jornada'))
+                ->orderBy('cod_asignacion_personal');
+            $totalAsignaciones = (clone $query)->count();
+            $asignaciones = $query->limit(5)->get();
+        }
+
+        if ($personal && app(CapacidadDocumentalPersonal::class)->disponible()) {
+            $solicitudes = $lectura->solicitudesEnCarpetas($actor)->where('cod_personal', $personal->getKey())->get();
+            app(PlazoExpedienteDocumental::class)->preparar($solicitudes);
+            $hayCarpeta = $hayCarpeta || $solicitudes->isNotEmpty();
+            $pendientes = $solicitudes->map(function ($destino) use ($lectura) {
+                $estado = $lectura->situacion($destino);
+
+                return ['nombre' => $destino->solicitud->nombre_documento, 'estado' => $estado['situacion'],
+                    'limite' => $estado['limite']?->format('d/m/Y'), 'requiere_entrega' => $estado['requiere_entrega']];
+            })->where('requiere_entrega', true);
+            $movimientos = MovimientoLaboralPersonal::where('cod_personal', $personal->getKey())
+                ->orderByDesc('fecha_hora_efecto')->orderByDesc('cod_movimiento_laboral')->limit(3)->get();
+        }
+
+        $checklist = collect(app(DocumentacionUsuarioService::class)->obtenerChecklistUsuario($usuario))
+            ->filter(fn ($item) => $item['obligatorio'] || $item['cargado'])->values();
+        $faltantesObligatorios = $checklist->where('obligatorio', true)->where('cargado', false)->count();
+        $porRevisar = $checklist->where('cargado', true)->where('conflicto', false)
+            ->whereIn('estado', ['CARGADO', 'PENDIENTE'])->count();
+        $edad = $personal?->fecha_nacimiento?->lte(today()) ? $personal->fecha_nacimiento->age : null;
+        $mesesIngreso = $personal?->fecha_ingreso?->lte(today())
+            ? (int) $personal->fecha_ingreso->diffInMonths(today()) : null;
+        $antiguedad = $mesesIngreso === null ? null : ($mesesIngreso < 1 ? 'Menos de un mes'
+            : \Carbon\CarbonInterval::months($mesesIngreso)->cascade()->locale('es')->forHumans(['parts' => 2]));
+        $urlDocumentacion = route('admin.personal.documentacion', $hayCarpeta ? ['carpeta' => $usuario->getKey()] : []);
+
+        return compact('usuario', 'archivos', 'pendientes', 'movimientos', 'asignaciones', 'totalAsignaciones',
+            'checklist', 'faltantesObligatorios', 'porRevisar', 'edad', 'antiguedad', 'urlDocumentacion');
+    }
+
     /**
      * Obtiene el expediente consolidado del usuario.
      */

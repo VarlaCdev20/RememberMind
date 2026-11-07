@@ -210,6 +210,8 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->assertSee('Editar ficha')->call('abrirFichaPersonal', $usuario->getKey())
             ->assertSee('Ficha del trabajador')->assertSee('DIRECCIÓN DE PRUEBA')->assertSee('45678910')
             ->assertSee('3 archivos registrados')->assertDontSee('Pasos del registro')
+            ->assertViewHas('fichaPersonal', fn ($ficha) => $ficha['faltantesObligatorios'] === 0
+                && $ficha['porRevisar'] === 3)
             ->call('cerrarFichaPersonal')->assertSet('usuarioFichaId', null)->assertDontSee('Ficha del trabajador');
         Mail::assertSent(PersonalInstitucionalBienvenidaMail::class, fn ($mail) => $mail->documentos_pendientes === [] && $mail->fecha_limite === '');
     }

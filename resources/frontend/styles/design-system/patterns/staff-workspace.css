@@ -379,6 +379,25 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     background: color-mix(in srgb, var(--rm-surface) 62%, transparent);
 }
 .rm-staff-record__statuses dd { margin-top: var(--rm-space-1); }
+.rm-staff-record__overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--rm-space-3);
+}
+.rm-staff-record__overview > div {
+    min-width: 0;
+    padding: var(--rm-space-3) var(--rm-space-4);
+    border-radius: var(--rm-radius-xl);
+    background: color-mix(in srgb, var(--rm-staff-record-accent) 9%, var(--rm-surface));
+}
+.rm-staff-record__overview dd {
+    font: 800 var(--rm-font-size-dashboard)/1.2 var(--rm-font-friendly);
+    margin-top: var(--rm-space-1);
+}
+.rm-staff-record__subheading {
+    font: 800 var(--rm-font-size-body-lg)/1.4 var(--rm-font-friendly);
+    margin-block: var(--rm-space-3) var(--rm-space-2);
+}
 .rm-staff-record__sections {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -489,6 +508,9 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 @media (max-width: 479px) {
     .rm-staff-record__field--primary { grid-column: 1 / -1; }
+    .rm-staff-record__overview { grid-template-columns: minmax(0, 1fr); }
+    .rm-staff-record__overview > div { display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-3); }
+    .rm-staff-record__overview dd { margin: 0; flex-shrink: 0; }
 }
 
 /* Registro institucional: secciones compartidas y progreso como el alta de usuarios. */

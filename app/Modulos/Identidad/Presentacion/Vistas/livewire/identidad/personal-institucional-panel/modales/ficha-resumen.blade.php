@@ -1,7 +1,7 @@
 @php
     $titular = $fichaPersonal['usuario'];
     $personal = $titular->personal;
-    $horario = $fichaPersonal['horario'];
+    $asignaciones = $fichaPersonal['asignaciones'];
     $archivos = $fichaPersonal['archivos'];
     $pendientes = $fichaPersonal['pendientes'];
     $secciones = [
@@ -12,13 +12,16 @@
             'Número de documento' => $personal?->numero_documento,
             'Tipo de documento' => $personal?->tipo_documento,
             'Fecha de nacimiento' => $personal?->fecha_nacimiento?->format('d/m/Y'),
+            'Edad' => $fichaPersonal['edad'] !== null ? $fichaPersonal['edad'].' años' : null,
             'Género' => match ($personal?->genero) {'F' => 'Femenino', 'M' => 'Masculino', default => $personal?->genero},
             'País emisor' => $personal?->pais_documento,
             'Expedido en' => $personal?->expedicion_documento,
         ]],
         'laboral' => ['titulo' => 'Información laboral', 'icono' => 'ph-briefcase', 'datos' => [
             'Profesión o función' => $personal?->profesion,
+            'Especialidad' => $personal?->especialidad,
             'Fecha de ingreso' => $personal?->fecha_ingreso?->format('d/m/Y'),
+            'Tiempo desde el ingreso' => $fichaPersonal['antiguedad'],
             'Alta de la cuenta' => $titular->fecha_hora_alta?->format('d/m/Y H:i'),
             'Matrícula profesional' => $personal?->matricula_profesional,
             'Observaciones' => $personal?->observacion,
@@ -38,6 +41,14 @@
             </dl>
         </header>
 
+        <dl class="rm-staff-record__overview">
+            @can('asignaciones_personal.ver')
+                <div><dt>Asignaciones de hoy y próximas</dt><dd>{{ $fichaPersonal['totalAsignaciones'] }}</dd></div>
+            @endcan
+            <div><dt>Obligatorios sin archivo</dt><dd>{{ $fichaPersonal['faltantesObligatorios'] }}</dd></div>
+            <div><dt>Recibidos para revisión</dt><dd>{{ $fichaPersonal['porRevisar'] }}</dd></div>
+        </dl>
+
         <div class="rm-staff-record__sections">
             @foreach($secciones as $clave => $seccion)
                 <x-ui.section-card :title="$seccion['titulo']" :icon="$seccion['icono']">
@@ -56,12 +67,26 @@
                         @can('asignaciones_personal.ver')
                             <div class="rm-staff-record__schedule">
                                 <x-ui.section-header title="Horarios" icon="ph-calendar-blank" :level="4" />
-                                @if($horario)
-                                    <p class="rm-help">Última asignación activa</p>
-                                    <p class="font-semibold">{{ $horario->area?->nombre ?? 'Área sin registrar' }} · {{ $horario->jornada?->turno?->nombre ?? 'Turno sin registrar' }}</p>
-                                    <p class="rm-help">{{ $horario->jornada?->fecha_jornada?->format('d/m/Y') }}</p>
-                                @else
-                                    <p class="rm-help">Sin asignaciones activas.</p>
+                                <p class="rm-help">Hoy y próximas jornadas abiertas</p>
+                                <ul class="rm-staff-record__list">
+                                    @forelse($asignaciones as $asignacion)
+                                        <li class="rm-staff-record__file">
+                                            <div>
+                                                <strong>{{ $asignacion->jornada?->fecha_jornada?->format('d/m/Y') }} · {{ $asignacion->area?->nombre ?? 'Área sin registrar' }}</strong>
+                                                <p>{{ $asignacion->jornada?->turno?->nombre ?? 'Turno sin registrar' }}
+                                                    @if($asignacion->hora_inicio && $asignacion->hora_fin)
+                                                        · {{ substr($asignacion->hora_inicio, 0, 5) }}–{{ substr($asignacion->hora_fin, 0, 5) }}
+                                                    @endif
+                                                </p>
+                                                @if($asignacion->funcion)<p class="rm-help">Función {{ $asignacion->funcion }}</p>@endif
+                                            </div>
+                                        </li>
+                                    @empty
+                                        <li class="rm-help">Sin asignaciones para hoy o próximas jornadas abiertas.</li>
+                                    @endforelse
+                                </ul>
+                                @if($fichaPersonal['totalAsignaciones'] > $asignaciones->count())
+                                    <p class="rm-help">Mostrando {{ $asignaciones->count() }} de {{ $fichaPersonal['totalAsignaciones'] }} asignaciones.</p>
                                 @endif
                                 <x-ui.action-button variant="secondary" class="rm-staff-record__action" wire:click="abrirHorariosDesdeFicha" icono="ph-arrow-right">Consultar horarios</x-ui.action-button>
                             </div>
@@ -75,34 +100,88 @@
                     {{ $archivos->count() }} {{ $archivos->count() === 1 ? 'archivo registrado' : 'archivos registrados' }}
                     @if($ampliacionDisponible) · {{ $pendientes->count() }} {{ $pendientes->count() === 1 ? 'pendiente de entrega' : 'pendientes de entrega' }} @endif
                 </p>
-                <div @class(['rm-staff-record__document-lists' => $pendientes->isNotEmpty() && $archivos->isNotEmpty()])>
-                    @if($pendientes->isNotEmpty())
-                        <ul class="rm-staff-record__list" aria-label="Pendientes de entrega">
-                            @foreach($pendientes->take(4) as $documento)
-                                <li class="rm-staff-record__pending">
-                                    <i class="ph-bold ph-clock" aria-hidden="true"></i>
-                                    <div>
-                                        <strong>{{ $documento['nombre'] }}</strong>
-                                        <p>{{ $documento['estado'] }}</p>
-                                        @if($documento['limite'])<p class="rm-staff-record__deadline">Plazo {{ $documento['limite'] }}</p>@endif
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @if($archivos->isNotEmpty())
-                        <ul class="rm-staff-record__list" aria-label="Archivos registrados">
-                            @foreach($archivos->take(3) as $archivo)
+                <div class="rm-staff-record__document-lists">
+                    <section aria-label="Requisitos documentales del trabajador">
+                        <h4 class="rm-staff-record__subheading">Requisitos del perfil</h4>
+                        <ul class="rm-staff-record__list">
+                            @foreach($fichaPersonal['checklist'] as $requisito)
                                 <li class="rm-staff-record__file">
-                                    <span><i class="ph ph-file-text" aria-hidden="true"></i> {{ $archivo->nombre }}</span>
-                                    <x-ui.status-badge :estado="$archivo->estado" />
+                                    <div>
+                                        <strong>{{ $requisito['nombre'] }}</strong>
+                                        <p class="rm-help">{{ $requisito['obligatorio'] ? 'Obligatorio' : 'Archivo complementario' }}</p>
+                                        @if($requisito['documento']?->fecha_vencimiento)
+                                            <p class="rm-help">Vencimiento {{ $requisito['documento']->fecha_vencimiento->format('d/m/Y') }}</p>
+                                        @endif
+                                    </div>
+                                    @if($requisito['conflicto'])
+                                        <x-ui.status-badge label="Revisar archivos vigentes" variant="warning" />
+                                    @elseif(!$requisito['cargado'])
+                                        <x-ui.status-badge label="Sin entregar" variant="warning" />
+                                    @else
+                                        <x-ui.status-badge :estado="$requisito['estado']" />
+                                    @endif
                                 </li>
                             @endforeach
                         </ul>
-                    @endif
+                    </section>
+                    <section aria-label="Solicitudes pendientes y archivos registrados">
+                        <div>
+                            @if($pendientes->isNotEmpty())
+                                <h4 class="rm-staff-record__subheading">Solicitudes con plazo</h4>
+                                <ul class="rm-staff-record__list" aria-label="Pendientes de entrega">
+                                    @foreach($pendientes->take(4) as $documento)
+                                        <li class="rm-staff-record__pending">
+                                            <i class="ph-bold ph-clock" aria-hidden="true"></i>
+                                            <div>
+                                                <strong>{{ $documento['nombre'] }}</strong>
+                                                <p>{{ $documento['estado'] }}</p>
+                                                @if($documento['limite'])<p class="rm-staff-record__deadline">Plazo {{ $documento['limite'] }}</p>@endif
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                @if($pendientes->count() > 4)
+                                    <p class="rm-help">Mostrando 4 de {{ $pendientes->count() }} solicitudes pendientes.</p>
+                                @endif
+                            @endif
+                            @if($archivos->isNotEmpty())
+                                <h4 class="rm-staff-record__subheading">Archivos del expediente</h4>
+                                <ul class="rm-staff-record__list" aria-label="Archivos registrados">
+                                    @foreach($archivos->take(3) as $archivo)
+                                        <li class="rm-staff-record__file">
+                                            <span><i class="ph ph-file-text" aria-hidden="true"></i> {{ $archivo->nombre }}</span>
+                                            <x-ui.status-badge :estado="$archivo->estado" />
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                @if($archivos->count() > 3)
+                                    <p class="rm-help">Mostrando 3 de {{ $archivos->count() }} archivos.</p>
+                                @endif
+                            @endif
+                            @if($archivos->isEmpty() && $pendientes->isEmpty())
+                                <p class="rm-help">El expediente todavía no tiene archivos ni solicitudes con plazo.</p>
+                            @endif
+                        </div>
+                            </section>
                 </div>
-                <a class="rm-btn rm-btn-secondary rm-staff-record__action" href="{{ route('admin.personal.documentacion') }}"><i class="ph-bold ph-folder-open" aria-hidden="true"></i> Abrir documentación laboral</a>
+                <a class="rm-btn rm-btn-secondary rm-staff-record__action" href="{{ $fichaPersonal['urlDocumentacion'] }}"><i class="ph-bold ph-folder-open" aria-hidden="true"></i> Abrir documentación laboral</a>
             </x-ui.section-card>
+
+            @if($fichaPersonal['movimientos']->isNotEmpty())
+                <x-ui.section-card title="Últimos cambios laborales" icon="ph-clock-counter-clockwise" class="rm-staff-record__documents">
+                    <ol class="rm-staff-record__list">
+                        @foreach($fichaPersonal['movimientos'] as $movimiento)
+                            <li class="rm-staff-record__file">
+                                <div>
+                                    <strong>{{ $movimiento->fecha_hora_efecto->format('d/m/Y H:i') }}</strong>
+                                    <p>{{ $movimiento->motivo }}</p>
+                                </div>
+                                <span><x-ui.status-badge :estado="$movimiento->estado_anterior" /> → <x-ui.status-badge :estado="$movimiento->estado_nuevo" /></span>
+                            </li>
+                        @endforeach
+                    </ol>
+                </x-ui.section-card>
+            @endif
         </div>
     </div>
 
