@@ -1,6 +1,6 @@
 <x-sistema-layout>
 <div class="rm-management-workspace space-y-4">
-    <x-ui.collection-header :title="$persona->nombre_completo" subtitle="Ficha administrativa del residente" icon="ph-user"><x-slot:actions><a class="rm-btn-secondary" href="{{ route('admin.residentes.index') }}">Volver a residentes</a></x-slot:actions></x-ui.collection-header>
+    <x-ui.collection-header :title="$persona->nombre_completo" subtitle="Ficha administrativa del residente" icon="ph-user"><x-slot:actions>@can('residentes_contactos.ver')<a class="rm-btn rm-btn-secondary" href="{{ route('admin.familia-social.red-apoyo', ['residente'=>$persona->getKey()]) }}">Familiares y contactos</a>@endcan <a class="rm-btn-secondary" href="{{ route('admin.residentes.index') }}">Volver a residentes</a></x-slot:actions></x-ui.collection-header>
     <nav class="rm-management-tabs" aria-label="Secciones autorizadas de la ficha">@foreach($tabs as $clave=>$nombre)<a href="{{ route('admin.residentes.show', [$persona, 'tab'=>$clave]) }}" class="{{ $tab === $clave ? 'rm-btn-primary' : 'rm-btn-secondary' }}" @if($tab === $clave) aria-current="page" @endif>{{ $nombre }}</a>@endforeach</nav>
     <x-ui.section-card :title="$tabs[$tab]" icon="ph-identification-card">
         @if($tab === 'resumen')

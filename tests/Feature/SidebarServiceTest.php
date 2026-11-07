@@ -302,4 +302,19 @@ class SidebarServiceTest extends TestCase
         $responseAdmin = $this->actingAs($user)->get(route('admin.administracion.dashboard'));
         $responseAdmin->assertOk();
     }
+    public function test_gerencia_agrupa_residentes_y_familiares_fuera_de_personal(): void
+    {
+        $gerente = User::factory()->create(['estado' => 'ACTIVO']);
+        $gerente->assignRole('GERENTE');
+        $this->actingAs($gerente);
+        $sidebar = collect(app(SidebarService::class)->getSidebar());
+        $personal = $sidebar->firstWhere('title', 'Personal');
+        $consulta = $sidebar->firstWhere('title', 'Consulta institucional');
+        $this->assertNotContains('Familiares y contactos', array_column($personal['items'], 'label'));
+        $this->assertSame(['Residentes', 'Familiares y contactos'], array_slice(array_column($consulta['items'], 'label'), 0, 2));
+        $routes = $this->extractAllRoutes($sidebar->all());
+        $this->assertSame(1, count(array_filter($routes, fn ($r) => $r === 'admin.residentes.index')));
+        $this->assertSame(1, count(array_filter($routes, fn ($r) => $r === 'admin.familia-social.red-apoyo')));
+    }
+
 }

@@ -209,4 +209,21 @@ class GerenciaContactosTest extends TestCase
         $this->assertSame($cuenta->getKey(), $c->fresh()->cod_usuario);
     }
 
+    public function test_red_muestra_residentes_existentes_y_busca_nombre_y_apellidos_sin_crear_datos(): void
+    {
+        $this->residente->update(['nombres' => 'Teresa de prueba', 'apellido_paterno' => 'Aguilar', 'apellido_materno' => 'Sintética']);
+        $c = $this->contacto();
+        app(GestionarRedApoyo::class)->vincular($this->gerente, $this->residente->getKey(), $c->getKey(), $this->datos());
+        $antes = Residente::count();
+        Livewire::test(RedApoyoPanel::class)->assertSee('Ver todos los residentes')
+            ->assertSeeHtml('data-residente-red="'.$this->residente->getKey().'"')
+            ->assertViewHas('residentes', fn ($p) => $p->contains(fn ($r) => $r->getKey() === $this->residente->getKey() && (int)$r->vinculos_contacto_count === 1))
+            ->set('buscar', 'Teresa Aguilar Sintética')->assertViewHas('residentes', fn ($p) => $p->count() === 1)
+            ->set('buscar', 'Nadie inexistente')->assertSee('No hay residentes con esa búsqueda')
+            ->call('limpiar')->set('residenteSeleccionado', $this->residente->getKey())->assertSee('Persona sintética Prueba');
+        $this->assertDatabaseCount('residentes', $antes);
+        $this->assertDatabaseCount('residentes_contactos', 1);
+        $this->assertDatabaseCount('personal', 0);
+    }
+
 }

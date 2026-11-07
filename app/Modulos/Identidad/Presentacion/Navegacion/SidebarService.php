@@ -150,7 +150,6 @@ class SidebarService
             $this->buildSection('Personal', 'ph-identification-badge', null, [
                 $this->buildItem('Personal institucional', 'admin.personal-institucional', 'personal_institucional.ver'),
                 $this->buildItem('Documentación laboral', 'admin.personal.documentacion', 'personal_institucional.ver'),
-                $this->buildItem('Familiares y contactos', 'admin.familia-social.red-apoyo', 'residentes_contactos.ver'),
             ]),
             $this->buildSection('Organización', 'ph-buildings', null, [
                 $this->buildItem('Áreas y equipo', 'admin.areas-institucionales.index', 'areas.ver'),
@@ -159,6 +158,7 @@ class SidebarService
             ]),
             $this->buildSection('Consulta institucional', 'ph-chart-line-up', null, [
                 $this->buildItem('Residentes', 'admin.residentes.index', 'residentes.ver'),
+                $this->buildItem('Familiares y contactos', 'admin.familia-social.red-apoyo', 'residentes_contactos.ver'),
                 $this->buildItem('Ocupación', 'admin.habitaciones.index', 'habitaciones.ver'),
                 $this->buildItem('Alertas', 'admin.alertas-clinicas.index', 'alertas.ver'),
                 $this->buildItem('Reportes gerenciales', 'admin.reportes.institucional.preview', 'reportes.institucional'),

@@ -279,8 +279,16 @@ class RedApoyoPanel extends Component
         if ($residente) {
             Gate::authorize('view', $residente);
         }
-        $residentes = Residente::where('estado', 'ADMITIDO')->when($this->vista === 'residentes' && trim($this->buscar) !== '', fn ($q) => $q->where(fn ($n) => $n->whereLike('nombres', '%'.trim($this->buscar).'%')->orWhereLike('apellido_paterno', '%'.trim($this->buscar).'%')->orWhereLike('apellido_materno', '%'.trim($this->buscar).'%')))
-            ->orderBy('apellido_paterno')->orderBy('nombres')->limit(40)->get(['cod_residente', 'nombres', 'apellido_paterno', 'apellido_materno', 'estado']);
+        $residentes = Residente::where('estado', 'ADMITIDO')
+            ->when($this->vista === 'residentes' && trim($this->buscar) !== '', function ($q): void {
+                foreach (array_slice(preg_split('/\s+/u', mb_substr(trim($this->buscar), 0, 100)), 0, 12) as $palabra) {
+                    $q->where(fn ($n) => $n->whereLike('nombres', '%'.$palabra.'%')
+                        ->orWhereLike('apellido_paterno', '%'.$palabra.'%')->orWhereLike('apellido_materno', '%'.$palabra.'%'));
+                }
+            })
+            ->orderBy('apellido_paterno')->orderBy('nombres')->limit(40)
+            ->select(['cod_residente', 'nombres', 'apellido_paterno', 'apellido_materno', 'estado'])
+            ->withCount('vinculosContacto')->get();
         $contactos = Contacto::query()->when(! $actor->can('contactos.ver'), fn ($q) => $q->whereHas('vinculos', fn ($v) => $v->where('cod_residente', $residente?->getKey() ?? '')))
             ->when($this->vista === 'personas' && trim($this->buscar) !== '', fn ($q) => $q->where(fn ($n) => $n->whereLike('nombres', '%'.trim($this->buscar).'%')->orWhereLike('apellido_paterno', '%'.trim($this->buscar).'%')->orWhereLike('numero_documento', '%'.trim($this->buscar).'%')))
             ->with(['vinculos' => fn ($q) => $q->when(! $actor->can('contactos.ver'), fn ($v) => $v->where('cod_residente', $residente?->getKey() ?? ''))->with('residente')])->orderBy('apellido_paterno')->orderBy('nombres')->paginate(12);

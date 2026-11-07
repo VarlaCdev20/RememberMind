@@ -43,6 +43,14 @@
 .rm-support-contact__manage .rm-management-actions { display: grid; gap: 8px; margin-top: 8px; }
 .rm-support-contact__manage button { min-height: 44px; text-align: start; }
 .rm-support-network__help { margin-top: 20px; }
+.rm-support-picker__grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(100%,260px),1fr)); gap: 12px; margin-block: 16px; }
+.rm-support-picker__resident { display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding: 16px; color: var(--rm-text-primary); text-decoration: none; box-shadow: var(--rm-shadow-sm); }
+.rm-support-picker__resident > div { min-width: 0; overflow-wrap: anywhere; }
+.rm-support-picker__resident h3 { font-size: 15px; font-weight: 800; line-height: 1.4; }
+.rm-support-picker__resident p { margin-top: 6px; font-size: 13px; color: var(--rm-text-secondary); }
+.rm-support-picker__resident div > span { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 24px; font-size: 13px; font-weight: 800; color: var(--rm-primary-ink); }
+.rm-support-picker__resident:hover { border-color: var(--rm-primary-ink); }
+.rm-support-picker__resident:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
 @media (max-width: 900px) {
     .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) table.rm-table { display: block; width: 100%; min-width: 0; }
     .rm-support-workspace :is(.rm-support-table, .rm-support-people-table) .rm-table thead { display: none; }

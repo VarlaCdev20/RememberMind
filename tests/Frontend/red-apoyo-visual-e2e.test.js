@@ -12,7 +12,7 @@ import puppeteer from 'puppeteer';
 
 test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 240000 }, async t => {
     const root = fileURLToPath(new URL('../../', import.meta.url));
-    const output = path.join(root, 'output', 'red-apoyo-visual-20261106');
+    const output = path.join(root, 'output', 'gerencia-residentes-conexion-20261107');
     await mkdir(output, { recursive: true });
     const db = path.join(tmpdir(), `remembermind-gerencia-${randomBytes(8).toString('hex')}_testing.sqlite`);
     await writeFile(db, '', { flag: 'wx', mode: 0o600 });
@@ -47,7 +47,13 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
     const empty = await page.$eval('#familia-residente', e => [...e.options].find(o=>o.value && !o.textContent.includes('Persona de prueba')).value);
     for(const width of [1440,1280,1024,768,390]) {
         await page.setViewport({width,height:1000});
-        await page.goto(base+'/admin/familia-social/red-apoyo?residente='+first,{waitUntil:'networkidle0'});
+        await page.goto(base+'/admin/familia-social/red-apoyo',{waitUntil:'networkidle0'});
+        await page.waitForSelector('[data-residente-red]', {visible:true});
+        assert.equal(await page.$$eval('[data-residente-red]', e=>e.length),3,'Residentes existentes visibles sin selección');
+        await page.screenshot({path:path.join(output,'residentes-disponibles-'+width+'.png'),fullPage:true});
+        await page.type('#familia-buscar','Persona de prueba Primer apellido');
+        await page.waitForFunction(()=>document.querySelectorAll('[data-residente-red]').length===1);
+        await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}), page.click('[data-residente-red="'+first+'"]')]);
         await page.waitForSelector('.rm-support-network',{visible:true});
         assert.equal(await page.$$eval('[data-vinculo-nodo]',e=>e.length),3);
         const text=await page.$eval('.rm-support-network',e=>e.innerText);
@@ -76,5 +82,10 @@ test('Red de apoyo: residente, contactos, tabla y cinco anchos', { timeout: 2400
         assert.ok(await page.$$eval('.rm-support-workspace tbody tr', rows => rows.every(r => r.scrollHeight <= r.clientHeight + 2)), 'Filas de personas sin contenido superpuesto');
         await page.screenshot({path:path.join(output,'personas-'+width+'.png'),fullPage:true});
     }
+    await page.goto(base+'/admin/residentes',{waitUntil:'networkidle0'});
+    assert.match(await page.$eval('main',e=>e.innerText),/Residentes/);
+    await page.waitForSelector('main a[href="'+base+'/admin/familia-social/red-apoyo"]',{visible:true});
+    assert.ok(await page.$$eval('a[href*="/admin/familia-social/red-apoyo?residente="]',e=>e.length)>0,'Directorio enlazado a la red de cada residente');
+    await page.screenshot({path:path.join(output,'directorio-residentes-390.png'),fullPage:true});
     assert.deepEqual(errors,[]);
 });

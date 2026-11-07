@@ -1,6 +1,6 @@
 <x-sistema-layout>
 <div class="rm-management-workspace space-y-4">
-    <x-ui.collection-header title="Residentes" subtitle="Identidad, estado administrativo y alojamiento registrado" icon="ph-users-three"><x-slot:actions>@if($verAlojamiento)<a href="{{ route('admin.habitaciones.index') }}" class="rm-btn-secondary">Ver ocupación</a>@endif</x-slot:actions></x-ui.collection-header>
+    <x-ui.collection-header title="Residentes" subtitle="Identidad, estado administrativo y alojamiento registrado" icon="ph-users-three"><x-slot:actions>@can('residentes_contactos.ver')<a href="{{ route('admin.familia-social.red-apoyo') }}" class="rm-btn rm-btn-secondary">Familiares y contactos</a>@endcan @if($verAlojamiento)<a href="{{ route('admin.habitaciones.index') }}" class="rm-btn-secondary">Ver ocupación</a>@endif</x-slot:actions></x-ui.collection-header>
     <div class="rm-management-overview"><x-ui.metric-card label="Residentes del filtro" :value="$resumen['total']" icon="ph-users" /><x-ui.metric-card label="Con alojamiento registrado" :value="$resumen['con_cama'] ?? 'Consulta restringida'" icon="ph-bed" /><x-ui.metric-card label="Sin alojamiento registrado" :value="$resumen['sin_cama'] ?? 'Consulta restringida'" icon="ph-house" /></div>
     <form method="GET" action="{{ route('admin.residentes.index') }}" class="rm-filter-bar rm-management-tabs">
         <input type="hidden" name="vista" value="{{ $vista }}">
@@ -18,7 +18,7 @@
     @elseif($vista === 'tarjetas')
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" role="list" aria-label="Residentes de la consulta">
         @foreach($residentes as $residente)
-        <x-ui.resident-card :resident="$residente" variant="management" :show-location="$verAlojamiento" :location="$verAlojamiento ? null : 'Consulta restringida'" primary-label="Ver ficha" :primary-href="route('admin.residentes.show', $residente)"><x-slot:status><span class="rm-badge">{{ str_replace('_', ' ', $residente->estado) }}</span></x-slot:status></x-ui.resident-card>
+        <x-ui.resident-card :resident="$residente" variant="management" :show-location="$verAlojamiento" :location="$verAlojamiento ? null : 'Consulta restringida'" primary-label="Ver ficha" :primary-href="route('admin.residentes.show', $residente)"><x-slot:status><span class="rm-badge">{{ str_replace('_', ' ', $residente->estado) }}</span></x-slot:status>@can('residentes_contactos.ver')<x-slot:menu><a href="{{ route('admin.familia-social.red-apoyo', ['residente' => $residente->getKey()]) }}">Familiares y contactos</a></x-slot:menu>@endcan</x-ui.resident-card>
         @endforeach
     </div>
     @else

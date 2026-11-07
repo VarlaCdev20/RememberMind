@@ -33,7 +33,9 @@
                 @foreach($vinculos as $vinculo)<tr wire:key="familia-vinculo-{{ $vinculo->getKey() }}"><th scope="row">{{ $vinculo->contacto->nombre_completo }}<small class="block">{{ $vinculo->contacto->celular ?: ($vinculo->contacto->telefono ?: 'Teléfono no registrado') }}</small></th><td data-label="Parentesco y función">{{ $vinculo->parentesco }}@if($vinculo->responsable_principal)<small class="block">Responsable principal</small>@endif @if($vinculo->contacto_emergencia)<small class="block">Contacto de emergencia</small>@endif</td><td data-label="Autorizaciones"><span class="block">Información: {{ $vinculo->autoriza_informacion ? 'Registrada; cada fuente conserva su permiso' : 'No acreditada' }}</span><span class="block">Salida: {{ $vinculo->autoriza_salida ? 'Registrada; requiere su proceso propio' : 'No acreditada' }}</span></td><td data-label="Vínculo">{{ $vinculo->estado==='ACTIVO' ? 'Activo' : 'Inactivo' }}</td><td data-label="Acciones">@include('social::livewire.residentes.red-apoyo-acciones-vinculo')</td></tr>@endforeach
                 </tbody></table></div>@endif
                 </div>
-            @else<x-ui.empty-state title="Selecciona un residente" description="Consulta sus contactos y las condiciones de cada vínculo sin modificar el expediente clínico." />@endif
+            @else
+                @include('social::livewire.residentes.red-apoyo-residentes')
+            @endif
         </x-ui.section-card>
     @else
         <x-ui.section-card title="Personas de contacto" icon="ph-address-book">
