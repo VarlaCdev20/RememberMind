@@ -71,7 +71,7 @@ test('Áreas de Gerencia: tarjetas compartidas, filtro y equipo en cinco anchos'
         await page.setViewport({width,height:960});
         await go('/admin/areas-institucionales');
         await page.waitForSelector('[data-area-card]');
-        assert.ok(await page.$eval('main',e=>e.innerText.includes('Áreas y equipo')));
+        assert.match(await page.$eval('main', e => e.innerText), /Áreas y equipo/i);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
         assert.doesNotMatch(await page.$eval('main',e=>e.innerText),/Sin Responsable|Seeder|undefined|\[object Object\]/);
         const total=await page.$$eval('[data-area-card]',e=>e.length);assert.ok(total>0);
@@ -86,7 +86,37 @@ test('Áreas de Gerencia: tarjetas compartidas, filtro y equipo en cinco anchos'
         await page.waitForSelector('#gerencia-area-equipo [role="dialog"]',{visible:true});
         await page.waitForSelector('#gerencia-area-fecha',{visible:true});
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+        const ficha = await page.$eval('#gerencia-area-equipo [role="dialog"]', dialogo => {
+            const rect = dialogo.getBoundingClientRect();
+            const lista = dialogo.querySelector('.rm-area-detail__people');
+            return {
+                cabe: rect.left >= 0 && rect.right <= innerWidth && rect.top >= 0 && rect.bottom <= innerHeight,
+                desborda: dialogo.scrollWidth > dialogo.clientWidth + 1,
+                personas: lista?.children.length,
+                texto: lista?.innerText,
+            };
+        });
+        assert.equal(ficha.cabe, true);
+        assert.equal(ficha.desborda, false);
+        assert.equal(ficha.personas, 3);
+        assert.match(ficha.texto, /Profesional de prueba 1/);
+        assert.match(ficha.texto, /Función asignada/);
         await page.screenshot({path:join(out,'equipo-'+width+'.png'),fullPage:true});
+        if (width === 390) {
+            const fechaOriginal = await page.$eval('#gerencia-area-fecha', input => {
+                const anterior = input.value;
+                const siguiente = new Date(anterior + 'T00:00:00Z');
+                siguiente.setUTCDate(siguiente.getUTCDate() + 1);
+                input.value = siguiente.toISOString().slice(0, 10);
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                return anterior;
+            });
+            await page.waitForFunction(() => document.querySelector('#gerencia-area-equipo').innerText.includes('Sin asignaciones para esta fecha'));
+            await page.click('#gerencia-area-equipo .rm-area-detail__dates button:first-child');
+            await page.waitForFunction(fecha => document.querySelector('#gerencia-area-fecha').value === fecha
+                && document.querySelectorAll('#gerencia-area-equipo .rm-area-detail__people li').length === 3, {}, fechaOriginal);
+        }
         await page.evaluate(async()=>{const comp=[...document.querySelectorAll('[wire\\:id]')].find(e=>e.querySelector('#areas-buscar'));await Livewire.find(comp.getAttribute('wire:id')).call('cerrarFicha');});
         await page.waitForFunction(()=>!document.getElementById('gerencia-area-equipo'));
     }

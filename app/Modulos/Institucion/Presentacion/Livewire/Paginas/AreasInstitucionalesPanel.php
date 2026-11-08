@@ -16,6 +16,7 @@ use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -104,12 +105,22 @@ class AreasInstitucionalesPanel extends Component
             $areas = Area::query()->with('fotografiaPrincipal:cod_fotografia,titulo,texto_alternativo,estado')->when(trim($this->search) !== '', fn ($q) => $q->where(fn ($buscar) => $buscar->whereLike('nombre', '%'.trim($this->search).'%')->orWhereLike('cod_area', '%'.trim($this->search).'%')))
                 ->when($this->filtroEstado, fn ($q) => $q->whereIn('estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO', 'ACTIVA'] : ['INACTIVO', 'INACTIVA']))->orderBy('nombre')->get();
             $equipo = null;
-            $areaActual = $this->mostrarFicha && $this->areaSeleccionada ? Area::findOrFail($this->areaSeleccionada->getKey()) : null;
-            if ($areaActual && auth()->user()->can('jornadas.ver') && auth()->user()->can('asignaciones_personal.ver')) {
-                $equipo = app(ConsultarCoberturaEquipo::class)->consultar(auth()->user(), ['area' => $areaActual->getKey(), 'fecha' => $this->fechaEquipo]);
+            $areaActual = $this->mostrarFicha && $this->areaSeleccionada
+                ? Area::with('fotografiaPrincipal:cod_fotografia,titulo,texto_alternativo,estado')->findOrFail($this->areaSeleccionada->getKey()) : null;
+            $puedeVerEquipo = $actor->can('personal.ver') && $actor->can('jornadas.ver')
+                && $actor->can('asignaciones_personal.ver') && ! $actor->hasRole('FAMILIAR');
+            if ($areaActual && $puedeVerEquipo) {
+                $fechaValidada = Validator::make(['fechaEquipo' => $this->fechaEquipo], ['fechaEquipo' => 'required|date_format:Y-m-d'],
+                    ['fechaEquipo.required' => 'Selecciona una fecha para consultar el equipo.', 'fechaEquipo.date_format' => 'Selecciona una fecha válida.']);
+                if ($fechaValidada->fails()) {
+                    $this->addError('fechaEquipo', $fechaValidada->errors()->first('fechaEquipo'));
+                } else {
+                    $equipo = app(ConsultarCoberturaEquipo::class)->consultar($actor,
+                        ['area' => $areaActual->getKey(), 'fecha' => $this->fechaEquipo], incluirFechasArea: true);
+                }
             }
 
-            return view('institucion::livewire.gerencia.areas-equipo', [...compact('areas', 'areaActual', 'equipo', 'totalAreas', 'areasActivas', 'areasInactivas'), ...$vistaFotos]);
+            return view('institucion::livewire.gerencia.areas-equipo', [...compact('areas', 'areaActual', 'equipo', 'puedeVerEquipo', 'totalAreas', 'areasActivas', 'areasInactivas'), ...$vistaFotos]);
         }
         $reporte = app(AreasReportDataService::class)->getGeneralReportData();
         $areas = $reporte['areas']
@@ -306,6 +317,11 @@ class AreasInstitucionalesPanel extends Component
     {
         $this->mostrarFicha = false;
         $this->areaSeleccionada = null;
+    }
+
+    public function updatedFechaEquipo(): void
+    {
+        $this->resetValidation('fechaEquipo');
     }
 
     public function cerrarFormulario()

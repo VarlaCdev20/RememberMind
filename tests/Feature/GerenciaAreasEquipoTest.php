@@ -49,6 +49,43 @@ class GerenciaAreasEquipoTest extends TestCase
         Livewire::test(AreasInstitucionalesPanel::class)->assertForbidden();
     }
 
+    public function test_ficha_separa_funcion_de_profesion_y_cuenta_una_vez_por_persona(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $gerente = User::factory()->create();
+        $gerente->assignRole('GERENTE');
+        $this->actingAs($gerente);
+        $trabajador = User::factory()->create(['nombres' => 'Equipo de prueba']);
+        $trabajador->assignRole('ENFERMEROS');
+        $personal = $trabajador->personal;
+        $personal->update(['profesion' => 'Enfermería de prueba']);
+        $area = Area::create(['nombre' => 'Área sintética', 'descripcion' => 'Organiza el acompañamiento diario.', 'estado' => 'ACTIVA']);
+        $otraArea = Area::create(['nombre' => 'Otra área', 'estado' => 'ACTIVA']);
+        $manana = Turno::create(['nombre' => 'Mañana', 'hora_inicio' => '08:00:00', 'hora_cierre' => '16:00:00', 'estado' => 'ACTIVO', 'orden' => 1]);
+        $noche = Turno::create(['nombre' => 'Noche', 'hora_inicio' => '20:00:00', 'hora_cierre' => '06:00:00', 'estado' => 'ACTIVO', 'orden' => 2]);
+
+        foreach ([[$manana, '2026-10-26', $area, 'Coordinar acompañamiento'], [$noche, '2026-10-26', $area, null],
+            [$manana, '2026-10-28', $otraArea, 'Función ajena'], [$manana, '2026-10-30', $area, 'Actividad futura']] as [$turno, $fecha, $destino, $funcion]) {
+            $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => $fecha, 'estado' => 'ABIERTA']);
+            AsignacionPersonal::create(['cod_personal' => $personal->getKey(), 'cod_area' => $destino->getKey(),
+                'cod_jornada' => $jornada->getKey(), 'estado' => 'ACTIVA', 'funcion' => $funcion]);
+        }
+
+        $panel = Livewire::test(AreasInstitucionalesPanel::class)->set('fechaEquipo', '2026-10-26')->call('verArea', $area->getKey())
+            ->assertSee('Organiza el acompañamiento diario.')->assertSee('Enfermería de prueba')->assertSee('Coordinar acompañamiento')
+            ->assertSee('Sin función específica registrada')->assertSee('26/10 20:00')->assertSee('27/10 06:00');
+        $this->assertSame(['personas' => 1, 'turnos' => 2, 'asignaciones' => 2], $panel->viewData('equipo')['resumen']);
+
+        $panel->set('fechaEquipo', '2026-10-28')->assertDontSee('Función ajena')->assertSee('Sin asignaciones para esta fecha');
+        $this->assertSame(['anterior' => '2026-10-26', 'siguiente' => '2026-10-30'], $panel->viewData('equipo')['fechasArea']);
+        $panel->set('fechaEquipo', '')->assertHasErrors('fechaEquipo')->assertDontSee('Actividad futura')
+            ->set('fechaEquipo', '2026-10-30')->assertHasNoErrors()->assertSee('Actividad futura');
+
+        Role::findByName('GERENTE', 'web')->revokePermissionTo('personal.ver');
+        $panel->call('$refresh')->assertSee('Consulta de equipo restringida')->assertDontSee('Actividad futura')
+            ->assertDontSee('Equipo de prueba');
+    }
+
     public function test_da01_bloquea_desactivar_con_asignaciones_y_permite_despues_de_cerrarlas(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
