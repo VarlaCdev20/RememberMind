@@ -126,7 +126,7 @@ class AreasReportDataService
 
     private function areasConUsuarios(): EloquentCollection
     {
-        return Area::query()->with('asignaciones.personal.usuario.roles')->orderBy('nombre')->get()
+        return Area::query()->with(['asignaciones.personal.usuario.roles', 'fotografiaPrincipal:cod_fotografia,titulo,texto_alternativo,estado'])->orderBy('nombre')->get()
             ->map(fn (Area $area) => $this->prepararArea($area));
     }
 

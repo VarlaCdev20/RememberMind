@@ -188,7 +188,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 **PK:** `cod_area string(20)`
 
 
-**FK:** ninguna.
+**FK:** `cod_fotografia → fotografias_institucionales.cod_fotografia`, opcional,
+con índice y UPDATE/DELETE RESTRICT. Ampliación autorizada el 08/11/2026;
+véase [fotografía principal del área](DECISION_FOTOGRAFIA_AREA_2026_11_08.md).
 
 
 **Atributos:**
@@ -198,6 +200,9 @@ Todas las PK `cod_*` usan `string(20)` salvo decisión futura explícitamente ap
 - `descripcion text NULL`
 
 - `estado string(20)`
+
+- `cod_fotografia string(20) NULL` — una fotografía principal por área; no duplica
+  los archivos ni los metadatos conservados en Galería.
 
 
 **Relaciones:**

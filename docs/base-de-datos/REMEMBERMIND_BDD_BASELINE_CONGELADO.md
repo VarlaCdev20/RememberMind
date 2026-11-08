@@ -619,3 +619,13 @@ La [decisión Eliminación V2](DECISION_ELIMINACION_V2.md) autoriza únicamente 
 ## Extensión aprobada posterior: Movilidad V2 — 2026-10-10
 
 La [decisión Movilidad V2](DECISION_MOVILIDAD_V2.md) autoriza exactamente nueve columnas nullable en `registros_movilidad`. Conserva las columnas previas, filas históricas, PK/FK, relaciones, índices y el inventario de 71 tablas operativas. La aprobación no incluye cambios estructurales en otros módulos ni nuevas reglas clínicas.
+
+## Fotografía principal del área — autorización del 08/11/2026
+
+La [decisión de fotografía del área](DECISION_FOTOGRAFIA_AREA_2026_11_08.md)
+autoriza exclusivamente `areas.cod_fotografia VARCHAR(20) NULL`, índice y FK
+a `fotografias_institucionales.cod_fotografia` con UPDATE/DELETE RESTRICT.
+Una fila sigue identificando un área, con hasta una imagen principal. Sin nuevas
+tablas ni permisos, duplicación de archivos, JSON/EAV o asignación supuesta a
+datos anteriores. La instalación se acredita en su informe fechado; la aprobación
+no equivale por sí sola a ejecución.

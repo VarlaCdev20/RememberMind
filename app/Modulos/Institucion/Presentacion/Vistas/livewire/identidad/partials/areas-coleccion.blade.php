@@ -113,14 +113,20 @@
  @forelse($areas as $area)
  @php
  $esInactiva = in_array($area->estado, ['INACTIVA', 'INACTIVO'], true);
+ $fotoVisible = $puedeVerFotos && $area->fotografiaPrincipal?->estado === 'ACTIVA';
  @endphp
  <div data-area-card="{{ $area->getKey() }}" wire:key="area-card-{{ $area->getKey() }}" class="group relative rounded-3xl transition-all duration-300 hover:-translate-y-1 rm-card overflow-hidden border-2 border-transparent hover:border-borde-suave flex flex-col {{ $esInactiva ? 'opacity-70 grayscale bg-[var(--surface-soft)]' : '' }}">
 
  {{-- Cabecera institucional --}}
  <div class="relative h-36 w-full shrink-0 overflow-hidden bg-[var(--surface-soft)]">
+ @if($fotoVisible)
+ <img class="h-full w-full object-cover" src="{{ route('admin.galeria.archivo', [$area->fotografiaPrincipal->getKey(), 'imagen']) }}" alt="{{ $area->fotografiaPrincipal->texto_alternativo ?: $area->fotografiaPrincipal->titulo }}" loading="lazy">
+ <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" aria-hidden="true"></div>
+ @else
  <div class="h-full w-full flex items-center justify-center bg-[var(--rm-primary-soft)]">
  <i class="ph-bold ph-buildings text-[var(--rm-primary)] text-5xl opacity-40" aria-hidden="true"></i>
  </div>
+ @endif
 
  {{-- Estado --}}
  <div class="absolute top-4 left-4 flex flex-wrap gap-2">
@@ -137,7 +143,7 @@
 
  {{-- Nombre del área encima de la imagen --}}
  <div class="absolute bottom-4 left-4 right-4">
- <h3 class="text-base font-extrabold text-[var(--rm-text-primary)] leading-snug break-words">
+ <h3 class="text-base font-extrabold {{ $fotoVisible ? 'text-white' : 'text-[var(--rm-text-primary)]' }} leading-snug break-words">
  {{ $area->nombre }}
  </h3>
  </div>

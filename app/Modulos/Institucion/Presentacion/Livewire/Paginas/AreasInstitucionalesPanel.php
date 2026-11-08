@@ -3,8 +3,11 @@
 namespace App\Modulos\Institucion\Presentacion\Livewire\Paginas;
 
 use App\Models\Area;
+use App\Models\FotografiaInstitucional;
 use App\Models\User;
 use App\Modulos\Institucion\Aplicacion\Acciones\GestionarAreasInstitucionales;
+use App\Modulos\Institucion\Aplicacion\Consultas\ConsultarCoberturaEquipo;
+use App\Modulos\Institucion\Presentacion\Policies\FotografiaInstitucionalPolicy;
 use App\Modulos\Reportes\Aplicacion\Consultas\AreasReportDataService;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\AreasInstitucionalesExport;
 use App\Modulos\Reportes\Infraestructura\Exportaciones\ReportExportService;
@@ -13,10 +16,17 @@ use App\Modulos\Reportes\Infraestructura\Exportaciones\UsuariosPorAreaExport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AreasInstitucionalesPanel extends Component
 {
+    use WithFileUploads, WithPagination;
+
     // Filtros de búsqueda
     public $search = '';
 
@@ -31,6 +41,7 @@ class AreasInstitucionalesPanel extends Component
 
     public $mostrarReportes = false;
 
+    #[Locked]
     public $isEdit = false;
 
     // Reportes interactivos
@@ -39,6 +50,7 @@ class AreasInstitucionalesPanel extends Component
     public $reporteData = [];
 
     // Propiedades del formulario
+    #[Locked]
     public $areaId; // Corresponde al cod_area
 
     public $nombre;
@@ -46,6 +58,19 @@ class AreasInstitucionalesPanel extends Component
     public $descripcion;
 
     public $estado = 'ACTIVO';
+
+    public ?string $cod_fotografia = null;
+
+    public $archivo_fotografia = null;
+
+    public string $texto_alternativo = '';
+
+    public bool $selectorFotografiaAbierto = false;
+
+    public string $busquedaFotografia = '';
+
+    #[Locked]
+    public array $formularioAreaOriginal = [];
 
     // Ficha de detalle de área
     public $areaSeleccionada = null;
@@ -60,20 +85,31 @@ class AreasInstitucionalesPanel extends Component
     public function render()
     {
         abort_unless($this->usuarioAutorizado('areas.ver'), 403);
-        if (auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+        $policyFotos = app(FotografiaInstitucionalPolicy::class);
+        $actor = Auth::user()->fresh();
+        $puedeVerFotos = $policyFotos->viewAny($actor);
+        $puedeSubirFoto = $policyFotos->manage($actor);
+        $fotoArea = $this->mostrarFormulario && $puedeVerFotos && $this->cod_fotografia
+            ? FotografiaInstitucional::select('cod_fotografia', 'titulo', 'texto_alternativo', 'estado')->find($this->cod_fotografia) : null;
+        $fotosGaleriaArea = $this->mostrarFormulario && $this->selectorFotografiaAbierto && $puedeVerFotos
+            ? FotografiaInstitucional::select('cod_fotografia', 'titulo', 'texto_alternativo', 'estado')
+                ->where('estado', 'ACTIVA')->when(trim($this->busquedaFotografia) !== '', fn ($q) => $q->whereLike('titulo', '%'.trim($this->busquedaFotografia).'%'))
+                ->orderByDesc('fecha_registro')->orderByDesc('cod_fotografia')->paginate(8, ['*'], 'fotografiasArea') : null;
+        $vistaFotos = compact('puedeVerFotos', 'puedeSubirFoto', 'fotoArea', 'fotosGaleriaArea');
+        if (auth()->user()->hasRole('GERENTE') && ! auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $resumen = Area::query()->get(['estado']);
             $totalAreas = $resumen->count();
-            $areasActivas = $resumen->whereIn('estado', ['ACTIVO','ACTIVA'])->count();
+            $areasActivas = $resumen->whereIn('estado', ['ACTIVO', 'ACTIVA'])->count();
             $areasInactivas = $totalAreas - $areasActivas;
-            $areas = Area::query()->when(trim($this->search) !== '', fn ($q) => $q->where(fn ($buscar) => $buscar->whereLike('nombre', '%'.trim($this->search).'%')->orWhereLike('cod_area', '%'.trim($this->search).'%')))
-                ->when($this->filtroEstado, fn ($q) => $q->whereIn('estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO','ACTIVA'] : ['INACTIVO','INACTIVA']))->orderBy('nombre')->get();
+            $areas = Area::query()->with('fotografiaPrincipal:cod_fotografia,titulo,texto_alternativo,estado')->when(trim($this->search) !== '', fn ($q) => $q->where(fn ($buscar) => $buscar->whereLike('nombre', '%'.trim($this->search).'%')->orWhereLike('cod_area', '%'.trim($this->search).'%')))
+                ->when($this->filtroEstado, fn ($q) => $q->whereIn('estado', $this->filtroEstado === 'ACTIVO' ? ['ACTIVO', 'ACTIVA'] : ['INACTIVO', 'INACTIVA']))->orderBy('nombre')->get();
             $equipo = null;
             $areaActual = $this->mostrarFicha && $this->areaSeleccionada ? Area::findOrFail($this->areaSeleccionada->getKey()) : null;
             if ($areaActual && auth()->user()->can('jornadas.ver') && auth()->user()->can('asignaciones_personal.ver')) {
-                $equipo = app(\App\Modulos\Institucion\Aplicacion\Consultas\ConsultarCoberturaEquipo::class)->consultar(auth()->user(), ['area'=>$areaActual->getKey(),'fecha'=>$this->fechaEquipo]);
+                $equipo = app(ConsultarCoberturaEquipo::class)->consultar(auth()->user(), ['area' => $areaActual->getKey(), 'fecha' => $this->fechaEquipo]);
             }
 
-            return view('institucion::livewire.gerencia.areas-equipo', compact('areas','areaActual','equipo','totalAreas','areasActivas','areasInactivas'));
+            return view('institucion::livewire.gerencia.areas-equipo', [...compact('areas', 'areaActual', 'equipo', 'totalAreas', 'areasActivas', 'areasInactivas'), ...$vistaFotos]);
         }
         $reporte = app(AreasReportDataService::class)->getGeneralReportData();
         $areas = $reporte['areas']
@@ -96,6 +132,7 @@ class AreasInstitucionalesPanel extends Component
         $areasSinUsuarios = $reporte['areasSinUsuarios'];
 
         return view('livewire.identidad.areas-institucionales-panel', [
+            ...$vistaFotos,
             'areas' => $areas,
             'todosResponsables' => $todosResponsables,
             'totalAreas' => $totalAreas,
@@ -141,6 +178,7 @@ class AreasInstitucionalesPanel extends Component
         $this->resetErrorBag();
         $this->resetForm();
         $this->isEdit = false;
+        $this->recordarFormularioOriginal();
         $this->mostrarFormulario = true;
         $this->mostrarFicha = false;
     }
@@ -159,12 +197,15 @@ class AreasInstitucionalesPanel extends Component
         }
 
         $this->resetErrorBag();
+        $this->resetForm();
         $area = app(AreasReportDataService::class)->getAreaReportData($codArea)['area'];
 
         $this->areaId = $area->cod_area;
         $this->nombre = $area->nombre;
         $this->descripcion = $area->descripcion;
         $this->estado = in_array($area->estado, ['ACTIVO', 'ACTIVA'], true) ? 'ACTIVO' : 'INACTIVO';
+        $this->cod_fotografia = $area->cod_fotografia;
+        $this->recordarFormularioOriginal();
 
         $this->isEdit = true;
         $this->mostrarFormulario = true;
@@ -188,11 +229,24 @@ class AreasInstitucionalesPanel extends Component
             'nombre' => 'required|string|max:80|unique:areas,nombre,'.($this->areaId ?? 'NULL').',cod_area',
             'descripcion' => 'nullable|string',
             'estado' => 'required|in:ACTIVO,INACTIVO',
+            'cod_fotografia' => 'nullable|string|max:20',
+            'archivo_fotografia' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'texto_alternativo' => 'nullable|string|max:255',
         ];
 
         $this->validate($rules);
 
-        $mensaje = app(GestionarAreasInstitucionales::class)->guardarArea(Auth::user(), ['nombre' => $this->nombre, 'descripcion' => $this->descripcion, 'estado' => $this->estado, 'isEdit' => $this->isEdit, 'areaId' => $this->areaId]);
+        try {
+            $mensaje = app(GestionarAreasInstitucionales::class)->guardarArea(Auth::user(), ['nombre' => $this->nombre, 'descripcion' => $this->descripcion, 'estado' => $this->estado, 'isEdit' => $this->isEdit, 'areaId' => $this->areaId,
+                'cod_fotografia' => $this->cod_fotografia, 'archivo_fotografia' => $this->archivo_fotografia, 'texto_alternativo' => $this->texto_alternativo]);
+        } catch (ValidationException|HttpException $error) {
+            throw $error;
+        } catch (\Throwable $error) {
+            report($error);
+            $this->addError('guardadoArea', 'No se pudo guardar el área. Tus datos se conservan; vuelve a intentarlo.');
+
+            return;
+        }
         $this->mostrarFormulario = false;
         $this->resetForm();
 
@@ -234,10 +288,11 @@ class AreasInstitucionalesPanel extends Component
     public function verArea($codArea)
     {
         abort_unless($this->usuarioAutorizado('areas.ver'), 403);
-        if (auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
+        if (auth()->user()->hasRole('GERENTE') && ! auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->areaSeleccionada = Area::findOrFail($codArea);
             $this->mostrarFicha = true;
             $this->mostrarFormulario = false;
+
             return;
         }
         $this->areaSeleccionada = app(AreasReportDataService::class)
@@ -257,6 +312,65 @@ class AreasInstitucionalesPanel extends Component
     {
         $this->mostrarFormulario = false;
         $this->resetForm();
+    }
+
+    public function abrirGaleriaArea(): void
+    {
+        $this->autorizarFormularioFoto();
+        abort_unless(app(FotografiaInstitucionalPolicy::class)->viewAny(Auth::user()->fresh()), 403);
+        $this->selectorFotografiaAbierto = ! $this->selectorFotografiaAbierto;
+    }
+
+    public function seleccionarFotografia(string $codigo): void
+    {
+        $this->autorizarFormularioFoto();
+        $policy = app(FotografiaInstitucionalPolicy::class);
+        $actor = Auth::user()->fresh();
+        abort_unless($policy->viewAny($actor), 403);
+        $foto = FotografiaInstitucional::findOrFail($codigo);
+        if (! $policy->view($actor, $foto)) {
+            $this->addError('cod_fotografia', 'Esta imagen está archivada. Elige otra fotografía.');
+
+            return;
+        }
+        $this->cod_fotografia = $foto->getKey();
+        $this->reset('archivo_fotografia', 'texto_alternativo', 'selectorFotografiaAbierto');
+        $this->resetValidation(['cod_fotografia', 'archivo_fotografia']);
+    }
+
+    public function quitarFotografia(): void
+    {
+        $this->autorizarFormularioFoto();
+        $this->reset('cod_fotografia', 'archivo_fotografia', 'texto_alternativo');
+        $this->resetValidation(['cod_fotografia', 'archivo_fotografia']);
+    }
+
+    public function updatedArchivoFotografia(): void
+    {
+        $this->autorizarFormularioFoto();
+        abort_unless(app(FotografiaInstitucionalPolicy::class)->manage(Auth::user()->fresh()), 403);
+        $this->validateOnly('archivo_fotografia', ['archivo_fotografia' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048']);
+        if ($this->archivo_fotografia) {
+            $this->cod_fotografia = null;
+            $this->selectorFotografiaAbierto = false;
+        }
+    }
+
+    public function updatedBusquedaFotografia(): void
+    {
+        $this->resetPage('fotografiasArea');
+    }
+
+    private function autorizarFormularioFoto(): void
+    {
+        abort_unless($this->mostrarFormulario && $this->usuarioAutorizado($this->isEdit ? 'areas.editar' : 'areas.crear'), 403);
+    }
+
+    private function recordarFormularioOriginal(): void
+    {
+        $this->formularioAreaOriginal = ['nombre' => (string) $this->nombre, 'descripcion' => (string) $this->descripcion,
+            'estado' => (string) $this->estado, 'cod_fotografia' => (string) $this->cod_fotografia,
+            'archivo' => false, 'texto_alternativo' => (string) $this->texto_alternativo];
     }
 
     // ── MÓDULO DE REPORTES INTERACTIVOS ──
@@ -677,5 +791,7 @@ class AreasInstitucionalesPanel extends Component
         $this->nombre = '';
         $this->descripcion = '';
         $this->estado = 'ACTIVO';
+        $this->reset('cod_fotografia', 'archivo_fotografia', 'texto_alternativo', 'selectorFotografiaAbierto', 'busquedaFotografia', 'formularioAreaOriginal');
+        $this->resetPage('fotografiasArea');
     }
 }

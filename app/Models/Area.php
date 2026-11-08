@@ -1,9 +1,33 @@
 <?php
+
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-class Area extends ModeloOperativo {
-    protected $table='areas'; protected $primaryKey='cod_area';
-    public function asignaciones(): HasMany { return $this->hasMany(AsignacionPersonal::class,'cod_area','cod_area'); }
-    public function atenciones(): HasMany { return $this->hasMany(Atencion::class,'cod_area','cod_area'); }
-    public function planesCuidado(): HasMany { return $this->hasMany(PlanCuidado::class,'cod_area','cod_area'); }
+
+class Area extends ModeloOperativo
+{
+    protected $table = 'areas';
+
+    protected $primaryKey = 'cod_area';
+
+    public function fotografiaPrincipal(): BelongsTo
+    {
+        return $this->belongsTo(FotografiaInstitucional::class, 'cod_fotografia', 'cod_fotografia');
+    }
+
+    public function asignaciones(): HasMany
+    {
+        return $this->hasMany(AsignacionPersonal::class, 'cod_area', 'cod_area');
+    }
+
+    public function atenciones(): HasMany
+    {
+        return $this->hasMany(Atencion::class, 'cod_area', 'cod_area');
+    }
+
+    public function planesCuidado(): HasMany
+    {
+        return $this->hasMany(PlanCuidado::class, 'cod_area', 'cod_area');
+    }
 }
