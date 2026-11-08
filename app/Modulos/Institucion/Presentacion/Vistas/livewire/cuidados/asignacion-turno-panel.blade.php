@@ -113,7 +113,7 @@
                     </div>
                     @if($asignacion->estado === 'ACTIVA')
                         @can('turnos.finalizar')
-                            <x-secondary-button wire:click="finalizarAsignacion('{{ $asignacion->cod_asignacion }}')" wire:confirm="¿Finalizar esta asignación?" class="rounded-xl border-[var(--rm-border)] text-xs font-bold shrink-0">
+                            <x-secondary-button wire:click="finalizarAsignacion('{{ $asignacion->cod_asignacion }}')" data-rm-confirm="¿Finalizar esta asignación?" class="rounded-xl border-[var(--rm-border)] text-xs font-bold shrink-0">
                                 Finalizar
                             </x-secondary-button>
                         @endcan

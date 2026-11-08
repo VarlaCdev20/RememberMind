@@ -57,6 +57,7 @@ final class ResultadosEstudiosService
                 'observaciones' => $documento->observacion ?: $documento->descripcion,
                 'hallazgos' => null, 'conclusion' => null, 'tiene_documento' => filled($documento->ruta_archivo),
                 'nombre_documento' => $documento->titulo.'.'.strtolower((string) $documento->formato),
+                'url_documento' => filled($documento->ruta_archivo) ? route('admin.documentos-clinicos.descargar', $documento->getKey()) : null,
                 'ruta_documento' => $documento->ruta_archivo, 'es_real_db' => true, 'historico_valores' => [],
             ]);
         }
@@ -158,6 +159,7 @@ final class ResultadosEstudiosService
             'hallazgos' => $informe?->hallazgos, 'conclusion' => $informe?->conclusion,
             'tiene_documento' => (bool) $documento,
             'nombre_documento' => $documento ? $documento->titulo.'.'.strtolower((string) $documento->formato) : null,
+            'url_documento' => $documento && filled($documento->ruta_archivo) ? route('admin.documentos-clinicos.descargar', $documento->getKey()) : null,
             'ruta_documento' => $documento?->ruta_archivo, 'es_real_db' => true, 'historico_valores' => [],
         ];
     }

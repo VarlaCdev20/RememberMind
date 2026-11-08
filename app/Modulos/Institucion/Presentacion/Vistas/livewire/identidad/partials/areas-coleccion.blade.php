@@ -223,7 +223,11 @@
  @can('areas.cambiar_estado')
  <button type="button"
  wire:click="toggleEstado('{{ $area->cod_area }}')"
- wire:confirm="¿Está seguro de cambiar el estado de este área institucional?"
+ data-rm-confirm="{{ $esInactiva ? '¿Activar esta área institucional?' : '¿Desactivar esta área institucional?' }}"
+ data-rm-confirm-title="Estado del área"
+ data-rm-confirm-subject="{{ $area->nombre }}"
+ data-rm-confirm-label="{{ $esInactiva ? 'Activar área' : 'Desactivar área' }}"
+ data-rm-confirm-tone="{{ $esInactiva ? 'neutral' : 'danger' }}"
  class="inline-flex h-11 w-11 items-center justify-center rounded-full transition duration-200 {{ $esInactiva ? 'bg-estado-exitoBg text-estado-exito hover:bg-estado-exitoBg hover:text-inverso' : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-inverso' }}"
  title="{{ $esInactiva ? 'Activar Área' : 'Desactivar Área' }}">
  <i class="ph-bold {{ $esInactiva ? 'ph-power' : 'ph-x-circle' }}"></i>

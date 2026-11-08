@@ -66,7 +66,7 @@
                 <p class="text-sm text-rm-secondary">El nombre corresponde a la cuenta actual. Este historial no conserva una copia del documento ni de la dirección de correo utilizada.</p>
                 @if($detalle['actual']['estado'] === 'FALLIDO')
                     <p class="text-sm">Volver a solicitar prepara un documento nuevo con los datos y el correo actuales. Comprueba que sean correctos.</p>
-                    <button type="button" class="rm-btn rm-btn-primary" wire:click="reenviar" wire:confirm="¿Solicitar otro envío de este documento? Se utilizarán los datos y el correo actuales del usuario." wire:loading.attr="disabled" wire:target="reenviar">Volver a solicitar envío</button>
+                    <button type="button" class="rm-btn rm-btn-primary" wire:click="reenviar" data-rm-confirm="¿Solicitar otro envío de este documento? Se utilizarán los datos y el correo actuales del usuario." wire:loading.attr="disabled" wire:target="reenviar">Volver a solicitar envío</button>
                 @endif
             </div>
         @endif

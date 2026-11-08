@@ -42,6 +42,7 @@ class ResultadosEstudiosRealesTest extends TestCase
             self::assertSame('Documento adjunto', $fila['resultado_valor']);
             self::assertNull($fila['parametro_clave']);
             self::assertSame('No registrado', $fila['profesional_nombre']);
+            self::assertSame(route('admin.documentos-clinicos.descargar', $fila['cod_doc']), $fila['url_documento']);
         }
     }
 

@@ -432,7 +432,7 @@
  @can('documentos.gestionar')
  <button type="button"
  wire:click="validarDoc('{{ $item['documento']->getKey() }}')"
- wire:confirm="¿Está seguro de validar este documento?"
+ data-rm-confirm="¿Está seguro de validar este documento?"
  class="inline-flex items-center gap-1 rounded-full bg-estado-exitoBg px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-inverso shadow-sm hover:bg-fondo-panel active:scale-95"
  title="Validar documento">
  <i class="ph-bold ph-check"></i> Validar
@@ -615,7 +615,7 @@
  @if($usuario->cod_usuario !== auth()->id())
  <button type="button"
  wire:click="toggleAcceso"
- wire:confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
+ data-rm-confirm="¿Está seguro de cambiar el estado de acceso del usuario?"
  class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase text-inverso shadow-md transition hover:-translate-y-0.5 active:translate-y-0
  {{ $usuario->estado === 'ACTIVO' ? 'bg-boton-acento shadow-2xs hover:bg-fondo-panel' : 'bg-estado-exitoBg shadow-sm hover:bg-fondo-panel' }}">
  <i class="ph-bold {{ $usuario->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>

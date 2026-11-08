@@ -1053,7 +1053,7 @@
     @if($u->cod_usuario !== auth()->id())
      <button type="button"
      wire:click="toggleEstado('{{ $u->cod_usuario }}')"
-     wire:confirm="¿Desea cambiar el estado de este usuario?"
+     data-rm-confirm="¿Desea cambiar el estado de este usuario?"
      class="inline-flex h-8 items-center gap-1 rounded-xl px-2.5 text-xs font-bold transition cursor-pointer {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-danger)] hover:bg-[var(--rm-danger-soft)]' : 'bg-[var(--rm-success-soft)] border border-[var(--rm-success)] text-[var(--rm-success)]' }}"
      title="{{ $u->estado === 'ACTIVO' ? 'Inactivar usuario' : 'Activar usuario' }}">
      <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }}"></i>
@@ -1218,7 +1218,7 @@
       @if($u->cod_usuario !== auth()->id())
       <button type="button"
        wire:click="toggleEstado('{{ $u->cod_usuario }}')"
-       wire:confirm="¿Desea cambiar el estado de este usuario?"
+       data-rm-confirm="¿Desea cambiar el estado de este usuario?"
        class="flex h-8 w-8 items-center justify-center rounded-lg transition cursor-pointer {{ $u->estado === 'ACTIVO' ? 'bg-[var(--rm-surface-soft)] border border-[var(--rm-border)] text-[var(--rm-danger)] hover:bg-[var(--rm-danger-soft)]' : 'bg-[var(--rm-success-soft)] border border-[var(--rm-success)] text-[var(--rm-success)]' }}"
        title="{{ $u->estado === 'ACTIVO' ? 'Inactivar usuario' : 'Activar usuario' }}">
        <i class="ph-bold {{ $u->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-sm"></i>

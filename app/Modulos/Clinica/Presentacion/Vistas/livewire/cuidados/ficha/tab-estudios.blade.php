@@ -191,18 +191,11 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 pt-1">
-                                <button type="button"
-                                        onclick="alert('Abriendo visor de documento: {{ $estudioActivo['nombre_documento'] }}')"
-                                        class="flex-1 py-1.5 px-2.5 rounded-xl bg-[var(--rm-action-primary)] text-[var(--rm-text-on-primary)] font-bold text-xs hover:bg-[var(--rm-action-primary)]/90 transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer">
-                                    <i class="ph-bold ph-eye text-xs"></i>
-                                    <span>Ver informe</span>
-                                </button>
-                                <button type="button"
-                                        onclick="alert('Descargando informe: {{ $estudioActivo['nombre_documento'] }}')"
-                                        class="py-1.5 px-3 rounded-xl bg-[var(--rm-surface)] border border-[var(--rm-border)] text-[var(--rm-text-title)] font-bold text-xs hover:bg-[var(--rm-surface-soft)] dark:hover:bg-[var(--rm-surface-soft)] transition flex items-center gap-1 cursor-pointer">
-                                    <i class="ph-bold ph-download-simple text-xs"></i>
-                                    <span>Descargar</span>
-                                </button>
+                                @if(!empty($estudioActivo['url_documento']))
+                                <a href="{{ $estudioActivo['url_documento'] }}" class="rm-btn-secondary"><i class="ph-bold ph-download-simple" aria-hidden="true"></i>Descargar informe</a>
+                                @else
+                                <span class="rm-help">Archivo no disponible</span>
+                                @endif
                             </div>
                         </div>
                     @else

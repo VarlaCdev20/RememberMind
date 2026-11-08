@@ -10,6 +10,7 @@
 
  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+ <x-ui.confirmation-guard />
  @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
  @livewireStyles

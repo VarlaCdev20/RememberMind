@@ -13,6 +13,7 @@
  <link rel="icon" type="image/png" href="{{ asset('storage/imagenes/LOGO.png') }}">
 
  <!-- Scripts de la aplicación (Vite compila Inter, Outfit, Alpine, etc.) -->
+ <x-ui.confirmation-guard />
  @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
  <!-- Phosphor Icons (igual que welcome.blade.php) -->

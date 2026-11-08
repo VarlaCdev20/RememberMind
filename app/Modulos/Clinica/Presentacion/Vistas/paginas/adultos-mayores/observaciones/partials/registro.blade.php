@@ -8,7 +8,7 @@
 <label>Tipo<x-input name="tipo_obs" value="{{ $observacion->tipo_obs }}" required /></label>
 <label class="block">Descripción<textarea class="block w-full" name="descripcion" required>{{ $observacion->descripcion }}</textarea></label><x-button>Guardar corrección</x-button></form></details>
 @endcan
-@can('notas_clinicas.anular')<form method="POST" action="{{ route('admin.adultos-mayores.observaciones.destroy', [$adulto_mayor, $observacion]) }}" onsubmit="return confirm('¿Anular esta nota conservando el historial?')">@csrf @method('DELETE')<x-danger-button type="submit">Anular</x-danger-button></form>@endcan
+@can('notas_clinicas.anular')<form method="POST" action="{{ route('admin.adultos-mayores.observaciones.destroy', [$adulto_mayor, $observacion]) }}" data-rm-confirm="¿Anular esta nota conservando el historial?" data-rm-confirm-tone="danger">@csrf @method('DELETE')<x-danger-button type="submit">Anular</x-danger-button></form>@endcan
 @else
 @can('notas_clinicas.editar')<form method="POST" action="{{ route('admin.adultos-mayores.observaciones.restore', [$adulto_mayor, $observacion->cod_nota]) }}">@csrf @method('PATCH')<x-secondary-button type="submit">Restaurar</x-secondary-button></form>@endcan
 @endif

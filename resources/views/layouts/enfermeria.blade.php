@@ -34,6 +34,7 @@
     {{-- Chart.js Oficial --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <x-ui.confirmation-guard />
     @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
     @livewireStyles
 

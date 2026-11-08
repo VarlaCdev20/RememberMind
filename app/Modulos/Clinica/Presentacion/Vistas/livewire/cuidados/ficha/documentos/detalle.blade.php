@@ -261,13 +261,6 @@
                         </a>
 
                         <button type="button"
-                                @click="alert('Enlace de consulta seguro generado para personal acreditado.')"
-                                class="px-3 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:bg-[var(--rm-surface)] text-[var(--rm-text-title)] font-bold text-xs transition flex items-center gap-1.5 shadow-2xs">
-                            <i class="ph-bold ph-share-network"></i>
-                            <span>Compartir</span>
-                        </button>
-
-                        <button type="button"
                                 onclick="window.print()"
                                 class="px-3 py-2 rounded-xl border border-[var(--rm-border)] bg-[var(--rm-surface-alt)] hover:bg-[var(--rm-surface)] text-[var(--rm-text-title)] font-bold text-xs transition flex items-center gap-1.5 shadow-2xs">
                             <i class="ph-bold ph-printer"></i>

@@ -61,7 +61,8 @@ class DocumentacionFichaTest extends TestCase
             ->assertSee('Información')
             ->assertSee('Historial')
             ->assertSee('Descargar')
-            ->assertSee('Compartir')
+            ->assertDontSee('Compartir')
+            ->assertDontSee('Enlace de consulta seguro generado')
             ->assertSee('Imprimir');
     }
 

@@ -9,7 +9,7 @@ window.rmWoundWorkspace = () => ({
             event.preventDefault(); event.returnValue = '';
         };
         this.beforeNavigate = event => {
-            if (this.clinicalFormOpen && this.clinicalFormDirty && !window.confirm('¿Salir sin guardar? Los datos y las fotografías seleccionadas se perderán.')) event.preventDefault();
+            if (this.clinicalFormOpen && this.clinicalFormDirty) window.rmConfirmarSalida(event, '¿Salir sin guardar? Los datos y las fotografías seleccionadas se perderán.', this.$el);
         };
         window.addEventListener('beforeunload', this.beforeUnload);
         document.addEventListener('livewire:navigate', this.beforeNavigate);
@@ -29,15 +29,15 @@ window.rmWoundWorkspace = () => ({
         this.$wire.$set('mostrarFormularioHerida', true, false);
         this.$nextTick(() => this.$root.querySelector(this.nueva ? '#nueva-nuevaHeridaTipo' : (operation === 'cierre-herida' ? '#herida-resultado' : '#curacion-herida'))?.focus());
     },
-    chooseWound(code) {
-        if (this.clinicalFormDirty && !window.confirm('¿Cambiar de herida sin guardar? Los datos y las fotografías seleccionadas se perderán.')) return;
+    async chooseWound(code) {
+        if (this.clinicalFormDirty && !(await window.rmConfirmar({ title: 'Cambios sin guardar', text: '¿Cambiar de herida sin guardar? Los datos y las fotografías seleccionadas se perderán.' }, this.$el))) return;
         if (!code) return;
         this.closeConsultations();
         this.clearPreviews(); this.$wire.seleccionarHerida(code);
         this.clinicalFormDirty = false;
     },
     async startNewWound(event) {
-        if (this.uploading || (this.clinicalFormDirty && !window.confirm('¿Registrar otra herida sin guardar? Los datos y las fotografías seleccionadas se perderán.'))) return;
+        if (this.uploading || (this.clinicalFormDirty && !(await window.rmConfirmar({ title: 'Cambios sin guardar', text: '¿Registrar otra herida sin guardar? Los datos y las fotografías seleccionadas se perderán.' }, event.currentTarget)))) return;
         const trigger = event.currentTarget;
         await this.$wire.prepararNuevaHerida();
         this.closeConsultations();

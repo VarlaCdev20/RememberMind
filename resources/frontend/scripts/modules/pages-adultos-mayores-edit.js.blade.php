@@ -34,7 +34,7 @@
  previewImage(event) {
  const file = event.target.files[0];
  if (!file) { this.fotoPreview = @js($fotoUrl); return; }
- if (file.size > 2 * 1024 * 1024) alert('La imagen supera los 2MB.');
+ if (file.size > 2 * 1024 * 1024) { window.rmAvisar({ title: 'Revisa la fotografía', text: 'La imagen supera los 2 MB. Selecciona un archivo más pequeño.' }); return; }
  this.fotoPreview = URL.createObjectURL(file);
  },
 
@@ -112,12 +112,12 @@
  dep = this.getValue('departamento_residencia'),
  ciu = this.getValue('ciudad_municipio'),
  zon = this.getValue('zona'), cal = this.getValue('calle');
- 
+
  if (this.tiene_celular) {
  if (this.isEmpty(cel)) this.setError('celular', 'Ingrese un celular válido de 8 dígitos que empiece con 6 o 7.');
  else if (!this.isPhone(cel)) this.setError('celular', 'Ingrese un celular válido de 8 dígitos que empiece con 6 o 7.');
  }
- 
+
  if (!this.isFixedPhone(fijo)) this.setError('telefono_fijo', 'Ingrese un teléfono fijo válido (ej. 2223344).');
  if (this.isEmpty(dep)) this.setError('departamento_residencia', 'Seleccione el departamento de residencia.');
  if (this.isEmpty(ciu)) this.setError('ciudad_municipio', 'Ingrese la ciudad o municipio.');
@@ -177,4 +177,4 @@
  }
  };
  }
- 
+

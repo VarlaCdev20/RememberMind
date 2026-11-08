@@ -604,14 +604,14 @@
    @if(in_array($estado, ['ACTIVO', 'ACTIVA']) && $puedeActuarComoMedico && auth()->user()?->can('prescripciones.suspender'))
     <button type="button"
     wire:click="suspenderMedicamento('{{ $med->cod_prescripcion }}')"
-    wire:confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"
+    data-rm-confirm="¿Seguro que desea suspender la medicación '{{ $med->nombre_medicamento }}'?"
     class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)]-focus bg-[var(--rm-danger-soft)] p-1.5 text-boton-acento transition hover:bg-boton-acento hover:text-inverso active:scale-95 cursor-pointer"
     title="Suspender medicamento">
     <i class="ph-bold ph-pause-circle"></i>
     </button>
     <button type="button"
     wire:click="finalizarMedicamento('{{ $med->cod_prescripcion }}')"
-    wire:confirm="¿Seguro que desea finalizar el tratamiento de '{{ $med->nombre_medicamento }}'?"
+    data-rm-confirm="¿Seguro que desea finalizar el tratamiento de '{{ $med->nombre_medicamento }}'?"
     class="inline-flex items-center justify-center rounded-lg border border-[var(--rm-border)]-fuerte bg-[var(--rm-surface)] p-1.5 text-[var(--rm-text-body)]/80 transition hover:bg-[var(--rm-primary)] hover:text-inverso active:scale-95 cursor-pointer"
     title="Finalizar tratamiento">
     <i class="ph-bold ph-check-square-offset"></i>

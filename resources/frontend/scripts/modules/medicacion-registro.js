@@ -4,7 +4,7 @@ export function medicacionRegistro() {
         dirty: false, busy: false, transportError: '',
         init() {
             this.unload = event => { if (this.$wire.showModal && this.dirty) { event.preventDefault(); event.returnValue = ''; } };
-            this.navigate = event => { if (this.$wire.showModal && this.dirty && !window.confirm('¿Salir sin guardar esta captura?')) event.preventDefault(); };
+            this.navigate = event => { if (this.$wire.showModal && this.dirty) window.rmConfirmarSalida(event, '¿Salir sin guardar esta captura?', this.$el); };
             window.addEventListener('beforeunload', this.unload);
             document.addEventListener('livewire:navigate', this.navigate);
         },

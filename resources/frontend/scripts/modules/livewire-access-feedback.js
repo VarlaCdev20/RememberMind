@@ -21,19 +21,13 @@ export function registrarRespuestaAcceso() {
             rechazoMostrado = true;
 
             const mensaje = 'El servidor rechazó esta solicitud. Si estabas guardando, el resultado no está confirmado. Al volver al inicio perderás los cambios sin guardar.';
-            const dialogo = window.SwalAmandita || window.Swal;
-            if (!dialogo?.fire) {
-                window.alert(mensaje);
-                return;
-            }
             mostrandoDialogo = true;
-            Promise.resolve(dialogo.fire({
-                icon: 'warning', title: 'Solicitud rechazada', text: mensaje,
-                showCancelButton: true, confirmButtonText: 'Volver a mi inicio',
-                cancelButtonText: 'Mantener pantalla', allowOutsideClick: false,
-            })).then(resultado => {
+            window.rmConfirmar({
+                tone: 'danger', title: 'Solicitud rechazada', text: mensaje,
+                confirmText: 'Volver a mi inicio', cancelText: 'Mantener pantalla',
+            }).then(aceptado => {
                 const inicio = aviso.querySelector('[data-rm-access-home]');
-                if (resultado.isConfirmed && inicio) window.location.assign(inicio.href);
+                if (aceptado && inicio) window.location.assign(inicio.href);
             }).finally(() => { mostrandoDialogo = false; });
         });
     });

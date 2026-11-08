@@ -31,55 +31,33 @@
  if (window.rmSignosConfirmListeners[componentId]) return;
  window.rmSignosConfirmListeners[componentId] = true;
 
- window.addEventListener('signos-confirmar-alertas', function(event) {
+ window.addEventListener('signos-confirmar-alertas', async function(event) {
+ const root = [...document.querySelectorAll('[wire\\:id]')].find(el => el.getAttribute('wire:id') === componentId);
+ if (!root) return;
  const data = event.detail?.[0] || event.detail || {};
- const confirmar = () => {
- const component = window.Livewire && window.Livewire.find(componentId);
- if (component) component.call('confirmarGuardarConAlertas');
- };
-
- if (window.SwalAmandita) {
- window.SwalAmandita.fire({
+ if (!(await window.rmConfirmar({
  title: data.titulo || 'Valores fuera del rango referencial',
  text: data.texto || 'Verifique la información antes de guardar.',
- icon: 'warning',
- showCancelButton: true,
- confirmButtonText: 'Guardar verificado',
- cancelButtonText: 'Revisar datos'
- }).then(result => {
- if (result.isConfirmed) confirmar();
- });
- } else if (confirm(data.texto || 'Se detectaron valores fuera de rango. ¿Desea guardar?')) {
- confirmar();
- }
+ confirmText: 'Guardar verificado', cancelText: 'Revisar datos'
+ }, document.activeElement))) return;
+ if (!root.isConnected) return;
+ const component = window.Livewire?.find(componentId);
+ if (component) component.call('confirmarGuardarConAlertas');
  });
 
- window.addEventListener('signos-confirmar-anulacion', function(event) {
+ window.addEventListener('signos-confirmar-anulacion', async function(event) {
+ const root = [...document.querySelectorAll('[wire\\:id]')].find(el => el.getAttribute('wire:id') === componentId);
+ if (!root) return;
  const data = event.detail?.[0] || event.detail || {};
- const enviar = (motivo) => {
- const component = window.Livewire && window.Livewire.find(componentId);
+ const motivo = await window.rmPedirTexto({
+ title: 'Anular registro', text: 'Indique el motivo. El registro no será eliminado.',
+ inputLabel: 'Motivo de anulación', inputPlaceholder: 'Escribe el motivo…',
+ tone: 'danger', confirmText: 'Anular registro',
+ inputValidator: value => !value || value.trim().length < 10 ? 'El motivo debe tener al menos 10 caracteres.' : undefined,
+ }, document.activeElement);
+ if (motivo === null) return;
+ if (!root.isConnected) return;
+ const component = window.Livewire?.find(componentId);
  if (component) component.call('anularConMotivo', data.id, motivo);
- };
-
- if (window.SwalAmandita) {
- window.SwalAmandita.fire({
- title: 'Anular registro',
- text: 'Indique el motivo. El registro no será eliminado.',
- input: 'textarea',
- inputPlaceholder: 'Motivo de anulación...',
- icon: 'warning',
- showCancelButton: true,
- confirmButtonText: 'Anular registro',
- cancelButtonText: 'Cancelar',
- inputValidator: (value) => {
- if (!value || value.trim().length < 10) return 'El motivo debe tener al menos 10 caracteres.';
- }
- }).then(result => {
- if (result.isConfirmed) enviar(result.value);
- });
- } else {
- const motivo = prompt('Motivo de anulación');
- if (motivo) enviar(motivo);
- }
  });
  })();

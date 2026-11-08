@@ -160,7 +160,7 @@
                 @if($usuarioFicha->cod_usuario !== auth()->id())
                     <button type="button"
                             wire:click="toggleEstado('{{ $usuarioFicha->cod_usuario }}')"
-                            wire:confirm="¿Desea cambiar el estado de este usuario?"
+                            data-rm-confirm="¿Desea cambiar el estado de este usuario?"
                             class="rm-btn rm-btn-sm {{ $usuarioFicha->estado === 'ACTIVO' ? 'rm-btn-secondary text-[var(--rm-danger)]' : 'rm-btn-success' }}">
                         <i class="ph-bold {{ $usuarioFicha->estado === 'ACTIVO' ? 'ph-user-minus' : 'ph-user-plus' }} text-base"></i>
                         <span>{{ $usuarioFicha->estado === 'ACTIVO' ? 'Inactivar' : 'Activar' }}</span>

@@ -8,7 +8,7 @@
     <x-ui.section-card title="Versión del conocimiento">
         @if($puedeRegistrar)
             <div class="mb-4 space-y-2">
-                <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarInstitucional" wire:confirm="Registrar el contrato institucional A–D adoptado, sin modificar los registros de residentes ni firmar revisiones profesionales. Si ya existe, se abrirá su versión original." wire:loading.attr="disabled">Registrar base institucional adoptada</button>
+                <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarInstitucional" data-rm-confirm="Registrar el contrato institucional A–D adoptado, sin modificar los registros de residentes ni firmar revisiones profesionales. Si ya existe, se abrirá su versión original." wire:loading.attr="disabled">Registrar base institucional adoptada</button>
                 <button type="button" class="rm-btn rm-btn-secondary" wire:click="registrarPetersen" wire:loading.attr="disabled">Registrar patrones de Petersen adoptados</button>
                 <p class="text-sm text-rm-secondary">Las observaciones se conservan como tales. Las reglas instrumentales requieren sus antecedentes originales; no se completan puntuaciones ni resultados.</p>
             </div>

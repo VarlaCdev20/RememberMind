@@ -682,7 +682,7 @@
      </div>
      <button type="button"
      wire:click="restablecerPasswordUsuario('{{ $usuarioId }}')"
-     wire:confirm="¿Está seguro de que desea restablecer la contraseña de este usuario? Se generará una clave temporal y se le enviará por correo."
+     data-rm-confirm="¿Está seguro de que desea restablecer la contraseña de este usuario? Se generará una clave temporal y se le enviará por correo."
      class="inline-flex items-center gap-2 rounded-xl bg-[var(--rm-primary)] hover:bg-[var(--rm-primary-hover)] text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer">
      <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
      <span>Restablecer Contraseña Temporal</span>

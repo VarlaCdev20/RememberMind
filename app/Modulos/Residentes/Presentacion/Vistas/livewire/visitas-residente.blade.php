@@ -40,7 +40,7 @@
                     @if(in_array($residente->estado, ['ADMITIDO', 'ACTIVO', 'EST_001'], true))
                         <button type="button" class="rm-btn-primary" wire:click="cambiar(@js($visita->getKey()), 'entrada')" wire:loading.attr="disabled">Registrar entrada</button>
                     @endif
-                    <button type="button" class="rm-btn-secondary" wire:click="cambiar(@js($visita->getKey()), 'cancelar')" wire:confirm="¿Cancelar esta visita?" wire:loading.attr="disabled">Cancelar visita</button>
+                    <button type="button" class="rm-btn-secondary" wire:click="cambiar(@js($visita->getKey()), 'cancelar')" data-rm-confirm="¿Cancelar esta visita?" wire:loading.attr="disabled">Cancelar visita</button>
                 @elseif($visita->estado === 'EN_CURSO' && $visita->fecha_hora_ingreso && !$visita->fecha_hora_salida)
                     <button type="button" class="rm-btn-primary" wire:click="cambiar(@js($visita->getKey()), 'salida')" wire:loading.attr="disabled">Registrar salida</button>
                 @endif

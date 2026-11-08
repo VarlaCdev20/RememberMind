@@ -292,11 +292,11 @@
                                                 <p class="text-[10.5px] text-[var(--rm-text-muted)] font-mono">{{ $doc['fecha'] }} · {{ $doc['tamano'] }}</p>
                                             </div>
                                         </div>
-                                        <button type="button"
-                                                onclick="alert('Descargando copia clínica oficial: {{ $doc['nombre'] }}')"
-                                                class="px-2.5 py-1 rounded-lg border border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] text-xs font-bold transition cursor-pointer">
-                                            Consultar
-                                        </button>
+                                        @if(!empty($doc['url_descarga']))
+                                        <a href="{{ $doc['url_descarga'] }}" class="rm-btn-secondary">Consultar archivo</a>
+                                        @else
+                                        <span class="rm-help">Archivo no disponible</span>
+                                        @endif
                                     </div>
                                 @empty
                                     <p class="text-xs text-[var(--rm-text-muted)] py-4 text-center">Sin documentos adjuntos.</p>

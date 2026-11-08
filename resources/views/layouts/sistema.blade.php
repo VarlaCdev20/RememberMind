@@ -32,6 +32,7 @@
 
     {{-- Chart.js y notificaciones utilizan la entrada local compartida de Vite. --}}
 
+    <x-ui.confirmation-guard />
     @vite(['resources/frontend/styles/app.css', 'resources/frontend/scripts/app.js'])
 
     @stack('styles')

@@ -36,7 +36,7 @@ export function conductaRegistro() {
         historyOpen: false, busy: false, discardIntent: 'close', conductaViewportCompact: null,
         init() {
             this.navigationHandler = event => {
-                if (this.$wire.mostrarFormulario && this.clinicalFormDirty && !window.confirm('¿Salir sin guardar? Los datos de este registro se perderán.')) event.preventDefault();
+                if (this.$wire.mostrarFormulario && this.clinicalFormDirty) window.rmConfirmarSalida(event, '¿Salir sin guardar? Los datos de este registro se perderán.', this.$el);
             };
             document.addEventListener('livewire:navigate', this.navigationHandler);
         },

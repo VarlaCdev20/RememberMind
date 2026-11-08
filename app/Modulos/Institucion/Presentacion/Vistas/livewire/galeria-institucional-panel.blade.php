@@ -2,7 +2,7 @@
     <x-ui.collection-header title="Galería del centro" subtitle="Fotografías de nuestros espacios y actividades." icon="ph-images">
         <x-slot:actions>
             @if($puedeGestionar)
-                <button type="button" class="rm-btn-primary" wire:click="nuevo" x-on:click.capture="if (editorDirty &amp;&amp; !confirm('¿Descartar los cambios sin guardar?')) { $event.preventDefault(); $event.stopImmediatePropagation(); }" ><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Subir fotografías</button>
+                <button type="button" class="rm-btn-primary" wire:click="nuevo" x-bind:data-rm-confirm="editorDirty ? '¿Descartar los cambios sin guardar?' : null" ><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Subir fotografías</button>
 @endif
 </x-slot:actions>
     </x-ui.collection-header>
@@ -38,7 +38,7 @@
                     <div class="rm-gallery-fields__wide"><label for="gallery-alt">Descripción accesible (opcional)</label><input id="gallery-alt" type="text" wire:model="texto_alternativo" maxlength="255"><p>Si la dejas vacía se utiliza el título.</p>@error('texto_alternativo')<p role="alert">{{ $message }}</p>@enderror</div>
                 </div>
                 <label class="rm-gallery-checkbox"><input type="checkbox" wire:model="usar_en_bienvenida"><span>Ofrecer en la bienvenida de Gerencia y Administración</span></label>
-                <div class="rm-gallery-actions"><button type="submit" class="rm-btn-primary" x-bind:disabled="errorCarga !== ''" wire:loading.attr="disabled" wire:target="guardar,archivos">{{ $editando ? 'Guardar cambios' : 'Guardar fotografías' }}</button><button type="button" class="rm-btn-secondary" wire:click="cerrar" x-on:click.capture="if (editorDirty &amp;&amp; !confirm('¿Descartar los cambios sin guardar?')) { $event.preventDefault(); $event.stopImmediatePropagation(); }" >Cancelar</button><span wire:loading wire:target="guardar" role="status">Guardando…</span></div>
+                <div class="rm-gallery-actions"><button type="submit" class="rm-btn-primary" x-bind:disabled="errorCarga !== ''" wire:loading.attr="disabled" wire:target="guardar,archivos">{{ $editando ? 'Guardar cambios' : 'Guardar fotografías' }}</button><button type="button" class="rm-btn-secondary" wire:click="cerrar" x-bind:data-rm-confirm="editorDirty ? '¿Descartar los cambios sin guardar?' : null" >Cancelar</button><span wire:loading wire:target="guardar" role="status">Guardando…</span></div>
             </form>
         </section>
 @endif
@@ -58,7 +58,7 @@
 <p class="rm-gallery-meta">{{ $foto->fecha_fotografia?->format('d/m/Y') ?? 'Fecha de fotografía sin registrar' }}</p>
                     @if($foto->usar_en_bienvenida && $foto->estado === 'ACTIVA')<span class="rm-badge">Disponible en bienvenida</span>
 @endif
-@if($puedeGestionar)<div class="rm-gallery-actions"><button type="button" class="rm-btn-secondary" wire:click="editar('{{ $foto->getKey() }}')" x-on:click.capture="if (editorDirty &amp;&amp; !confirm('¿Descartar los cambios sin guardar?')) { $event.preventDefault(); $event.stopImmediatePropagation(); }" >Editar datos</button><button type="button" class="rm-btn-secondary" wire:click="cambiarEstado('{{ $foto->getKey() }}', '{{ $foto->estado === 'ACTIVA' ? 'ARCHIVADA' : 'ACTIVA' }}')" wire:confirm="{{ $foto->estado === 'ACTIVA' ? '¿Archivar esta fotografía? Se conserva el archivo y dejará de mostrarse en la bienvenida.' : '¿Reactivar esta fotografía para que vuelva a estar disponible en la galería?' }}" wire:loading.attr="disabled">{{ $foto->estado === 'ACTIVA' ? 'Archivar' : 'Reactivar' }}</button></div>
+@if($puedeGestionar)<div class="rm-gallery-actions"><button type="button" class="rm-btn-secondary" wire:click="editar('{{ $foto->getKey() }}')" x-bind:data-rm-confirm="editorDirty ? '¿Descartar los cambios sin guardar?' : null" >Editar datos</button><button type="button" class="rm-btn-secondary" wire:click="cambiarEstado('{{ $foto->getKey() }}', '{{ $foto->estado === 'ACTIVA' ? 'ARCHIVADA' : 'ACTIVA' }}')" data-rm-confirm="{{ $foto->estado === 'ACTIVA' ? '¿Archivar esta fotografía? Se conserva el archivo y dejará de mostrarse en la bienvenida.' : '¿Reactivar esta fotografía para que vuelva a estar disponible en la galería?' }}" wire:loading.attr="disabled">{{ $foto->estado === 'ACTIVA' ? 'Archivar' : 'Reactivar' }}</button></div>
 @endif
 </div>
             </article></li>

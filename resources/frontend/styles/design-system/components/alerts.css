@@ -83,11 +83,18 @@
 .swal2-popup.rm-confirmation .swal2-icon.rm-confirmation__icon { width: 48px; height: 48px; margin: 0 auto; border: 0; border-radius: var(--rm-radius-pill); background: color-mix(in srgb, var(--rm-palette-mint) 25%, var(--rm-surface)); color: var(--rm-primary-ink); }
 .swal2-popup.rm-confirmation .rm-confirmation__icon .swal2-icon-content { font-size: var(--rm-icon-xl); }
 .swal2-popup.rm-confirmation--danger .swal2-icon.rm-confirmation__icon { background: var(--rm-danger-soft); color: var(--rm-danger-strong); }
+.swal2-popup.rm-confirmation--success .swal2-icon.rm-confirmation__icon { background: var(--rm-success-soft); color: var(--rm-success-strong); }
+.swal2-popup.rm-confirmation--warning .swal2-icon.rm-confirmation__icon { background: var(--rm-warning-soft); color: var(--rm-warning-strong); }
+.swal2-popup.rm-confirmation--info .swal2-icon.rm-confirmation__icon { background: var(--rm-info-soft); color: var(--rm-info-strong); }
 .swal2-popup.rm-confirmation .swal2-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--rm-space-2); width: 100%; margin: var(--rm-space-4) 0 0; padding-top: var(--rm-space-3); border-top: 1px solid var(--rm-border-soft); }
 .swal2-popup.rm-confirmation .swal2-actions .rm-btn { min-height: 44px; margin: 0; padding-inline: var(--rm-space-4); border-radius: var(--rm-radius-pill); font: 700 var(--rm-font-size-body-lg)/1.35 "Nunito", sans-serif; box-shadow: none; }
 .swal2-popup.rm-confirmation .rm-btn:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 3px; }
 .swal2-popup.rm-confirmation .rm-confirmation__close { position: absolute; top: var(--rm-space-2); inset-inline-end: var(--rm-space-2); width: 44px; height: 44px; border-radius: var(--rm-radius-pill); color: var(--rm-text-secondary); font-size: var(--rm-icon-xl); }
 .swal2-popup.rm-confirmation .rm-confirmation__close:focus-visible { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.swal2-container.rm-confirmation-container[popover] { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; }
+.swal2-container.rm-confirmation-container[popover]::backdrop { background: transparent; }
+.swal2-popup.rm-confirmation .rm-confirmation__input { width: calc(100% - var(--rm-space-6)); min-height: 96px; margin: var(--rm-space-3) auto 0; padding: var(--rm-space-3); line-height: 1.4; border-radius: var(--rm-radius-xl); }
+.rm-confirmation-unavailable { position: fixed; inset: auto var(--rm-space-4) var(--rm-space-4); z-index: 2147483647; margin: 0; }
 @media (max-width: 479px) { .swal2-popup.rm-confirmation .swal2-actions > button { flex: 1 1 auto; } }
 
 /* Feedback temporal compartido por los layouts institucionales. */

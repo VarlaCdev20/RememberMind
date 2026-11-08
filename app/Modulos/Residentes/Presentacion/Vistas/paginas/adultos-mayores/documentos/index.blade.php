@@ -116,7 +116,7 @@
  <button type="button" @click='abrirEdicion(@json($doc))' class="rounded-lg p-2 text-apoyo hover:bg-fondo-panel hover:text-titulo" title="Editar Información">
  <i class="ph-bold ph-pencil-simple text-lg"></i>
  </button>
- <form action="{{ route('admin.adultos-mayores.documentos.destroy', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline" onsubmit="return confirm('¿Archivar este documento?');">
+ <form action="{{ route('admin.adultos-mayores.documentos.destroy', ['adulto_mayor' => $adulto_mayor->cod_residente, 'documento' => $doc->cod_documento]) }}" method="POST" class="inline" data-rm-confirm="¿Archivar este documento?" data-rm-confirm-tone="danger">
  @csrf @method('DELETE')
  <button type="submit" class="rounded-lg p-2 text-red-500 hover:bg-red-50" title="Archivar">
  <i class="ph-bold ph-archive text-lg"></i>

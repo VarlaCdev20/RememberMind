@@ -8,7 +8,7 @@
     class="rm-medication-dose-drawer"
     close-method="cerrarDrawerDosis"
     :dismiss-on-escape="!$modalMedicamentoAbierto"
-    alpine-close="if ($wire.modalMedicamentoAbierto) { $wire.cerrarModalMedicamento() } else if (!$wire.observacionEnfermeria.trim() || window.confirm('¿Descartar la observación sin guardar y cerrar?')) { $wire.cerrarDrawerDosis() }"
+    alpine-close="if ($wire.modalMedicamentoAbierto) { $wire.cerrarModalMedicamento() } else if (!$wire.observacionEnfermeria.trim() || (await window.rmConfirmar({ title: 'Descartar observación', text: '¿Descartar la observación sin guardar y cerrar?' }, $event.target))) { $wire.cerrarDrawerDosis() }"
 >
 @if(!empty($dosisDetalle))
     @php
