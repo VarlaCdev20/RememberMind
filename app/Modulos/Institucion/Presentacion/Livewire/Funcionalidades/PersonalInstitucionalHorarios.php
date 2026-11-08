@@ -57,6 +57,9 @@ class PersonalInstitucionalHorarios extends Component
 
     public string $estadoUsuario = '';
 
+    #[Locked]
+    public string $nombrePersonal = '';
+
     public array $rolesUsuario = [];
 
     public bool $sinRol = false;
@@ -126,6 +129,7 @@ class PersonalInstitucionalHorarios extends Component
         }
 
         $this->estadoUsuario = (string) $usuario->estado;
+        $this->nombrePersonal = $usuario->name;
         $this->rolesUsuario = $usuario->roles->pluck('name')->values()->all();
         $this->sinRol = $this->rolesUsuario === [];
 

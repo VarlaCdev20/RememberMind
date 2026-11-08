@@ -1,7 +1,7 @@
 @if($modalGestionAbierto)
  @if((auth()->user()->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) || !$usuarioSeleccionadoId)
   @php($cerrarEditorPersonal = $modalTabInicial === 'horarios' ? null : "\$dispatch('gerencia-personal-cerrar')")
-  <x-ui.modal-livewire id="gerencia-personal-ficha" wire:model="modalGestionAbierto" :title="$modalTabInicial === 'horarios' ? 'Horarios del trabajador' : ($usuarioSeleccionadoId ? 'Editar trabajador' : 'Registrar trabajador')" :max-width="$modalTabInicial === 'horarios' ? 'lg' : '5xl'" :class="$modalTabInicial === 'horarios' ? '' : 'rm-staff-registration-dialog'" close-method="cerrarModal" :alpine-close="$cerrarEditorPersonal" icon="ph-identification-badge">
+  <x-ui.modal-livewire id="gerencia-personal-ficha" wire:model="modalGestionAbierto" :title="$modalTabInicial === 'horarios' ? 'Horarios del trabajador' : ($usuarioSeleccionadoId ? 'Editar registro' : 'Registrar trabajador')" :max-width="$modalTabInicial === 'horarios' ? '4xl' : '5xl'" :class="$modalTabInicial === 'horarios' ? 'rm-staff-action-dialog' : 'rm-staff-registration-dialog'.($usuarioSeleccionadoId ? ' rm-staff-action-dialog' : '')" close-method="cerrarModal" :alpine-close="$cerrarEditorPersonal" icon="ph-identification-badge" :show-validation="false" :surface="$usuarioSeleccionadoId ? 'reading' : 'default'">
    @if($modalTabInicial === 'horarios')
     <livewire:identidad.personal-institucional-horarios :usuario-id="$usuarioSeleccionadoId" :abrir-formulario-inicial="$abrirFormularioHorarioInicial" wire:key="gerencia-horarios-{{ $usuarioSeleccionadoId }}" />
    @else

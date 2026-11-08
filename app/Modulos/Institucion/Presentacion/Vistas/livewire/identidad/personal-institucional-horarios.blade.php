@@ -1,4 +1,26 @@
 <div class="rm-staff-schedule space-y-5">
+ @if($modalFinalizarAbierto)
+ <section id="staff-schedule-finalizar" class="rm-staff-action__form" aria-label="Finalizar asignación">
+  <x-ui.section-header title="Finalizar asignación" icon="ph-flag-checkered" />
+  <div class="rm-staff-action__context"><i class="ph-bold ph-calendar-check" aria-hidden="true"></i><div><p class="rm-help">Trabajador</p><strong>{{ $nombrePersonal }}</strong></div></div>
+  @php
+   $asignacionAFinalizar = collect($asignaciones)->firstWhere('cod_asignacion', $codAsignacionFinalizar);
+  @endphp
+  @if($asignacionAFinalizar)
+   <p><strong>{{ $asignacionAFinalizar['turno_nombre'] }}</strong> · {{ $asignacionAFinalizar['area_nombre'] }} · {{ $asignacionAFinalizar['hora_inicio'] }}–{{ $asignacionAFinalizar['hora_fin'] }}</p>
+  @endif
+  <form wire:submit="solicitarFinalizar" class="rm-staff-action__form" x-data x-init="$nextTick(() => $refs.fechaFin.focus())" novalidate>
+   <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>Las jornadas anteriores se conservan. Las ocurrencias seleccionadas desde la fecha indicada quedarán inactivas.</span></p>
+   <x-ui.field label="Cancelar desde la fecha" for="staff-schedule-fecha-fin" error="f_fecha_fin_finalizar" required>
+    <input id="staff-schedule-fecha-fin" x-ref="fechaFin" type="date" wire:model="f_fecha_fin_finalizar" class="rm-input" aria-invalid="{{ $errors->has('f_fecha_fin_finalizar') ? 'true' : 'false' }}" @if($errors->has('f_fecha_fin_finalizar')) aria-describedby="staff-schedule-fecha-fin-error" @endif required>
+   </x-ui.field>
+   <div class="rm-staff-action__actions">
+    <x-ui.action-button variant="secondary" wire:click="cancelarFinalizar">Cancelar</x-ui.action-button>
+    <x-ui.action-button tipo="submit" loading="solicitarFinalizar,confirmarFinalizar" icono="ph-flag-checkered">Confirmar finalización</x-ui.action-button>
+   </div>
+  </form>
+ </section>
+ @else
 
  {{-- ══ SIN CLASIFICACIÓN ══ --}}
  @if($tipoPersonal === 'ninguno')
@@ -6,203 +28,87 @@
   <i class="ph-fill ph-calendar-slash text-5xl mb-4 opacity-40"></i>
   <h4 class="text-lg font-bold text-titulo">Sin clasificación operativa</h4>
   <p class="text-sm font-semibold mt-2 text-center max-w-md text-apoyo">
-  Este usuario no está registrado como Personal de Salud ni Administrativo. Completa la clasificación en la pestaña «Información Base» antes de asignar horarios.
+  Este trabajador no tiene una clasificación compatible con la asignación de horarios. Revisa su rol institucional y su registro laboral.
   </p>
  </div>
 
  @else
 
- {{-- ══ HEADER ══ --}}
- <div class="rm-staff-schedule__heading flex items-center justify-between">
-  <div>
-  <h4 class="text-sm font-black text-titulo flex items-center gap-2">
-   <i class="ph-fill ph-calendar-check text-boton-acento"></i>
-   Asignaciones de Turno
-   <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
-   {{ $tipoPersonal === 'salud' && $esEnfermeria
-    ? 'bg-estado-infoBg text-estado-info border border-estado-infoBorde'
-    : 'bg-boton-acento/10 text-boton-acento border border-boton-acento/20' }}">
-   {{ $tipoPersonal === 'salud' ? ($subtipoSalud ?: 'Salud') : 'Administrativo' }}
-   </span>
-  </h4>
-  <p class="text-xs text-apoyo font-semibold mt-0.5">
-   {{ $tipoPersonal === 'salud' && $esEnfermeria
-   ? 'Enfermería: validación estricta de solapamientos. Tipo ROTATIVO recomendado.'
-   : 'Gestiona turnos, áreas y días laborales del personal.' }}
-  </p>
-  </div>
+ <div class="rm-staff-action__context">
+  <i class="ph-bold ph-identification-badge" aria-hidden="true"></i>
+  <div><p class="rm-help">Trabajador</p><strong>{{ $nombrePersonal }}</strong></div>
+  <x-ui.status-badge :estado="$estadoUsuario" />
+ </div>
+ <div class="rm-staff-schedule__heading">
+  <x-ui.section-header title="Asignaciones de turno" icon="ph-calendar-check" />
   @if(!$formAbierto)
-  <button type="button" wire:click="abrirFormNuevo" wire:loading.attr="disabled"
-   @disabled($sinRol || in_array(strtoupper($estadoUsuario), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true))
-   class="rm-btn-primary h-9 gap-1.5 rounded-xl px-4 text-xs flex items-center disabled:cursor-not-allowed disabled:opacity-50">
-   <i class="ph-bold ph-plus text-base"></i> Nueva asignación
-  </button>
+   <x-ui.action-button wire:click="abrirFormNuevo" loading="abrirFormNuevo" icono="ph-plus"
+    :disabled="$sinRol || in_array(strtoupper($estadoUsuario), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true)">Nueva asignación</x-ui.action-button>
   @endif
  </div>
-
  @if($sinRol)
-  <div class="flex items-start gap-2 rounded-xl border border-estado-advertenciaBorde bg-estado-advertenciaBg px-3 py-2 text-xs font-semibold text-estado-advertencia">
-  <i class="ph-bold ph-warning-circle mt-0.5 text-base"></i>
-  <span>Este usuario no tiene un rol institucional. La creación y edición de horarios permanecerá bloqueada hasta asignarle uno.</span>
-  </div>
+  <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>Este usuario no tiene un rol institucional. La creación y edición de horarios permanecerá bloqueada hasta asignarle uno.</span></p>
  @elseif(in_array(strtoupper($estadoUsuario), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true))
-  <div class="flex items-start gap-2 rounded-xl border border-estado-peligroBorde bg-estado-peligroBg px-3 py-2 text-xs font-semibold text-estado-peligro">
-  <i class="ph-bold ph-prohibit mt-0.5 text-base"></i>
-  <span>Usuario {{ strtoupper($estadoUsuario) }}. No se permiten nuevas asignaciones ni cambios de horario.</span>
-  </div>
- @elseif(collect($asignaciones)->contains('estado', 'ACTIVA'))
-  <div class="flex items-start gap-2 rounded-xl border border-estado-infoBorde bg-estado-infoBg px-3 py-2 text-xs font-semibold text-estado-info">
-  <i class="ph-bold ph-info mt-0.5 text-base"></i>
-  <span>El usuario ya tiene horario activo. Puede editarlo para finalizar el registro anterior y crear una nueva versión, o finalizarlo manualmente.</span>
-  </div>
+  <p class="rm-error" role="status">Usuario {{ strtoupper($estadoUsuario) }}. No se permiten nuevas asignaciones ni cambios de horario.</p>
+ @elseif(!$formAbierto && collect($asignaciones)->contains('estado', 'ACTIVA'))
+  <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>La edición conserva las jornadas anteriores y registra una nueva versión del horario.</span></p>
  @endif
 
- {{-- ══ FORMULARIO CREAR / EDITAR ══ --}}
  @if($formAbierto)
- <div class="border border-boton-acento/30 rounded-2xl bg-boton-acento/5 p-5 space-y-4 animate-fade-in">
-  <div class="flex items-center justify-between mb-1">
-  <h5 class="text-sm font-bold text-titulo flex items-center gap-2">
-   <i class="ph-bold {{ $modoEdicion ? 'ph-pencil-simple' : 'ph-plus-circle' }} text-boton-acento"></i>
-   {{ $modoEdicion ? 'Editar Asignación (se creará historial)' : 'Nueva Asignación de Turno' }}
-  </h5>
-  <button type="button" wire:click="cancelarFormulario" aria-label="Cerrar formulario de horario" class="h-7 w-7 flex items-center justify-center rounded-lg text-apoyo hover:bg-estado-peligroBg hover:text-estado-peligro transition-colors">
-   <i class="ph-bold ph-x"></i>
-  </button>
-  </div>
-
-  @if($modoEdicion)
-  <div class="p-3 bg-estado-advertenciaBg border border-estado-advertenciaBorde rounded-xl flex gap-2 text-xs text-estado-advertencia font-semibold">
-  <i class="ph-bold ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
-  <span>Al guardar, la asignación actual quedará como <strong>inactivas</strong> y se creará una nueva asignación con los datos modificados.</span>
-  </div>
-  @endif
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  {{-- Área --}}
-  <div>
-   <label for="staff-schedule-f_cod_area" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
-   Área <span class="text-estado-peligro">*</span>
-   </label>
-   <select id="staff-schedule-f_cod_area" wire:model="f_cod_area" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   <option value="">Seleccione un área...</option>
-   @foreach($areas as $area)
-    <option value="{{ $area['cod_area'] }}">{{ $area['nombre'] }}</option>
-   @endforeach
-   </select>
-   @error('f_cod_area') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
-
-  {{-- Turno --}}
-  <div>
-   <label for="staff-schedule-f_cod_turno" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
-   Turno <span class="text-estado-peligro">*</span>
-   </label>
-   <select id="staff-schedule-f_cod_turno" wire:model.live="f_cod_turno" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   <option value="">Seleccione un turno...</option>
-   @foreach($turnos as $turno)
-    <option value="{{ $turno['cod_turno'] }}">
-    {{ $turno['nombre'] }}
-    @if($turno['hora_inicio'] && $turno['hora_fin'])
-     ({{ \Carbon\Carbon::parse($turno['hora_inicio'])->format('H:i') }} – {{ \Carbon\Carbon::parse($turno['hora_fin'])->format('H:i') }})
+ <form wire:submit="solicitarGuardar" class="rm-staff-action__form" novalidate>
+  <x-ui.form-section :title="$modoEdicion ? 'Editar asignación' : 'Nueva asignación de turno'" :icon="$modoEdicion ? 'ph-pencil-simple' : 'ph-calendar-plus'" :columns="2">
+   <x-ui.field label="Área" for="staff-schedule-f_cod_area" error="f_cod_area" required>
+    <select id="staff-schedule-f_cod_area" wire:model="f_cod_area" class="rm-input" aria-invalid="{{ $errors->has('f_cod_area') ? 'true' : 'false' }}" @if($errors->has('f_cod_area')) aria-describedby="staff-schedule-f_cod_area-error" @endif required>
+     <option value="">SELECCIONAR ÁREA</option>
+     @foreach($areas as $area)<option value="{{ $area['cod_area'] }}">{{ mb_strtoupper($area['nombre'], 'UTF-8') }}</option>@endforeach
+    </select>
+   </x-ui.field>
+   <x-ui.field label="Turno" for="staff-schedule-f_cod_turno" error="f_cod_turno" required>
+    <select id="staff-schedule-f_cod_turno" wire:model.live="f_cod_turno" class="rm-input" aria-invalid="{{ $errors->has('f_cod_turno') ? 'true' : 'false' }}" @if($errors->has('f_cod_turno')) aria-describedby="staff-schedule-f_cod_turno-error" @endif required>
+     <option value="">SELECCIONAR TURNO</option>
+     @foreach($turnos as $turno)
+      <option value="{{ $turno['cod_turno'] }}">{{ mb_strtoupper($turno['nombre'], 'UTF-8') }} @if($turno['hora_inicio'] && $turno['hora_fin']) ({{ \Carbon\Carbon::parse($turno['hora_inicio'])->format('H:i') }}–{{ \Carbon\Carbon::parse($turno['hora_fin'])->format('H:i') }}) @endif</option>
+     @endforeach
+    </select>
+    @php
+     $turnoSeleccionado = collect($turnos)->firstWhere('cod_turno', $f_cod_turno);
+    @endphp
+    @if($turnoSeleccionado)
+     <p class="rm-help"><i class="ph-bold ph-clock" aria-hidden="true"></i> Horario institucional: {{ $turnoSeleccionado['hora_inicio'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_inicio'])->format('H:i') : 'Sin hora' }}–{{ $turnoSeleccionado['hora_fin'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_fin'])->format('H:i') : 'Sin hora' }}</p>
     @endif
-    </option>
-   @endforeach
-   </select>
-   @php
-   $turnoSeleccionado = collect($turnos)->firstWhere('cod_turno', $f_cod_turno);
-   @endphp
-   @if($turnoSeleccionado)
-   <div class="mt-1.5 flex items-center gap-2 rounded-lg border border-borde bg-fondo px-2.5 py-1.5 text-[11px] font-semibold text-apoyo">
-    <i class="ph-bold ph-clock text-boton-acento"></i>
-    <span>Horario institucional:</span>
-    <strong class="text-titulo">
-    {{ $turnoSeleccionado['hora_inicio'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_inicio'])->format('H:i') : 'Sin hora' }}
-    -
-    {{ $turnoSeleccionado['hora_fin'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_fin'])->format('H:i') : 'Sin hora' }}
-    </strong>
+   </x-ui.field>
+   <x-ui.field label="Tipo de asignación" for="staff-schedule-f_tipo_asignacion" error="f_tipo_asignacion" required>
+    <select id="staff-schedule-f_tipo_asignacion" wire:model="f_tipo_asignacion" class="rm-input" aria-invalid="{{ $errors->has('f_tipo_asignacion') ? 'true' : 'false' }}" @if($errors->has('f_tipo_asignacion')) aria-describedby="staff-schedule-f_tipo_asignacion-error" @endif required>
+     <option value="FIJO">FIJO · HORARIO FIJO SEMANAL</option><option value="ROTATIVO">ROTATIVO · TURNOS ROTATIVOS</option><option value="TEMPORAL">TEMPORAL · VIGENCIA LIMITADA</option><option value="EVENTUAL">EVENTUAL · COBERTURA PUNTUAL</option>
+    </select>
+   </x-ui.field>
+   <x-ui.field label="Fecha de inicio" for="staff-schedule-f_fecha_inicio" error="f_fecha_inicio" required>
+    <input id="staff-schedule-f_fecha_inicio" type="date" wire:model="f_fecha_inicio" class="rm-input" aria-invalid="{{ $errors->has('f_fecha_inicio') ? 'true' : 'false' }}" @if($errors->has('f_fecha_inicio')) aria-describedby="staff-schedule-f_fecha_inicio-error" @endif required>
+   </x-ui.field>
+   <x-ui.field label="Observaciones (opcional)" for="staff-schedule-f_observaciones" error="f_observaciones" class="rm-staff-action__wide">
+    <textarea id="staff-schedule-f_observaciones" wire:model="f_observaciones" class="rm-input" rows="2" maxlength="1000" placeholder="Ej. cobertura temporal o reemplazo" aria-invalid="{{ $errors->has('f_observaciones') ? 'true' : 'false' }}" @if($errors->has('f_observaciones')) aria-describedby="staff-schedule-f_observaciones-error" @endif></textarea>
+   </x-ui.field>
+  </x-ui.form-section>
+  <fieldset class="rm-staff-action__days" @if($errors->has('f_dias_semana')) aria-describedby="staff-schedule-dias-error" @endif>
+   <legend class="rm-label rm-label-required">Días laborales</legend>
+   <div class="rm-staff-action__day-options">
+    @foreach($diasSemana as $dia)
+     <label><input class="sr-only" type="checkbox" wire:model="f_dias_semana" value="{{ $dia }}"><span><i class="ph-bold ph-check" aria-hidden="true"></i>{{ ['MIERCOLES'=>'MIÉRCOLES','SABADO'=>'SÁBADO'][$dia] ?? $dia }}</span></label>
+    @endforeach
    </div>
-   @endif
-   @error('f_cod_turno') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
+   @error('f_dias_semana')<p id="staff-schedule-dias-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
+   @foreach($errors->get('f_dias_semana.*') as $mensajes) @foreach($mensajes as $mensaje)<p class="rm-error" role="alert">{{ $mensaje }}</p>@endforeach @endforeach
+  </fieldset>
+  <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>Se guardará una jornada por cada día elegido dentro de los siete días desde el inicio. @if($modoEdicion)Las jornadas anteriores se conservan; se registrará una nueva versión.@endif</span></p>
+  <div class="rm-staff-action__actions">
+   <x-ui.action-button variant="secondary" wire:click="cancelarFormulario">Cancelar</x-ui.action-button>
+   <x-ui.action-button tipo="submit" loading="solicitarGuardar,guardar" icono="ph-check">{{ $modoEdicion ? 'Guardar cambios' : 'Crear asignación' }}</x-ui.action-button>
   </div>
-
-  {{-- Tipo de asignación --}}
-  <div>
-   <label for="staff-schedule-f_tipo_asignacion" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
-   Tipo de Asignación <span class="text-estado-peligro">*</span>
-   </label>
-   <select id="staff-schedule-f_tipo_asignacion" wire:model="f_tipo_asignacion" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   <option value="FIJO">FIJO – Horario fijo semanal</option>
-   <option value="ROTATIVO">ROTATIVO – Turnos rotativos</option>
-   <option value="TEMPORAL">TEMPORAL – Vigencia limitada</option>
-   <option value="EVENTUAL">EVENTUAL – Cobertura puntual</option>
-   </select>
-   @error('f_tipo_asignacion') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
-
-  {{-- Fecha inicio --}}
-  <div>
-   <label for="staff-schedule-f_fecha_inicio" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">
-   Fecha Inicio <span class="text-estado-peligro">*</span>
-   </label>
-   <input id="staff-schedule-f_fecha_inicio" type="date" wire:model="f_fecha_inicio" class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   @error('f_fecha_inicio') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
-<p class="rm-help">Se guardará una jornada concreta por cada día seleccionado dentro de los próximos siete días desde el inicio. No se crea una recurrencia indefinida.</p>
-
-
-  {{-- Observaciones --}}
-  <div>
-   <label for="staff-schedule-f_observaciones" class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Observaciones</label>
-   <input id="staff-schedule-f_observaciones" type="text" wire:model="f_observaciones" placeholder="Ej: Cobertura temporal, reemplazo..." class="w-full rounded-xl border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-  </div>
-  </div>
-
-  {{-- Das de la semana --}}
-  <div>
-  <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-2">
-   Días laborales <span class="text-estado-peligro">*</span>
-   @if($tipoPersonal === 'salud' && $esEnfermeria)
-   <span class="ml-2 text-estado-info text-[10px] font-bold normal-case">Enfermería: sin solapamiento en ningún día</span>
-   @endif
-  </label>
-  <div class="flex flex-wrap gap-2">
-   @foreach($diasSemana as $dia)
-   <label class="relative cursor-pointer select-none">
-    <input type="checkbox" wire:model="f_dias_semana" value="{{ $dia }}" class="sr-only peer">
-    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border-2 transition-all
-    peer-checked:bg-boton-acento peer-checked:border-boton-acento peer-checked:text-white
-    border-borde text-apoyo hover:border-boton-acento/50 bg-[var(--rm-surface-soft)]">
-    {{ $dia }}
-    </span>
-   </label>
-   @endforeach
-  </div>
-  @error('f_dias_semana') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
-
-  {{-- Botones --}}
-  <div class="flex items-center justify-end gap-3 pt-2 border-t border-borde/60">
-  <button type="button" wire:click="cancelarFormulario"
-   class="px-4 py-2 text-sm font-bold text-apoyo hover:text-titulo transition-colors rounded-xl hover:bg-fondo-hover">
-   Cancelar
-  </button>
-  <button type="button" wire:click="solicitarGuardar"
-   wire:loading.attr="disabled"
-   wire:target="solicitarGuardar,guardar"
-   class="rm-btn-primary px-5 py-2 text-sm rounded-xl flex items-center gap-2 disabled:opacity-60">
-   <span wire:loading.remove wire:target="solicitarGuardar,guardar">
-   <i class="ph-bold {{ $modoEdicion ? 'ph-arrows-clockwise' : 'ph-check' }} text-sm"></i>
-   {{ $modoEdicion ? 'Guardar cambios' : 'Crear asignación' }}
-   </span>
-   <span wire:loading wire:target="solicitarGuardar,guardar" class="flex items-center gap-2">
-   <i class="ph-bold ph-spinner animate-spin"></i> Guardando...
-   </span>
-  </button>
-  </div>
- </div>
+ </form>
  @endif
 
  {{-- ══ TABLA DE ASIGNACIONES ══ --}}
+ @if(!$formAbierto)
  @if(count($asignaciones) > 0)
  <div class="bg-[var(--rm-surface-soft)] rounded-2xl border border-borde rm-staff-table-wrap">
   <table role="table" class="rm-staff-table rm-data-table rm-data-table--actions w-full min-w-[760px] text-left text-sm">
@@ -312,50 +218,10 @@
  </div>
  @endif
 
+ @endif {{-- fin de la lista mientras el formulario está cerrado --}}
  @endif {{-- fin @if tipoPersonal !== ninguno --}}
 
 
- {{-- ══ MODAL: FINALIZAR ══ --}}
- @if($modalFinalizarAbierto)
- <div class="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
- <div class="w-full max-w-sm bg-[var(--rm-surface-soft)] rounded-2xl shadow-2xl border border-borde overflow-hidden">
-  <div class="flex items-center gap-3 px-5 py-4 border-b border-borde bg-estado-advertenciaBg">
-  <div class="h-10 w-10 rounded-xl bg-estado-advertencia/20 flex items-center justify-center text-estado-advertencia">
-   <i class="ph-bold ph-flag-checkered text-xl"></i>
-  </div>
-  <div>
-   <h5 class="font-black text-titulo text-sm">Finalizar Asignación</h5>
-   <p class="text-xs text-apoyo font-semibold">{{ $codAsignacionFinalizar }}</p>
-  </div>
-  </div>
-  <div class="p-5 space-y-4">
-  <p class="text-sm text-parrafo">Indica desde qué fecha cancelar las ocurrencias seleccionadas. Las jornadas anteriores se conservan; las posteriores quedarán <strong>inactivas</strong>.</p>
-  <div>
-   <label class="block text-xs font-bold text-apoyo uppercase tracking-wider mb-1">Cancelar desde la fecha <span class="text-estado-peligro">*</span></label>
-   <input type="date" wire:model="f_fecha_fin_finalizar" class="w-full rounded-xl border-input-borde bg-input-bg text-sm focus:ring-input-ringFocus focus:border-input-bordeFocus">
-   @error('f_fecha_fin_finalizar') <span class="text-xs text-estado-peligro mt-1 block">{{ $message }}</span> @enderror
-  </div>
-  </div>
-  <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-borde bg-fondo-hover">
-  <button type="button" wire:click="cancelarFinalizar"
-   class="px-4 py-2 text-sm font-bold text-apoyo hover:text-titulo transition-colors rounded-xl hover:bg-fondo-hover">
-   Cancelar
-  </button>
-  <button type="button" wire:click="solicitarFinalizar"
-   wire:loading.attr="disabled"
-   wire:target="solicitarFinalizar,confirmarFinalizar"
-   class="px-5 py-2 text-sm font-bold bg-estado-advertencia text-white rounded-xl hover:bg-estado-advertencia/90 transition-colors flex items-center gap-2 disabled:opacity-60">
-   <span wire:loading.remove wire:target="solicitarFinalizar,confirmarFinalizar">
-   <i class="ph-bold ph-flag-checkered"></i> Confirmar finalización
-   </span>
-   <span wire:loading wire:target="solicitarFinalizar,confirmarFinalizar" class="flex items-center gap-2">
-   <i class="ph-bold ph-spinner animate-spin"></i> Procesando...
-   </span>
-  </button>
-  </div>
- </div>
- </div>
- @endif
 
 
  {{-- ══ MODAL: DETALLE ══ --}}
@@ -439,6 +305,7 @@
  </div>
  @endif
 
+ @endif
 </div>
 
 @script
