@@ -71,6 +71,8 @@ test('Áreas de Gerencia: tarjetas compartidas, filtro y equipo en cinco anchos'
         await page.setViewport({width,height:960});
         await go('/admin/areas-institucionales');
         await page.waitForSelector('[data-area-card]');
+        const editarTarjeta = await page.$eval('[data-area-card] button[aria-label^="Editar área "]', boton => boton.innerText.trim());
+        assert.equal(editarTarjeta, 'Editar área');
         assert.match(await page.$eval('main', e => e.innerText), /Áreas y equipo/i);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
         assert.doesNotMatch(await page.$eval('main',e=>e.innerText),/Sin Responsable|Seeder|undefined|\[object Object\]/);
@@ -117,7 +119,13 @@ test('Áreas de Gerencia: tarjetas compartidas, filtro y equipo en cinco anchos'
             await page.waitForFunction(fecha => document.querySelector('#gerencia-area-fecha').value === fecha
                 && document.querySelectorAll('#gerencia-area-equipo .rm-area-detail__people li').length === 3, {}, fechaOriginal);
         }
-        await page.evaluate(async()=>{const comp=[...document.querySelectorAll('[wire\\:id]')].find(e=>e.querySelector('#areas-buscar'));await Livewire.find(comp.getAttribute('wire:id')).call('cerrarFicha');});
+        if (width === 390) {
+            await page.click('#gerencia-area-equipo .rm-area-detail__identity button');
+            await page.waitForSelector('#area-registro-dialogo [role="dialog"]', { visible: true });
+            assert.equal(await page.$eval('#area-registro-nombre', input => input.value), 'Acompañamiento y cuidados');
+        } else {
+            await page.evaluate(async()=>{const comp=[...document.querySelectorAll('[wire\\:id]')].find(e=>e.querySelector('#areas-buscar'));await Livewire.find(comp.getAttribute('wire:id')).call('cerrarFicha');});
+        }
         await page.waitForFunction(()=>!document.getElementById('gerencia-area-equipo'));
     }
     assert.deepEqual(errors,[]);assert.deepEqual(solicitudesFallidas,[]);

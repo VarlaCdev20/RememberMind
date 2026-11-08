@@ -210,14 +210,11 @@
  @endunless
  </div>
 
- <div class="flex items-center gap-1.5">
+ <div class="flex flex-wrap items-center gap-1.5">
  @can('areas.editar')
- <button type="button"
- wire:click="editarArea('{{ $area->cod_area }}')"
- class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-estado-peligroBg text-boton-acento hover:bg-boton-acento hover:text-inverso transition duration-200"
- aria-label="Editar área {{ $area->nombre }}" title="Editar Área">
- <i class="ph-bold ph-pencil-simple"></i>
- </button>
+ <x-ui.action-button variant="secondary" icono="ph-pencil-simple" loading="editarArea"
+     wire:click="editarArea('{{ $area->cod_area }}')"
+     :aria-label="'Editar área '.$area->nombre">Editar área</x-ui.action-button>
  @endcan
 
  @can('areas.cambiar_estado')

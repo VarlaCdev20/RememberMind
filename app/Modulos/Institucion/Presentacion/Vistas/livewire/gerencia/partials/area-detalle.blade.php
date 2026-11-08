@@ -14,6 +14,10 @@
             <div class="rm-area-detail__identity">
                 <h3 id="area-detalle-nombre">{{ $areaActual->nombre }}</h3>
                 <x-ui.status-badge :estado="$areaActual->estado" :label="in_array($areaActual->estado, ['ACTIVO', 'ACTIVA'], true) ? 'Área activa' : 'Área inactiva'" />
+                @can('areas.editar')
+                    <x-ui.action-button variant="secondary" icono="ph-pencil-simple" loading="editarArea" class="sm:ml-auto"
+                        wire:click="editarArea('{{ $areaActual->getKey() }}')">Editar área</x-ui.action-button>
+                @endcan
             </div>
             <h4>¿De qué se encarga?</h4>
             <p class="rm-area-detail__description">{{ filled($areaActual->descripcion) ? $areaActual->descripcion : 'Todavía no se registró la descripción funcional de esta área.' }}</p>
@@ -90,9 +94,6 @@
         @endif
     </section>
     <x-slot:footer>
-        @can('areas.editar')
-            <x-ui.action-button variant="secondary" icono="ph-pencil-simple" wire:click="editarArea('{{ $areaActual->getKey() }}')">Editar área</x-ui.action-button>
-        @endcan
         @if($puedeVerEquipo && $equipo !== null)
             <a class="rm-btn rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['area' => $areaActual->getKey(), 'fecha' => $fechaEquipo]) }}">Ver cobertura completa</a>
         @endif
