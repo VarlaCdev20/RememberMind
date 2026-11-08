@@ -1,11 +1,13 @@
 import Swal from 'sweetalert2';
 
-let abierta = false;
+let activa = null;
 
 // La confirmación solo autoriza continuar la interacción; el servidor decide el resultado.
 export async function confirmarOperacion({ title, text, subject = '', detail = '', confirmText = 'Confirmar', tone = 'neutral' }, origen = null) {
-    if (abierta) return false;
-    abierta = true;
+    if (activa && document.querySelector('.rm-confirmation')) return false;
+    if (activa) Swal.close();
+    const intento = Symbol('confirmacion');
+    activa = intento;
     try {
         const contenido = document.createElement('div');
         if (subject) {
@@ -26,8 +28,9 @@ export async function confirmarOperacion({ title, text, subject = '', detail = '
         mensaje.textContent = text;
         contenido.append(mensaje);
         const peligro = tone === 'danger';
+        const modal = origen?.closest('.rm-modal-shell, .jetstream-modal, .rm-staff-overlay');
         const resultado = await Swal.fire({
-            target: origen?.closest('.rm-modal-shell, .jetstream-modal, .rm-staff-overlay') || document.body,
+            target: modal?.querySelector('[data-rm-confirmation-host]') || modal || document.body,
             position: 'center',
             toast: false,
             heightAuto: false,
@@ -58,10 +61,12 @@ export async function confirmarOperacion({ title, text, subject = '', detail = '
         });
         return resultado.isConfirmed && (!origen || origen.isConnected);
     } finally {
-        abierta = false;
-        if (origen?.isConnected) {
-            const destino = origen.getClientRects().length ? origen : origen.closest('[x-data]')?.querySelector('button[aria-expanded]');
-            destino?.focus({ preventScroll: true });
+        if (activa === intento) {
+            activa = null;
+            if (origen?.isConnected) {
+                const destino = origen.getClientRects().length ? origen : origen.closest('[x-data]')?.querySelector('button[aria-expanded]');
+                destino?.focus({ preventScroll: true });
+            }
         }
     }
 }

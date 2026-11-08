@@ -114,6 +114,11 @@ try {
     await page.click('button[form="gerencia-laboral-form"]');
     await page.waitForSelector('.rm-confirmation',{visible:true});
     await page.waitForFunction(()=>document.querySelector('.rm-confirmation .swal2-cancel')===document.activeElement);
+    await page.evaluate(async()=>{
+        const raiz=document.querySelector('#gerencia-estado-laboral').closest('[wire\\:id]');
+        await window.Livewire.find(raiz.getAttribute('wire:id')).$refresh();
+    });
+    assert.equal(await page.$$eval('.rm-confirmation',e=>e.length),1,'Actualizar el formulario debe conservar el aviso abierto');
     assert.equal(await page.$eval('.rm-confirmation',e=>e.querySelector('.swal2-cancel')===document.activeElement),true);
     await page.keyboard.press('Tab');
     assert.equal(await page.$eval('.rm-confirmation',e=>e.contains(document.activeElement)),true);
@@ -142,11 +147,17 @@ try {
     await page.waitForSelector('#gerencia-personal-ficha [role="dialog"]',{hidden:true});
     assert.deepEqual(leer(),original);
     // Los nombres se muestran como texto, sin interpretar HTML.
-    await page.evaluate(()=>{void window.rmConfirmar({title:'Confirmación de prueba',subject:'<img src=x onerror="window.inyectado=true">',text:'Contenido sintético.',confirmText:'Continuar'});});
+    await page.evaluate(()=>{void window.rmConfirmar({title:'Confirmación de prueba',subject:'<img src=x onerror="window.inyectado=true">',text:'Contenido sintético.',confirmText:'Continuar'},document.querySelector('button[aria-expanded]'));});
     await page.waitForSelector('.rm-confirmation',{visible:true});
     assert.equal(await page.$('.rm-confirmation__subject img'),null);
     assert.match(await page.$eval('.rm-confirmation__subject',e=>e.textContent),/^<img src=x/);
     assert.equal(await page.evaluate(()=>window.inyectado),undefined);
+    await page.evaluate(()=>{
+        document.querySelector('.rm-confirmation-container').remove();
+        void window.rmConfirmar({title:'Confirmación recuperada',text:'Contenido sintético.'});
+    });
+    await page.waitForFunction(()=>document.querySelector('.rm-confirmation .swal2-title')?.textContent==='Confirmación recuperada');
+    await page.waitForFunction(()=>document.querySelector('.rm-confirmation .swal2-cancel')===document.activeElement);
     await page.click('.swal2-cancel');await page.waitForSelector('.rm-confirmation',{hidden:true});
     assert.deepEqual(nativos,[]);
     assert.deepEqual(ventanas,[],'Las advertencias no deben abrir pestañas ni ventanas');

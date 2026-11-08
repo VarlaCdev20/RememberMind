@@ -86,6 +86,8 @@ $modalId = $id ?: 'modal-'.\Illuminate\Support\Str::slug((string) ($attributes->
     x-on:keydown.escape.window="if (show && @js($dismissOnEscape)) { $event.stopPropagation(); {{ $alpineClose ?: '$wire.'.$closeMethod.'()' }} }"
     class="rm-modal-shell {{ $surface === 'reading' ? 'rm-modal-shell--reading' : '' }} fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 font-sans {{ $attributes->get('class') }}"
 >
+    <div wire:ignore data-rm-confirmation-host class="contents"></div>
+
     <!-- Overlay Accesible Cálido -->
     <div
         x-show="show"
