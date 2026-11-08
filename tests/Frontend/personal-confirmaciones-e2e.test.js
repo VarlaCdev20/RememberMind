@@ -33,7 +33,8 @@ try {
     page.on('request',r=>r.url().startsWith(base+'/') ? r.continue({headers:{...r.headers(),'X-RM-GERENCIA-QA':token}}) : r.abort());
     await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
 
-    const nativos=[], llamadas=[];
+    const nativos=[], llamadas=[], ventanas=[];
+    browser.on('targetcreated',target=>{if(target.type()==='page')ventanas.push(target.url());});
     page.on('dialog',async d=>{nativos.push(d.type());await d.dismiss();});
     page.on('request',r=>{
         if(r.method()!=='POST'||!r.url().endsWith('/update'))return;
@@ -63,14 +64,17 @@ try {
         await menu();await clickText('Suspender acceso');
         await page.waitForSelector('.rm-confirmation',{visible:true});
         await page.waitForFunction(()=>document.activeElement?.classList.contains('swal2-cancel'));
+        await page.waitForFunction(()=>{const r=document.querySelector('.rm-confirmation')?.getBoundingClientRect();return r&&Math.abs((r.left+r.right)/2-innerWidth/2)<2&&Math.abs((r.top+r.bottom)/2-innerHeight/2)<2;});
         const state=await page.$eval('.rm-confirmation',e=>{
             const r=e.getBoundingClientRect();
             return {fit:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight,
+                centered:Math.abs((r.left+r.right)/2-innerWidth/2)<2&&Math.abs((r.top+r.bottom)/2-innerHeight/2)<2,
                 overflow:e.scrollWidth>e.clientWidth+1,font:getComputedStyle(e).fontFamily,
                 cancel:e.querySelector('.swal2-cancel').offsetHeight,confirm:e.querySelector('.swal2-confirm').offsetHeight,
                 cancelFocused:document.activeElement===e.querySelector('.swal2-cancel')};
         });
         assert.ok(state.fit&&!state.overflow&&state.cancel>=44&&state.confirm>=44&&state.cancelFocused,JSON.stringify(state));
+        assert.equal(state.centered,true,JSON.stringify(state));
         assert.match(state.font,/Nunito/);
         assert.match(await page.$eval('.rm-confirmation',e=>e.textContent),/equipo1@example.test/);
         const path=join(tmpdir(),'remembermind-confirmaciones-'+id+'-'+width+'-'+theme+'.png');
@@ -78,6 +82,7 @@ try {
         await page.click('.swal2-cancel');
         await page.waitForSelector('.rm-confirmation',{hidden:true});
         assert.equal(contar('toggleEstado'),0);assert.deepEqual(leer(),original);
+        assert.equal(page.url(),base+'/admin/personal-institucional');
         await menu();await clickText('Enviar enlace de acceso');
         await page.waitForSelector('.rm-confirmation',{visible:true});
         await page.keyboard.press('Escape');await page.waitForSelector('.rm-confirmation',{hidden:true});
@@ -120,7 +125,7 @@ try {
     await page.waitForSelector('#laboral-motivo[aria-invalid="true"]');
     assert.equal(contar('guardarEstadoLaboral'),1);assert.deepEqual(leer(),original);
     await clickText('Cancelar','#gerencia-estado-laboral');
-    await page.waitForSelector('.rm-confirmation',{visible:true});await page.click('.swal2-cancel');
+    await page.waitForSelector('.rm-confirmation',{visible:true});await page.click('.rm-confirmation__close');
     await page.waitForSelector('.rm-confirmation',{hidden:true});
     assert.ok(await page.$('#laboral-motivo'));
     await clickText('Cancelar','#gerencia-estado-laboral');
@@ -144,6 +149,7 @@ try {
     assert.equal(await page.evaluate(()=>window.inyectado),undefined);
     await page.click('.swal2-cancel');await page.waitForSelector('.rm-confirmation',{hidden:true});
     assert.deepEqual(nativos,[]);
+    assert.deepEqual(ventanas,[],'Las advertencias no deben abrir pestañas ni ventanas');
     console.log('Confirmaciones: una ejecución, cancelación sin cambios, validación y texto seguro correctos');
     assert.deepEqual(errors,[]);
 }finally{

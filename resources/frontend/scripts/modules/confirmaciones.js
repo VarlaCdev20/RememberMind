@@ -28,11 +28,17 @@ export async function confirmarOperacion({ title, text, subject = '', detail = '
         const peligro = tone === 'danger';
         const resultado = await Swal.fire({
             target: origen?.closest('.rm-modal-shell, .jetstream-modal, .rm-staff-overlay') || document.body,
+            position: 'center',
+            toast: false,
+            heightAuto: false,
+            backdrop: true,
             titleText: title,
             html: contenido,
             icon: peligro ? 'warning' : 'question',
             iconHtml: `<i class="ph-bold ${peligro ? 'ph-warning-circle' : 'ph-shield-check'}" aria-hidden="true"></i>`,
             showCancelButton: true,
+            showCloseButton: true,
+            closeButtonAriaLabel: 'Cerrar aviso',
             confirmButtonText: confirmText,
             cancelButtonText: 'Cancelar',
             focusConfirm: false,
@@ -47,6 +53,7 @@ export async function confirmarOperacion({ title, text, subject = '', detail = '
                 icon: 'rm-confirmation__icon',
                 confirmButton: `rm-btn ${peligro ? 'rm-btn-danger' : 'rm-btn-primary'}`,
                 cancelButton: 'rm-btn rm-btn-secondary',
+                closeButton: 'rm-confirmation__close',
             },
         });
         return resultado.isConfirmed && (!origen || origen.isConnected);
