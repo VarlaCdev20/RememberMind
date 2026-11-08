@@ -63,37 +63,35 @@
                             </div>
                         @endforeach
                     </dl>
-                    @if($clave === 'laboral')
-                        @can('asignaciones_personal.ver')
-                            <div class="rm-staff-record__schedule">
-                                <x-ui.section-header title="Horarios" icon="ph-calendar-blank" :level="4" />
-                                <p class="rm-help">Hoy y próximas jornadas abiertas</p>
-                                <ul class="rm-staff-record__list">
-                                    @forelse($asignaciones as $asignacion)
-                                        <li class="rm-staff-record__file">
-                                            <div>
-                                                <strong>{{ $asignacion->jornada?->fecha_jornada?->format('d/m/Y') }} · {{ $asignacion->area?->nombre ?? 'Área sin registrar' }}</strong>
-                                                <p>{{ $asignacion->jornada?->turno?->nombre ?? 'Turno sin registrar' }}
-                                                    @if($asignacion->hora_inicio && $asignacion->hora_fin)
-                                                        · {{ substr($asignacion->hora_inicio, 0, 5) }}–{{ substr($asignacion->hora_fin, 0, 5) }}
-                                                    @endif
-                                                </p>
-                                                @if($asignacion->funcion)<p class="rm-help">Función {{ $asignacion->funcion }}</p>@endif
-                                            </div>
-                                        </li>
-                                    @empty
-                                        <li class="rm-help">Sin asignaciones para hoy o próximas jornadas abiertas.</li>
-                                    @endforelse
-                                </ul>
-                                @if($fichaPersonal['totalAsignaciones'] > $asignaciones->count())
-                                    <p class="rm-help">Mostrando {{ $asignaciones->count() }} de {{ $fichaPersonal['totalAsignaciones'] }} asignaciones.</p>
-                                @endif
-                                <x-ui.action-button variant="secondary" class="rm-staff-record__action" wire:click="abrirHorariosDesdeFicha" icono="ph-arrow-right">Consultar horarios</x-ui.action-button>
-                            </div>
-                        @endcan
-                    @endif
                 </x-ui.section-card>
             @endforeach
+
+            @can('asignaciones_personal.ver')
+                <x-ui.section-card title="Horarios" icon="ph-calendar-blank" class="rm-staff-record__schedule">
+                    <p class="rm-help">Hoy y próximas jornadas abiertas</p>
+                    <ul class="rm-staff-record__list">
+                        @forelse($asignaciones as $asignacion)
+                            <li class="rm-staff-record__file">
+                                <div>
+                                    <strong>{{ $asignacion->jornada?->fecha_jornada?->format('d/m/Y') }} · {{ $asignacion->area?->nombre ?? 'Área sin registrar' }}</strong>
+                                    <p>{{ $asignacion->jornada?->turno?->nombre ?? 'Turno sin registrar' }}
+                                        @if($asignacion->hora_inicio && $asignacion->hora_fin)
+                                            · {{ substr($asignacion->hora_inicio, 0, 5) }}–{{ substr($asignacion->hora_fin, 0, 5) }}
+                                        @endif
+                                    </p>
+                                    @if($asignacion->funcion)<p class="rm-help">Función {{ $asignacion->funcion }}</p>@endif
+                                </div>
+                            </li>
+                        @empty
+                            <li class="rm-help">Sin asignaciones para hoy o próximas jornadas abiertas.</li>
+                        @endforelse
+                    </ul>
+                    @if($fichaPersonal['totalAsignaciones'] > $asignaciones->count())
+                        <p class="rm-help">Mostrando {{ $asignaciones->count() }} de {{ $fichaPersonal['totalAsignaciones'] }} asignaciones.</p>
+                    @endif
+                    <x-ui.action-button variant="secondary" class="rm-staff-record__action" wire:click="abrirHorariosDesdeFicha" icono="ph-arrow-right">Consultar horarios</x-ui.action-button>
+                </x-ui.section-card>
+            @endcan
 
             <x-ui.section-card title="Documentación" icon="ph-folder-open" class="rm-staff-record__documents">
                 <p class="rm-staff-record__counts">
@@ -162,7 +160,7 @@
                                 <p class="rm-help">El expediente todavía no tiene archivos ni solicitudes con plazo.</p>
                             @endif
                         </div>
-                            </section>
+                    </section>
                 </div>
                 <a class="rm-btn rm-btn-secondary rm-staff-record__action" href="{{ $fichaPersonal['urlDocumentacion'] }}"><i class="ph-bold ph-folder-open" aria-hidden="true"></i> Abrir documentación laboral</a>
             </x-ui.section-card>

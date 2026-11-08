@@ -305,6 +305,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
     gap: var(--rm-space-2);
+    padding: var(--rm-space-1) var(--rm-space-3);
     background: color-mix(in srgb, var(--rm-staff-record-accent) 12%, var(--rm-surface));
     border-bottom-color: color-mix(in srgb, var(--rm-staff-record-accent) 18%, transparent);
 }
@@ -319,7 +320,11 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     letter-spacing: 0.025em;
 }
 .rm-staff-record-dialog .rm-modal-panel__title > i { display: none; }
-.rm-staff-record-dialog .rm-modal-footer { border-top-color: var(--rm-border-soft); }
+.rm-staff-record-dialog .rm-modal-body { padding: var(--rm-space-3); }
+.rm-staff-record-dialog .rm-modal-footer {
+    padding: var(--rm-space-1) var(--rm-space-3);
+    border-top-color: var(--rm-border-soft);
+}
 .rm-staff-record-dialog .rm-modal-footer .rm-btn {
     border-radius: var(--rm-radius-pill);
     padding-inline: var(--rm-space-5);
@@ -328,7 +333,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     --rm-font-body: "Nunito", sans-serif;
     --rm-font-friendly: var(--rm-font-body);
     display: grid;
-    gap: var(--rm-space-4);
+    gap: var(--rm-space-2);
     min-width: 0;
     font-family: var(--rm-font-body);
     font-size: calc(var(--rm-font-size-body) + 2px);
@@ -341,8 +346,8 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--rm-space-4);
-    padding: var(--rm-space-5);
+    gap: var(--rm-space-2);
+    padding: var(--rm-space-3);
     border: 1px solid color-mix(in srgb, var(--rm-staff-record-accent) 45%, var(--rm-border-soft));
     border-radius: var(--rm-staff-record-radius);
     background: linear-gradient(120deg,
@@ -371,7 +376,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-record__statuses {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--rm-space-3) var(--rm-space-5);
+    gap: var(--rm-space-2);
 }
 .rm-staff-record__statuses > div {
     padding: var(--rm-space-2) var(--rm-space-3);
@@ -382,27 +387,32 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-record__overview {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--rm-space-3);
+    gap: var(--rm-space-2);
 }
 .rm-staff-record__overview > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rm-space-2);
     min-width: 0;
-    padding: var(--rm-space-3) var(--rm-space-4);
+    padding: var(--rm-space-2) var(--rm-space-3);
     border-radius: var(--rm-radius-xl);
     background: color-mix(in srgb, var(--rm-staff-record-accent) 9%, var(--rm-surface));
 }
 .rm-staff-record__overview dd {
     font: 800 var(--rm-font-size-dashboard)/1.2 var(--rm-font-friendly);
-    margin-top: var(--rm-space-1);
+    margin: 0;
+    flex-shrink: 0;
 }
 .rm-staff-record__subheading {
     font: 800 var(--rm-font-size-body-lg)/1.4 var(--rm-font-friendly);
-    margin-block: var(--rm-space-3) var(--rm-space-2);
+    margin-block: var(--rm-space-2) var(--rm-space-1);
 }
 .rm-staff-record__sections {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     align-items: start;
-    gap: var(--rm-space-4);
+    gap: var(--rm-space-2);
 }
 .rm-staff-record__sections > .rm-card {
     min-width: 0;
@@ -410,11 +420,11 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     border-color: color-mix(in srgb, var(--rm-border-soft) 55%, transparent);
     box-shadow: none;
     background-image: none;
-    padding: var(--rm-space-4);
+    padding: var(--rm-space-3);
 }
 .rm-staff-record .rm-section-header {
     border-bottom: 0;
-    padding-bottom: var(--rm-space-2);
+    padding-bottom: 0;
     gap: var(--rm-space-2);
 }
 .rm-staff-record .rm-section-header__icon {
@@ -429,11 +439,10 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 .rm-staff-record__fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--rm-space-4) var(--rm-space-5);
+    gap: var(--rm-space-2) var(--rm-space-3);
 }
 .rm-staff-record__fields > div {
     min-width: 0;
-    padding-block-end: var(--rm-space-2);
 }
 .rm-staff-record__field--wide { grid-column: 1 / -1; }
 .rm-staff-record :is(dt, .rm-staff-record__counts) {
@@ -442,7 +451,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     font-weight: 700;
 }
 .rm-staff-record__fields dd {
-    margin-top: var(--rm-space-1);
+    margin: 0;
     font-size: calc(var(--rm-font-size-body-lg) + 2px);
     font-weight: 700;
 }
@@ -452,16 +461,27 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     font-size: var(--rm-font-size-body-lg);
     font-weight: 500;
 }
-.rm-staff-record__schedule { margin-top: var(--rm-space-3); }
-.rm-staff-record__schedule .rm-section-header { margin-bottom: var(--rm-space-2); }
-.rm-staff-record__documents { grid-column: 1 / -1; }
+.rm-staff-record__schedule, .rm-staff-record__documents { grid-column: 1 / -1; }
+.rm-staff-record__schedule .rm-card-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--rm-space-3);
+}
+.rm-staff-record__schedule .rm-card-content > .rm-help { grid-column: 1 / -1; }
+.rm-staff-record__schedule .rm-staff-record__action { grid-column: 2; grid-row: 2; }
 .rm-staff-record__document-lists {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     align-items: start;
-    gap: var(--rm-space-3);
+    gap: var(--rm-space-1);
 }
-.rm-staff-record__list { display: grid; gap: var(--rm-space-2); margin-top: var(--rm-space-3); }
+.rm-staff-record__list { display: grid; gap: var(--rm-space-2); margin-top: var(--rm-space-1); }
+.rm-staff-record :is(.rm-staff-record__schedule, .rm-staff-record__document-lists) .rm-staff-record__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--rm-space-3);
+}
+.rm-staff-record :is(.rm-staff-record__schedule, .rm-staff-record__document-lists) .rm-staff-record__list:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
 .rm-staff-record__pending {
     display: flex;
     align-items: flex-start;
@@ -483,7 +503,7 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     border-bottom: 1px solid color-mix(in srgb, var(--rm-border-soft) 55%, transparent);
 }
 .rm-staff-record .rm-staff-record__action {
-    margin-top: var(--rm-space-3);
+    margin-top: var(--rm-space-2);
     min-height: 44px;
     padding-inline: var(--rm-space-4);
     border-radius: var(--rm-radius-pill);
@@ -498,19 +518,16 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
 }
 
 @media (max-width: 767px) {
-    .rm-staff-record :is(.rm-staff-record__sections, .rm-staff-record__document-lists) { grid-template-columns: minmax(0, 1fr); }
-    .rm-staff-record__profile { padding: var(--rm-space-4); }
+    .rm-staff-record .rm-staff-record__sections,
+    .rm-staff-record :is(.rm-staff-record__schedule, .rm-staff-record__document-lists) .rm-staff-record__list { grid-template-columns: minmax(0, 1fr); }
+    .rm-staff-record__schedule .rm-card-content { display: block; }
     .rm-staff-record__statuses {
         flex-basis: 100%;
-        padding-top: var(--rm-space-2);
-        border-top: 0;
     }
 }
 @media (max-width: 479px) {
     .rm-staff-record__field--primary { grid-column: 1 / -1; }
     .rm-staff-record__overview { grid-template-columns: minmax(0, 1fr); }
-    .rm-staff-record__overview > div { display: flex; align-items: center; justify-content: space-between; gap: var(--rm-space-3); }
-    .rm-staff-record__overview dd { margin: 0; flex-shrink: 0; }
 }
 
 /* Registro institucional: secciones compartidas y progreso como el alta de usuarios. */
