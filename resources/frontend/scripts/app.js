@@ -2,6 +2,7 @@ import './utilities/bootstrap.js';
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 import './modules/operaciones-interactivas.js';
+import './modules/confirmaciones.js';
 import './modules/correo-envios.js';
 import './modules/alertas-signos.js';
 import './modules/alertas-trazabilidad.js';

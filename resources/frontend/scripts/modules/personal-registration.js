@@ -1,8 +1,19 @@
+import { confirmarOperacion } from './confirmaciones.js';
+
 export function crearRegistroPersonal() {
     return {
         dirty: false,
         archivosLocales: {},
         vistaDocumento: null,
+        async confirmarSalida() {
+            if (!this.dirty) return true;
+            return confirmarOperacion({
+                title: '¿Descartar los cambios?',
+                text: 'Los cambios de este registro no se guardarán.',
+                confirmText: 'Descartar cambios',
+                tone: 'danger',
+            }, this.$el);
+        },
         normalizar(event) {
             const campo = event.target, tipo = campo.dataset.captura;
             if (!tipo || !campo.value) return;

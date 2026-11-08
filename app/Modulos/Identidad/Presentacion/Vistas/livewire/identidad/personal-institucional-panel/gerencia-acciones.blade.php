@@ -20,14 +20,16 @@
         @if($ampliacionDisponible)
             <x-ui.action-button variant="ghost" wire:click="abrirEstadoLaboral('{{ $usuario->getKey() }}')" icono="ph-user-switch">Cambiar situación laboral</x-ui.action-button>
         @endif
-        <x-ui.action-button variant="ghost" wire:click="toggleEstado('{{ $usuario->getKey() }}', '{{ $usuario->estado }}')" icono="ph-lock-key"
-            wire:confirm="{{ $usuario->estado === 'ACTIVO' ? '¿Suspender el acceso de esta cuenta? Su ficha laboral y sus asignaciones se conservarán.' : '¿Activar el acceso de esta cuenta? Esto no modifica su estado laboral ni acredita competencia profesional.' }}" wire:loading.attr="disabled">
+        <x-ui.action-button variant="ghost" icono="ph-lock-key" loading="toggleEstado"
+            :data-confirmation="\Illuminate\Support\Js::encode(['title'=>$usuario->estado === 'ACTIVO' ? '¿Suspender el acceso?' : '¿Activar el acceso?', 'subject'=>$usuario->name, 'detail'=>$usuario->correo, 'text'=>$usuario->estado === 'ACTIVO' ? 'Esta cuenta no podrá iniciar sesión. Su ficha laboral y sus asignaciones se conservarán.' : 'Se habilitará el inicio de sesión. El estado laboral y la competencia profesional conservan su propio proceso.', 'confirmText'=>$usuario->estado === 'ACTIVO' ? 'Suspender acceso' : 'Activar acceso', 'tone'=>$usuario->estado === 'ACTIVO' ? 'danger' : 'neutral'])"
+            :data-usuario="$usuario->getKey()" :data-estado="$usuario->estado"
+            @click="if (await rmConfirmar(JSON.parse($el.dataset.confirmation), $el)) $wire.toggleEstado($el.dataset.usuario, $el.dataset.estado)">
             {{ $usuario->estado === 'ACTIVO' ? 'Suspender acceso' : 'Activar acceso' }}
         </x-ui.action-button>
         @if($usuario->estado === 'ACTIVO')
-            <x-ui.action-button variant="ghost" wire:click="enviarRecuperacion('{{ $usuario->getKey() }}')" icono="ph-envelope-simple"
-                wire:confirm="¿Solicitar un enlace de recuperación al correo registrado de {{ $usuario->name }}? La contraseña la elegirá el titular."
-                wire:loading.attr="disabled" wire:target="enviarRecuperacion">
+            <x-ui.action-button variant="ghost" icono="ph-envelope-simple" loading="enviarRecuperacion"
+                :data-confirmation="\Illuminate\Support\Js::encode(['title'=>'¿Solicitar un enlace de acceso?', 'subject'=>$usuario->name, 'detail'=>$usuario->correo, 'text'=>'Se solicitará un enlace de recuperación al correo registrado. La contraseña la elegirá el titular.', 'confirmText'=>'Solicitar enlace'])" :data-usuario="$usuario->getKey()"
+                @click="if (await rmConfirmar(JSON.parse($el.dataset.confirmation), $el)) $wire.enviarRecuperacion($el.dataset.usuario)">
                 <span wire:loading.remove wire:target="enviarRecuperacion">Enviar enlace de acceso</span>
                 <span wire:loading wire:target="enviarRecuperacion">Solicitando enlace…</span>
             </x-ui.action-button>

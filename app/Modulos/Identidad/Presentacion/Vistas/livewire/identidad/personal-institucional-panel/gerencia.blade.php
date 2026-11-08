@@ -75,7 +75,7 @@
             <x-ui.status-badge :estado="$estadoLaboralEsperado" />
         </div>
         @error('estado_esperado')<p class="rm-error" role="alert">{{ $message }}</p>@enderror
-        <form id="gerencia-laboral-form" wire:submit="guardarEstadoLaboral" wire:confirm="¿Confirmar la transición laboral sin cambiar el acceso de la cuenta?" class="rm-staff-action__form" novalidate>
+        <form id="gerencia-laboral-form" @submit.prevent="if (await rmConfirmar(@js(['title'=>'¿Guardar el cambio laboral?', 'subject'=>$nombreLaboral, 'text'=>'Se registrará la nueva situación laboral. El acceso a la cuenta y las asignaciones existentes se conservarán.', 'confirmText'=>'Guardar cambio']), $el)) $wire.guardarEstadoLaboral()" class="rm-staff-action__form" novalidate>
             <div class="rm-staff-action__grid">
                 <x-ui.field label="Nuevo estado laboral" for="laboral-estado" error="estado_nuevo" required>
                     <x-ui.selector id="laboral-estado" label="Nuevo estado laboral" wire:model="nuevoEstadoLaboral" teleport="#gerencia-estado-laboral" aria-invalid="{{ $errors->has('estado_nuevo') ? 'true' : 'false' }}" :aria-describedby="$errors->has('estado_nuevo') ? 'laboral-estado-error' : null"><option value="ACTIVO">ACTIVO</option><option value="INACTIVO">INACTIVO</option></x-ui.selector>
@@ -90,7 +90,7 @@
             <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>El acceso a la cuenta se conserva. Administración revisará las asignaciones afectadas; los turnos y actuaciones anteriores permanecen en el historial.</span></p>
         </form>
         <x-slot:footer>
-            <x-ui.action-button variant="secondary" wire:click="cerrarEstadoLaboral" wire:confirm="¿Descartar el movimiento sin guardar?">Cancelar</x-ui.action-button>
+            <x-ui.action-button variant="secondary" :data-confirmation="\Illuminate\Support\Js::encode(['title'=>'¿Descartar el cambio laboral?', 'subject'=>$nombreLaboral, 'text'=>'Los datos introducidos en este formulario no se guardarán.', 'confirmText'=>'Descartar cambio', 'tone'=>'danger'])" @click="if (await rmConfirmar(JSON.parse($el.dataset.confirmation), $el)) $wire.cerrarEstadoLaboral()">Cancelar</x-ui.action-button>
             <x-ui.action-button tipo="submit" form="gerencia-laboral-form" loading="guardarEstadoLaboral" icono="ph-check">Guardar cambio</x-ui.action-button>
         </x-slot:footer>
     </x-ui.modal-livewire>
