@@ -214,7 +214,7 @@
        type="button"
        wire:click="abrirModalEdicion('{{ $usuario->cod_usuario }}')"
        class="tooltip-btn flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-apoyo shadow-sm transition-colors hover:border-borde-hover hover:bg-fondo-hover hover:text-boton-acento"
-       aria-label="Ver / Editar ficha" title="Ver / Editar ficha"
+       aria-label="Editar registro" title="Editar registro"
        >
        <i class="ph-bold ph-pencil-simple text-base"></i>
        </button>

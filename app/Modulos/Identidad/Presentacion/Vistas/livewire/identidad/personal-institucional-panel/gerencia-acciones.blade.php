@@ -11,7 +11,7 @@
         </x-slot>
         <x-slot name="content">
         @if($puedeGestionar)
-            <x-ui.action-button variant="ghost" wire:click="abrirModalEdicion('{{ $usuario->getKey() }}')" icono="ph-pencil-simple">Editar ficha</x-ui.action-button>
+            <x-ui.action-button variant="ghost" wire:click="abrirModalEdicion('{{ $usuario->getKey() }}')" icono="ph-pencil-simple">Editar registro</x-ui.action-button>
         @endif
         @can('asignaciones_personal.ver')
             <x-ui.action-button variant="ghost" wire:click="abrirHorariosPersonal('{{ $usuario->getKey() }}')" icono="ph-calendar-blank">Consultar horarios</x-ui.action-button>

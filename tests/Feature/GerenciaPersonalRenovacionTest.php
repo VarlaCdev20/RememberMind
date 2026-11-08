@@ -207,7 +207,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertSame('FOTO_DOC', $foto['documento']->tipo_documento);
         $this->assertSame($antes, \App\Models\Documento::where('cod_usuario', $usuario->getKey())->orderBy('cod_documento')->get()->map->getAttributes()->all());
         Livewire::test(PersonalInstitucionalPanel::class)
-            ->assertSee('Editar ficha')->call('abrirFichaPersonal', $usuario->getKey())
+            ->assertSee('Editar registro')->call('abrirFichaPersonal', $usuario->getKey())
             ->assertSee('Ficha del trabajador')->assertSee('DIRECCIÓN DE PRUEBA')->assertSee('45678910')
             ->assertSee('3 archivos registrados')->assertDontSee('Pasos del registro')
             ->assertViewHas('fichaPersonal', fn ($ficha) => $ficha['faltantesObligatorios'] === 0
