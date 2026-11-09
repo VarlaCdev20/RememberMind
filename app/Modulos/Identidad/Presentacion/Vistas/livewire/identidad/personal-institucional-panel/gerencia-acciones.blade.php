@@ -7,7 +7,7 @@
     @if(($modoAcciones ?? 'completo') !== 'ficha' && ($puedeGestionar || auth()->user()->can('asignaciones_personal.ver')))
     <x-dropdown align="right" width="60" dropdownClasses="rm-staff-directory__menu" contentClasses="rm-staff-directory__menu-content">
         <x-slot name="trigger">
-            <x-ui.action-button variant="ghost" icono="ph-dots-three" x-bind:aria-expanded="open" aria-label="Acciones de {{ $usuario->name }}">Acciones</x-ui.action-button>
+            <x-ui.action-button variant="ghost" icono="ph-dots-three" class="rm-staff-directory__menu-trigger" x-bind:aria-expanded="open" aria-label="Acciones de {{ $usuario->name }}"><span class="rm-staff-directory__menu-label">Acciones</span></x-ui.action-button>
         </x-slot>
         <x-slot name="content">
         @if($puedeGestionar)

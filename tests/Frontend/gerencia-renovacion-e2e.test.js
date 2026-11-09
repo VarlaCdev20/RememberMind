@@ -133,7 +133,7 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         writeFileSync(documentoImagen,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9N8AAAAASUVORK5CYII=','base64'));
         writeFileSync(documentoTexto, 'Archivo sintético que no es un documento permitido.');
         t.after(()=>{for(const archivo of [documentoPdf, documentoTexto, documentoImagen]){assert.equal(resolve(dirname(archivo)),resolve(tmpdir()));rmSync(archivo,{force:true});}});
-        for (const width of [1440,1280,1024,768,390]) {
+        for (const width of [1440,1280,1024,952,768,390]) {
             await page.setViewport({width,height:960});
             await go('/admin/personal-institucional');
             const filas = await page.$$eval('.rm-staff-directory__table tbody tr', rows => rows.length);
@@ -150,11 +150,17 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
                     fuentes:[...document.querySelectorAll('.rm-staff-directory button')].filter(e=>e.getClientRects().length).every(e=>e.getBoundingClientRect().height>=43),
                     controlesPequenos:[...document.querySelectorAll('.rm-staff-directory button')].filter(e=>e.getClientRects().length && e.getBoundingClientRect().height<43).map(e=>({texto:e.getAttribute('aria-label')||e.textContent.trim(),alto:e.getBoundingClientRect().height,minimo:getComputedStyle(e).minHeight})),
                     celdasContenidas:[...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row=>[...row.cells].every(cell=>cell.getBoundingClientRect().bottom<=row.getBoundingClientRect().bottom+1)),
+                    cabeceraTablaVisible:(document.querySelector('.rm-staff-directory__table thead')?.getBoundingClientRect().width || 0)>1,
+                    filasEnTabla:[...document.querySelectorAll('.rm-staff-directory__table tbody tr')].every(row=>getComputedStyle(row).display==='table-row'),
                 }));
                 assert.equal(medidas.overflow,false,`${mode} ${width}: sin scroll horizontal`);
                 assert.equal(medidas.prohibidos,false);
                 assert.equal(medidas.fuentes,true,`${mode} ${width}: controles táctiles ${JSON.stringify(medidas.controlesPequenos)}`);
                 assert.equal(medidas.celdasContenidas,true,`${mode} ${width}: filas sin superposición vertical`);
+                if(mode==='tabla' && width>=768) {
+                    assert.equal(medidas.cabeceraTablaVisible,true,`${width}: Tabla conserva sus encabezados visibles`);
+                    assert.equal(medidas.filasEnTabla,true,`${width}: Tabla conserva filas y columnas, sin convertirse en tarjetas`);
+                }
                 if(mode==='tarjetas') assert.equal(medidas.tarjetas,filas);
                 const trigger = '.rm-staff-directory__actions button[aria-expanded]';
                 await page.click(trigger);
