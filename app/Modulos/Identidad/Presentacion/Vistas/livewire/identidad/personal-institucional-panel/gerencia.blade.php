@@ -40,7 +40,7 @@
             <x-ui.table-surface class="rm-staff-directory__table-surface">
                 <table class="rm-table rm-staff-directory__table" role="table">
                     <caption class="sr-only">Personal institucional y acceso</caption>
-                    <thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Ficha</th><th scope="col">Acciones</th></tr></thead>
+                    <thead><tr><th scope="col">Trabajador</th><th scope="col">Función</th><th scope="col">Estado laboral</th><th scope="col">Acceso</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                         @foreach($personalResumen as $usuario)
                             @php
@@ -49,11 +49,10 @@
                             @endphp
                             <tr wire:key="personal-row-{{ $usuario->getKey() }}">
                                 <td data-label="Trabajador"><x-ui.resident-card-identity :name="$nombre" :code="$usuario->getKey()" :secondary="$usuario->correo" mode="row" /></td>
-                                <td data-label="Función"><span class="rm-staff-directory__role"><i class="ph ph-identification-badge" aria-hidden="true"></i>{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</span></td>
+                                <td data-label="Función"><span class="rm-staff-directory__role">{{ $funcion ? \Illuminate\Support\Str::headline(mb_strtolower($funcion, 'UTF-8')) : 'Sin ficha laboral' }}</span></td>
                                 <td data-label="Estado laboral"><x-ui.status-badge :estado="$usuario->personal?->estado ?? ''" :label="$usuario->personal ? null : 'Sin registrar'" /></td>
                                 <td data-label="Acceso"><x-ui.status-badge :estado="$usuario->estado" /></td>
-                                <td data-label="Ficha">@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones', ['modoAcciones' => 'ficha'])</td>
-                                <td data-label="Acciones">@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones', ['modoAcciones' => 'menu'])</td>
+                                <td data-label="Acciones">@include('identidad::livewire.identidad.personal-institucional-panel.gerencia-acciones')</td>
                             </tr>
                         @endforeach
                     </tbody>
