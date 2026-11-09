@@ -176,7 +176,7 @@ final class RoleDashboardDataService
             'metrics' => [
                 $this->metric('Personal activo', $gerencia['personal'], 'Trabajadores, no cuentas', 'ph-identification-badge', 'neutral'),
                 $this->metric('Camas ocupadas', $gerencia['ocupadas'], 'Ocupaciones vigentes', 'ph-bed', 'neutral'),
-                $this->metric('Alertas activas', $gerencia['alertas'], 'Avisos persistidos', 'ph-bell', 'neutral'),
+                $this->metric('Avisos documentales', $gerencia['avisos_documentales'], 'Pendientes de documentación laboral', 'ph-bell', 'neutral'),
             ],
             'gerencia' => $gerencia,
             'coverage' => ['personas' => $verCobertura ? (clone $assignments)->distinct('ap.cod_personal')->count('ap.cod_personal') : null, 'areas' => $verCobertura ? $coverage->count() : null],

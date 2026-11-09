@@ -1,7 +1,7 @@
 <div class="rm-management-workspace space-y-4">
     <x-ui.collection-header title="Avisos administrativos" subtitle="Pendientes de documentación y cobertura del equipo" icon="ph-bell-ringing" />
 
-    @if(count($avisosDocumentales))
+    @if($avisosDocumentales)
         <x-ui.section-card title="Documentación laboral" icon="ph-files">
             <ul class="grid gap-3">
                 @foreach($avisosDocumentales as $aviso)
@@ -21,7 +21,7 @@
         </x-ui.section-card>
     @else
         <x-ui.section-card title="Documentación laboral" icon="ph-files">
-            <p class="rm-help">No hay avisos documentales en tu ámbito.</p>
+            <p class="rm-help">{{ $avisosDocumentales === null ? 'La consulta de avisos documentales no está disponible.' : 'No hay avisos documentales en tu ámbito.' }}</p>
         </x-ui.section-card>
     @endif
 
@@ -29,8 +29,8 @@
         @can('personal_institucional.ver')
             <a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal.documentacion') }}"><i class="ph ph-folder-open" aria-hidden="true"></i>Ver documentación laboral</a>
         @endcan
-        @can('jornadas.ver')
+        @if(app(\App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion::class)->puedeVerRuta('admin.cobertura-equipo.index'))
             <a class="rm-btn rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index') }}"><i class="ph ph-calendar-check" aria-hidden="true"></i>Consultar cobertura</a>
-        @endcan
+        @endif
     </div>
 </div>

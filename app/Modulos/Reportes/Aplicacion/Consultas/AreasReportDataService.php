@@ -6,12 +6,21 @@ use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\User;
+use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
 class AreasReportDataService
 {
     public function __construct(private readonly ContextoEjecucion $contexto) {}
+
+    public function autorizarReporteOperativo(?User $actor): void
+    {
+        $actor = $actor?->fresh();
+        abort_unless($actor?->estado === 'ACTIVO' && $actor->can('areas.reportes')
+            && ! $actor->hasRole('FAMILIAR') && ! app(RolePreviewService::class)->isActive($actor)
+            && (! $actor->hasRole('GERENTE') || $actor->hasRole('SUPERADMINISTRADOR')), 403);
+    }
 
     public function getGeneralReportData(): array
     {

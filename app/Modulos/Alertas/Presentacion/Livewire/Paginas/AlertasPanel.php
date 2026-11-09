@@ -648,7 +648,7 @@ class AlertasPanel extends Component
         $perfil = app(ExperienciaAlertas::class)->paraUsuario($usuario);
         if ($perfil['foco'] === 'supervision') {
             return view('alertas::livewire.alertas.gerencia', [
-                'avisosDocumentales' => app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->avisos($usuario),
+                'avisosDocumentales' => app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->avisosGerencia($usuario),
             ])->layout('layouts.sistema');
         }
 

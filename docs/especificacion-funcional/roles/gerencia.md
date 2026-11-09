@@ -14,9 +14,9 @@ runtime_verified: false
 
 [Definición progresiva de vistas, formularios y accesos](GERENCIA_PLAN_VISTAS.md): mapa inicial y preguntas por paso. Las preferencias pendientes no se tratan como decisiones aprobadas.
 
-**Bloque 15–29 adoptado el 25/10/2026:** [matriz de respuestas](GERENCIA_CUESTIONARIO_PENDIENTE.md#registro-y-próximos-pasos). Incluye recuperación por enlace iniciada por Gerencia, registro/corrección de vínculos familiares y exportación PDF/CSV de indicadores agregados. Las opciones dobles son dos presentaciones de los mismos datos. Adopción funcional, con implementación y pruebas pendientes.
+**Bloque 15–29 adoptado el 25/10/2026** [Matriz de respuestas](GERENCIA_CUESTIONARIO_PENDIENTE.md#registro-y-próximos-pasos). Incluye recuperación por enlace iniciada por Gerencia, registro y corrección de vínculos familiares, y exportación PDF/CSV de indicadores agregados. Estos flujos cuentan con implementación y pruebas focalizadas. Las opciones dobles son dos presentaciones de los mismos datos. [Auditoría de Gerencia](../../auditorias/2026-11-08/AUDITORIA_GERENCIA.md).
 
-> **Decisiones expresas del 25/10/2026:** Gerencia crea cuentas de Administración, seis roles profesionales y Familiar; no crea Gerencia ni Superadministración. También puede editar sus datos y activar/suspender su acceso, dentro del mismo alcance. Superadministración crea los diez roles. Véanse [alta](../vistas/gerencia/02-PERSONAL.md#7-decisión-de-la-propietaria-alta-de-cuentas-por-rol) y [mantenimiento aprobado](../vistas/gerencia/02-PERSONAL.md#9-decisión-registrada-mantenimiento-de-datos-y-acceso). No incluye cambio de roles, edición del catálogo de permisos o eliminación. La implementación de esta extensión sigue pendiente.
+> **Decisiones expresas del 25/10/2026.** Gerencia crea cuentas de Administración, seis roles profesionales y Familiar. Puede editar los datos y activar o suspender el acceso de esas cuentas. Superadministración crea cuentas de los diez roles. La edición de roles y permisos y la eliminación de cuentas quedan fuera del alcance de este flujo. [Alta](../vistas/gerencia/02-PERSONAL.md#7-decisión-de-la-propietaria-alta-de-cuentas-por-rol) · [Mantenimiento aprobado](../vistas/gerencia/02-PERSONAL.md#9-decisión-registrada-mantenimiento-de-datos-y-acceso).
 
 **Identificador del catálogo:** `GERENTE`. **Grupo:** Institucional y dirección. **Corte documental:** 25/10/2026.
 
@@ -37,7 +37,7 @@ La funcionalidad de esta ficha compila [el baseline aprobado](../../arquitectura
 | Familiares y contactos | Registrar y corregir vínculos familiares trazables, activar Familiar cuando cuenta y vínculo sean aptos, y consultar por residente o contacto; decisiones 17B, 18A, 19B/A. No publica clínica por implicación. |
 | Alta laboral conjunta | Registrar al nuevo trabajador y crear su cuenta vinculada en una operación atómica, conforme a la opción B del 25/10; no ofrecer alta sin cuenta en este flujo. La cuenta no acredita competencia clínica. |
 | Documentación laboral | Subir, revisar y anular documentos laborales con motivo e historia dentro del alcance aprobado; conservar autoría de carga separada de la revisión. Mínimo inmediato obligatorio y peticiones adicionales por rol, sin obligación general de otros respaldos. |
-| Estado laboral | Cambiar ACTIVO/INACTIVO con motivo/fecha, separado del acceso a la cuenta; Administración revisa asignaciones afectadas, sin borrar pasado ni alterar clínica. R03A, implementación pendiente. |
+| Estado laboral | Cambiar ACTIVO/INACTIVO con motivo y fecha, por separado del acceso a la cuenta. Administración revisa las asignaciones afectadas. El flujo conserva el historial y el alcance de R03A. |
 | Organización | Mantener áreas y planificación maestra de turnos/cobertura. |
 | Supervisión residencial | Consultar residentes, ocupación y capacidad administrativa necesarias para la dirección. |
 | Incidencias | Consultar alertas e incidentes relevantes para coordinación institucional, respetando acceso al contenido. |

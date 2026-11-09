@@ -48,6 +48,7 @@ class AreasInstitucionalesPanel extends Component
     // Reportes interactivos
     public $reporteTipo = null;
 
+    #[Locked]
     public $reporteData = [];
 
     // Propiedades del formulario
@@ -166,9 +167,15 @@ class AreasInstitucionalesPanel extends Component
     {
         $usuario = Auth::user()?->fresh();
 
-        return $usuario !== null
+        $autorizado = $usuario !== null
             && strtoupper((string) $usuario->estado) === 'ACTIVO'
             && $usuario->can($permiso);
+
+        if ($autorizado && $permiso === 'areas.reportes') {
+            app(AreasReportDataService::class)->autorizarReporteOperativo($usuario);
+        }
+
+        return $autorizado;
     }
 
     // ── GESTIÓN DE ACCESO A FORMULARIO (CRUD) ──
@@ -749,12 +756,12 @@ class AreasInstitucionalesPanel extends Component
         }
     }
 
-    public function obtenerDatosReporteGeneral()
+    private function obtenerDatosReporteGeneral()
     {
         return app(AreasReportDataService::class)->getGeneralReportData();
     }
 
-    public function obtenerDatosReporteArea($codArea)
+    private function obtenerDatosReporteArea($codArea)
     {
         return app(AreasReportDataService::class)->getAreaReportData($codArea);
     }

@@ -5,8 +5,7 @@ namespace App\Modulos\Reportes\Aplicacion\Consultas;
 use App\Models\Cama;
 use App\Models\User;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
-use App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta;
+use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
 use Illuminate\Support\Facades\DB;
 
 /** Proyección agregada compartida por Inicio y Reportes; nunca contiene expedientes. */
@@ -36,40 +35,40 @@ final class ConsultarIndicadoresGerencia
             $situacionCamas = [['label' => 'Ocupadas', 'value' => $ocupadas],
                 ['label' => 'Disponibles', 'value' => $disponibles], ['label' => 'No habilitadas', 'value' => $noHabilitadas]];
         }
-        $activas = $sinResponsable = $limiteSuperado = null;
-        $situacionAlertas = [];
-        if ($usuario->can('alertas.ver')) {
-            $base = app(BandejaAlertas::class)->pendientes($usuario);
-            $grupos = (clone $base)->select('estado')->selectRaw('COUNT(*) as total')->groupBy('estado')->orderBy('estado')->get();
-            $activas = (int) $grupos->sum('total');
-            $situacionAlertas = $grupos->map(fn ($grupo) => [
-                'label' => match ($grupo->estado) {
-                    'ABIERTA' => 'Abiertas', 'PENDIENTE' => 'Pendientes',
-                    default => LenguajeAlerta::estado($grupo->estado),
-                }, 'value' => (int) $grupo->total,
-            ])->all();
-            $sinResponsable = (clone $base)->whereNull('cod_personal_responsable')->count();
-            $limiteSuperado = (clone $base)->whereNotNull('fecha_hora_limite')->where('fecha_hora_limite', '<', now())->count();
-        }
+        $avisos = app(ConsultarDocumentacionPersonal::class)->avisosGerencia($usuario);
+        $grupos = collect($avisos)->countBy('tipo');
+        $situacionAvisos = $grupos->map(fn (int $total, string $tipo) => [
+            'label' => match ($tipo) {
+                'vencido' => 'Plazo vencido',
+                'proximo' => 'Plazo próximo',
+                'recibido' => 'Recibidos para revisión',
+                'correccion' => 'Corrección pendiente',
+                'plazo_por_revisar' => 'Plazo por revisar',
+            },
+            'value' => $total,
+        ])->values()->all();
+        $totalAvisos = $avisos === null ? null : count($avisos);
+        $vencidos = $avisos === null ? null : ($grupos['vencido'] ?? 0);
         $filas = [];
         foreach ([['personal', 'Personal activo', $personal, 'personas'], ['ocupacion', 'Camas ocupadas', $ocupadas, 'camas'],
             ['ocupacion', 'Camas disponibles', $disponibles, 'camas'], ['ocupacion', 'Camas no habilitadas', $noHabilitadas, 'camas'],
-            ['alertas', 'Alertas activas', $activas, 'alertas']] as [$origen, $indicador, $valor, $unidad]) {
+            ['alertas', 'Avisos documentales', $totalAvisos, 'avisos'],
+            ['alertas', 'Avisos con plazo vencido', $vencidos, 'avisos']] as [$origen, $indicador, $valor, $unidad]) {
             if ($seccion !== 'resumen' && $seccion !== $origen) {
                 continue;
             }
             $filas[] = compact('indicador', 'valor', 'unidad') + ['referencia' => 'Situación actual',
-                'calidad' => $valor === null ? 'Fuente no autorizada' : 'Consulta realizada'];
+                'calidad' => $valor === null ? 'Consulta no disponible' : 'Consulta realizada'];
         }
 
         return ['seccion' => $seccion, 'consultado_en' => now()->toIso8601String(), 'referencia' => 'Situación actual',
             'ambito' => 'Institucional autorizado', 'personal' => $personal, 'camas' => $camas,
             'ocupadas' => $ocupadas, 'disponibles' => $disponibles, 'no_habilitadas' => $noHabilitadas,
-            'alertas' => $activas, 'sin_responsable' => $sinResponsable, 'limite_superado' => $limiteSuperado,
-            'camas_serie' => $situacionCamas, 'alertas_serie' => $situacionAlertas, 'filas' => $filas,
+            'avisos_documentales' => $totalAvisos, 'avisos_vencidos' => $vencidos,
+            'camas_serie' => $situacionCamas, 'avisos_serie' => $situacionAvisos, 'filas' => $filas,
             'limites' => ['Los conteos actuales no representan un cierre histórico.',
                 'La disponibilidad requiere cama y habitación habilitadas, sin ocupación vigente.',
-                'Los estados de alertas son categorías excluyentes; no constituyen diagnósticos.',
+                'Los avisos documentales se cuentan por solicitud y trabajador dentro del ámbito autorizado.',
                 'Personal activo cuenta trabajadores, no cuentas ni roles.']];
     }
 }

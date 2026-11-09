@@ -1,9 +1,13 @@
+@inject('visibilidad', 'App\Modulos\Identidad\Presentacion\Navegacion\VisibilidadNavegacion')
+@php($puedeVerCobertura = $visibilidad->puedeVerRuta('admin.cobertura-equipo.index'))
 <div class="rm-management-workspace rm-planning" x-data
      @planificacion-detalle-seleccionado.window="$nextTick(() => { const panel = $refs.detalle; panel?.focus({preventScroll:true}); if (panel && panel.getBoundingClientRect().top > innerHeight * .75) panel.scrollIntoView({block:'start'}); })"
      @planificacion-detalle-cerrado.window="$nextTick(() => Array.from($el.querySelectorAll('[data-asignacion]')).find(button => button.dataset.asignacion === $event.detail.codigo && button.getClientRects().length)?.focus())">
     <x-ui.collection-header title="Planificación del equipo" subtitle="Organiza las asignaciones por fecha, área y turno" icon="ph-calendar-check">
         <x-slot:actions>
-            <a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$fechaSeleccionada, 'area'=>$filtroArea ?: null]) }}">Ver cobertura</a>
+            @if($puedeVerCobertura)
+                <a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$fechaSeleccionada, 'area'=>$filtroArea ?: null, 'turno'=>$turnos->firstWhere('nombre', $filtroTurno)?->getKey()]) }}">Ver cobertura</a>
+            @endif
             @if(\Illuminate\Support\Facades\Route::has('admin.avisos-planificacion.index'))<a class="rm-btn-secondary" href="{{ route('admin.avisos-planificacion.index') }}">Ver avisos</a>@endif
             @can('turnos.asignar')<button class="rm-btn-primary" type="button" wire:click="abrirNuevaAsignacion"><i class="ph-bold ph-plus" aria-hidden="true"></i>Planificar asignación</button>@endcan
         </x-slot:actions>
@@ -58,7 +62,7 @@
                 <dl class="rm-planning__facts"><div><dt>Área</dt><dd>{{ $detalleAgenda['asignacion']->area?->nombre ?: 'Sin área registrada' }}</dd></div><div><dt>Fecha</dt><dd>{{ \Carbon\Carbon::parse($detalleAgenda['fecha'])->locale('es')->translatedFormat('l d \d\e F Y') }}</dd></div><div><dt>Turno</dt><dd>{{ $detalleAgenda['asignacion']->turno?->nombre ?: 'Sin turno registrado' }}</dd></div><div><dt>Horario</dt><dd>{{ $detalleAgenda['hora'] }}</dd></div></dl>
                 @if($detalleAgenda['estado']==='CONFLICTO')<p class="rm-error"><i class="ph-bold ph-warning" aria-hidden="true"></i> Solapamiento registrado. Revisa los horarios antes de modificar la asignación.</p>@elseif($detalleAgenda['estado']==='SUSPENDIDO')<p class="rm-error">Revisa el estado del trabajador antes de gestionar su horario.</p>@endif
                 <p class="rm-planning__notice"><i class="ph-bold ph-info" aria-hidden="true"></i>Asignación registrada; no confirma asistencia.</p>
-                <div class="rm-planning__detail-actions">@can('turnos.asignar')@if($detalleAgenda['asignacion']->cod_usuario)<button type="button" class="rm-btn-primary" wire:click="seleccionarUsuario('{{ $detalleAgenda['asignacion']->cod_usuario }}')">Gestionar horarios</button>@endif@endcan<a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$detalleAgenda['fecha'],'area'=>$detalleAgenda['asignacion']->cod_area]) }}">Ver cobertura del área</a></div>
+                <div class="rm-planning__detail-actions">@can('turnos.asignar')@if($detalleAgenda['asignacion']->cod_usuario)<button type="button" class="rm-btn-primary" wire:click="seleccionarUsuario('{{ $detalleAgenda['asignacion']->cod_usuario }}')">Gestionar horarios</button>@endif@endcan @if($puedeVerCobertura)<a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$detalleAgenda['fecha'],'area'=>$detalleAgenda['asignacion']->cod_area,'turno'=>$detalleAgenda['asignacion']->cod_turno]) }}">Ver cobertura del área</a>@endif</div>
             @else
                 <div class="rm-planning__no-selection"><i class="ph-bold ph-calendar-check" aria-hidden="true"></i><h3>Selecciona una tarjeta</h3><p>Consulta su área, fecha y horario aquí, sin modificar la asignación.</p></div>
                 <p class="rm-planning__notice"><i class="ph-bold ph-info" aria-hidden="true"></i>Solo asignaciones guardadas. No se infiere asistencia ni suficiencia de personal.</p>

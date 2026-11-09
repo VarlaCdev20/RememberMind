@@ -54,6 +54,7 @@ class AreaReporteController extends Controller
      */
     public function generalPdf()
     {
+        $this->reportDataService->autorizarReporteOperativo(Auth::user());
         try {
             $data = $this->reportDataService->getGeneralReportData();
 
@@ -117,6 +118,7 @@ class AreaReporteController extends Controller
      */
     public function areaPdf($codArea)
     {
+        $this->reportDataService->autorizarReporteOperativo(Auth::user());
         try {
             $data = $this->reportDataService->getAreaReportData($codArea);
             $area = $data['area'];
@@ -152,6 +154,7 @@ class AreaReporteController extends Controller
      */
     public function generalExcel()
     {
+        $this->reportDataService->autorizarReporteOperativo(Auth::user());
         try {
             $filename = $this->fileNameService->generate('areas_institucionales', 'xlsx');
 
@@ -177,6 +180,7 @@ class AreaReporteController extends Controller
      */
     public function generalCsv()
     {
+        $this->reportDataService->autorizarReporteOperativo(Auth::user());
         try {
             $filename = $this->fileNameService->generate('areas_institucionales', 'csv');
 
@@ -202,6 +206,7 @@ class AreaReporteController extends Controller
      */
     public function areaExcel($codArea)
     {
+        $this->reportDataService->autorizarReporteOperativo(Auth::user());
         try {
             $area = Area::findOrFail($codArea);
             $nombreSeguro = Str::slug($area->nombre, '_');

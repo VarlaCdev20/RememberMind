@@ -44,15 +44,15 @@ final class ConsultarDocumentacionPersonal
     }
 
     /** Solicitudes consultables desde el mismo alcance de titulares de la biblioteca. */
-    public function solicitudesEnCarpetas(User $actor): Builder
+    public function solicitudesEnCarpetas(User $actor, bool $soloRolesGestionables = false): Builder
     {
         $consulta = $this->consulta($actor);
 
-        return $consulta->whereHas('personal.usuario', function (Builder $u) use ($actor): void {
+        return $consulta->whereHas('personal.usuario', function (Builder $u) use ($actor, $soloRolesGestionables): void {
             $u->where('cod_usuario', $actor->getKey());
             if ($this->esGestor($actor)) {
-                $u->orWhere(function (Builder $equipo) use ($actor): void {
-                    if (! $actor->hasRole('SUPERADMINISTRADOR')) {
+                $u->orWhere(function (Builder $equipo) use ($actor, $soloRolesGestionables): void {
+                    if ($soloRolesGestionables || ! $actor->hasRole('SUPERADMINISTRADOR')) {
                         $equipo->whereHas('roles')->whereDoesntHave('roles', fn ($r) => $r->whereNotIn('name', AutorizarGestionPersonal::ROLES_TRABAJADOR));
                     } else {
                         $equipo->whereNotNull('cod_usuario');
@@ -92,7 +92,7 @@ final class ConsultarDocumentacionPersonal
         $limite = $plazo['limite'];
         if ($plazo['conflicto_plazo']) {
             return $plazo + ['situacion' => 'Plazo con concesiones contradictorias', 'aviso' => 'Revisar la historia: hay varias prórrogas para la misma alta.',
-                'ultima' => $ultima, 'requiere_entrega' => ! in_array($estado, ['VALIDADO', 'CARGADO', 'PENDIENTE'], true)];
+                'tipoAviso' => 'plazo_por_revisar', 'ultima' => $ultima, 'requiere_entrega' => ! in_array($estado, ['VALIDADO', 'CARGADO', 'PENDIENTE'], true)];
         }
         $situacion = match ($estado) {
             'VALIDADO' => 'Validado','CARGADO','PENDIENTE' => 'Recibido, pendiente de revisión','OBSERVADO' => 'Corrección solicitada',
@@ -105,22 +105,30 @@ final class ConsultarDocumentacionPersonal
             ->filter(fn ($e) => $e->documento && ! in_array($e->documento->estado, ['ANULADO', 'ANULADA'], true))
             ->sortBy('fecha_hora_registro')->first();
         $entregaEnPlazo = $primeraEntrega?->fecha_hora_registro?->lte($limite->copy()->endOfDay()) ?? false;
-        $aviso = match (true) {
-            $estado === 'VALIDADO' => null,
-            in_array($estado, ['CARGADO', 'PENDIENTE'], true) => 'Documento recibido para revisión',
-            $estado === 'OBSERVADO' && $entregaEnPlazo => 'Corrección pendiente; la entrega original se recibió en plazo',
-            $estado === 'OBSERVADO' && $dias < 0 => 'Plazo registrado vencido; falta corregir el documento',
-            $estado === 'OBSERVADO' && $dias <= 2 => 'Plazo próximo; falta corregir el documento',
-            $estado === 'OBSERVADO' => 'Corrección solicitada; se conserva el plazo original',
-            $dias < 0 => 'Plazo registrado vencido',
-            $dias <= 2 => 'Plazo próximo: revisar documentación',
-            default => null,
+        [$tipoAviso, $aviso] = match (true) {
+            $estado === 'VALIDADO' => [null, null],
+            in_array($estado, ['CARGADO', 'PENDIENTE'], true) => ['recibido', 'Documento recibido para revisión'],
+            $estado === 'OBSERVADO' && $entregaEnPlazo => ['correccion', 'Corrección pendiente; la entrega original se recibió en plazo'],
+            $estado === 'OBSERVADO' && $dias < 0 => ['vencido', 'Plazo registrado vencido; falta corregir el documento'],
+            $estado === 'OBSERVADO' && $dias <= 2 => ['proximo', 'Plazo próximo; falta corregir el documento'],
+            $estado === 'OBSERVADO' => ['correccion', 'Corrección solicitada; se conserva el plazo original'],
+            $dias < 0 => ['vencido', 'Plazo registrado vencido'],
+            $dias <= 2 => ['proximo', 'Plazo próximo: revisar documentación'],
+            default => [null, null],
         };
 
-        return compact('situacion', 'limite', 'aviso', 'ultima') + $plazo + ['requiere_entrega' => ! in_array($estado, ['VALIDADO', 'CARGADO', 'PENDIENTE'], true)];
+        return compact('situacion', 'limite', 'aviso', 'tipoAviso', 'ultima') + $plazo + ['requiere_entrega' => ! in_array($estado, ['VALIDADO', 'CARGADO', 'PENDIENTE'], true)];
     }
 
-    public function avisos(User $actor): array
+    public function avisosGerencia(User $actor): ?array
+    {
+        $actor = $actor->fresh();
+
+        return $actor?->can('alertas.ver') && $this->esGestor($actor) && app(CapacidadDocumentalPersonal::class)->disponible()
+            ? $this->avisos($actor, soloExpedientes: true) : null;
+    }
+
+    public function avisos(User $actor, bool $soloExpedientes = false): array
     {
         if (! app(CapacidadDocumentalPersonal::class)->disponible()) {
             return [];
@@ -131,7 +139,7 @@ final class ConsultarDocumentacionPersonal
         }
         $gestor = $this->esGestor($actor);
 
-        $destinatarios = $this->consulta($actor)->get();
+        $destinatarios = ($soloExpedientes ? $this->solicitudesEnCarpetas($actor, soloRolesGestionables: true) : $this->consulta($actor))->get();
         app(PlazoExpedienteDocumental::class)->preparar($destinatarios);
 
         return $destinatarios->map(function ($d) use ($gestor) {
@@ -140,7 +148,7 @@ final class ConsultarDocumentacionPersonal
                 return null;
             }
 
-            return ['clave' => $d->getKey(), 'titulo' => $d->solicitud->nombre_documento, 'mensaje' => $s['aviso'],
+            return ['clave' => $d->getKey(), 'titulo' => $d->solicitud->nombre_documento, 'mensaje' => $s['aviso'], 'tipo' => $s['tipoAviso'],
                 'persona' => $gestor ? trim($d->personal->nombres.' '.$d->personal->apellido_paterno) : null,
                 'fecha' => $s['limite']?->format('d/m/Y') ?? 'Por revisar', 'url' => route('admin.personal.documentacion', ['vista' => 'solicitudes'])];
         })->filter()->values()->all();

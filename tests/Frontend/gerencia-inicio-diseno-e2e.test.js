@@ -47,6 +47,8 @@ test('inicio gerencial: composición compartida, enlaces y cinco anchos', { skip
     for (const width of [1440, 1280, 1024, 768, 390]) {
         await page.setViewport({ width, height: 900 });
         await page.evaluate(() => { window.scrollTo(0, 0); document.querySelector('[data-rm-main]').scrollTop = 0; });
+        await page.waitForFunction(() => innerWidth >= 768 || !document.body.classList.contains('is-sidebar-collapsed'));
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const datos = await page.evaluate(() => ({
             overflow: document.documentElement.scrollWidth - innerWidth,
             indicadores: document.querySelectorAll('.rm-manager-home .rm-metric-card').length,

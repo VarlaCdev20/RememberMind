@@ -475,12 +475,16 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.click('button[wire\\:click="avanzarPaso"]');
     await page.waitForFunction(()=>!!document.querySelector('.rm-staff-registration [aria-invalid="true"]'));
     await page.type('#trabajador-nombres','Nombre sin guardar');
-    let dialogos=0, aceptarDialogos=false;
-    page.on('dialog',async d=>{dialogos++;aceptarDialogos ? await d.accept() : await d.dismiss();});
     await page.keyboard.press('Escape');
+    await page.waitForSelector('.rm-confirmation', {visible:true});
+    assert.match(await page.$eval('.rm-confirmation', e=>e.innerText), /¿Descartar los cambios\?/);
+    await page.click('.rm-confirmation .swal2-cancel');
     await page.waitForFunction(()=>document.querySelector('#trabajador-nombres')?.value==='NOMBRE SIN GUARDAR');
-    assert.equal(dialogos,1,'Escape debe pedir confirmación si hay datos nuevos.');
     await page.screenshot({path:join(out,'personal-validacion-390.png'),fullPage:true});
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('.rm-confirmation', {visible:true});
+    await page.click('.rm-confirmation .swal2-confirm');
+    await page.waitForSelector('#trabajador-nombres', {hidden:true});
     await go('/admin/areas-institucionales');
     await page.click('button[wire\\:click^="verArea("]');
     await page.waitForSelector('#gerencia-area-fecha',{visible:true});
@@ -501,17 +505,17 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.screenshot({path:join(out,'exportacion-390.png'),fullPage:true});
     await go('/admin/turnos-asignaciones');
     await page.click('button[wire\\:click="cambiarVista(\'mes\')"]');
-    await page.waitForSelector('.rm-management-calendar.is-month button');
-    await page.click('.rm-management-calendar.is-month button');
-    await page.waitForSelector('.rm-management-workspace table');
+    await page.waitForSelector('.rm-planning__month-day', {visible:true});
+    await page.click('.rm-planning__month-day');
+    await page.waitForSelector('.rm-planning .rm-table-scroll table', {visible:true});
     await page.click('button[wire\\:click="abrirNuevaAsignacion"]');
     await page.waitForSelector('#planificar-persona',{visible:true});
     await page.click('[role="dialog"] button[wire\\:click^="seleccionarUsuario("]');
     await page.waitForSelector('.rm-staff-schedule',{visible:true});
     await page.screenshot({path:join(out,'planificacion-asignar-390.png'),fullPage:true});
     await go('/admin/familia-social/red-apoyo');
+    page.on('dialog', async dialog => { await dialog.accept(); });
     if(process.env.RM_GERENCIA_QA_ACCESIBILIDAD){
-        aceptarDialogos=true;
         for(const width of [1440,1280,1024,768,390]){
             await page.setViewport({width,height:960,hasTouch:width===390});
             await page.focus('button[wire\\:click="nuevoContacto"]');
@@ -541,15 +545,18 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.type('#contacto-apellido_paterno','Registro sintético');
     await page.click('form[wire\\:submit="guardarContacto"] button[type="submit"]');
     await page.waitForFunction(()=>document.querySelector('main')?.innerText.includes('Contacto guardado.'));
-    await page.click('button[wire\\:click^="abrirCuenta("]');
+    const contactoConVinculo = (await page.waitForFunction(() => [...document.querySelectorAll('.rm-support-people-table tbody tr')]
+        .find(fila => fila.querySelector('th')?.textContent.includes('Contacto de prueba')))).asElement();
+    await (await contactoConVinculo.$('details summary')).click();
+    await (await contactoConVinculo.$('details[open] button[wire\\:click^="abrirCuenta("]')).click();
     await page.waitForSelector('#familia-correo-acceso',{visible:true});
     await page.type('#familia-correo-acceso','familiar-qa@example.test');
-    aceptarDialogos=true;
     await page.click('form[wire\\:submit="crearCuenta"] button[type="submit"]');
+    await page.waitForSelector('.rm-confirmation .swal2-confirm', {visible:true});
+    await page.click('.rm-confirmation .swal2-confirm');
     await page.waitForFunction(()=>document.querySelector('main')?.innerText.includes('Cuenta Familiar creada.'));
     await page.screenshot({path:join(out,'contactos-cuenta-390.png'),fullPage:true});
     if(process.env.RM_GERENCIA_QA_AMPLIACION) {
-        aceptarDialogos=true;
         await go('/admin/personal-documentacion');
         await page.click('button[wire\\:click="nuevaSolicitud"]');
         await page.waitForSelector('#solicitud-nombre',{visible:true});

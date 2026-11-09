@@ -13,6 +13,7 @@ use App\Modulos\Institucion\Infraestructura\Exportaciones\GeneradorPlanillaEnfer
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -176,6 +177,21 @@ class TurnosAsignacionesPanel extends Component
 
         if (auth()->user()?->hasRole('GERENTE') && !auth()->user()->hasRole('SUPERADMINISTRADOR')) {
             $this->tipoPlanilla='general';
+            $contexto = Validator::make(request()->only('fecha', 'area', 'turno'), [
+                'fecha' => ['nullable', 'date_format:Y-m-d'],
+                'area' => ['nullable', 'string', 'exists:areas,cod_area'],
+                'turno' => ['nullable', 'string', 'exists:turnos,cod_turno'],
+            ]);
+            if ($contexto->passes()) {
+                $filtros = $contexto->validated();
+                if (isset($filtros['fecha'])) {
+                    $this->fechaSeleccionada = $filtros['fecha'];
+                    $this->vistaCalendario = 'dia';
+                }
+                $this->filtroArea = $filtros['area'] ?? '';
+                $this->filtroTurno = isset($filtros['turno']) ? (Turno::find($filtros['turno'])?->nombre ?? '') : '';
+            }
+
             return;
         }
 

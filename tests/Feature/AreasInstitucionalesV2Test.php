@@ -126,6 +126,32 @@ class AreasInstitucionalesV2Test extends TestCase
         $this->assertSame($auditorias, Activity::query()->count());
     }
 
+    public function test_gerencia_no_puede_invocar_reportes_operativos_de_areas(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $gerente = User::factory()->create(['estado' => 'ACTIVO']);
+        $gerente->assignRole('GERENTE');
+        $this->actingAs($gerente);
+        $this->assertTrue($gerente->can('areas.reportes'));
+        $area = Area::create(['nombre' => 'Área sintética', 'estado' => 'ACTIVO']);
+
+        $auditorias = Activity::query()->count();
+        foreach ([
+            'abrirReportes' => [], 'abrirReporteArea' => [$area->getKey()], 'generarReporteGeneral' => [],
+            'exportarReporteGeneralPdf' => [], 'exportarReporteAreaPdf' => [$area->getKey()],
+            'exportarReporteGeneralExcel' => [], 'exportarAreasExcel' => [], 'exportarUsuariosAreaExcel' => [$area->getKey()],
+            'exportarReporteGeneralCsv' => [],
+        ] as $accion => $parametros) {
+            Livewire::test(AreasInstitucionalesPanel::class)->call($accion, ...$parametros)->assertForbidden();
+        }
+        foreach (['general.pdf', 'general.excel', 'general.csv', 'area.pdf', 'area.excel'] as $salida) {
+            $parametros = str_starts_with($salida, 'area.') ? ['area' => $area->getKey()] : [];
+            $this->get(route('admin.areas-institucionales.reportes.'.$salida, $parametros))->assertForbidden();
+        }
+        $this->assertSame($auditorias, Activity::query()->count());
+        $this->get(route('admin.reportes.institucional.preview'))->assertOk()->assertSeeText('Preparar exportación');
+    }
+
     public function test_panel_guarda_solo_datos_reales_de_area_y_muestra_la_ficha(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

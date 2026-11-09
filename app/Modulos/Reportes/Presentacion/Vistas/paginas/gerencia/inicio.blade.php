@@ -9,7 +9,9 @@
     @include('reportes::paginas.gerencia.partials.indicadores', ['compacto' => true])
     <x-ui.section-card class="rm-manager-home__pending" title="Para revisar hoy" icon="ph-clipboard-text">
         <div class="rm-management-pending">
-            @if($enlaces['alertas'])<a href="{{ $enlaces['alertas'] }}" class="rm-management-pending-item" wire:navigate><i class="ph-bold ph-user-circle-dashed" aria-hidden="true"></i><span><strong>{{ $reporte['sin_responsable'] }} alertas sin responsable</strong></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a><a href="{{ $enlaces['alertas'] }}" class="rm-management-pending-item" wire:navigate><i class="ph-bold ph-clock" aria-hidden="true"></i><span><strong>{{ $reporte['limite_superado'] }} alertas fuera de plazo</strong></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endif
+            @if($enlaces['alertas'] && $reporte['avisos_vencidos'] !== null)
+                <a href="{{ $enlaces['alertas'] }}" class="rm-management-pending-item" wire:navigate><i class="ph-bold ph-clock" aria-hidden="true"></i><span><strong>{{ $reporte['avisos_vencidos'] }} {{ $reporte['avisos_vencidos'] === 1 ? 'aviso con plazo vencido' : 'avisos con plazo vencido' }}</strong></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
+            @endif
             @if($enlaces['documentacion'])<a href="{{ $enlaces['documentacion'] }}" class="rm-management-pending-item" wire:navigate><i class="ph-bold ph-folder-user" aria-hidden="true"></i><span><strong>Documentación del personal</strong></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>@endif
         </div>
     </x-ui.section-card>
@@ -18,5 +20,5 @@
     </x-ui.section-card>
     @include('reportes::paginas.gerencia.partials.distribuciones')
     <details class="rm-management-secondary"><summary>Equipo y asignaciones de hoy</summary><div class="rm-management-panels">@foreach($panels as $panel)<x-ui.dashboard-data-panel :panel="$panel" />@endforeach</div></details>
-    <details class="rm-management-secondary"><summary>Sobre estos datos · {{ \Carbon\Carbon::parse($reporte['consultado_en'])->format('d/m/Y H:i') }}</summary><ul class="rm-management-limits"><li>Personal activo se refiere al estado laboral, no al acceso a la cuenta.</li><li>Las alertas se cuentan sin duplicar eventos; los plazos son los registrados.</li><li>Las asignaciones no acreditan presencia física ni suficiencia de dotación.</li><li>Una fuente no autorizada se muestra como no disponible.</li></ul></details>
+    <details class="rm-management-secondary"><summary>Sobre estos datos · {{ \Carbon\Carbon::parse($reporte['consultado_en'])->format('d/m/Y H:i') }}</summary><ul class="rm-management-limits"><li>Personal activo se refiere al estado laboral, no al acceso a la cuenta.</li><li>Los avisos documentales se cuentan por solicitud y trabajador.</li><li>Las asignaciones no acreditan presencia física ni suficiencia de dotación.</li><li>Una fuente no autorizada se muestra como no disponible.</li></ul></details>
 </div>

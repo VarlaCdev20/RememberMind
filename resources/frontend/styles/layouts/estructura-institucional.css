@@ -133,7 +133,11 @@
         .rm-sidebar__header-toggle { display: none; }
         .rm-sidebar__mobile-close { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: var(--rm-radius-md); background: transparent; color: var(--rm-sidebar-text); font-size: 20px; }
         .rm-sidebar__flyout, .rm-sidebar__tooltip { display: none !important; }
-        .rm-shell [data-rm-main], .rm-shell [data-rm-topbar], .rm-shell [data-role-preview-banner] { margin-left: 0; width: 100%; }
+        :is(.rm-shell, .rm-shell.is-sidebar-collapsed) :is([data-rm-main], [data-rm-topbar], [data-role-preview-banner]) {
+            margin-left: 0;
+            width: 100%;
+            transition: none;
+        }
     }
 
     .rm-sidebar-overlay { position: fixed; inset: 0; z-index: calc(var(--rm-z-topbar) + 50); background: color-mix(in srgb, var(--rm-sidebar-bg) 38%, transparent); }

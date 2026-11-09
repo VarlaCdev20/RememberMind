@@ -11,9 +11,11 @@ use App\Modulos\Social\Aplicacion\Consultas\ConsultarAvisosVisitasFamiliar;
 use App\Modulos\Alertas\Aplicacion\Acciones\GestionarAtencionAlerta;
 use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
 use App\Modulos\Alertas\Aplicacion\Consultas\ConsultarPanelResidenteAlerta;
+use App\Modulos\Alertas\Aplicacion\Consultas\ExperienciaAlertas;
 use App\Modulos\Alertas\Aplicacion\Consultas\OrdenAlertas;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
+use App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal;
 use App\Modulos\Institucion\Aplicacion\Consultas\ConsultarAvisosPlanificacion;
 use App\Modulos\Medicacion\Aplicacion\Consultas\AgendaMedicacionService;
 use Illuminate\Database\Eloquent\Builder;
@@ -298,7 +300,9 @@ class CampanaNotificaciones extends Component
         $user = auth()->user();
         $puedeAtender = (bool) $user?->canAny(['alertas.gestionar', 'alertas.seguimiento']);
         $puedeCerrar = (bool) $user?->canAny(['alertas.gestionar', 'alertas.cerrar']);
-        $avisosDocumentales=app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarDocumentacionPersonal::class)->avisos($user);
+        $documentacion = app(ConsultarDocumentacionPersonal::class);
+        $avisosDocumentales = app(ExperienciaAlertas::class)->paraUsuario($user)['foco'] === 'supervision'
+            ? ($documentacion->avisosGerencia($user) ?? []) : $documentacion->avisos($user);
         $cambiosLaborales=app(\App\Modulos\Identidad\Aplicacion\Consultas\ConsultarCambiosLaboralesPendientes::class)->consultar($user);
         $this->sincronizarAvisos('documentacion', collect($avisosDocumentales),
             fn ($a) => $a['clave'].'|'.$a['mensaje'].'|'.$a['fecha'],

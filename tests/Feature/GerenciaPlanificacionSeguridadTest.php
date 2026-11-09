@@ -110,6 +110,39 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->get(route('admin.cobertura-equipo.index'))->assertForbidden();
     }
 
+    public function test_cobertura_distingue_fecha_de_jornada_y_ventana_nocturna_vigente(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-26 07:30:00'));
+        $noche = $this->turno('Noche', '20:00', '08:00');
+        $jornada = Jornada::create(['cod_turno' => $noche->getKey(), 'fecha_jornada' => '2026-10-25', 'estado' => 'EN_CURSO']);
+        AsignacionPersonal::create(['cod_personal' => $this->trabajador->personal->getKey(), 'cod_jornada' => $jornada->getKey(),
+            'cod_area' => $this->area->getKey(), 'estado' => 'ACTIVO', 'funcion' => 'Coordinación nocturna']);
+        $contexto = ['fecha' => '2026-10-25', 'area' => $this->area->getKey(), 'turno' => $noche->getKey()];
+        $ruta = 'admin.cobertura-equipo.index';
+
+        $this->get(route($ruta))->assertOk()->assertDontSeeText('Persona Sintetica');
+        $this->get(route($ruta, ['modo' => 'vigente']))->assertOk()->assertSeeText('Persona Sintetica')->assertSeeText('26/10 08:00')
+            ->assertSeeText('Coordinación nocturna')->assertSeeText('Asignación de personal vinculada a una jornada')
+            ->assertSee(route('admin.turnos-asignaciones.index', $contexto));
+        $this->get(route($ruta, $contexto + ['estado' => 'cerrada']))->assertOk()->assertDontSeeText('Persona Sintetica');
+        $this->get(route($ruta, $contexto + ['estado' => 'abierta']))->assertOk()->assertSeeText('Persona Sintetica');
+        $this->get(route('admin.turnos-asignaciones.index', $contexto))->assertOk()->assertSeeText('Persona Sintetica');
+        $this->travel(30)->minutes();
+        $this->get(route($ruta, ['modo' => 'vigente']))->assertOk()->assertDontSeeText('Persona Sintetica');
+        $this->assertDatabaseCount('asignaciones_personal', 1);
+    }
+
+    public function test_cobertura_muestra_errores_en_sus_campos_y_conserva_filtros_validos(): void
+    {
+        $ruta = 'admin.cobertura-equipo.index';
+        $fecha = ['fecha' => '2026-10-25'];
+        $respuesta = $this->from(route('dashboard'))->get(route($ruta, $fecha + ['area' => 'NO_EXISTE', 'turno' => 'NO_EXISTE']))
+            ->assertRedirect(route($ruta, $fecha))->assertSessionHasErrors(['area', 'turno']);
+        $cookie = $respuesta->getCookie(config('session.cookie'), decrypt: false);
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())->get(route($ruta, $fecha))->assertOk()->assertSeeText('Elige un área disponible.')
+            ->assertSeeText('Elige un turno disponible.')->assertDontSeeText('Sin asignaciones en esta consulta');
+    }
+
     private function turno(string $nombre, string $inicio, string $fin): Turno
     {
         return Turno::create(['nombre' => $nombre, 'hora_inicio' => $inicio, 'hora_cierre' => $fin, 'estado' => 'ACTIVO']);

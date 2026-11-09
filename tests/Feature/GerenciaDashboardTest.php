@@ -71,7 +71,7 @@ class GerenciaDashboardTest extends TestCase
             $this->get(route($route))->assertOk();
         }
         $response->assertSee('Organizar el equipo')->assertSeeText('Gerencia')
-            ->assertSeeText('Para revisar hoy')->assertSeeText('Camas ocupadas')->assertSeeText('Alertas activas');
+            ->assertSeeText('Para revisar hoy')->assertSeeText('Camas ocupadas')->assertSeeText('Avisos documentales');
         $this->assertFalse($gerente->can('prescripciones.crear'));
         $this->assertFalse($gerente->can('usuarios.gestionar'));
         $this->assertDatabaseCount('asignaciones_personal', 0);

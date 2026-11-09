@@ -70,6 +70,30 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         return app(GestionarSolicitudesDocumentales::class)->emitir($this->actor, $this->entrada($cambios))->destinatarios->sole();
     }
 
+    public function test_aviso_vencido_coincide_en_bandeja_inicio_y_reportes_agregados(): void
+    {
+        $this->emitir();
+        $this->travel(8)->days();
+
+        $this->get(route('admin.alertas-clinicas.index'))->assertOk()
+            ->assertSeeText('Constancia de prueba')->assertSeeText('Plazo registrado vencido');
+        $this->get(route('dashboard'))->assertOk()->assertSeeText('1 aviso con plazo vencido');
+
+        $vista = $this->get(route('admin.reportes.institucional.preview', ['seccion' => 'alertas']))->assertOk();
+        $this->assertSame(1, $vista->viewData('reporte')['avisos_documentales']);
+        $this->assertSame(1, $vista->viewData('reporte')['avisos_vencidos']);
+        $this->assertStringNotContainsString('Constancia de prueba', json_encode($vista->viewData('reporte'), JSON_THROW_ON_ERROR));
+        $solicitud = $vista->viewData('solicitud');
+        $csv = $this->get(route('admin.reportes.institucional.csv', compact('solicitud')))->assertOk()->streamedContent();
+        $this->assertStringContainsString('"Avisos con plazo vencido",1,avisos', $csv);
+        $this->assertStringNotContainsString('Constancia de prueba', $csv);
+        $this->get(route('admin.reportes.institucional.pdf', compact('solicitud')))->assertOk()->assertDownload();
+
+        Role::findByName('GERENTE', 'web')->revokePermissionTo('personal_institucional.ver');
+        $this->get(route('admin.alertas-clinicas.index'))->assertOk()
+            ->assertSeeText('La consulta de avisos documentales no está disponible.')->assertDontSeeText('Constancia de prueba');
+    }
+
     public function test_ficha_personal_muestra_documento_pendiente_y_su_plazo(): void
     {
         $this->emitir();
