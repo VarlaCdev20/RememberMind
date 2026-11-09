@@ -5,11 +5,12 @@
      @planificacion-detalle-cerrado.window="$nextTick(() => Array.from($el.querySelectorAll('[data-asignacion]')).find(button => button.dataset.asignacion === $event.detail.codigo && button.getClientRects().length)?.focus())">
     <x-ui.collection-header title="Planificación del equipo" subtitle="Organiza las asignaciones por fecha, área y turno" icon="ph-calendar-check">
         <x-slot:actions>
+            @include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'planificacion', 'parametrosReporte' => ['fecha' => $fechaSeleccionada, 'periodo' => $vistaCalendario, 'area' => $filtroArea ?: null, 'turno' => $turnos->firstWhere('nombre', $filtroTurno)?->getKey()]])
             @if($puedeVerCobertura)
-                <a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$fechaSeleccionada, 'area'=>$filtroArea ?: null, 'turno'=>$turnos->firstWhere('nombre', $filtroTurno)?->getKey()]) }}">Ver cobertura</a>
+                <a class="rm-btn-secondary" href="{{ route('admin.cobertura-equipo.index', ['fecha'=>$fechaSeleccionada, 'area'=>$filtroArea ?: null, 'turno'=>$turnos->firstWhere('nombre', $filtroTurno)?->getKey()]) }}" data-rm-action-icon aria-label="Ver cobertura"><i class="ph-bold ph-users-three" aria-hidden="true"></i><span>Ver cobertura</span></a>
             @endif
-            @if(\Illuminate\Support\Facades\Route::has('admin.avisos-planificacion.index'))<a class="rm-btn-secondary" href="{{ route('admin.avisos-planificacion.index') }}">Ver avisos</a>@endif
-            @can('turnos.asignar')<button class="rm-btn-primary" type="button" wire:click="abrirNuevaAsignacion"><i class="ph-bold ph-plus" aria-hidden="true"></i>Planificar asignación</button>@endcan
+            @if(\Illuminate\Support\Facades\Route::has('admin.avisos-planificacion.index'))<a class="rm-btn-secondary" href="{{ route('admin.avisos-planificacion.index') }}" data-rm-action-icon aria-label="Ver avisos"><i class="ph-bold ph-bell" aria-hidden="true"></i><span>Ver avisos</span></a>@endif
+            @can('turnos.asignar')<button class="rm-btn-primary" type="button" wire:click="abrirNuevaAsignacion" data-rm-action-icon aria-label="Planificar asignación"><i class="ph-bold ph-plus" aria-hidden="true"></i><span>Planificar asignación</span></button>@endcan
         </x-slot:actions>
     </x-ui.collection-header>
 

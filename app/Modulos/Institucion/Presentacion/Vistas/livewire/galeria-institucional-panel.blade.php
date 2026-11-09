@@ -1,8 +1,9 @@
 <div class="rm-gallery space-y-4" x-data="{ editorDirty: false }" x-on:gallery-editor-reset.window="editorDirty = false">
     <x-ui.collection-header title="Galería del centro" subtitle="Fotografías de nuestros espacios y actividades." icon="ph-images">
         <x-slot:actions>
+            @include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'galeria'])
             @if($puedeGestionar)
-                <button type="button" class="rm-btn-primary" wire:click="nuevo" x-bind:data-rm-confirm="editorDirty ? '¿Descartar los cambios sin guardar?' : null" ><i class="ph-bold ph-upload-simple" aria-hidden="true"></i> Subir fotografías</button>
+                <button type="button" class="rm-btn-primary" wire:click="nuevo" x-bind:data-rm-confirm="editorDirty ? '¿Descartar los cambios sin guardar?' : null" data-rm-action-icon aria-label="Subir fotografías"><i class="ph-bold ph-upload-simple" aria-hidden="true"></i><span>Subir fotografías</span></button>
 @endif
 </x-slot:actions>
     </x-ui.collection-header>

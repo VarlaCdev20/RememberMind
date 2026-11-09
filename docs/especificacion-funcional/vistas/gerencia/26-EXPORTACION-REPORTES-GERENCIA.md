@@ -11,9 +11,19 @@ runtime_verified: false
 
 # Exportación gerencial
 
+## Acceso desde cada vista
+
+Gerencia abre «Exportar reporte» en la cabecera de la consulta. Inicio prepara el resumen institucional. Personal, Documentación, Solicitudes y entregas, Áreas, Planificación, Cobertura, Residentes, Familiares y contactos, Ocupación, Alertas y Galería ofrecen indicadores de su propio ámbito. Los avisos de planificación ofrecen su reporte cuando la bandeja está habilitada.
+
+El botón abre una ventana emergente en la consulta de origen. Permite elegir PDF o CSV y seleccionar todo el resumen o determinados indicadores. La descarga mantiene la consulta abierta y los errores se muestran dentro de la ventana. Cobertura conserva los filtros aplicados. Planificación conserva el período, área y turno, con una nota sobre la búsqueda por trabajador. Los demás reportes son resúmenes generales de su vista. Cada archivo conserva el alcance agregado aprobado en 26B/C y revalida el permiso de su fuente al descargar.
+
+Inicio, Reportes, la ventana de exportación y el PDF comparten una proyección de gráficas por unidad. El selector ofrece diseño recomendado, dona, torta, radar (estrella) y barras. Donas y tortas se habilitan para categorías excluyentes; el total no se suma como otra porción. Cuando existe un total y categorías parciales, «Resto de registros» es su diferencia explícita. El radar compara al menos tres conteos de la misma unidad desde cero; no expresa una puntuación ni una meta institucional. Si el tipo elegido no es aplicable, se conserva la comparación en barras con una explicación. Los valores cero y las fuentes no disponibles siguen diferenciados. El PDF conserva el tipo elegido y el CSV los valores originales.
+
+Por corrección expresa de la propietaria del 08/11/2026, los paneles nuevos de gráficas se limitan a Inicio y Reportes, que reutilizan su proyección ya cargada. Personal y las demás vistas operativas conservan sus tablas, tarjetas, filtros y paginación anteriores, con su botón de exportación en la cabecera. La ventana y los archivos exportados mantienen las gráficas y los filtros de su reporte. Se conserva el gráfico físico de Ocupación que existía antes de esta ampliación.
+
 ## 1. Recorrido y contenido
 
-Desde [Reportes](25-REPORTES-GERENCIA.md), Preparar exportación abre una vista de revisión. Izquierda: contexto leído y selección PDF/CSV; derecha: vista previa del contenido agregado. En móvil se apilan, con tabla alternativa legible. El formato no cambia la población, fórmulas o filtros; solo la representación.
+Desde la consulta de origen, «Exportar reporte» abre el modal compartido. Muestra el contexto, el formato y una lista de los indicadores disponibles con sus valores. Ambos formatos contienen la selección autorizada y conservan sus fórmulas y filtros.
 
 Datos visibles: nombre del reporte, sección, referencia temporal, filtros efectivos, hora de consulta, hora de generación, ámbito autorizado, definiciones, unidades y limitaciones. Las fechas de consulta y generación pueden diferir: deben identificarse por separado. El autor generador procede de la sesión y auditoría, nunca de un campo editable para firmar por otro. La identidad técnica no se imprime al usuario como explicación.
 
@@ -45,10 +55,18 @@ Las salidas siguen siendo información institucional: agregado no significa anon
 
 ## 5. Formularios y estados
 
-Solo el formato es selección en preparación; los datos del reporte son de lectura. PDF/CSV funcionan como radios con label/ayuda; Descargar PDF cambia a Descargar CSV al seleccionar. Cancelar y Volver recuperan consulta/filtros. No hay Guardar como cierre institucional ni formulario de firma médica.
+El formato y los indicadores son las selecciones de la ventana. Los valores consultados son de lectura. PDF y CSV usan radios con etiqueta y ayuda. «Descargar PDF» cambia a «Descargar CSV» al elegir el formato. Los indicadores se marcan mediante casillas y se requiere al menos uno. Cerrar devuelve el foco al botón de origen y conserva la consulta y sus filtros.
 
 Carga y generación muestran estado anunciado, prevención de doble envío y botón deshabilitado temporalmente; un fallo permite reintentar. Si faltan permisos, la denegación no simula un reporte con menos filas como si fuera completo. Fuentes insuficientes se indican; no son éxito total ni cero automático. Un reporte con cero comprobado puede exportarse con esa explicación, a diferencia de una consulta fallida.
 
 ## 6. Alcance de esta entrega
 
 Preparación y contrato de descarga especificados, con [imagen](28-DISENO-IMAGENES-REPORTES.md) y [casos](27-ACEPTACION-REPORTES-GERENCIA.md). No se generó un reporte institucional real, no se instaló un permiso, no se cambió el motor de exportación ni se modificó la BDD. La representación técnica de un conjunto preparado y su caducidad deben implementarse y probarse sin crear persistencia histórica ficticia o campos ajenos.
+
+### Verificación de gráficas del 08/11/2026
+
+Sobre el árbol local, se verificaron las barras del modal y del PDF con datos sintéticos: selección parcial, agrupación por unidad, conteos cero y fuentes no disponibles. El modal se comprobó en 1440, 1280, 1024, 768 y 390 px; se revisaron las descargas PDF/CSV, el retorno del foco y el modo oscuro móvil. Se inspeccionaron los PDF renderizados, incluido el resumen de seis indicadores en una página. Pasaron 11 pruebas de exportación gerencial con 156 aserciones, dos pruebas JavaScript y la compilación de producción. Esta evidencia corresponde a presentación y exportación local; no es una nueva aceptación integral de Gerencia ni una prueba nueva de PostgreSQL.
+
+Ampliación posterior del mismo día: cinco pruebas de presentación (23 aserciones), cinco pruebas de integración del reporte (60 aserciones) y tres pruebas JavaScript verifican tipos de gráfica, denominadores, ausencia de datos, selección preparada y permisos. Se recorrieron 13 vistas en escritorio y móvil, se ejercitaron dona/torta/radar y se inspeccionaron sus PDF renderizados. La revisión final comprobó leyendas y notas completas en los cinco anchos, temas claro/oscuro y actualización Livewire sin duplicar instancias. Se conserva el gráfico físico existente de Ocupación. Compilación de producción correcta; sin cambios de BDD ni permisos nuevos. Evidencia de navegador generada exclusivamente con datos sintéticos y base temporal aislada.
+
+Corrección posterior solicitada por la propietaria: retirados los paneles nuevos de las diez vistas operativas y la exportación repetida dentro de las tarjetas de Personal. El contenido de la vista de Personal coincide con la versión anterior, salvo el botón de reporte de cabecera ya solicitado. Verificación sintética en navegador: tabla en cinco anchos, cambio a tarjetas sin botones de exportación duplicados e Inicio/Reportes conservando las gráficas. Compilación correcta. Esta corrección sustituye la ubicación en vistas operativas descrita en la ampliación anterior.

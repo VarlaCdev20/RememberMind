@@ -1,6 +1,7 @@
  {{-- ENCABEZADO PREMIUM --}}
  <x-ui.collection-header class="no-print" :title="$modoEquipo ? 'Áreas y equipo' : 'Áreas institucionales'" :subtitle="$modoEquipo ? 'Organización institucional y equipo registrado por jornada.' : 'Estructura y organigrama funcional del centro.'" icon="ph-buildings" eyebrow="Gestión institucional">
  <x-slot:actions>
+ @if($modoEquipo)@include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'areas'])@endif
  @unless($modoEquipo)
  @can('areas.reportes')
  <button type="button"
@@ -15,9 +16,9 @@
  @can('areas.crear')
  <button type="button"
  wire:click="crearArea"
- class="inline-flex items-center justify-center gap-2 rm-btn-primary">
- <i class="ph-bold ph-plus-circle text-base"></i>
- Nueva área
+ class="inline-flex items-center justify-center gap-2 rm-btn-primary" data-rm-action-icon aria-label="Nueva área">
+ <i class="ph-bold ph-plus-circle text-base" aria-hidden="true"></i>
+ <span>Nueva área</span>
  </button>
  @endcan
  </x-slot:actions>

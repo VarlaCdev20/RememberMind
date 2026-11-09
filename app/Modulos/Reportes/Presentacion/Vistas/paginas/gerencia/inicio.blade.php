@@ -18,7 +18,7 @@
     <x-ui.section-card class="rm-manager-home__planning" title="Organizar el equipo" icon="ph-calendar-check">
         <nav class="rm-management-tabs" aria-label="Organización de Gerencia">@foreach($accesos as $acceso)<a class="rm-btn-secondary" href="{{ route($acceso['route']) }}" wire:navigate><i class="ph-bold {{ $acceso['icon'] }}" aria-hidden="true"></i>{{ $acceso['label'] }}</a>@endforeach</nav>
     </x-ui.section-card>
-    @include('reportes::paginas.gerencia.partials.distribuciones')
+    @include('reportes::paginas.gerencia.partials.distribuciones', ['esInicioGerencia' => true])
     <details class="rm-management-secondary"><summary>Equipo y asignaciones de hoy</summary><div class="rm-management-panels">@foreach($panels as $panel)<x-ui.dashboard-data-panel :panel="$panel" />@endforeach</div></details>
     <details class="rm-management-secondary"><summary>Sobre estos datos · {{ \Carbon\Carbon::parse($reporte['consultado_en'])->format('d/m/Y H:i') }}</summary><ul class="rm-management-limits"><li>Personal activo se refiere al estado laboral, no al acceso a la cuenta.</li><li>Los avisos documentales se cuentan por solicitud y trabajador.</li><li>Las asignaciones no acreditan presencia física ni suficiencia de dotación.</li><li>Una fuente no autorizada se muestra como no disponible.</li></ul></details>
 </div>

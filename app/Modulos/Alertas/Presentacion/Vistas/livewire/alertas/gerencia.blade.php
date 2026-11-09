@@ -1,5 +1,7 @@
 <div class="rm-management-workspace space-y-4">
-    <x-ui.collection-header title="Avisos administrativos" subtitle="Pendientes de documentación y cobertura del equipo" icon="ph-bell-ringing" />
+    <x-ui.collection-header title="Avisos administrativos" subtitle="Pendientes de documentación y cobertura del equipo" icon="ph-bell-ringing">
+        <x-slot:actions>@include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'alertas'])</x-slot:actions>
+    </x-ui.collection-header>
 
     @if($avisosDocumentales)
         <x-ui.section-card title="Documentación laboral" icon="ph-files">

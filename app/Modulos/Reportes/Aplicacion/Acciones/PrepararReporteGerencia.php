@@ -5,6 +5,7 @@ namespace App\Modulos\Reportes\Aplicacion\Acciones;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use App\Modulos\Reportes\Aplicacion\Consultas\ConsultarIndicadoresGerencia;
+use App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReportePorVistaGerencia;
 use Illuminate\Support\Str;
 
 /** Preparación temporal de descarga; no es un cierre o histórico institucional SQL. */
@@ -14,7 +15,7 @@ final class PrepararReporteGerencia
 
     public function preparar(User $usuario, array $datos): string
     {
-        $this->autorizar($usuario);
+        $this->autorizar($usuario, $datos);
         $solicitud = (string) Str::uuid();
         $preparaciones = collect(session('reportes_gerencia', []))
             ->filter(fn ($item) => $item['actor'] === $usuario->getKey() && $item['vence'] >= now()->timestamp)
@@ -27,18 +28,23 @@ final class PrepararReporteGerencia
 
     public function recuperar(User $usuario, string $solicitud): array
     {
-        $this->autorizar($usuario);
+        abort_if(app(RolePreviewService::class)->isActive($usuario), 403);
         abort_unless(Str::isUuid($solicitud), 404);
         $preparacion = session('reportes_gerencia.'.$solicitud);
         abort_unless($preparacion && $preparacion['actor'] === $usuario->getKey(), 404);
+        $this->autorizar($usuario, $preparacion['datos']);
         abort_if($preparacion['vence'] < now()->timestamp, 409, 'La preparación caducó. Vuelve al reporte para actualizar y revisar sus datos.');
 
         return $preparacion['datos'];
     }
 
-    private function autorizar(User $usuario): void
+    private function autorizar(User $usuario, array $datos): void
     {
-        $this->consulta->autorizarReporte($usuario);
         abort_if(app(RolePreviewService::class)->isActive($usuario), 403);
+        if (isset($datos['vista_origen'])) {
+            app(ConsultarReportePorVistaGerencia::class)->autorizar($usuario, $datos['vista_origen']);
+        } else {
+            $this->consulta->autorizarReporte($usuario);
+        }
     }
 }

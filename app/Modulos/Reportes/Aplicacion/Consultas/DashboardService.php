@@ -152,7 +152,6 @@ class DashboardService
                     ['route' => 'admin.areas-institucionales.index', 'permission' => 'areas.ver', 'icon' => 'ph-buildings', 'label' => 'Áreas y equipo', 'description' => 'Organización del equipo por área.'],
                     ['route' => 'admin.turnos-asignaciones.index', 'permission' => 'turnos.ver', 'icon' => 'ph-calendar-check', 'label' => 'Planificación', 'description' => 'Turnos y horarios del personal.'],
                     ['route' => 'admin.cobertura-equipo.index', 'permission' => 'jornadas.ver', 'icon' => 'ph-users-three', 'label' => 'Cobertura', 'description' => 'Asignaciones guardadas por fecha, área y turno.'],
-                    ['route' => 'admin.reportes.institucional.preview', 'permission' => 'reportes.institucional', 'icon' => 'ph-chart-bar', 'label' => 'Reportes gerenciales', 'description' => 'Información institucional consolidada.'],
                 ],
             ],
             'ADMINISTRADOR' => [

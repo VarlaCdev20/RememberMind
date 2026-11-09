@@ -1,5 +1,12 @@
 <div class="rm-management-workspace rm-staff-documents space-y-4" x-data x-on:personal-documento-cerrado.window="$nextTick(() => requestAnimationFrame(() => Array.from($el.querySelectorAll('[data-documento-trigger]')).find(el => el.dataset.documentoTrigger === $event.detail.documento && el.getClientRects().length)?.focus()))">
-    <x-ui.collection-header :title="$gestor ? 'Documentación del personal' : 'Mi documentación'" subtitle="Archivos del expediente, solicitudes y seguimiento de entregas" icon="ph-folder-user"><x-slot:actions>@if($gestor)<a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal-institucional') }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver a personal</a>@endif</x-slot:actions></x-ui.collection-header>
+    <x-ui.collection-header :title="$gestor ? 'Documentación del personal' : 'Mi documentación'" subtitle="Archivos del expediente, solicitudes y seguimiento de entregas" icon="ph-folder-user">
+        <x-slot:actions>
+            @if($vista === 'archivos' || $disponible)
+                @include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => $vista === 'solicitudes' ? 'solicitudes' : 'documentacion'])
+            @endif
+            @if($gestor)<a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal-institucional') }}" data-rm-action-icon aria-label="Volver a personal"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Volver a personal</span></a>@endif
+        </x-slot:actions>
+    </x-ui.collection-header>
     @if($mensaje)<x-ui.callout title="Operación confirmada" variant="success"><p role="status">{{ $mensaje }}</p></x-ui.callout>@endif
     <nav class="rm-staff-documents__navigation" aria-label="Tipo de consulta documental">
         <button type="button" wire:click="cambiarVista('archivos')" aria-pressed="{{ $vista === 'archivos' ? 'true' : 'false' }}" wire:loading.attr="disabled"><i class="ph ph-files" aria-hidden="true"></i>Archivos del personal</button>

@@ -1,6 +1,6 @@
 <div class="rm-management-workspace rm-support-workspace space-y-4" x-data="{ modoRed: 'red' }">
     <x-ui.collection-header title="Familiares y contactos" subtitle="La red de apoyo de cada residente" icon="ph-users-three">
-        <x-slot:actions>@can('contactos.gestionar')<button type="button" class="rm-btn-primary" wire:click="nuevoContacto">Registrar contacto</button>@endcan</x-slot:actions>
+        <x-slot:actions>@include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'contactos'])@can('contactos.gestionar')<button type="button" class="rm-btn-primary" wire:click="nuevoContacto" data-rm-action-icon aria-label="Registrar contacto"><i class="ph-bold ph-user-plus" aria-hidden="true"></i><span>Registrar contacto</span></button>@endcan</x-slot:actions>
     </x-ui.collection-header>
     @if($mensaje)<x-ui.callout title="Operación confirmada" variant="success"><p role="status">{{ $mensaje }}</p></x-ui.callout>@endif
     @error('acceso')<p class="rm-alert rm-alert-danger" role="alert">{{ $message }}</p>@enderror

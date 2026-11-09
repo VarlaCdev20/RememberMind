@@ -27,6 +27,8 @@ Uso de superficie con pie:
 
 No anidar `section-card` o `table-wrapper` para reproducir la misma superficie. Las variantes locales deben resolver distribución o densidad, sin copiar tipografía y paleta compartidas.
 
+Las cabeceras con exportación agrupan sus acciones en iconos. El nombre de cada acción aparece al pasar el puntero o enfocarla con el teclado. Cada icono conserva un área de pulsación de 44 × 44 px y las acciones principales mantienen su acento.
+
 ## Alcance comprobado en código
 
 La búsqueda de componentes y clases comunes localizó 109 archivos Blade consumidores en los doce módulos: Admisiones 2, Alertas 6, ApoyoDecision 3, Clinica 21, Cuidados 8, Identidad 11, Institucion 17, Medicacion 7, Reportes 15, Residentes 8, Social 5 y Valoraciones 6. Es un inventario de archivos consumidores, no un número de rutas ni una certificación visual individual.

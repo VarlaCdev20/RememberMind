@@ -161,6 +161,7 @@ import './modules/free-text-select.js';
 import './modules/filter-selection.js';
 import './modules/controles-institucionales.js';
 import './modules/personal-registration.js';
+import './modules/report-export.js';
 import './modules/personal-address-map.js';
 import 'leaflet/dist/leaflet.css';
 import './modules/admisiones-interactivas.js';

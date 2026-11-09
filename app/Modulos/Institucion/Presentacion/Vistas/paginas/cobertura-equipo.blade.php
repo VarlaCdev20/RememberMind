@@ -7,9 +7,12 @@
 <x-sistema-layout>
     <div class="rm-management-workspace rm-coverage space-y-4">
         <x-ui.collection-header title="Cobertura del equipo" subtitle="Consulta las asignaciones registradas por fecha, área y turno" icon="ph-users-three">
-            @if($puedeVerPlanificacion)
-                <x-slot:actions><a class="rm-btn-secondary" href="{{ route('admin.turnos-asignaciones.index', $contextoPlanificacion) }}" wire:navigate>Ver planificación</a></x-slot:actions>
-            @endif
+            <x-slot:actions>
+                @unless($errors->any())
+                    @include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'cobertura', 'parametrosReporte' => $filtros + ['fecha' => $fecha]])
+                @endunless
+                @if($puedeVerPlanificacion)<a class="rm-btn-secondary" href="{{ route('admin.turnos-asignaciones.index', $contextoPlanificacion) }}" wire:navigate data-rm-action-icon aria-label="Ver planificación"><i class="ph-bold ph-calendar-check" aria-hidden="true"></i><span>Ver planificación</span></a>@endif
+            </x-slot:actions>
         </x-ui.collection-header>
 
         <x-ui.filter-bar as="form" class="rm-coverage__filters" method="GET" :action="route('admin.cobertura-equipo.index')" x-data="{ modo: $el.elements.namedItem('modo').value }">

@@ -65,6 +65,8 @@ return [
             ->name('institucional.preview');
         Route::get('/institucional/preparar', [ReporteInstitucionalController::class, 'prepararGerencia'])
             ->middleware('permission:reportes.institucional')->name('institucional.preparar');
+        Route::get('/institucional/graficas', [ReporteInstitucionalController::class, 'graficasGerencia'])
+            ->middleware('permission:reportes.institucional')->name('institucional.graficas');
         Route::get('/institucional/csv', [ReporteInstitucionalController::class, 'csvGerencia'])
             ->middleware('permission:reportes.institucional')->name('institucional.csv');
     },

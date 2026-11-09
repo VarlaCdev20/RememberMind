@@ -66,10 +66,12 @@ class GerenciaDashboardTest extends TestCase
         $gerente->assignRole('GERENTE');
         $response = $this->actingAs($gerente)->get(route('dashboard'))->assertOk();
         foreach (['admin.personal-institucional', 'admin.areas-institucionales.index', 'admin.turnos-asignaciones.index',
-            'admin.cobertura-equipo.index', 'admin.reportes.institucional.preview'] as $route) {
+            'admin.cobertura-equipo.index'] as $route) {
             $response->assertSee(route($route), false);
             $this->get(route($route))->assertOk();
         }
+        $response->assertSee(route('admin.reportes.institucional.preparar', ['vista' => 'inicio']), false)
+            ->assertDontSee('Reportes gerenciales');
         $response->assertSee('Organizar el equipo')->assertSeeText('Gerencia')
             ->assertSeeText('Para revisar hoy')->assertSeeText('Camas ocupadas')->assertSeeText('Avisos documentales');
         $this->assertFalse($gerente->can('prescripciones.crear'));

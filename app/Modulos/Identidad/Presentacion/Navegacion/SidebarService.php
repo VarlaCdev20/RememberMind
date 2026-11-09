@@ -161,7 +161,6 @@ class SidebarService
                 $this->buildItem('Familiares y contactos', 'admin.familia-social.red-apoyo', 'residentes_contactos.ver'),
                 $this->buildItem('Ocupación', 'admin.habitaciones.index', 'habitaciones.ver'),
                 $this->buildItem('Alertas', 'admin.alertas-clinicas.index', 'alertas.ver'),
-                $this->buildItem('Reportes gerenciales', 'admin.reportes.institucional.preview', 'reportes.institucional'),
             ]),
             $this->buildSection('Galería', 'ph-images', 'admin.galeria.index', [], false, 'fotografias_institucionales.ver'),
         ]));

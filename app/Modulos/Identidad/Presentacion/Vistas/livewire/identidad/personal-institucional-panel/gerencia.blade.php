@@ -1,8 +1,9 @@
 <div class="rm-management-workspace rm-staff-directory space-y-4">
     <x-ui.collection-header title="Personal" subtitle="Equipo institucional, documentación y acceso" icon="ph-identification-badge" class="rm-staff-directory__heading">
         <x-slot:actions>
-            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal.documentacion') }}"><i class="ph-bold ph-files" aria-hidden="true"></i> Documentación laboral</a>
-            @can('personal.gestionar')<x-ui.action-button wire:click="abrirModalNuevo" icono="ph-user-plus" loading="abrirModalNuevo">Registrar trabajador</x-ui.action-button>@endcan
+            @include('reportes::paginas.gerencia.partials.exportar-vista', ['origenReporte' => 'personal'])
+            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.personal.documentacion') }}" data-rm-action-icon aria-label="Documentación laboral"><i class="ph-bold ph-files" aria-hidden="true"></i><span>Documentación laboral</span></a>
+            @can('personal.gestionar')<x-ui.action-button wire:click="abrirModalNuevo" icono="ph-user-plus" loading="abrirModalNuevo" data-rm-action-icon aria-label="Registrar trabajador"><span>Registrar trabajador</span></x-ui.action-button>@endcan
         </x-slot:actions>
     </x-ui.collection-header>
     @error('recuperacion')<p role="alert" class="rm-alert rm-alert-danger">{{ $message }}</p>@enderror

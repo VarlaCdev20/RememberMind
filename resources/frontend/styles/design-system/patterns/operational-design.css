@@ -121,3 +121,95 @@ html .rm-shell [data-rm-main] .rm-pagination:not(.rm-pagination--compact) .rm-pa
     .rm-collection-header__actions { justify-content: center; width: 100%; }
     html .rm-shell [data-rm-main] .rm-filter-bar.rm-filter-bar { padding: var(--rm-space-3); }
 }
+
+/* La presencia del componente de exportación activa la cabecera compacta compartida. */
+html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rm-space-2) var(--rm-space-3);
+}
+html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__identity {
+    flex: 1 1 12rem;
+    min-width: min(100%, 12rem);
+}
+html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__aside {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    width: auto;
+    max-width: 100%;
+    margin-inline-start: auto;
+    gap: var(--rm-space-1);
+}
+html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    width: auto;
+    max-width: 100%;
+    gap: var(--rm-space-1);
+}
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    --rm-button-secondary-bg: var(--rm-surface-soft);
+    flex: 0 0 auto;
+    width: var(--rm-control-lg);
+    min-width: var(--rm-control-lg);
+    height: var(--rm-control-lg);
+    min-height: var(--rm-control-lg);
+    padding: 0;
+    gap: 0;
+    border-radius: var(--rm-radius-pill);
+    box-shadow: none;
+}
+html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon] > span:not(.rm-btn__spinner) {
+    display: none;
+}
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice) > i {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--rm-radius-pill);
+    background: var(--rm-role-primary-soft, var(--rm-primary-soft));
+    color: var(--rm-role-ink, var(--rm-action-primary-ink));
+    font-size: var(--rm-icon-md);
+}
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice):hover {
+    border-color: var(--rm-role-primary, var(--rm-primary));
+}
+/* La etiqueta flota bajo el icono para no desplazar los controles vecinos. */
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon])::after {
+    content: attr(aria-label);
+    position: absolute;
+    z-index: 5;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    padding: var(--rm-space-1) var(--rm-space-2);
+    border: 1px solid var(--rm-border-soft);
+    border-radius: var(--rm-radius-md);
+    background: var(--rm-surface-raised);
+    color: var(--rm-text-primary);
+    box-shadow: var(--rm-shadow-sm);
+    font: 600 var(--rm-font-size-label)/1.45 var(--rm-font-body);
+    white-space: nowrap;
+    visibility: hidden;
+    pointer-events: none;
+}
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]):focus-visible::after {
+    visibility: visible;
+}
+@media (hover: hover) {
+    html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]):hover::after {
+        visibility: visible;
+    }
+}
