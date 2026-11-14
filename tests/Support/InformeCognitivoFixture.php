@@ -22,6 +22,10 @@ final class InformeCognitivoFixture
                 if (isset($fila['cod_usuario_creacion'])) {
                     $fila['cod_usuario_creacion'] = $usuario->getKey();
                 }
+                if ($tabla === 'criterios_dominios_resultado') {
+                    $fila += ['cod_usuario_creacion' => $usuario->getKey(),
+                        'fecha_hora_creacion' => now()->subDay()->format('Y-m-d H:i:s')];
+                }
                 if ($tabla === 'dominios_valores_expertos') {
                     $fila['codigo_dominio'] = $fila['cod_dominio_valores'] === 'DOM_RES' ? 'DOM-RESULTADO-COG-MEM' : 'DOM-ARTIFICIAL';
                 }

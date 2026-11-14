@@ -79,7 +79,7 @@ class BddOperativaV2Test extends TestCase
 
     public function test_las_claves_y_columnas_de_identidad_respetan_el_baseline(): void
     {
-        $this->assertSame(['cod_usuario', 'correo', 'contrasena', 'foto', 'estado'], Schema::getColumnListing('usuarios'));
+        $this->assertSame(['cod_usuario', 'correo', 'contrasena', 'foto', 'estado', 'remember_token'], Schema::getColumnListing('usuarios'));
         $this->assertTrue(Schema::hasColumns('residentes', ['cod_residente', 'numero_documento', 'fecha_nacimiento', 'estado']));
         $this->assertFalse(Schema::hasColumn('usuarios', 'cod_usu'));
         $this->assertFalse(Schema::hasColumn('residentes', 'cod_am'));
