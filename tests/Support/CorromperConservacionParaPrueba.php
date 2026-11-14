@@ -19,7 +19,7 @@ trait CorromperConservacionParaPrueba
             && ! EntornoPruebas::postgresDesechable($db->getDatabaseName(), $db->getConfig('username'), $db->getConfig('host'))) {
             throw new RuntimeException('La corrupción sintética requiere la base desechable del runner.');
         }
-        $guardas = new GuardasReduccionConservacion;
+        $guardas = new GuardasReduccionConservacion($db->getSchemaBuilder()->hasTable('vinculos_evidencia_experta'));
         $sqlite = $db->getDriverName() === 'sqlite';
         $bloques = $sqlite
             ? DB::select("SELECT name, tbl_name, sql FROM sqlite_master WHERE type='trigger' AND name LIKE 'b4_%'")

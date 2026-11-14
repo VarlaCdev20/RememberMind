@@ -82,9 +82,9 @@ final class ReduccionConcurrenciaPostgresTest extends TestCase
                 $objetivo = $modo === 'mismo_hecho' ? $hs[0] : $hs[1];
                 $this->corromperConservacion(fn () => DB::table(P::HECHOS)->where('cod_hecho_instantanea', $objetivo->cod_hecho_instantanea)
                     ->update(['cod_evidencia_evaluacion' => 'SIM-EVID', 'tipo_origen' => 'D137', 'cod_atencion' => 'SIM-AT']));
-                $v = (array) DB::table(P::VINCULOS)->first();
+                $v = (array) \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta(P::VINCULOS)->first();
                 $criterio = $v['cod_evaluacion_criterio'];
-                DB::table(P::VINCULOS)->where('cod_evaluacion_criterio', $criterio)->delete();
+                DB::table('vinculos_evidencia_experta')->where('cod_evaluacion_criterio', $criterio)->delete();
                 $datos['vinculos'][1] = array_replace($v, ['cod_evidencia_criterio' => 'EVC-CARRERA-1', 'cod_soporte_sintetico' => 'SSX-CARRERA',
                     'cod_hecho_instantanea' => $hs[0]->cod_hecho_instantanea, 'cod_evidencia_evaluacion' => null, 'fecha_hora_vinculacion' => null, 'orden_conservacion' => 0]);
                 $datos['vinculos'][2] = array_replace($v, ['cod_evidencia_criterio' => 'EVC-CARRERA-2', 'cod_soporte_sintetico' => null,
@@ -95,6 +95,10 @@ final class ReduccionConcurrenciaPostgresTest extends TestCase
                     foreach (['id_evaluacion_dominio', 'version_conservacion', 'huella_memoria_cognicion', 'fecha_corte_utc', 'fecha_corte_zona', 'fecha_corte_offset'] as $columna) {
                         $cab[$columna] = null;
                     }
+                    $bloqueDcl = \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::DEFINICIONES['clasificaciones_dcl_instantanea'];
+                    foreach (array_diff($bloqueDcl['campos'], [$bloqueDcl['propietario']]) as $columna) {
+                        $cab[$columna] = null;
+                    }
                     DB::table('evaluaciones_expertas')->insert($cab);
                     $datos['criterio'] = $criterio;
                 }
@@ -102,18 +106,18 @@ final class ReduccionConcurrenciaPostgresTest extends TestCase
         }
         $salidas = $this->correr($datos);
         self::assertSame($modo === 'clasificacion' ? ['guardado', 'guardado'] : ['guardado', 'rechazado'], $salidas);
-        self::assertSame(1, DB::table(P::CLASIFICACIONES)->count());
+        self::assertSame(1, \App\Models\ClasificacionDclInstantanea::count());
         if ($modo === 'iadl') {
             $h = (array) DB::table(P::HECHOS)->where('cod_hecho_instantanea', $datos['hecho'])->first();
             self::assertSame($baseAntes, array_diff_key($h, $bloque));
             self::assertContains($h['cod_evidencia_iadl_instantanea'], ['EIX-CARRERA-1', 'EIX-CARRERA-2']);
         } elseif ($modo === 'padre') {
-            $q = DB::table(P::VINCULOS.' as v')->join('evaluacion_criterios as c', 'v.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
+            $q = DB::table('vinculos_evidencia_experta as v')->join('evaluacion_criterios as c', 'v.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
                 ->join(P::HECHOS.' as h', 'h.cod_hecho_instantanea', '=', 'v.cod_hecho_instantanea')->where('v.cod_evaluacion_criterio', $criterio);
             self::assertSame(0, (clone $q)->whereColumn('c.cod_evaluacion_experta', '<>', 'h.cod_evaluacion_experta')->count());
             self::assertSame(DB::table('evaluacion_criterios')->where('cod_evaluacion_criterio', $criterio)->value('cod_evaluacion_experta') === 'SIM-EVAL' ? 1 : 0, $q->count());
         } elseif ($modo !== 'clasificacion') {
-            self::assertSame(1, DB::table(P::VINCULOS)->where('cod_evaluacion_criterio', $criterio)->count());
+            self::assertSame(1, DB::table('vinculos_evidencia_experta')->where('cod_evaluacion_criterio', $criterio)->count());
         }
     }
 

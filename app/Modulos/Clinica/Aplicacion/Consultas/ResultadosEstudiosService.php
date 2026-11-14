@@ -117,7 +117,7 @@ final class ResultadosEstudiosService
         $ultimo = ResultadoEstudio::query()
             ->whereHas('estudio', fn ($query) => $query->where('cod_residente', $residente->cod_residente))
             ->whereHas('componente', fn ($query) => $query->whereRaw('LOWER(nombre) LIKE ?', ['%'.mb_strtolower($parametro).'%']))
-            ->with('componente')->whereNotNull('rango_referencia')->latest('cod_resultado_estudio')->first();
+            ->with('componente')->whereNotNull('rango_referencia')->latest('cod_registro_estudio')->first();
 
         return [
             'nombre' => $ultimo?->componente?->nombre ?? Str::ucfirst($parametro),

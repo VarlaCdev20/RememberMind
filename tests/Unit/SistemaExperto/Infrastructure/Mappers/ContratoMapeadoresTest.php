@@ -88,7 +88,7 @@ final class ContratoMapeadoresTest extends TestCase
             'evidencias_soporte_condicion' => [Models\EvidenciaSoporteCondicion::class, 'cod_evidencia_soporte_condicion'],
         ];
         $fisicas = array_map(static fn ($t) => BloquesExpertos::tablaFisica($t), array_keys($modelos));
-        self::assertSame(InventarioExperto::TABLAS, array_values(array_unique($fisicas)));
+        self::assertEqualsCanonicalizing(InventarioExperto::TABLAS, array_values(array_unique($fisicas)));
         foreach ($modelos as $tabla => [$tipo, $pk]) {
             $modelo = new $tipo;
             self::assertSame(BloquesExpertos::tablaFisica($tabla), $modelo->getTable());

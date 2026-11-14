@@ -89,7 +89,6 @@ class HistoriaResidencialSeeder extends Seeder
             'horarios_prescripcion',
             'incidentes',
             'indicaciones_clinicas',
-            'informes_estudio',
             'instrumentos',
             'intervenciones_cuidado',
             'jornadas',
@@ -113,7 +112,7 @@ class HistoriaResidencialSeeder extends Seeder
             'residentes',
             'residentes_contactos',
             'respuestas_instrumento',
-            'resultados_estudio',
+            'registros_estudio',
             'seguimientos_pedagogicos',
             'seguros_residente',
             'secuencias_codigos',
@@ -1089,7 +1088,7 @@ class HistoriaResidencialSeeder extends Seeder
             ->whereIn('a.cod_residente', $ids)->whereColumn('a.cod_prescripcion', '<>', 'h.cod_prescripcion')->exists()) {
             throw new RuntimeException('Horario de otra prescripción.');
         }
-        if (DB::table('resultados_estudio as r')->join('estudios_clinicos as e', 'e.cod_estudio', '=', 'r.cod_estudio')
+        if (DB::table('registros_estudio as r')->where('r.tipo_evento', 'RESULTADO')->join('estudios_clinicos as e', 'e.cod_estudio', '=', 'r.cod_estudio')
             ->join('componentes_estudio as c', 'c.cod_componente', '=', 'r.cod_componente')
             ->whereIn('e.cod_residente', $ids)->whereColumn('e.cod_tipo_estudio', '<>', 'c.cod_tipo_estudio')->exists()) {
             throw new RuntimeException('Resultado de un componente ajeno al estudio.');

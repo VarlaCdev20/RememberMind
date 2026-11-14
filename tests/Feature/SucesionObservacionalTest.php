@@ -108,7 +108,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertDatabaseCount('evaluacion_criterios', 3);
         self::assertSame(1, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
         self::assertDatabaseCount('evaluaciones_reglas', 4);
-        self::assertDatabaseCount('evidencias_soporte_condicion', 4);
+        self::assertSame(4, \App\Models\EvidenciaSoporteCondicion::count());
         self::assertSame('OBSERVACIONAL', DB::table('reglas_expertas')->where('codigo_regla', 'OBS-MEM-NUEVA')->value('tipo_regla'));
     }
 

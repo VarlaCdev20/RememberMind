@@ -55,14 +55,19 @@ final class EvaluarReduccionConservacion
         $tablas = $reducida ? [ProyeccionReduccionExperta::HECHOS, ProyeccionReduccionExperta::CLASIFICACIONES, ProyeccionReduccionExperta::VINCULOS] : ProyeccionReduccionExperta::TABLAS;
         $conteos = [];
         $t = [];
+        $vinculosUnificados = $db->getSchemaBuilder()->hasTable('vinculos_evidencia_experta');
         foreach ($tablas as $tabla) {
-            $conteos[$tabla] = $db->table($tabla)->count();
+            $consulta = $vinculosUnificados && $tabla === ProyeccionReduccionExperta::VINCULOS
+                ? BloquesExpertos::consulta($tabla, $db->getName()) : $db->table($tabla);
+            $conteos[$tabla] = $consulta->count();
         }
         if (array_sum($conteos) > 100000) {
             throw new DomainException('El preflight en memoria admite hasta 100000 filas; se requiere un cotejo por lotes para este volumen.');
         }
         foreach ($tablas as $tabla) {
-            $t[$tabla] = array_map(static fn ($fila) => (array) $fila, $db->table($tabla)->get()->all());
+            $consulta = $vinculosUnificados && $tabla === ProyeccionReduccionExperta::VINCULOS
+                ? BloquesExpertos::consulta($tabla, $db->getName()) : $db->table($tabla);
+            $t[$tabla] = array_map(static fn ($fila) => (array) $fila, $consulta->get()->all());
         }
         if ($reducida) {
             $t = $plan->restaurar($t);

@@ -130,7 +130,7 @@ final class HallazgosObservacionalesTest extends TestCase
         self::assertDatabaseCount('hechos_instantanea_experta', 4);
         self::assertDatabaseCount('evaluaciones_reglas', 3);
         self::assertDatabaseCount('evaluaciones_condiciones_regla', 3);
-        self::assertDatabaseCount('evidencias_soporte_condicion', 3);
+        self::assertSame(3, \App\Models\EvidenciaSoporteCondicion::count());
         $r = app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
         self::assertTrue($r['persistido']);
         self::assertSame(['CUMPLE', 'NO_CUMPLE', 'NO_EVALUABLE'], array_column($r['resultados'], 'estado'));
@@ -239,6 +239,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $paquete = app(PaqueteObservacional::class)->preparar($this->medico);
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $reduccion = new TransicionReduccionConservacion;
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         $reduccion->bajar();
         InformeCognitivoFixture::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'cod_version_modelo' => $paquete['version'], 'cod_residente' => $this->residente->getKey(), 'origen_activacion' => 'PRUEBA_TECNICA']);
@@ -296,8 +297,9 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        $vinculo = DB::table('evidencias_criterio_evaluacion')->orderBy('cod_evidencia_criterio')->first();
-        $q = DB::table('evidencias_criterio_evaluacion')->where('cod_evidencia_criterio', $vinculo->cod_evidencia_criterio);
+        $vinculo = DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CRITERIO')
+            ->orderBy('cod_vinculo_evidencia')->first();
+        $q = DB::table('vinculos_evidencia_experta')->where('cod_vinculo_evidencia', $vinculo->cod_vinculo_evidencia);
         if ($caso === 'ajena') {
             $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
             $this->control(['cod_residente' => $otro->getKey()]);

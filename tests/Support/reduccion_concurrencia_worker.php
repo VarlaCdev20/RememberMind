@@ -43,7 +43,7 @@ try {
         } elseif ($datos['modo'] === 'padre' && $i === '2') {
             DB::table('evaluacion_criterios')->where('cod_evaluacion_criterio', $datos['criterio'])->update(['cod_evaluacion_experta' => 'SIM-EVAL-OTRA']);
         } else {
-            DB::table('evidencias_criterio_evaluacion')->insert($datos['vinculos'][$i]);
+            \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('evidencias_criterio_evaluacion', $datos['vinculos'][$i]);
         }
         // Mantener el ganador sin confirmar fuerza solapamiento real con el competidor.
         DB::select('SELECT pg_sleep(0.15)');

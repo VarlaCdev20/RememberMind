@@ -13,12 +13,17 @@ abstract class ConsolidacionClinica20261114 extends Migration
 
     abstract protected function indicesDestino(): array;
 
+    protected function antesDeMover(bool $subir): void {}
+
+    protected function despuesDeMover(bool $subir): void {}
+
     final public function up(): void
     {
         DB::transaction(function (): void {
             $tablas = array_keys(static::ORIGENES);
             $this->bloquear($tablas);
             $this->verificarReferencias($tablas, false);
+            $this->antesDeMover(true);
             $temporal = static::DESTINO.'_copia';
             $this->crearDestino($temporal);
             foreach (static::ORIGENES as $tabla => [$tipo, $columnas]) {
@@ -38,6 +43,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
                 Schema::drop($tabla);
             }
             $this->indices(static::DESTINO, $this->indicesDestino());
+            $this->despuesDeMover(true);
         });
     }
 
@@ -46,6 +52,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
         DB::transaction(function (): void {
             $this->bloquear([static::DESTINO]);
             $this->verificarReferencias([static::DESTINO], true);
+            $this->antesDeMover(false);
             $origen = static::DESTINO;
             if (isset(static::ORIGENES[static::DESTINO])) {
                 $origen .= '_copia';
@@ -62,6 +69,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
                 $this->cambiarReferencia($tabla, $columna, $nombre, static::DESTINO, $claveNueva, $destino, $clave);
             }
             Schema::drop($origen);
+            $this->despuesDeMover(false);
         });
     }
 

@@ -57,9 +57,7 @@ final class CatalogoCodigos
         'evaluaciones_expertas' => ['cod_evaluacion_experta', 'EEX'],
         'evaluaciones_reglas' => ['cod_evaluacion_regla', 'ERG'],
         'eventos_alerta' => ['cod_evento_alerta', 'EAL'],
-        'evidencias_criterio_evaluacion' => ['cod_evidencia_criterio', 'EVC'],
         'evidencias_evaluacion' => ['cod_evidencia_evaluacion', 'EVE'],
-        'evidencias_soporte_condicion' => ['cod_evidencia_soporte_condicion', 'ESC'],
         'fuentes_datos_expertas' => ['cod_fuente_dato_experta', 'FDE'],
         'fotografias_institucionales' => ['cod_fotografia', 'FGI'],
         'habitaciones' => ['cod_habitacion', 'HAB'],
@@ -68,7 +66,6 @@ final class CatalogoCodigos
         'horarios_prescripcion' => ['cod_horario_prescripcion', 'HPR'],
         'incidentes' => ['cod_incidente', 'INC'],
         'indicaciones_clinicas' => ['cod_indicacion', 'IND'],
-        'informes_estudio' => ['cod_informe_estudio', 'INF'],
         'instrumentos' => ['cod_instrumento', 'INS'],
         'intervenciones_cuidado' => ['cod_intervencion', 'INT'],
         'jornadas' => ['cod_jornada', 'JOR'],
@@ -97,7 +94,7 @@ final class CatalogoCodigos
         'residentes' => ['cod_residente', 'RES'],
         'residentes_contactos' => ['cod_residente_contacto', 'RCT'],
         'respuestas_instrumento' => ['cod_respuesta', 'RSP'],
-        'resultados_estudio' => ['cod_resultado_estudio', 'RET'],
+        'registros_estudio' => ['cod_registro_estudio', 'RESC'],
         'seguimientos_pedagogicos' => ['cod_seguimiento_pedagogico', 'SPD'],
         'seguros_residente' => ['cod_seguro', 'SEG'],
         'tipos_estudio_clinico' => ['cod_tipo_estudio', 'TEC'],
@@ -108,10 +105,15 @@ final class CatalogoCodigos
         'valores_semanticos' => ['cod_valor_semantico', 'VSE'],
         'versiones_modelo_experto' => ['cod_version_modelo', 'VME'],
         'visitas' => ['cod_visita', 'VIS'],
+        'vinculos_evidencia_experta' => ['cod_vinculo_evidencia', 'VEE'],
     ];
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'evidencias_criterio_evaluacion' => ['cod_evidencia_criterio', 'EVC'],
+        'evidencias_soporte_condicion' => ['cod_evidencia_soporte_condicion', 'ESC'],
+        'informes_estudio' => ['cod_informe_estudio', 'INF'],
+        'resultados_estudio' => ['cod_resultado_estudio', 'RET'],
         'mediciones_antropometricas' => ['cod_medicion', 'MAN'],
         'registros_sueno' => ['cod_registro_sueno', 'RSU'],
         'signos_vitales' => ['cod_signo', 'SGN'],

@@ -68,7 +68,7 @@ class BddOperativaV2Test extends TestCase
         sort($esperadas);
         sort($reales);
 
-        $this->assertCount(67, $reales);
+        $this->assertCount(66, $reales);
         $this->assertSame($esperadas, $reales);
         foreach ($esperadas as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla), "Falta la tabla operativa {$tabla}");
@@ -284,11 +284,27 @@ class BddOperativaV2Test extends TestCase
         $solicitud = $this->actingAs($medico)->postJson(route('admin.estudios.store', $residente), ['cod_atencion' => $atencion->cod_atencion, 'cod_tipo_estudio' => $tipo->cod_tipo_estudio])->assertCreated();
         $codigo = $solicitud->json('cod_estudio');
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $ajeno->cod_componente, 'valor_numerico' => 95]]])->assertStatus(422);
-        $this->assertDatabaseCount('resultados_estudio', 0);
+        $this->assertSame(0, \App\Models\ResultadoEstudio::count());
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $componente->cod_componente, 'valor_numerico' => 13.5]]])->assertCreated();
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $componente->cod_componente, 'valor_numerico' => 14.0]]])->assertStatus(409);
-        $this->assertDatabaseHas('resultados_estudio', ['cod_estudio' => $codigo, 'cod_componente' => $componente->cod_componente]);
-        $this->assertDatabaseMissing('resultados_estudio', ['cod_estudio' => $codigo, 'cod_componente' => $componente->cod_componente, 'valor_numerico' => 14.0]);
+        $this->assertDatabaseHas('registros_estudio', ['tipo_evento' => 'RESULTADO', 'cod_estudio' => $codigo, 'cod_componente' => $componente->cod_componente]);
+        $this->assertDatabaseMissing('registros_estudio', ['tipo_evento' => 'RESULTADO', 'cod_estudio' => $codigo, 'cod_componente' => $componente->cod_componente, 'valor_numerico' => 14.0]);
+        foreach (['Informe inicial', 'Segundo informe'] as $conclusion) {
+            $this->actingAs($medico)->postJson(route('admin.estudios.informes', $codigo), [
+                'conclusion' => $conclusion, 'origen' => 'INTERNO',
+            ])->assertCreated();
+        }
+        $this->assertSame(1, \App\Models\ResultadoEstudio::where('cod_estudio', $codigo)->count());
+        $this->assertSame(2, \App\Models\InformeEstudio::where('cod_estudio', $codigo)->count());
+        $migracion = require database_path('migrations/2026_11_14_000009_consolidate_registros_estudio.php');
+        $migracion->down();
+        try {
+            $this->assertDatabaseCount('resultados_estudio', 1);
+            $this->assertDatabaseCount('informes_estudio', 2);
+        } finally {
+            $migracion->up();
+        }
+        $this->assertDatabaseCount('registros_estudio', 3);
     }
 
     public function test_documento_clinico_se_guarda_en_disco_privado_y_valida_al_residente(): void
@@ -393,8 +409,8 @@ class BddOperativaV2Test extends TestCase
             'fotografias_institucionales',
             'controles_funcionales_iadl',
             'usuarios', 'personal', 'areas', 'turnos', 'contactos', 'residentes', 'habitaciones', 'camas', 'tipos_estudio_clinico', 'medicamentos', 'instrumentos',
-            'jornadas', 'preadmisiones', 'admisiones', 'historial_estados_residente', 'documentos', 'consentimientos', 'atenciones', 'notas_clinicas', 'antecedentes_clinicos', 'diagnosticos', 'alergias', 'seguros_residente', 'dispositivos_clinicos', 'mediciones_clinicas', 'objetivos_signos_vitales', 'valoraciones_dolor', 'estudios_clinicos', 'informes_estudio', 'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos', 'registros_observaciones_cuidado', 'registros_consumo', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado', 'ejecuciones_cuidado', 'prescripciones', 'administraciones_medicacion', 'aplicaciones_instrumento', 'valoraciones_profesionales', 'seguimientos_pedagogicos', 'actividades', 'visitas', 'alertas', 'eventos_alerta',
-            'asignaciones_personal', 'residentes_contactos', 'ocupaciones_cama', 'resultados_estudio', 'asignaciones_residente_jornada', 'respuestas_instrumento', 'participantes_actividad',
+            'jornadas', 'preadmisiones', 'admisiones', 'historial_estados_residente', 'documentos', 'consentimientos', 'atenciones', 'notas_clinicas', 'antecedentes_clinicos', 'diagnosticos', 'alergias', 'seguros_residente', 'dispositivos_clinicos', 'mediciones_clinicas', 'objetivos_signos_vitales', 'valoraciones_dolor', 'estudios_clinicos', 'registros_estudio', 'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos', 'registros_observaciones_cuidado', 'registros_consumo', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado', 'ejecuciones_cuidado', 'prescripciones', 'administraciones_medicacion', 'aplicaciones_instrumento', 'valoraciones_profesionales', 'seguimientos_pedagogicos', 'actividades', 'visitas', 'alertas', 'eventos_alerta',
+            'asignaciones_personal', 'residentes_contactos', 'ocupaciones_cama', 'asignaciones_residente_jornada', 'respuestas_instrumento', 'participantes_actividad',
             'componentes_estudio', 'intervenciones_cuidado', 'programaciones_cuidado', 'horarios_prescripcion', 'preguntas_instrumento', 'opciones_pregunta',
         ];
     }

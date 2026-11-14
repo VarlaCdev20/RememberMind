@@ -130,8 +130,8 @@ final class ConsultarObservacionesConservadas
         $trazas = BloquesExpertos::consulta('trazas_inferencia')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $reglas = DB::table('evaluaciones_reglas')->whereIn('cod_traza_inferencia', $trazas->pluck('cod_traza_inferencia'))->get();
         $condiciones = DB::table('evaluaciones_condiciones_regla')->whereIn('cod_evaluacion_regla', $reglas->pluck('cod_evaluacion_regla'))->get();
-        $soportes = DB::table('evidencias_soporte_condicion')->whereIn('cod_evaluacion_condicion', $condiciones->pluck('cod_evaluacion_condicion'))->get();
-        $participaciones = DB::table('evidencias_criterio_evaluacion')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
+        $soportes = BloquesExpertos::consulta('evidencias_soporte_condicion')->whereIn('cod_evaluacion_condicion', $condiciones->pluck('cod_evaluacion_condicion'))->get();
+        $participaciones = BloquesExpertos::consulta('evidencias_criterio_evaluacion')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $resultados = BloquesExpertos::consulta('resultados_criterio')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $evidencias = DB::table('evidencias_evaluacion')->where('cod_evaluacion_experta', $id)->get();
         if ($criterios->count() !== count($p['criterios']) || $trazas->count() !== count($p['criterios'])
@@ -254,7 +254,7 @@ final class ConsultarObservacionesConservadas
                 $esperados[] = $es->sole()->cod_evidencia_evaluacion;
                 $participacionEsperada[$es->sole()->cod_evidencia_evaluacion] = $decision['estado'];
             }
-            $vinculos = DB::table('evidencias_criterio_evaluacion')->where('cod_evaluacion_criterio', $r->cod_evaluacion_criterio)->get();
+            $vinculos = BloquesExpertos::consulta('evidencias_criterio_evaluacion')->where('cod_evaluacion_criterio', $r->cod_evaluacion_criterio)->get();
             if ($vinculos->count() !== count($participacionEsperada)) {
                 throw new DomainException('La participación de las evidencias conservadas está incompleta o duplicada.');
             }
@@ -264,7 +264,7 @@ final class ConsultarObservacionesConservadas
                     throw new DomainException('Una evidencia no corresponde al criterio o estado originales.');
                 }
             }
-            $guardados = DB::table('evidencias_soporte_condicion')->where('cod_evaluacion_condicion', $r->cod_evaluacion_condicion)->pluck('cod_evidencia_evaluacion')->all();
+            $guardados = BloquesExpertos::consulta('evidencias_soporte_condicion')->where('cod_evaluacion_condicion', $r->cod_evaluacion_condicion)->pluck('cod_evidencia_evaluacion')->all();
             sort($esperados);
             sort($guardados);
             if ($esperados !== $guardados) {

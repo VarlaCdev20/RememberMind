@@ -75,6 +75,11 @@ final class InformeCognitivoFixture
         if (! app()->environment('testing')) {
             throw new \LogicException('La fixture no se utiliza fuera de testing.');
         }
+        if (in_array($tabla, ['evidencias_criterio_evaluacion', 'evidencias_soporte_condicion'], true)) {
+            BloquesExpertos::insertar($tabla, $fila);
+
+            return;
+        }
         $bloque = BloquesExpertos::DEFINICIONES[$tabla] ?? null;
         $columnas = Schema::getColumns($bloque['tabla'] ?? $tabla);
         if ($bloque !== null) {

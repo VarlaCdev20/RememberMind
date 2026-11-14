@@ -23,6 +23,8 @@ final class RegistrosConsumo
         'valoraciones_psicologicas' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PSICOLOGICA', 'cod_valoracion_psicologica'],
         'valoraciones_nutricionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'NUTRICIONAL', 'cod_valoracion_nutricional'],
         'valoraciones_funcionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'FUNCIONAL', 'cod_valoracion_funcional'],
+        'resultados_estudio' => ['registros_estudio', 'cod_registro_estudio', 'RESULTADO', 'cod_resultado_estudio'],
+        'informes_estudio' => ['registros_estudio', 'cod_registro_estudio', 'INFORME', 'cod_informe_estudio'],
     ];
 
     public static function codigo(string $entidad): ?string

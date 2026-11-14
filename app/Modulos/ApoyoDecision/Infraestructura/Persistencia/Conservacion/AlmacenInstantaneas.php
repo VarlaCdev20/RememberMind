@@ -411,7 +411,7 @@ final readonly class AlmacenInstantaneas
         $todos = [];
         $originales = $this->db()->table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $e)
             ->whereNotNull('cod_evidencia_evaluacion')->pluck('id_hecho_dominio', 'cod_evidencia_evaluacion')->all();
-        $vinculos = $this->db()->table('evidencias_criterio_evaluacion as s')
+        $vinculos = $this->db()->query()->fromSub(BloquesExpertos::consulta('evidencias_criterio_evaluacion', $this->conexion), 's')
             ->join('evaluacion_criterios as c', 'c.cod_evaluacion_criterio', '=', 's.cod_evaluacion_criterio')
             ->where('c.cod_evaluacion_experta', $e)->where('c.tipo_registro', '<>', 'D137')->select('s.*')->get();
         foreach ($vinculos as $f) {

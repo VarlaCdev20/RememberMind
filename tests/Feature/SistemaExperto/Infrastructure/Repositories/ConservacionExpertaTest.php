@@ -221,6 +221,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $antes = DB::table('resultados_criterio')->orderBy('cod_resultado_criterio')->get()->all();
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         (new TransicionReduccionConservacion)->bajar();
         $migracion->down();
         self::assertFalse(DB::getSchemaBuilder()->hasTable('hechos_instantanea_experta'));

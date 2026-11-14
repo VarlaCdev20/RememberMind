@@ -203,7 +203,7 @@ class InformeCognitivoTest extends TestCase
     {
         F::evaluacion($this->residente, $this->personal, 'X');
         match ($caso) {
-            'contextual' => DB::table('evidencias_criterio_evaluacion')->update(['rol_en_criterio' => 'CONTEXTUAL']),
+            'contextual' => DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CRITERIO')->update(['rol_en_criterio' => 'CONTEXTUAL']),
             'valor ajeno' => $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_resultado_criterio')->update(['resultado_cod_valor_semantico' => 'VAL_A'])),
             'sin resultado' => DB::table('evaluacion_criterios')->update(['estado_evaluabilidad' => 'EV-CM-0']),
             'sin traza' => $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'INCOMPATIBLE'])),
@@ -355,7 +355,7 @@ class InformeCognitivoTest extends TestCase
         F::evaluacion($this->residente, $this->personal, 'T');
         DB::table('evaluaciones_expertas')->update(['origen_activacion' => 'PRUEBA_TECNICA', 'estado_ejecucion' => 'PRUEBA_FINALIZADA']);
         $this->corromperConservacion(fn () => DB::table('evaluacion_criterios')->whereNotNull('cod_traza_inferencia')->update(['traza_estado_inferencia' => 'PRUEBA_FINALIZADA']));
-        DB::table('evidencias_criterio_evaluacion')->update(['estado_participacion' => 'PRUEBA_TECNICA']);
+        DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CRITERIO')->update(['estado_participacion' => 'PRUEBA_TECNICA']);
         config(['sistema_experto.lectura_tecnica_pruebas.habilitada' => true]);
         [$informe, $lectura] = $this->informe();
         $this->assertFalse($informe['actual']['evaluada']);

@@ -53,6 +53,8 @@ final class PreflightReduccionExpertaTest extends TestCase
 
     public function test_referencia_entrante_fuera_del_mapa_bloquea_el_plan(): void
     {
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         (new TransicionReduccionConservacion)->bajar();
         Schema::create('prueba_fk_consolidacion', function (Blueprint $t): void {
             $t->string('cod_cognitiva', 20)->nullable();
@@ -84,6 +86,8 @@ final class PreflightReduccionExpertaTest extends TestCase
         if (DB::getDriverName() !== 'pgsql') {
             $this->markTestSkipped('El caso de esquemas separados requiere PostgreSQL.');
         }
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
+        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         (new TransicionReduccionConservacion)->bajar();
         DB::statement('CREATE SCHEMA prueba_fk_externa');
         try {

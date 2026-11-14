@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 /** Proyección de entidades singulares sobre su propietario físico. */
 final class BloquesExpertos
 {
+    private const VINCULOS = [
+        'evidencias_criterio_evaluacion' => ['CRITERIO', 'cod_evidencia_criterio', ['cod_evaluacion_criterio',
+            'cod_evidencia_evaluacion', 'rol_en_criterio', 'estado_participacion', 'justificacion', 'fecha_hora_vinculacion',
+            'orden_conservacion', 'cod_hecho_instantanea', 'cod_soporte_sintetico']],
+        'evidencias_soporte_condicion' => ['CONDICION', 'cod_evidencia_soporte_condicion', ['cod_evaluacion_condicion',
+            'cod_evidencia_evaluacion']],
+    ];
+
     public const DEFINICIONES = [
         'resultados_criterio' => ['tabla' => 'evaluacion_criterios', 'propietario' => 'cod_evaluacion_criterio', 'id' => 'cod_resultado_criterio',
             'campos' => ['cod_resultado_criterio' => 'cod_resultado_criterio', 'cod_evaluacion_criterio' => 'cod_evaluacion_criterio',
@@ -48,11 +56,20 @@ final class BloquesExpertos
 
     public static function tablaFisica(string $entidad): string
     {
+        if (isset(self::VINCULOS[$entidad])) {
+            return 'vinculos_evidencia_experta';
+        }
+
         return self::definicion($entidad)['tabla'] ?? $entidad;
     }
 
     public static function columnasLogicas(string $entidad): ?array
     {
+        if (isset(self::VINCULOS[$entidad])) {
+            [, $clave, $columnas] = self::VINCULOS[$entidad];
+
+            return [$clave, ...$columnas];
+        }
         $definicion = self::definicion($entidad);
 
         return $definicion === null ? null : array_keys($definicion['campos']);
@@ -61,6 +78,13 @@ final class BloquesExpertos
     public static function consulta(string $entidad, ?string $conexion = null): Builder
     {
         $db = DB::connection($conexion);
+        if (isset(self::VINCULOS[$entidad])) {
+            [$tipo, $clave, $columnas] = self::VINCULOS[$entidad];
+            $origen = $db->table('vinculos_evidencia_experta')->where('tipo_evento', $tipo)
+                ->select(['cod_vinculo_evidencia as '.$clave, ...$columnas]);
+
+            return $db->query()->fromSub($origen, $entidad);
+        }
         if (($d = self::definicion($entidad)) === null) {
             return $db->table($entidad);
         }
@@ -77,6 +101,15 @@ final class BloquesExpertos
         }
         $filas = array_is_list($filas) ? $filas : [$filas];
         $db = DB::connection($conexion);
+        if (isset(self::VINCULOS[$entidad])) {
+            [$tipo, $clave] = self::VINCULOS[$entidad];
+            $db->table('vinculos_evidencia_experta')->insert(array_map(
+                static fn (array $fila): array => ['tipo_evento' => $tipo, 'cod_vinculo_evidencia' => $fila[$clave]]
+                    + array_diff_key($fila, [$clave => true]), $filas,
+            ));
+
+            return;
+        }
         if (($d = self::definicion($entidad)) === null) {
             $db->table($entidad)->insert($filas);
 

@@ -114,7 +114,7 @@ class ExploradorExpertoTest extends TestCase
     public function test_regla_no_cumplida_no_conecta_consecuencia_al_resultado(): void
     {
         F::evaluacion($this->residente, $this->personal, 'NO');
-        DB::table('evidencias_soporte_condicion')->delete();
+        DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CONDICION')->delete();
         DB::table('evaluaciones_condiciones_regla')->update(['estado_condicion' => 'NO_CUMPLE']);
         DB::table('evaluaciones_reglas')->update(['estado_regla' => 'NO_CUMPLE']);
         $g = (new GrafoInferenciaHistorica)->presentar($this->lectura('E_NO'), true);

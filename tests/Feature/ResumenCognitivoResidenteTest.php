@@ -15,10 +15,10 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use MotorExperto\adaptadores\entrada\EjemploTecnicoCOGMEM;
 use Spatie\Permission\Models\Role;
+use Tests\Support\InformeCognitivoFixture;
 use Tests\TestCase;
 
 /** Lectura real con datos sintéticos: hechos, límites, publicación conservada y aislamiento. */
@@ -281,6 +281,10 @@ class ResumenCognitivoResidenteTest extends TestCase
                 if (isset($fila['cod_usuario_creacion'])) {
                     $fila['cod_usuario_creacion'] = $this->medico->getKey();
                 }
+                if ($tabla === 'criterios_dominios_resultado') {
+                    $fila += ['cod_usuario_creacion' => $this->medico->getKey(),
+                        'fecha_hora_creacion' => now()->subDay()->format('Y-m-d H:i:s')];
+                }
                 if ($tabla === 'dominios_valores_expertos') {
                     $fila['codigo_dominio'] = $fila['cod_dominio_valores'] === 'DOM_RES' ? 'DOM-RESULTADO-COG-MEM' : 'DOM-ARTIFICIAL';
                 }
@@ -310,15 +314,7 @@ class ResumenCognitivoResidenteTest extends TestCase
     /** Completa solo metadatos obligatorios de la fixture en la base aislada, nunca datos de producto. */
     private function insertar(string $tabla, array $fila): void
     {
-        foreach (Schema::getColumns($tabla) as $columna) {
-            $nombre = $columna['name'];
-            if (array_key_exists($nombre, $fila) || $columna['default'] !== null) {
-                continue;
-            }
-            $fila[$nombre] = $columna['nullable'] ? null : ($nombre === 'cod_usuario_creacion' ? $this->medico->getKey()
-                : (str_contains($columna['type_name'], 'time') || str_contains($columna['type_name'], 'date') ? now()->subDay()->format('Y-m-d H:i:s') : 'F3_'.reset($fila)));
-        }
-        DB::table($tabla)->insert($fila);
+        InformeCognitivoFixture::insertar($tabla, $fila);
     }
 
     public function test_hallazgo_sustentado_reutiliza_integridad_y_lenguaje_del_lector_sin_mutaciones(): void
@@ -338,7 +334,7 @@ class ResumenCognitivoResidenteTest extends TestCase
     public function test_ausencia_de_evidencia_instrumental_suprime_resultado_aunque_exista_valor(): void
     {
         $this->evaluacionConservada();
-        DB::table('evidencias_criterio_evaluacion')->update(['rol_en_criterio' => 'CONTEXTUAL']);
+        DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CRITERIO')->update(['rol_en_criterio' => 'CONTEXTUAL']);
         $resumen = $this->resumen();
         $this->assertSame('Información insuficiente', $resumen['experto']['estado']);
         $this->assertStringContainsString('requiere revisar su integridad', $resumen['experto']['alcance']);

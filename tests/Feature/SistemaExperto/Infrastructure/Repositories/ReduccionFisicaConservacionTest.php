@@ -35,6 +35,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         $r = (new ClasificadorPetersenService)->clasificar($perfil);
         $this->almacen()->guardar($perfil->cognicion);
         $this->almacen()->guardarClasificacion($r);
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         // Este contrato prueba la migración histórica del 20/10 sobre su esquema de entrada de 104.
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
 
@@ -69,6 +70,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         }
         self::assertSame($p->canonizar($antes), $p->canonizar($p->restaurar($this->filas([P::HECHOS, P::CLASIFICACIONES, P::VINCULOS]))));
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->subir();
+        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->up();
         $consultas = [];
         DB::listen(static function ($q) use (&$consultas) {
             $consultas[] = $q->sql;

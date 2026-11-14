@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 // sistema experto 4.16.14; restricciones físicas D-137.
-class EvidenciaCriterioEvaluacion extends ModeloExperto
+class EvidenciaCriterioEvaluacion extends ModeloBloqueExperto
 {
-    protected $table = 'evidencias_criterio_evaluacion';
+    protected const BLOQUE = 'evidencias_criterio_evaluacion';
+
+    protected $table = 'vinculos_evidencia_experta';
 
     protected $primaryKey = 'cod_evidencia_criterio';
 

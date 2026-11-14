@@ -29,7 +29,7 @@ DB::beginTransaction();
 DB::statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
 try {
     $inventario = InventarioExperto::diagnosticar(DB::connection());
-    if ($inventario['expertas_presentes'] !== 24 || $inventario['expertas_ausentes'] !== []) {
+    if ($inventario['expertas_presentes'] !== 23 || $inventario['expertas_ausentes'] !== []) {
         throw new RuntimeException('El inventario experto instalado está incompleto.');
     }
     foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado'] as $entidad) {

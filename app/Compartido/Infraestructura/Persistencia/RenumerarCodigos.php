@@ -45,7 +45,8 @@ final class RenumerarCodigos
                     throw new RuntimeException('Inventario incompleto: '.$tabla);
                 }
                 // Los registros consolidados conservan los correlativos de su entidad lógica.
-                if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado', 'mediciones_clinicas', 'valoraciones_profesionales'], true)) {
+                if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado', 'mediciones_clinicas',
+                    'valoraciones_profesionales', 'registros_estudio', 'vinculos_evidencia_experta'], true)) {
                     continue;
                 }
                 $ids = $db->table($tabla)->pluck($pk)->all();

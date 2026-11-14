@@ -36,10 +36,9 @@ final class InventarioExperto
         'evidencias_evaluacion',
         'relaciones_evidencias_evaluacion',
         'evaluacion_criterios',
-        'evidencias_criterio_evaluacion',
         'evaluaciones_reglas',
         'evaluaciones_condiciones_regla',
-        'evidencias_soporte_condicion',
+        'vinculos_evidencia_experta',
     ];
 
     public const CONSERVACION = [

@@ -83,7 +83,7 @@ final class PersistirEvaluacionTecnica
                 'estado_evaluabilidad' => $gate['estado'], 'codigo_modificador_interpretacion' => $gate['modificador'],
                 'motivo_evaluabilidad' => implode('; ', $gate['contexto']['faltantes']) ?: null, 'fecha_hora_determinacion' => $fecha]);
             foreach ($m->participaciones()[$criterio] ?? [] as $evidencia => $rol) {
-                DB::table('evidencias_criterio_evaluacion')->insert(['cod_evidencia_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_criterio_evaluacion'),
+                \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('evidencias_criterio_evaluacion', ['cod_evidencia_criterio' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_criterio_evaluacion'),
                     'cod_evaluacion_criterio' => $ec, 'cod_evidencia_evaluacion' => $identidadesEvidencia[$evidencia], 'rol_en_criterio' => $rol,
                     'estado_participacion' => 'PRUEBA_TECNICA', 'fecha_hora_vinculacion' => $fecha]);
             }
@@ -103,7 +103,7 @@ final class PersistirEvaluacionTecnica
                     DB::table('evaluaciones_condiciones_regla')->insert(['cod_evaluacion_condicion' => $ece, 'cod_evaluacion_regla' => $er,
                         'cod_condicion_regla' => $cond['condicion'], 'estado_condicion' => $cond['estado'], 'fecha_hora_evaluacion' => $fecha]);
                     foreach ($cond['soportes'] as $evidencia) {
-                        DB::table('evidencias_soporte_condicion')->insert(['cod_evidencia_soporte_condicion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_soporte_condicion'),
+                        \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('evidencias_soporte_condicion', ['cod_evidencia_soporte_condicion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_soporte_condicion'),
                             'cod_evaluacion_condicion' => $ece, 'cod_evidencia_evaluacion' => $identidadesEvidencia[$evidencia]]);
                     }
                 }
