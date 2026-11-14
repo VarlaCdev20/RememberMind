@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Consolidación instalada el 14/11/2026:** [valoración inicial de Enfermería dentro de preadmisiones](DECISION_CONSOLIDACION_VALORACION_PREADMISION_2026_11_14.md). El inventario vigente queda en **80 operativas + 25 expertas = 105 de negocio**, más **16 técnicas**.
+
 **Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.
 
 **Contexto escalar por atención —28/10/2026:** [tres columnas opcionales y conservación de 4FN](DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md), sin nuevas tablas/FK/permisos ni listas de informantes/idiomas. La instrucción posterior autoriza esta extensión acotada; el inventario permanece106 de negocio+16 técnicas.

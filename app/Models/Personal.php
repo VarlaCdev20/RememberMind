@@ -31,11 +31,6 @@ class Personal extends ModeloOperativo
         return $this->hasMany(AsignacionPersonal::class, 'cod_personal', 'cod_personal');
     }
 
-    public function valoracionesEnfermeriaPreadmision(): HasMany
-    {
-        return $this->hasMany(ValoracionEnfermeriaPreadmision::class, 'cod_personal_valorador', 'cod_personal');
-    }
-
     public function getNombreAttribute(): ?string
     {
         return $this->asignaciones()->with('area')->first()?->area?->nombre;

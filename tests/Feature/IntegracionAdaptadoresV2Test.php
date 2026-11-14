@@ -185,19 +185,28 @@ class IntegracionAdaptadoresV2Test extends TestCase
 
     public function test_valoracion_inicial_es_dato_estructurado_de_preadmision(): void
     {
-        $usuario = User::query()->firstOrFail();
+        $usuario = User::query()->whereHas('personal')->firstOrFail();
         $preadmision = Preadmision::create([
             'cod_preadmision' => 'PRE_TEST_V2', 'cod_usuario_registro' => $usuario->cod_usuario,
             'nombres' => 'Marta', 'apellido_paterno' => 'Flores', 'fecha_nacimiento' => '1940-01-01',
             'motivo_ingreso' => 'Evaluación integral', 'fecha_solicitud' => now(), 'estado' => 'PENDIENTE',
-            'valoracion_enfermeria' => ['estado_general' => 'ESTABLE', 'riesgo_caida' => 'BAJO'],
         ]);
+        $preadmision->forceFill([
+            'cod_valoracion_enfermeria' => 'VEN_TEST_V2',
+            'valoracion_cod_usuario_registro' => $usuario->getKey(),
+            'valoracion_cod_personal_valorador' => $usuario->personal->getKey(),
+            'valoracion_hay_dolor' => false,
+            'valoracion_hay_heridas' => false,
+            'valoracion_confirmacion_documentacion' => true,
+            'valoracion_estado_general' => 'ESTABLE',
+            'valoracion_riesgo_caida' => 'BAJO',
+        ])->save();
 
         $this->assertSame('ESTABLE', $preadmision->fresh()->valoracion_enfermeria['estado_general']);
-        $this->assertDatabaseHas('valoraciones_enfermeria_preadmision', [
+        $this->assertDatabaseHas('preadmisiones', [
             'cod_preadmision' => $preadmision->cod_preadmision,
-            'estado_general' => 'ESTABLE',
-            'riesgo_caida' => 'BAJO',
+            'valoracion_estado_general' => 'ESTABLE',
+            'valoracion_riesgo_caida' => 'BAJO',
         ]);
         $this->assertFalse(Schema::hasColumn('preadmisiones', 'valoracion_enfermeria'));
         $this->assertFalse(Schema::hasColumn('prescripciones', 'cod_med_adulto'));

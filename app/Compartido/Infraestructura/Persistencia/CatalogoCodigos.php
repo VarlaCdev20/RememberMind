@@ -110,7 +110,6 @@ final class CatalogoCodigos
         'turnos' => ['cod_turno', 'TUR'],
         'usuarios' => ['cod_usuario', 'USU'],
         'valoraciones_dolor' => ['cod_valoracion_dolor', 'VDL'],
-        'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],
         'valoraciones_funcionales' => ['cod_valoracion_funcional', 'VFU'],
         'valoraciones_nutricionales' => ['cod_valoracion_nutricional', 'VNU'],
         'valoraciones_psicologicas' => ['cod_valoracion_psicologica', 'VPS'],
@@ -121,6 +120,7 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],
         'clasificaciones_dcl_instantanea' => ['cod_clasificacion_dcl_instantanea', 'CIX'],
         'resultados_criterio' => ['cod_resultado_criterio', 'RCR'],
         'trazas_inferencia' => ['cod_traza_inferencia', 'TRI'],

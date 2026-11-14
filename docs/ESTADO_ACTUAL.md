@@ -33,7 +33,7 @@ Flujo institucional: **preadmisión → revisión → aprobación/rechazo → ad
 
 ## BDD y decisiones vigentes
 
-Inventario documentado tras las extensiones autorizadas: **81 tablas operativas + 25 expertas = 106 de negocio; 16 técnicas; 122 físicas**. Los 70 del diccionario son el núcleo original. Los recuentos anteriores de 100/104 describen otros cortes. Los archivos Eloquent incluyen proyecciones/identidades de bloques consolidados; su número no es un inventario físico de tablas.
+Inventario tras la [consolidación de la valoración inicial del 14/11/2026](base-de-datos/DECISION_CONSOLIDACION_VALORACION_PREADMISION_2026_11_14.md): **80 tablas operativas + 25 expertas = 105 de negocio**, más **16 técnicas**, para **121 físicas**. Los 70 del diccionario describen el núcleo original. Los archivos Eloquent incluyen proyecciones e identidades alternativas de bloques consolidados.
 
 - [Prohibición de crear tablas adicionales, 27/10](base-de-datos/DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md). Ampliar campos exige el alcance autorizado y preservar grano e integridad.
 - [Gerencia35/37, 27/10](base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) y [aviso compartido instalado](base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md).

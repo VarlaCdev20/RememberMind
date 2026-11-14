@@ -94,12 +94,30 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             ->set($this->getValidFormData())
             ->call('guardar');
 
-        $this->assertDatabaseHas('valoraciones_enfermeria_preadmision', [
+        $this->assertDatabaseHas('preadmisiones', [
             'cod_preadmision' => $preadmision->cod_preadmision,
-            'cod_personal_valorador' => $personal->cod_personal,
-            'cod_usuario_registro' => $enfermero->cod_usuario,
-            'estado_general' => 'ESTABLE',
+            'valoracion_cod_personal_valorador' => $personal->cod_personal,
+            'valoracion_cod_usuario_registro' => $enfermero->cod_usuario,
+            'valoracion_estado_general' => 'ESTABLE',
         ]);
+
+        $original = $preadmision->fresh()->valoracionEnfermeriaRegistro();
+        $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
+
+        Livewire::actingAs($superadmin)
+            ->test(ValoracionInicialModal::class)
+            ->call('open', $preadmision->cod_preadmision)
+            ->set($this->getValidFormData())
+            ->set('recomendacion_enfermeria', 'Recomendación actualizada para el caso sintético.')
+            ->call('guardar')
+            ->assertDispatched('valoracionCompletada');
+
+        $actual = $preadmision->fresh()->valoracionEnfermeriaRegistro();
+        $this->assertSame($original->getKey(), $actual->getKey());
+        $this->assertSame($original->cod_usuario_registro, $actual->cod_usuario_registro);
+        $this->assertSame($original->cod_personal_valorador, $actual->cod_personal_valorador);
+        $this->assertSame($original->getRawOriginal('fecha_hora'), $actual->getRawOriginal('fecha_hora'));
+        $this->assertSame('Recomendación actualizada para el caso sintético.', $actual->recomendacion_enfermeria);
     }
 
     /**
@@ -124,7 +142,8 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             ->call('guardar')
             ->assertForbidden();
 
-        $this->assertDatabaseMissing('valoraciones_enfermeria_preadmision', [
+        $this->assertDatabaseHas('preadmisiones', [
+            'cod_valoracion_enfermeria' => null,
             'cod_preadmision' => $preadmision->cod_preadmision,
         ]);
     }
@@ -263,10 +282,10 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             ->call('guardar')
             ->assertOk();
 
-        $this->assertDatabaseHas('valoraciones_enfermeria_preadmision', [
+        $this->assertDatabaseHas('preadmisiones', [
             'cod_preadmision' => $preadmision->cod_preadmision,
-            'cod_personal_valorador' => $superadmin->personal->cod_personal,
-            'cod_usuario_registro' => $superadmin->cod_usuario,
+            'valoracion_cod_personal_valorador' => $superadmin->personal->cod_personal,
+            'valoracion_cod_usuario_registro' => $superadmin->cod_usuario,
         ]);
     }
 
@@ -281,14 +300,18 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
         $enfermero = User::where('correo', 'enfermeria@remembermind.com')->firstOrFail();
         $preadmision = $this->crearPreadmision('PENDIENTE');
 
-        $valoracion = ValoracionEnfermeriaPreadmision::create([
+        $preadmision->forceFill([
+
             'cod_valoracion_enfermeria' => 'VEN_TEST_ED_01',
-            'cod_preadmision' => $preadmision->cod_preadmision,
-            'cod_personal_valorador' => $enfermero->personal->cod_personal,
-            'cod_usuario_registro' => $enfermero->cod_usuario,
-            'fecha_hora' => now(),
-            'estado_general' => 'ESTABLE',
-        ]);
+            'valoracion_hay_dolor' => false,
+            'valoracion_hay_heridas' => false,
+            'valoracion_confirmacion_documentacion' => false,
+            'valoracion_cod_personal_valorador' => $enfermero->personal->cod_personal,
+            'valoracion_cod_usuario_registro' => $enfermero->cod_usuario,
+            'valoracion_fecha_hora' => now(),
+            'valoracion_estado_general' => 'ESTABLE',
+        ])->save();
+        $valoracion = $preadmision->fresh()->valoracionEnfermeriaRegistro();
 
         $this->assertTrue(Gate::forUser($superadmin)->allows('update', $valoracion));
     }
@@ -302,14 +325,18 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
         $superadmin = User::where('correo', 'carlaencinas78@gmail.com')->firstOrFail();
         $preadmision = $this->crearPreadmision('PENDIENTE');
 
-        $valoracion = ValoracionEnfermeriaPreadmision::create([
+        $preadmision->forceFill([
+
             'cod_valoracion_enfermeria' => 'VEN_TEST_DEL_01',
-            'cod_preadmision' => $preadmision->cod_preadmision,
-            'cod_personal_valorador' => $enfermero->personal->cod_personal,
-            'cod_usuario_registro' => $enfermero->cod_usuario,
-            'fecha_hora' => now(),
-            'estado_general' => 'ESTABLE',
-        ]);
+            'valoracion_hay_dolor' => false,
+            'valoracion_hay_heridas' => false,
+            'valoracion_confirmacion_documentacion' => false,
+            'valoracion_cod_personal_valorador' => $enfermero->personal->cod_personal,
+            'valoracion_cod_usuario_registro' => $enfermero->cod_usuario,
+            'valoracion_fecha_hora' => now(),
+            'valoracion_estado_general' => 'ESTABLE',
+        ])->save();
+        $valoracion = $preadmision->fresh()->valoracionEnfermeriaRegistro();
 
         $this->assertFalse(Gate::forUser($enfermero)->allows('delete', $valoracion));
         $this->assertFalse(Gate::forUser($superadmin)->allows('delete', $valoracion));
@@ -363,7 +390,8 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
             ->call('guardar')
             ->assertStatus(422);
 
-        $this->assertDatabaseMissing('valoraciones_enfermeria_preadmision', [
+        $this->assertDatabaseHas('preadmisiones', [
+            'cod_valoracion_enfermeria' => null,
             'cod_preadmision' => $preadmisionAprobada->cod_preadmision,
         ]);
     }
@@ -378,13 +406,16 @@ class ValoracionEnfermeriaAutoriaTest extends TestCase
 
         $this->expectException(QueryException::class);
 
-        DB::table('valoraciones_enfermeria_preadmision')->insert([
+        DB::table('preadmisiones')->where('cod_preadmision', $preadmision->getKey())->update([
             'cod_valoracion_enfermeria' => 'VEN_BAD_FK_CHK',
-            'cod_preadmision' => $preadmision->cod_preadmision,
-            'cod_personal_valorador' => 'PER_INVENTADO_9999',
-            'cod_usuario_registro' => $enfermero->cod_usuario,
-            'fecha_hora' => now(),
-            'estado_general' => 'ESTABLE',
+            'valoracion_cod_personal_valorador' => 'PER_INVENTADO_9999',
+            'valoracion_cod_usuario_registro' => $enfermero->cod_usuario,
+            'valoracion_fecha_hora' => now(),
+            'valoracion_estado_general' => 'ESTABLE',
+
+            'valoracion_hay_dolor' => false,
+            'valoracion_hay_heridas' => false,
+            'valoracion_confirmacion_documentacion' => false,
         ]);
     }
 }

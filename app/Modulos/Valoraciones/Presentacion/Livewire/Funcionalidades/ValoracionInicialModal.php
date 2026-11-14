@@ -6,7 +6,9 @@ use App\Models\Preadmision;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Modulos\Clinica\Aplicacion\Validacion\ValidacionSignosVitalesService;
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarValoracionInicial;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ValoracionInicialModal extends Component
 {
@@ -14,6 +16,7 @@ class ValoracionInicialModal extends Component
 
     public $preadmision;
 
+    #[Locked]
     public ?string $valoracionId = null;
 
     public $estado_general;
@@ -110,10 +113,12 @@ class ValoracionInicialModal extends Component
             return;
         }
 
-        $existente = $this->preadmision->valoracion_enfermeria;
+        $registro = $this->preadmision->valoracionEnfermeriaRegistro();
 
-        if (is_array($existente)) {
-            $this->valoracionId = $this->preadmision->cod_preadmision;
+        if ($registro !== null) {
+            abort_unless(auth()->user()?->can('valoracion_enfermeria.ver'), 403);
+            $existente = $this->preadmision->valoracion_enfermeria;
+            $this->valoracionId = $registro->getKey();
             foreach ($existente as $campo => $valor) {
                 if (property_exists($this, $campo)) {
                     $this->{$campo} = $valor;
@@ -314,7 +319,7 @@ class ValoracionInicialModal extends Component
         ]);
 
         try {
-            app(RegistrarValoracionInicial::class)->ejecutar(auth()->user(), [
+            $codigo = app(RegistrarValoracionInicial::class)->ejecutar(auth()->user(), [
                 'valoracionId' => $this->valoracionId,
                 'orientacion_persona' => $this->orientacion_persona,
                 'orientacion_tiempo' => $this->orientacion_tiempo,
@@ -361,14 +366,17 @@ class ValoracionInicialModal extends Component
                 'icon' => 'success',
             ]);
 
-            $this->dispatch('valoracionCompletada', cod_pre: $this->preadmision->cod_preadmision, cod_val_enf: $this->preadmision->cod_preadmision);
+            $this->dispatch('valoracionCompletada', cod_pre: $this->preadmision->cod_preadmision, cod_val_enf: $codigo);
             $this->dispatch('refreshDashboard');
             $this->close();
+        } catch (HttpExceptionInterface $excepcion) {
+            throw $excepcion;
         } catch (\Throwable $e) {
+            report($e);
 
             $this->dispatch('swal', [
                 'title' => 'Error',
-                'text' => 'Ocurrio un error al guardar la valoracion: '.$e->getMessage(),
+                'text' => 'No se pudo guardar la valoración. Vuelve a abrir el formulario e inténtalo de nuevo.',
                 'icon' => 'error',
             ]);
         }

@@ -2,13 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LogicException;
 
-class ValoracionEnfermeriaPreadmision extends ModeloOperativo
+class ValoracionEnfermeriaPreadmision extends Model
 {
-    protected $table = 'valoraciones_enfermeria_preadmision';
+    protected $table = 'preadmisiones';
+
+    public $incrementing = false;
+
+    public $timestamps = false;
+
+    protected $keyType = 'string';
 
     protected $primaryKey = 'cod_valoracion_enfermeria';
+
+    public function save(array $options = [])
+    {
+        throw new LogicException('La valoración inicial se escribe mediante su preadmisión.');
+    }
+
+    public function delete()
+    {
+        throw new LogicException('La valoración inicial conserva su historial.');
+    }
 
     protected function casts(): array
     {

@@ -124,7 +124,6 @@ class HistoriaResidencialSeeder extends Seeder
             'turnos',
             'usuarios',
             'valoraciones_dolor',
-            'valoraciones_enfermeria_preadmision',
             'valoraciones_funcionales',
             'valoraciones_nutricionales',
             'valoraciones_psicologicas',
@@ -539,8 +538,9 @@ class HistoriaResidencialSeeder extends Seeder
             'permanencia' => 'PERMANENTE', 'prioridad' => 'MEDIA', 'descripcion_caso' => $reason,
             'fecha_solicitud' => $request, 'estado' => 'PENDIENTE']);
         $preadNurse = $this->nurse(substr($review, 0, 10), 0, ($i - 1) % 4);
-        $this->put('valoraciones_enfermeria_preadmision', 'LP_VEP_'.$serial, [
-            'cod_preadmision' => $pre, 'cod_usuario_registro' => str_replace('PER', 'USU', $preadNurse),
+        DB::table('preadmisiones')->where('cod_preadmision', $pre)->update(\App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial::atributos([
+            'cod_valoracion_enfermeria' => 'LP_VEP_'.$serial,
+            'cod_usuario_registro' => str_replace('PER', 'USU', $preadNurse),
             'cod_personal_valorador' => $preadNurse, 'fecha_hora' => $review,
             'estado_general' => 'ESTABLE', 'nivel_conciencia' => 'ALERTA',
             'orientacion_persona' => 'ORIENTADO', 'orientacion_tiempo' => $profile === 'cognicion' ? 'PARCIALMENTE_ORIENTADO' : 'ORIENTADO', 'orientacion_espacio' => 'ORIENTADO',
@@ -558,7 +558,7 @@ class HistoriaResidencialSeeder extends Seeder
             'riesgo_nutricional' => $profile === 'nutricion' ? 'ALTO' : 'BAJO', 'riesgo_cognitivo' => $profile === 'cognicion' ? 'ALTO' : 'BAJO',
             'necesidad_apoyo_inmediato' => false, 'prioridad_sugerida' => 'MEDIA', 'confirmacion_documentacion' => true,
             'recomendacion_enfermeria' => $reason,
-        ]);
+        ]));
         DB::table('preadmisiones')->where('cod_preadmision', $pre)->update([
             'estado' => 'APROBADA', 'cod_usuario_revision' => 'LP_USU_ADMIN', 'fecha_revision' => $review,
         ]);

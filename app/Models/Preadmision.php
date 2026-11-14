@@ -2,23 +2,17 @@
 
 namespace App\Models;
 
+use App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial as Bloque;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class Preadmision extends ModeloOperativo
 {
     protected $table = 'preadmisiones';
 
     protected $primaryKey = 'cod_preadmision';
-
-    /**
-     * Conserva el contrato `$preadmision->valoracion_enfermeria` utilizado por
-     * Livewire mientras el almacenamiento real queda normalizado en una tabla 1:1.
-     */
-    protected ?array $valoracionEnfermeriaPendiente = null;
 
     protected function casts(): array
     {
@@ -44,20 +38,33 @@ class Preadmision extends ModeloOperativo
         return $this->hasMany(Documento::class, 'cod_preadmision', 'cod_preadmision');
     }
 
-    public function valoracionEnfermeriaRegistro(): HasOne
+    public function getHidden()
     {
-        return $this->hasOne(
-            ValoracionEnfermeriaPreadmision::class,
-            'cod_preadmision',
-            'cod_preadmision',
-        );
+        return [...parent::getHidden(), ...Bloque::columnas()];
+    }
+
+    public function getGuarded()
+    {
+        return [...parent::getGuarded(), ...Bloque::columnas()];
+    }
+
+    public function valoracionEnfermeriaRegistro(): ?ValoracionEnfermeriaPreadmision
+    {
+        if ($this->getAttribute(Bloque::CODIGO) === null) {
+            return null;
+        }
+
+        $valores = ['cod_preadmision' => $this->getKey()];
+        foreach (array_keys(Bloque::TIPOS) as $campo) {
+            $valores[$campo] = $this->getAttribute(Bloque::columna($campo));
+        }
+
+        return (new ValoracionEnfermeriaPreadmision)->setRawAttributes($valores, true);
     }
 
     public function getValoracionEnfermeriaAttribute(): ?array
     {
-        $registro = $this->relationLoaded('valoracionEnfermeriaRegistro')
-            ? $this->getRelation('valoracionEnfermeriaRegistro')
-            : $this->valoracionEnfermeriaRegistro()->first();
+        $registro = $this->valoracionEnfermeriaRegistro();
 
         if (! $registro) {
             return null;
@@ -79,62 +86,6 @@ class Preadmision extends ModeloOperativo
         );
 
         return $datos;
-    }
-
-    public function setValoracionEnfermeriaAttribute(mixed $valor): void
-    {
-        $this->valoracionEnfermeriaPendiente = is_array($valor) ? $valor : null;
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(function (self $preadmision): void {
-            if ($preadmision->valoracionEnfermeriaPendiente === null) {
-                return;
-            }
-
-            $datos = $preadmision->valoracionEnfermeriaPendiente;
-            $preadmision->valoracionEnfermeriaPendiente = null;
-
-            $columnas = [
-                'fecha_hora', 'estado_general', 'nivel_conciencia',
-                'orientacion_persona', 'orientacion_tiempo', 'orientacion_espacio',
-                'comunicacion', 'hay_dolor', 'intensidad_dolor', 'ubicacion_dolor',
-                'movilidad', 'apoyo_movilidad', 'riesgo_caida', 'piel_estado',
-                'hay_heridas', 'ubicacion_heridas', 'higiene_ingreso',
-                'continencia_basica', 'alimentacion_aparente', 'pa_sistolica',
-                'pa_diastolica', 'frecuencia_cardiaca', 'frecuencia_respiratoria',
-                'temperatura', 'saturacion_oxigeno', 'peso', 'talla',
-                'antecedentes_relevantes', 'medicacion_referida',
-                'alergias_referidas', 'dependencia_funcional', 'riesgo_nutricional',
-                'riesgo_cognitivo', 'tipo_evaluacion_cognitiva',
-                'necesidad_apoyo_inmediato', 'prioridad_sugerida',
-                'confirmacion_documentacion', 'comentarios_adicionales',
-                'recomendacion_enfermeria',
-            ];
-
-            $valores = Arr::only($datos, $columnas);
-            $valores['cod_usuario_registro'] = $datos['registrado_por'] ?? $datos['cod_usuario_registro'] ?? auth()->id() ?? $preadmision->cod_usuario_registro;
-            $valores['cod_personal_valorador'] = $datos['cod_personal_valorador'] ?? null;
-            if (empty($valores['cod_personal_valorador']) && ! empty($valores['cod_usuario_registro'])) {
-                $personal = Personal::where('cod_usuario', $valores['cod_usuario_registro'])->first();
-                if ($personal) {
-                    $valores['cod_personal_valorador'] = $personal->cod_personal;
-                }
-            }
-            $valores['fecha_hora'] = $datos['fecha_hora'] ?? now();
-
-            $registro = $preadmision->valoracionEnfermeriaRegistro()->first();
-            if ($registro) {
-                $registro->fill($valores)->save();
-            } else {
-                $preadmision->valoracionEnfermeriaRegistro()->create($valores + [
-                    'cod_valoracion_enfermeria' => app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('valoraciones_enfermeria_preadmision'),
-                ]);
-            }
-
-            $preadmision->unsetRelation('valoracionEnfermeriaRegistro');
-        });
     }
 
     public function getCodPreAttribute(): string

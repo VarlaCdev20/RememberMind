@@ -198,23 +198,28 @@ class CasosPreadmisionTest extends TestCase
         ]);
 
         // 2. Valoración de enfermería NO cambia el estado de la preadmisión
-        $caso->valoracion_enfermeria = [
-            'estado_general' => 'BUENO',
-            'nivel_conciencia' => 'ALERTA',
-            'orientacion_persona' => 'ORIENTADO',
-            'orientacion_tiempo' => 'ORIENTADO',
-            'orientacion_espacio' => 'ORIENTADO',
-            'comunicacion' => 'NORMAL',
-            'movilidad' => 'INDEPENDIENTE',
-            'riesgo_caida' => 'BAJO',
-            'talla' => 160.0,
-            'peso' => 65.0,
-        ];
-        $caso->save();
+        $caso->forceFill([
+            'cod_valoracion_enfermeria' => 'VEN_TEST_EST_01',
+            'valoracion_cod_usuario_registro' => $usuario->getKey(),
+            'valoracion_cod_personal_valorador' => $usuario->personal->getKey(),
+            'valoracion_hay_dolor' => false,
+            'valoracion_hay_heridas' => false,
+            'valoracion_confirmacion_documentacion' => true,
+            'valoracion_estado_general' => 'BUENO',
+            'valoracion_nivel_conciencia' => 'ALERTA',
+            'valoracion_orientacion_persona' => 'ORIENTADO',
+            'valoracion_orientacion_tiempo' => 'ORIENTADO',
+            'valoracion_orientacion_espacio' => 'ORIENTADO',
+            'valoracion_comunicacion' => 'NORMAL',
+            'valoracion_movilidad' => 'INDEPENDIENTE',
+            'valoracion_riesgo_caida' => 'BAJO',
+            'valoracion_talla' => 160.0,
+            'valoracion_peso' => 65.0,
+        ])->save();
 
         $casoFresco = $caso->fresh();
         $this->assertSame('PENDIENTE', $casoFresco->estado);
-        $this->assertNotNull($casoFresco->valoracionEnfermeriaRegistro);
+        $this->assertNotNull($casoFresco->valoracionEnfermeriaRegistro());
 
         // 3. No aparece PENDIENTE_VALORACION_MEDICA en la persistencia
         $this->assertDatabaseMissing('preadmisiones', [

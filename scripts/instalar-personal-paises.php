@@ -28,7 +28,7 @@ if (DB::table('migrations')->where('migration',$nombre)->exists()) {
 }
 foreach ($columnasNuevas as $c) if (Schema::hasColumn('personal',$c)) throw new RuntimeException('Estructura parcial o sin registro; no se sobrescribe.');
 $tablas = Schema::getTableListing(); sort($tablas);
-if (count($tablas) !== 122) throw new RuntimeException('Inventario distinto del aprobado; requiere diagnóstico.');
+if (count($tablas) !== (Schema::hasColumn('preadmisiones', 'cod_valoracion_enfermeria') ? 121 : 122)) throw new RuntimeException('Inventario distinto del aprobado; requiere diagnóstico.');
 $hashDdl = hash_file('sha256',base_path($ddl));
 $respaldo = storage_path('app/private/backups/personal-paises-'.now()->format('Ymd-His').'-'.bin2hex(random_bytes(4)).'.dump');
 if (! is_dir(dirname($respaldo))) mkdir(dirname($respaldo),0700,true);

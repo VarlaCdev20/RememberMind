@@ -378,8 +378,9 @@ class Historical2026Seeder extends Seeder
             'permanencia' => 'PERMANENTE', 'prioridad' => 'MEDIA', 'descripcion_caso' => $reason,
             'fecha_solicitud' => $request, 'estado' => 'PENDIENTE']);
         $preadNurse = $this->nurse(substr($review, 0, 10), 0, ($i - 1) % 4);
-        $this->put('valoraciones_enfermeria_preadmision', $this->codigoImportacion('H26_VEP_'.$serial), [
-            'cod_preadmision' => $pre, 'cod_usuario_registro' => \App\Models\Personal::findOrFail($preadNurse)->cod_usuario,
+        DB::table('preadmisiones')->where('cod_preadmision', $pre)->update(\App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial::atributos([
+            'cod_valoracion_enfermeria' => $this->codigoImportacion('H26_VEP_'.$serial),
+            'cod_usuario_registro' => \App\Models\Personal::findOrFail($preadNurse)->cod_usuario,
             'cod_personal_valorador' => $preadNurse, 'fecha_hora' => $review,
             'estado_general' => 'ESTABLE', 'nivel_conciencia' => 'ALERTA',
             'orientacion_persona' => 'ORIENTADO', 'orientacion_tiempo' => $profile === 'cognicion' ? 'PARCIALMENTE_ORIENTADO' : 'ORIENTADO', 'orientacion_espacio' => 'ORIENTADO',
@@ -397,7 +398,7 @@ class Historical2026Seeder extends Seeder
             'riesgo_nutricional' => $profile === 'nutricion' ? 'ALTO' : 'BAJO', 'riesgo_cognitivo' => $profile === 'cognicion' ? 'ALTO' : 'BAJO',
             'necesidad_apoyo_inmediato' => false, 'prioridad_sugerida' => 'MEDIA', 'confirmacion_documentacion' => true,
             'recomendacion_enfermeria' => $reason,
-        ]);
+        ]));
         DB::table('preadmisiones')->where('cod_preadmision', $pre)->update([
             'estado' => 'APROBADA', 'cod_usuario_revision' => $this->codigoImportacion('H26_USU_ADMIN'), 'fecha_revision' => $review,
         ]);

@@ -2,13 +2,16 @@
 
 namespace App\Modulos\Valoraciones\Aplicacion\Acciones;
 
+use App\Compartido\Aplicacion\Contratos\CodigosEntidad;
+use App\Models\Preadmision;
 use App\Models\User;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
+use App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial as Bloque;
 use Illuminate\Support\Facades\DB;
 
 final class RegistrarValoracionInicial
 {
-    public function ejecutar(User $usuario, array $datos): void
+    public function ejecutar(User $usuario, array $datos): string
     {
         $user = $usuario;
         if (! $user || $user->estado !== 'ACTIVO') {
@@ -29,23 +32,25 @@ final class RegistrarValoracionInicial
             abort(403, 'El profesional asociado no se encuentra activo.');
         }
 
-        $esEdicion = ! empty($datos['valoracionId']);
-        $permiso = $esEdicion ? 'valoracion_enfermeria.editar' : 'valoracion_enfermeria.registrar';
-        if (! $user->can($permiso)) {
-            abort(403, "No posee el permiso [{$permiso}] requerido para la operacin.");
-        }
+        abort_if(empty($datos['preadmision']), 422, 'Se requiere una preadmisión.');
 
-        if (! $datos['preadmision'] || $datos['preadmision']->estado !== 'PENDIENTE') {
-            abort(422, 'La preadmisin no se encuentra en un estado admisible para valoracin de enfermera.');
-        }
+        return DB::transaction(function () use ($datos, $user, $personal): string {
+            $preadmision = Preadmision::query()->lockForUpdate()->findOrFail($datos['preadmision']->getKey());
+            abort_unless($preadmision->estado === 'PENDIENTE', 422, 'La preadmisión debe estar pendiente.');
 
-        DB::transaction(function () use ($usuario, $datos, $user, $personal) {
+            $codigo = $preadmision->getAttribute(Bloque::CODIGO);
+            $esEdicion = $codigo !== null;
+            $permiso = $esEdicion ? 'valoracion_enfermeria.editar' : 'valoracion_enfermeria.registrar';
+            abort_unless($user->can($permiso), 403, 'No posee el permiso requerido para la valoración.');
+            abort_unless($codigo === ($datos['valoracionId'] ?? null), 409, 'La valoración cambió. Abra el formulario de nuevo.');
+
+            $registroOriginal = $preadmision->valoracionEnfermeriaRegistro();
+
             $orientacionCombinada = "Persona: {$datos['orientacion_persona']}, Tiempo: {$datos['orientacion_tiempo']}, Espacio: {$datos['orientacion_espacio']}";
             $valoracion = [
-                'fecha_hora' => now()->toIso8601String(),
+                'fecha_hora' => $esEdicion ? $registroOriginal->getRawOriginal('fecha_hora') : now()->toDateTimeString(),
                 'estado_general' => $datos['estado_general'],
                 'nivel_conciencia' => $datos['nivel_conciencia'],
-                'orientacion' => $orientacionCombinada,
                 'orientacion_persona' => $datos['orientacion_persona'],
                 'orientacion_tiempo' => $datos['orientacion_tiempo'],
                 'orientacion_espacio' => $datos['orientacion_espacio'],
@@ -82,21 +87,19 @@ final class RegistrarValoracionInicial
                 'confirmacion_documentacion' => (bool) $datos['confirmacion_documentacion'],
                 'comentarios_adicionales' => $datos['comentarios_adicionales'],
                 'recomendacion_enfermeria' => $datos['recomendacion_enfermeria'],
-                'cod_personal_valorador' => $personal->cod_personal,
-                'registrado_por' => $user->cod_usuario,
+                'cod_personal_valorador' => $esEdicion ? $registroOriginal->cod_personal_valorador : $personal->cod_personal,
+                'cod_usuario_registro' => $esEdicion ? $registroOriginal->cod_usuario_registro : $user->cod_usuario,
             ];
 
-            $datos['preadmision']->update([
-                'estado' => 'PENDIENTE',
-                'prioridad' => $datos['prioridad_sugerida'],
-                'valoracion_enfermeria' => $valoracion,
-            ]);
+            $valoracion[Bloque::CODIGO] = $codigo ?? app(CodigosEntidad::class)->siguiente(Bloque::ORIGEN);
+            $preadmision->forceFill(['prioridad' => $datos['prioridad_sugerida']] + Bloque::atributos($valoracion))->save();
 
             activity('Enfermeria')
-                ->causedBy($usuario)
-                ->performedOn($datos['preadmision'])
+                ->causedBy($user)
+                ->performedOn($preadmision)
                 ->withProperties([
-                    'cod_preadmision' => $datos['preadmision']->cod_preadmision,
+                    'cod_preadmision' => $preadmision->cod_preadmision,
+                    'cod_valoracion_enfermeria' => $valoracion[Bloque::CODIGO],
                     'cod_personal_valorador' => $personal->cod_personal,
                     'cod_usuario_registro' => $user->cod_usuario,
                     'estado_general' => $datos['estado_general'],
@@ -106,8 +109,9 @@ final class RegistrarValoracionInicial
                     'hay_dolor' => $datos['hay_dolor'],
                     'recomendacion' => $datos['recomendacion_enfermeria'],
                 ])
-                ->log('Completo valoracion inicial de enfermeria.');
+                ->log($esEdicion ? 'Editó la valoración inicial de Enfermería.' : 'Registró la valoración inicial de Enfermería.');
 
+            return $valoracion[Bloque::CODIGO];
         });
     }
 }
