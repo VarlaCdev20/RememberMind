@@ -44,6 +44,10 @@ final class RenumerarCodigos
                 if (! in_array($tabla, $tablas, true)) {
                     throw new RuntimeException('Inventario incompleto: '.$tabla);
                 }
+                // Los eventos consolidados conservan las identidades de ingesta e hidratación.
+                if ($tabla === 'registros_consumo') {
+                    continue;
+                }
                 $ids = $db->table($tabla)->pluck($pk)->all();
                 $principal = $tabla === 'usuarios' ? $db->table('usuarios')->where('correo', 'admincasaamandita@gmail.com')->value($pk) : null;
                 usort($ids, function (string $a, string $b) use ($principal): int {

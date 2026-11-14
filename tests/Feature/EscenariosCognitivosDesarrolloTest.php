@@ -100,7 +100,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
             ->whereColumn('n.cod_residente', '!=', 'a.cod_residente')->exists());
         self::assertFalse(DB::table('valoraciones_funcionales as v')->join('atenciones as a', 'v.cod_atencion', '=', 'a.cod_atencion')
             ->where(fn ($q) => $q->whereColumn('v.cod_residente', '!=', 'a.cod_residente')->orWhereColumn('v.cod_personal', '!=', 'a.cod_personal'))->exists());
-        foreach (DB::table('registros_ingesta as i')->join('jornadas as j', 'i.cod_jornada', '=', 'j.cod_jornada')
+        foreach (DB::table('registros_consumo as i')->where('i.tipo_evento', 'INGESTA')->join('jornadas as j', 'i.cod_jornada', '=', 'j.cod_jornada')
             ->get(['i.fecha_hora', 'j.fecha_jornada']) as $registro) {
             self::assertSame(substr($registro->fecha_hora, 0, 10), substr($registro->fecha_jornada, 0, 10));
         }

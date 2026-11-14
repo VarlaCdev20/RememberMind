@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
 use App\Models\Area;
@@ -124,7 +125,7 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
                 $guardados = [];
                 foreach ($plan as $tabla => $grupo) {
                     $campo = $this->campoMarca($tabla);
-                    $originales = DB::table($tabla)->where($campo, 'like', '['.self::VERSION.':%')->get();
+                    $originales = RegistrosConsumo::consulta($tabla)->where($campo, 'like', '['.self::VERSION.':%')->get();
                     $guardados[$tabla] = $originales
                         ->keyBy(function (object $fila) use ($campo): string {
                             return substr($fila->$campo, 1, strpos($fila->$campo, ']') - 1);
@@ -139,12 +140,12 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
                     if ($existe && count($guardados[$tabla]) !== count($grupo)) {
                         throw new RuntimeException('Lote parcial o alterado en '.$tabla.'; no se completará ni sobrescribirá.');
                     }
-                    $pk = CatalogoCodigos::ENTIDADES[$tabla][0];
+                    $pk = CatalogoCodigos::clave($tabla);
                     foreach ($grupo as $clave => $datos) {
                         if ($existe && ! isset($guardados[$tabla][$clave])) {
                             throw new RuntimeException('Falta una observación original del lote: '.$clave);
                         }
-                        $ids[$clave] = $existe ? $guardados[$tabla][$clave]->$pk : app(GeneradorCodigo::class)->siguiente($tabla);
+                        $ids[$clave] = $existe ? $guardados[$tabla][$clave]->{isset(RegistrosConsumo::TIPOS[$tabla]) ? RegistrosConsumo::CODIGO : $pk} : app(GeneradorCodigo::class)->siguiente($tabla);
                     }
                 }
                 foreach ($plan as $tabla => $grupo) {
@@ -158,11 +159,11 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
                         if ($existe) {
                             $this->comparar($tabla, $guardados[$tabla][$clave], $datos);
                         } else {
-                            $filas[] = [CatalogoCodigos::ENTIDADES[$tabla][0] => $ids[$clave]] + $datos;
+                            $filas[] = [CatalogoCodigos::clave($tabla) => $ids[$clave]] + $datos;
                         }
                     }
                     foreach (array_chunk($filas, 150) as $lote) {
-                        DB::table($tabla)->insert($lote);
+                        RegistrosConsumo::insertar($tabla, $lote);
                     }
                 }
                 $rectificaciones = $this->rectificarCoincidencias($enfermero);

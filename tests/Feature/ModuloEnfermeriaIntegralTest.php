@@ -136,7 +136,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             $this->assertArrayHasKey('cantidad_ml', $exception->errors());
         }
 
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_valoracion_dolor_conserva_autoria_y_no_inventa_clasificacion(): void
@@ -169,7 +169,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             ->call('guardarCuidado')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('registros_ingesta', [
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA',
             'cod_residente' => $this->residente->cod_residente,
             'porcentaje_consumido' => 25,
             'estado' => 'VIGENTE',

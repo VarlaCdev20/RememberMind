@@ -350,7 +350,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             ->call('guardarCuidado')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('registros_ingesta', [
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA',
             'cod_residente' => $residente->cod_residente,
             'tipo_comida' => 'Desayuno completo',
             'porcentaje_consumido' => 75,
@@ -369,7 +369,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             ->call('guardarCuidado')
             ->assertHasErrors(['cantidadMl']);
 
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_registro_clinico_no_selecciona_una_intervencion_automaticamente(): void
@@ -417,7 +417,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             ->call('guardarCuidado')
             ->assertHasErrors(['jornada']);
 
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
     }
 
     public function test_guardar_nuevo_evento_registra_en_incidentes_v2_asocia_residente_y_personal_y_no_usa_v1(): void

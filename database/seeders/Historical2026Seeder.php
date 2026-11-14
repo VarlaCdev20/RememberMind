@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Preadmision;
 use App\Models\SignoVital;
 use App\Models\User;
@@ -146,7 +148,7 @@ class Historical2026Seeder extends Seeder
     private function put(string $table, string $id, array $data, bool $buffer = false): void
     {
         // Solo resuelve la PK del esquema aprobado; los atributos se mapean explícitamente debajo.
-        $pk = $this->keys[$table] ??= DB::getSchemaBuilder()->getColumnListing($table)[0];
+        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::TIPOS[$table]) ? CatalogoCodigos::clave($table) : DB::getSchemaBuilder()->getColumnListing($table)[0]);
         $row = [$pk => $id] + $data;
         if (strlen($id) > 20) {
             throw new RuntimeException('Código mayor de 20 caracteres: '.$id);
@@ -154,11 +156,11 @@ class Historical2026Seeder extends Seeder
         if ($buffer) {
             $this->pending[$table][] = $row;
             if (count($this->pending[$table]) >= 300) {
-                DB::table($table)->insert($this->pending[$table]);
+                RegistrosConsumo::insertar($table, $this->pending[$table]);
                 $this->pending[$table] = [];
             }
         } else {
-            DB::table($table)->insert($row);
+            RegistrosConsumo::insertar($table, [$row]);
         }
     }
 
@@ -166,7 +168,7 @@ class Historical2026Seeder extends Seeder
     {
         foreach ($this->pending as $table => $rows) {
             if ($rows) {
-                DB::table($table)->insert($rows);
+                RegistrosConsumo::insertar($table, $rows);
             }
         }
         $this->pending = [];
@@ -935,8 +937,8 @@ class Historical2026Seeder extends Seeder
             }
             foreach (['signos_vitales', 'valoraciones_dolor', 'registros_conductuales', 'registros_ingesta', 'registros_hidratacion', 'registros_eliminacion', 'registros_movilidad', 'ejecuciones_cuidado'] as $table) {
                 $time = $table === 'ejecuciones_cuidado' ? 'fecha_hora_ejecucion' : 'fecha_hora';
-                $dates = DB::table($table)->where('cod_residente', $a->cod_residente)->whereNotNull($time)->selectRaw('COUNT(DISTINCT DATE('.$time.')) AS n')->value('n');
-                if ((int) $dates !== $days || DB::table($table)->where('cod_residente', $a->cod_residente)->where(function ($q) use ($a, $time) {
+                $dates = RegistrosConsumo::consulta($table)->where('cod_residente', $a->cod_residente)->whereNotNull($time)->selectRaw('COUNT(DISTINCT DATE('.$time.')) AS n')->value('n');
+                if ((int) $dates !== $days || RegistrosConsumo::consulta($table)->where('cod_residente', $a->cod_residente)->where(function ($q) use ($a, $time) {
                     $q->where($time, '<', $a->fecha_hora_admision)->orWhere($time, '>', self::CUTOFF);
                 })->exists()) {
                     throw new RuntimeException('Cobertura diaria o fechas inválidas en '.$table.'.');
@@ -954,7 +956,7 @@ class Historical2026Seeder extends Seeder
                 }
             }
             foreach (['valoraciones_psicologicas', 'valoraciones_nutricionales', 'valoraciones_funcionales', 'seguimientos_pedagogicos', 'aplicaciones_instrumento', 'mediciones_antropometricas'] as $table) {
-                if (DB::table($table)->where('cod_residente', $a->cod_residente)->count() !== $assessments) {
+                if (RegistrosConsumo::consulta($table)->where('cod_residente', $a->cod_residente)->count() !== $assessments) {
                     throw new RuntimeException('Valoraciones incompletas en '.$table.'.');
                 }
             }

@@ -47,7 +47,7 @@ final class GestionarCuidadosHttp
         }
         /** @var class-string<Model> $modelo */
         $modelo = $definicion['modelo'];
-        $registro = $modelo::query()->create([$definicion['pk'] => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente((new $modelo)->getTable()), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, ...$definicion['valores']]);
+        $registro = $modelo::query()->create([$definicion['pk'] => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente((new $modelo)->entidadCodigo()), 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, ...$datos, ...$definicion['valores']]);
 
         return $registro;
     }

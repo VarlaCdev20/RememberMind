@@ -42,14 +42,19 @@ abstract class ModeloOperativo extends Model
         return $this->belongsTo(User::class, 'cod_usuario', 'cod_usuario');
     }
 
+    public function entidadCodigo(): string
+    {
+        return $this->getTable();
+    }
+
     protected static function boot(): void
     {
         parent::boot();
         static::creating(function (self $modelo): void {
             if (empty($modelo->getKey())) {
-                $modelo->setAttribute($modelo->getKeyName(), app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente($modelo->getTable(), $modelo->getConnectionName()));
+                $modelo->setAttribute($modelo->getKeyName(), app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente($modelo->entidadCodigo(), $modelo->getConnectionName()));
             }
-            app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->registrarExplicito($modelo->getTable(), (string) $modelo->getKey(), $modelo->getConnectionName());
+            app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->registrarExplicito($modelo->entidadCodigo(), (string) $modelo->getKey(), $modelo->getConnectionName());
         });
         static::deleting(function (): void {
             throw new \LogicException('Los registros operativos conservan historia y no admiten borrado físico ordinario.');

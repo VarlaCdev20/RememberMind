@@ -2285,7 +2285,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('subtipo', 'Agua')->call('guardarCuidado')->assertHasErrors('cantidadMl')
             ->assertSet('subtipo', 'Agua')->assertSeeHtml('id="hidratacion-volumen-error"')
             ->assertNotDispatched('swal');
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_clinica_sucesiva_conserva_historial_y_autoria(): void
@@ -2296,8 +2296,8 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('250.00')->assertSet('cantidadMl', null);
         $vista->set('subtipo', 'Infusión')->set('cantidadMl', 180)
             ->call('guardarCuidado')->assertHasNoErrors()->assertSee('180.00')->assertSee('250.00');
-        $this->assertDatabaseCount('registros_hidratacion', 2);
-        $this->assertDatabaseHas('registros_hidratacion', ['cod_residente' => $this->residenteEstable->cod_residente,
+        $this->assertSame(2, \App\Models\RegistroHidratacion::count());
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION', 'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal, 'cod_jornada' => 'JOR_MIS_PACIENTES', 'cantidad_ml' => 250]);
     }
 
@@ -2356,7 +2356,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaTipoComida', 'ALMUERZO')
             ->set('ingestaTolerancia', 'INVENTADA')
             ->call('guardarCuidado')->assertHasErrors('tolerancia');
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
     }
 
     public function test_alimentacion_rechaza_porcentaje_fuera_de_rango_y_no_numerico(): void
@@ -2368,7 +2368,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 ->set('ingestaPorcentaje', $porcentaje)
                 ->call('guardarCuidado')->assertHasErrors('porcentaje_consumido');
         }
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
     }
 
     public function test_alimentacion_rechaza_volumen_negativo_y_no_numerico(): void
@@ -2381,7 +2381,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 ->set('ingestaCantidadMl', $volumen)
                 ->call('guardarCuidado')->assertHasErrors('cantidad_ml');
         }
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_alimentacion_guarda_ingesta_e_hidratacion_reales_y_muestra_resultado(): void
@@ -2405,7 +2405,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('registrarOtraIngesta')->assertSet('drawerPaso', 'register-form')
             ->assertSet('ingestaTipoComida', '')->assertSet('ingestaDificultadDeglucion', null);
 
-        $this->assertDatabaseHas('registros_ingesta', [
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal,
             'cod_jornada' => 'JOR_MIS_PACIENTES',
@@ -2416,7 +2416,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'observacion' => 'Necesitó ayuda para comer.',
             'estado' => 'VIGENTE',
         ]);
-        $this->assertDatabaseHas('registros_hidratacion', [
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'cantidad_ml' => 220.25,
             'cod_jornada' => 'JOR_MIS_PACIENTES',
@@ -2432,7 +2432,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaDificultadDeglucion', false)
             ->set('ingestaPorcentaje', '100')
             ->call('guardarCuidado')->assertHasNoErrors();
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_alimentacion_baja_ingesta_conserva_alerta_institucional(): void
@@ -2445,7 +2445,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaPorcentaje', '49.50')
             ->call('guardarCuidado')->assertHasNoErrors();
 
-        $this->assertDatabaseHas('registros_ingesta', [
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'porcentaje_consumido' => 49.50,
         ]);
@@ -2487,7 +2487,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarCuidado')->assertHasErrors('dificultad_deglucion')
             ->assertSet('drawerPaso', 'register-form')->assertSet('ingestaObservacion', 'Dato capturado')
             ->assertSet('ingestaResultado', [])->assertNotDispatched('cuidado-registrado');
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
     }
 
     public function test_ingesta_v2_catalogo_nulos_autoria_y_hora_son_reales(): void
@@ -2511,7 +2511,7 @@ class MisPacientesRedisenadaTest extends TestCase
             $this->assertTrue($registro->fecha_hora->equalTo(now()));
         }
         $this->assertSame($alertas, Alerta::count());
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_ingesta_v2_extremos_decimales_y_umbral_configurado(): void
@@ -2531,7 +2531,7 @@ class MisPacientesRedisenadaTest extends TestCase
             $this->assertSame($alertas + 1, Alerta::count());
         }
         $this->assertDatabaseHas('alertas', ['tipo' => 'BAJA INGESTA', 'prioridad' => 'MEDIO', 'modulo' => 'SEGUIMIENTO']);
-        $this->assertDatabaseCount('registros_hidratacion', 5);
+        $this->assertSame(5, \App\Models\RegistroHidratacion::count());
         $ingesta = RegistroIngesta::first();
         $hidratacion = RegistroHidratacion::first();
         foreach (['cod_residente', 'cod_personal', 'cod_jornada'] as $campo) {
@@ -2556,7 +2556,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertArrayHasKey(array_key_first($dato), $exception->errors());
             }
         }
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
         $registro = $servicio->registrarAlimentacion($this->residenteEstable->cod_residente,
             ['tipo_comida' => 'CENA', 'dificultad_deglucion' => false,
                 'observacion' => str_repeat('á', 5000), 'cantidad_ml' => '999999.99'], $this->enfermero);
@@ -2571,7 +2571,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaCantidadMl', '220.25')->set('ingestaRegistrarLiquidos', false)
             ->assertSet('ingestaCantidadMl', '')->set('ingestaCantidadMl', '220.25')
             ->call('guardarCuidado')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result');
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_ingesta_v2_no_concede_hidratacion_por_manipulacion(): void
@@ -2582,8 +2582,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
         $formulario->set('ingestaRegistrarLiquidos', true)->set('ingestaCantidadMl', '0')
             ->call('guardarCuidado')->assertStatus(403);
-        $this->assertDatabaseCount('registros_ingesta', 0);
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_ingesta_v2_fallo_hidratacion_revierte_transaccion_y_conserva_datos(): void
@@ -2601,8 +2601,8 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('ingestaCantidadMl', '220.25')->assertSet('ingestaResultado', [])
             ->assertNotDispatched('cuidado-registrado')->assertSee('Conservamos los datos')
             ->assertDontSee('Synthetic persistence failure');
-        $this->assertDatabaseCount('registros_ingesta', 0);
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
         $this->assertSame($alertas, Alerta::count());
     }
 
@@ -2638,11 +2638,11 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('ingestaDificultadDeglucion', false)->call('guardarCuidado')->assertHasNoErrors();
         $formulario->call('volverResidenteDesdeIngesta')->assertSet('drawerPaso', 'resident-summary')
             ->assertSet('detalleResidente.cod_residente', $this->residenteEstable->cod_residente);
-        $this->assertDatabaseCount('registros_ingesta', 1);
+        $this->assertSame(1, \App\Models\RegistroIngesta::count());
         $this->formularioAlimentacion()->set('ingestaTipoComida', 'CENA')
             ->set('ingestaDificultadDeglucion', false)->call('guardarCuidado')->assertHasNoErrors()
             ->call('guardarCuidado')->assertStatus(403);
-        $this->assertDatabaseCount('registros_ingesta', 2);
+        $this->assertSame(2, \App\Models\RegistroIngesta::count());
     }
 
     public function test_ingesta_v2_revalida_cuenta_personal_jornada_y_asignacion_al_guardar(): void
@@ -2677,7 +2677,7 @@ class MisPacientesRedisenadaTest extends TestCase
             Jornada::whereKey('JOR_MIS_PACIENTES')->update(['estado' => 'ACTIVA']);
             AsignacionResidenteJornada::where('cod_residente', $this->residenteEstable->cod_residente)->update(['estado' => 'ACTIVA']);
         }
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
     }
 
     public function test_ingesta_v2_fallo_alerta_revierte_ingesta_e_hidratacion(): void
@@ -2694,8 +2694,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario->call('guardarCuidado')->assertHasErrors('ingesta_guardado')
             ->assertSet('ingestaPorcentaje', '10')->assertSet('ingestaResultado', [])
             ->assertNotDispatched('cuidado-registrado');
-        $this->assertDatabaseCount('registros_ingesta', 0);
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
         $this->assertSame($alertas, Alerta::count());
     }
 
@@ -2709,7 +2709,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('limpiarCamposRegistro')->assertSet('ingestaDificultadDeglucion', null)
             ->assertSet('ingestaRegistrarLiquidos', false)->assertSet('ingestaCantidadMl', '')
             ->assertSet('ingestaResidenteContexto', $this->residenteEstable->cod_residente);
-        $this->assertDatabaseCount('registros_ingesta', 0);
+        $this->assertSame(0, \App\Models\RegistroIngesta::count());
         $formulario->set('ingestaRegistrarLiquidos', true)->call('volverPanelDetalle')
             ->assertSet('confirmarDescarte', true)->call('descartarCambios')
             ->assertSet('drawerPaso', 'register-selector');
@@ -3256,7 +3256,7 @@ class MisPacientesRedisenadaTest extends TestCase
         foreach (['0', '-1', '10001', '250.5', 'NaN'] as $cantidad) {
             $vista->set('hidratacionCantidad', $cantidad)->call('guardarHidratacion')->assertHasErrors('cantidad_ml');
         }
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_v2_guarda_opcionales_nulos_autoria_hora_y_resultado_reales(): void
@@ -3272,7 +3272,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertSame($this->personal->cod_personal, $registro->cod_personal);
         $this->assertTrue(now()->equalTo($registro->fecha_hora));
         $vista->call('guardarHidratacion')->assertForbidden();
-        $this->assertDatabaseCount('registros_hidratacion', 1);
+        $this->assertSame(1, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_v2_continuidad_acumulado_jornada_y_historial_por_residente(): void
@@ -3306,7 +3306,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertHasErrors(['tipo_liquido', 'observacion']);
         $vista->set('hidratacionCantidad', '10000')->set('hidratacionTipo', ' Agua ')->set('hidratacionObservacion', ' Aporte observado ')
             ->call('guardarHidratacion')->assertHasNoErrors();
-        $this->assertDatabaseHas('registros_hidratacion', ['cantidad_ml' => 10000, 'tipo_liquido' => 'Agua', 'observacion' => 'Aporte observado']);
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION', 'cantidad_ml' => 10000, 'tipo_liquido' => 'Agua', 'observacion' => 'Aporte observado']);
     }
 
     public function test_hidratacion_v2_limpiar_descartar_y_contexto_bloqueado(): void
@@ -3319,7 +3319,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertDispatched('registro-campos-limpiados');
         $vista->set('hidratacionCantidad', '350')->set('modalCodResidente', $this->residenteCritico->cod_residente)
             ->call('guardarHidratacion')->assertForbidden();
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_v2_servicio_canonico_no_usa_via_ni_campos_ajenos(): void
@@ -3337,19 +3337,19 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertArrayHasKey('datos', $exception->errors());
             }
         }
-        $this->assertDatabaseCount('registros_hidratacion', 1);
+        $this->assertSame(1, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_v2_fallo_real_db_preserva_formulario_y_no_finge_exito(): void
     {
         $vista = $this->formularioHidratacionV2()->set('hidratacionCantidad', '250')->set('hidratacionTipo', 'Agua');
-        DB::unprepared("CREATE TRIGGER hydration_test_failure BEFORE INSERT ON registros_hidratacion BEGIN SELECT RAISE(ABORT, 'controlled hydration failure'); END");
+        DB::unprepared("CREATE TRIGGER hydration_test_failure BEFORE INSERT ON registros_consumo WHEN NEW.tipo_evento = 'HIDRATACION' BEGIN SELECT RAISE(ABORT, 'controlled hydration failure'); END");
         try {
             $vista->call('guardarHidratacion')->assertHasErrors('hidratacion_guardado')
                 ->assertSet('drawerPaso', 'register-form')->assertSet('hidratacionCantidad', '250')
                 ->assertSet('hidratacionTipo', 'Agua')->assertSet('hidratacionResultado', [])
                 ->assertNotDispatched('cuidado-registrado');
-            $this->assertDatabaseCount('registros_hidratacion', 0);
+            $this->assertSame(0, \App\Models\RegistroHidratacion::count());
         } finally {
             DB::unprepared('DROP TRIGGER hydration_test_failure');
         }
@@ -3362,7 +3362,7 @@ class MisPacientesRedisenadaTest extends TestCase
         Role::findByName('ENFERMEROS')->revokePermissionTo('registros_hidratacion.crear');
         $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
         $vista->call('guardarHidratacion')->assertForbidden();
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 
     public function test_hidratacion_v2_no_expone_historial_sin_permiso_de_lectura(): void
@@ -3389,7 +3389,7 @@ class MisPacientesRedisenadaTest extends TestCase
             } catch (HttpException $exception) {
                 $this->assertSame(403, $exception->getStatusCode());
             }
-            $this->assertDatabaseCount('registros_hidratacion', 0);
+            $this->assertSame(0, \App\Models\RegistroHidratacion::count());
         };
         $this->enfermero->estado = 'INACTIVO';
         $denegar();

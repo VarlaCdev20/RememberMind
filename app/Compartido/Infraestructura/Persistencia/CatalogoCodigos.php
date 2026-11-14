@@ -90,10 +90,9 @@ final class CatalogoCodigos
         'preguntas_instrumento' => ['cod_pregunta', 'PRG'],
         'prescripciones' => ['cod_prescripcion', 'PRS'],
         'programaciones_cuidado' => ['cod_programacion', 'PRC'],
+        'registros_consumo' => ['cod_registro_consumo', 'RCS'],
         'registros_conductuales' => ['cod_registro_conductual', 'RCO'],
         'registros_eliminacion' => ['cod_eliminacion', 'REL'],
-        'registros_hidratacion' => ['cod_hidratacion', 'RHI'],
-        'registros_ingesta' => ['cod_ingesta', 'RIN'],
         'registros_movilidad' => ['cod_movilidad', 'RMO'],
         'registros_sueno' => ['cod_registro_sueno', 'RSU'],
         'reglas_expertas' => ['cod_regla_experta', 'REX'],
@@ -120,6 +119,8 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'registros_hidratacion' => ['cod_hidratacion', 'RHI'],
+        'registros_ingesta' => ['cod_ingesta', 'RIN'],
         'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],
         'clasificaciones_dcl_instantanea' => ['cod_clasificacion_dcl_instantanea', 'CIX'],
         'resultados_criterio' => ['cod_resultado_criterio', 'RCR'],

@@ -2281,7 +2281,7 @@ class MisPacientes extends Component
         $base = RegistroHidratacion::query()
             ->where('cod_residente', $this->hidratacionResidenteContexto)
             ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
-        $this->hidratacionHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_hidratacion')
+        $this->hidratacionHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_registro_consumo')
             ->limit(10)->get()->map(fn ($row) => [
                 'codigo' => $row->cod_hidratacion, 'fecha_hora' => $row->fecha_hora->format('Y-m-d\TH:i:s'),
                 'volumen' => $row->cantidad_ml, 'tipo' => $row->tipo_liquido,
@@ -2551,7 +2551,7 @@ class MisPacientes extends Component
         $this->ingestaHistorial = Auth::user()->can('registros_ingesta.ver')
             ? RegistroIngesta::query()->where('cod_residente', $this->ingestaResidenteContexto)
                 ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now())
-                ->orderByDesc('fecha_hora')->orderByDesc('cod_ingesta')->limit(10)->get()
+                ->orderByDesc('fecha_hora')->orderByDesc('cod_registro_consumo')->limit(10)->get()
                 ->map(fn ($row) => ['codigo' => $row->cod_ingesta,
                     'fecha_hora' => $row->fecha_hora->format('Y-m-d\TH:i:s'),
                     'comida' => $this->etiquetaComidaIngesta($row->tipo_comida),

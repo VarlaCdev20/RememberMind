@@ -100,8 +100,8 @@ class SeguimientoDiarioPersistenciaTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('atenciones', ['cod_residente' => 'RES_SEG_DIARIO', 'motivo' => 'SEGUIMIENTO_DIARIO:VIGILANCIA']);
-        $this->assertDatabaseHas('registros_ingesta', ['tipo_comida' => 'DESAYUNO', 'porcentaje_consumido' => 50]);
-        $this->assertDatabaseHas('registros_hidratacion', ['tipo_liquido' => 'AGUA', 'cantidad_ml' => 250]);
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA', 'tipo_comida' => 'DESAYUNO', 'porcentaje_consumido' => 50]);
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION', 'tipo_liquido' => 'AGUA', 'cantidad_ml' => 250]);
         $this->assertDatabaseHas('registros_movilidad', ['marcha' => 'ASISTIDA', 'riesgo_caida' => 'INTENTO_CAMINAR_SOLO']);
         $this->assertDatabaseHas('registros_sueno', ['calidad' => 'INTERRUMPIDO']);
         $this->assertDatabaseHas('controles_cognitivos', ['repite_preguntas' => true]);
@@ -116,10 +116,10 @@ class SeguimientoDiarioPersistenciaTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertDatabaseCount('atenciones', 1);
-        $this->assertDatabaseCount('registros_ingesta', 1);
-        $this->assertDatabaseCount('registros_hidratacion', 1);
-        $this->assertDatabaseHas('registros_ingesta', ['porcentaje_consumido' => 75]);
-        $this->assertDatabaseHas('registros_hidratacion', ['cantidad_ml' => 300]);
+        $this->assertSame(1, \App\Models\RegistroIngesta::count());
+        $this->assertSame(1, \App\Models\RegistroHidratacion::count());
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA', 'porcentaje_consumido' => 75]);
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION', 'cantidad_ml' => 300]);
     }
 
     public function test_seguimiento_rechaza_hidratacion_sin_cantidad_real(): void
@@ -140,6 +140,6 @@ class SeguimientoDiarioPersistenciaTest extends TestCase
             ->assertHasErrors(['cantidadHidratacionMl']);
 
         $this->assertDatabaseCount('atenciones', 0);
-        $this->assertDatabaseCount('registros_hidratacion', 0);
+        $this->assertSame(0, \App\Models\RegistroHidratacion::count());
     }
 }

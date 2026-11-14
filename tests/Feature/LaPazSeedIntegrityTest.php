@@ -63,7 +63,7 @@ class LaPazSeedIntegrityTest extends TestCase
         $this->assertSame(48, DB::table('residentes')->distinct()->count('fecha_nacimiento'));
         $this->assertGreaterThan(10000, DB::table('signos_vitales')->count());
         $this->assertSame('2025-01-06 08:00:00', DB::table('signos_vitales')->min('fecha_hora'));
-        $this->assertFalse(DB::table('registros_hidratacion')->where('fecha_hora', '>', HistoriaResidencialSeeder::CUTOFF)->exists());
+        $this->assertFalse(DB::table('registros_consumo')->where('tipo_evento', 'HIDRATACION')->where('fecha_hora', '>', HistoriaResidencialSeeder::CUTOFF)->exists());
         $this->assertSame($original, $previa->fresh()->getRawOriginal());
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
         $this->assertDatabaseCount('reglas_expertas', 0);
@@ -74,12 +74,12 @@ class LaPazSeedIntegrityTest extends TestCase
         $this->assertTrue(User::findOrFail('LP_USU_MED')->can('prescripciones.crear'));
         $this->assertSame(48, DB::table('residentes_contactos')->distinct()->count('cod_residente'));
         $password = User::findOrFail('LP_USU_MED')->contrasena;
-        $conteos = [DB::table('usuarios')->count(), DB::table('registros_hidratacion')->count(), DB::table('activity_log')->count()];
+        $conteos = [DB::table('usuarios')->count(), DB::table('registros_consumo')->where('tipo_evento', 'HIDRATACION')->count(), DB::table('activity_log')->count()];
         $this->seed(HistoriaResidencialSeeder::class);
-        $this->assertSame($conteos, [DB::table('usuarios')->count(), DB::table('registros_hidratacion')->count(), DB::table('activity_log')->count()]);
+        $this->assertSame($conteos, [DB::table('usuarios')->count(), DB::table('registros_consumo')->where('tipo_evento', 'HIDRATACION')->count(), DB::table('activity_log')->count()]);
         $this->assertSame($password, User::findOrFail('LP_USU_MED')->contrasena);
         // Una sola fila ausente debe detectarse aunque la fecha siga cubierta por otras cuatro.
-        DB::table('registros_hidratacion')->where('cod_hidratacion', 'LP_HI_01_2501060')->delete();
+        DB::table('registros_consumo')->where('tipo_evento', 'HIDRATACION')->where('cod_registro_consumo', 'LP_HI_01_2501060')->delete();
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Número de registros incompleto en registros_hidratacion.');
         $this->seed(HistoriaResidencialSeeder::class);
