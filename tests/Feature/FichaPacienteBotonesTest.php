@@ -165,7 +165,7 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('modalSignos', false);
 
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->adulto->cod_residente,
             'presion_sistolica' => 125,
             'presion_diastolica' => 80,

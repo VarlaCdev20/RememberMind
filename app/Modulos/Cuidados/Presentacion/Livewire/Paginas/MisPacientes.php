@@ -1608,7 +1608,7 @@ class MisPacientes extends Component
         $this->signosHistorial = [];
         if (auth()->user()?->can('signos_vitales.ver')) {
             $historicos = SignoVital::query()->porResidente($codResidente)->vigentes()
-                ->orderByDesc('fecha_hora')->limit(30)->get(['cod_signo', 'fecha_hora', 'presion_sistolica', 'presion_diastolica',
+                ->orderByDesc('fecha_hora')->limit(30)->get(['cod_registro_medicion', 'fecha_hora', 'presion_sistolica', 'presion_diastolica',
                     'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura', 'saturacion_oxigeno', 'glucemia']);
             $objetivosHistoricos = ObjetivoSignoVital::query()->where('cod_residente', $codResidente)->get();
             $alertasHistoricas = auth()->user()?->can('alertas.ver') ? Alerta::query()->where('cod_residente', $codResidente)

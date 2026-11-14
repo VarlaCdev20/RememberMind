@@ -47,7 +47,7 @@ class MisResidentesNavegacionTest extends TestCase
             'cuidado' => 'signos', 'residente' => $this->residenteAsignado->cod_residente,
         ])->assertSee('Cuidados · Signos')->call('abrirCuidadoSeleccionado')
             ->assertSet('registroTipo', 'signos')->assertSet('mostrarSelectorModal', true);
-        $this->assertDatabaseCount('signos_vitales', $signosAntes);
+        $this->assertSame($signosAntes, \App\Models\SignoVital::count());
     }
 
     public function test_cuidado_no_es_accesible_con_permiso_revocado(): void
@@ -62,7 +62,7 @@ class MisResidentesNavegacionTest extends TestCase
         Livewire::actingAs($this->enfermero)->test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\RegistrosEnfermeria::class, [
             'codResidente' => $this->residenteAsignado->cod_residente, 'cuidado' => 'sueno', 'tipo' => 'SUENO',
         ])->assertSee('Sin registros de sueño')->call('guardarCuidado')->assertForbidden();
-        $this->assertDatabaseCount('registros_sueno', 0);
+        $this->assertSame(0, \App\Models\RegistroSueno::count());
     }
 
     public function test_cuidado_heridas_no_admite_curacion_con_permiso_revocado(): void

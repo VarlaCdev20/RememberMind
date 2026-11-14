@@ -208,7 +208,7 @@ class AlertasFlujosPorRolTest extends TestCase
         $panel->call('guardarRegistroEspecialidad')->assertForbidden();
         $this->assertSame($rolesOriginales, $superadmin->fresh()->getRoleNames()->all());
         $this->assertDatabaseCount('eventos_alerta', 0);
-        $this->assertDatabaseCount('valoraciones_nutricionales', 0);
+        $this->assertSame(0, \App\Models\ValoracionNutricional::count());
         $this->assertDatabaseCount('notas_clinicas', 0);
     }
 }

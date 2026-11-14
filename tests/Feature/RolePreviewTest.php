@@ -55,7 +55,7 @@ class RolePreviewTest extends TestCase
         $this->postJson(Livewire::getUpdateUri(), ['components' => [$escritura]])->assertForbidden();
         $this->assertDatabaseCount('alertas', 1);
         $this->assertDatabaseCount('eventos_alerta', 0);
-        $this->assertDatabaseCount('valoraciones_nutricionales', 0);
+        $this->assertSame(0, \App\Models\ValoracionNutricional::count());
     }
 
     public function test_solo_superadmin_puede_activar_preview(): void

@@ -6,7 +6,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarEjecucionesExperimentales;
+use App\Modulos\ApoyoDecision\Aplicacion\Contratos\AlmacenEjecucionesExperimentales;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\RecolectorContextoPerfilExperimental as Recolector;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\ArchivoEjecucionesExperimentales;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DateTimeImmutable;
 use DomainException;
@@ -30,14 +32,14 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         $control = F::evidencia(['memoria_reciente' => null, 'repite_preguntas' => false]);
         $comun = ['cod_residente' => 'SINTETICO-RES', 'cod_personal' => 'SIM-PER', 'cod_atencion' => 'SIM-AT',
             'fecha_hora' => '2026-10-16 12:00:00'];
-        DB::table('valoraciones_psicologicas')->insert($comun + ['cod_valoracion_psicologica' => 'SIM-PSI', 'estado' => 'VIGENTE',
+        DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
             'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']);
-        DB::table('valoraciones_funcionales')->insert($comun + ['cod_valoracion_funcional' => 'SIM-FUNC', 'estado' => 'ACTIVA']);
+        DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'FUNCIONAL', 'cod_valoracion_profesional' => 'SIM-FUNC', 'estado' => 'ACTIVA']);
         DB::table('diagnosticos')->insert($comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']);
         DB::table('antecedentes_clinicos')->insert(['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'tipo_antecedente' => 'PRUEBA_TECNICA', 'descripcion' => 'Antecedente ficticio.',
             'fecha_referencia' => '2026-10-15', 'estado' => 'VIGENTE']);
-        DB::table('registros_sueno')->insert(['cod_registro_sueno' => 'SIM-SUE', 'cod_residente' => 'SINTETICO-RES',
+        DB::table('registros_observaciones_cuidado')->insert(['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SIM-SUE', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'fecha' => '2026-10-16', 'horas_sueno' => '0.00', 'despertares' => 0,
             'insomnio' => false, 'somnolencia_diurna' => null, 'estado' => 'VIGENTE']);
         DB::table('actividades')->insert(['cod_actividad' => 'SIM-ACT', 'cod_area' => 'SIM-AREA', 'cod_personal' => 'SIM-PER',
@@ -79,6 +81,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         self::assertNull($r['petersen']['patron_candidato']);
         self::assertSame($r, (new EjecutarPerfilExperimental)->ejecutar(...$r['instantanea_entrada']));
         Storage::fake('local');
+        $this->app->bind(AlmacenEjecucionesExperimentales::class, ArchivoEjecucionesExperimentales::class);
         $archivo = app(GestionarEjecucionesExperimentales::class);
         $conservado = $archivo->ejecutar($autor, $caso);
         DB::table('controles_cognitivos')->where('cod_control_cognitivo', $selecciones['controles_cognitivos'][0])
@@ -96,7 +99,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
     public function test_futuro_y_fecha_ausente_no_exponen_valores_ni_fabrican_un_instante(): void
     {
         [$autor, $selecciones] = $this->prepararFuentes();
-        DB::table('valoraciones_psicologicas')->where('cod_valoracion_psicologica', 'SIM-PSI')->update(['fecha_hora' => '2026-10-18 12:00:00']);
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('valoraciones_psicologicas')->where('cod_valoracion_profesional', 'SIM-PSI')->update(['fecha_hora' => '2026-10-18 12:00:00']);
         DB::table('antecedentes_clinicos')->where('cod_antecedente', 'SIM-ANT')->update(['fecha_referencia' => null]);
         $fuentes = (new Recolector)->recoger($autor, 'SINTETICO-RES', 'SIM-INTEGRAL-01',
             new DateTimeImmutable('2026-10-17T23:59:59-04:00'), array_intersect_key($selecciones, ['valoraciones_psicologicas' => true, 'antecedentes_clinicos' => true]));

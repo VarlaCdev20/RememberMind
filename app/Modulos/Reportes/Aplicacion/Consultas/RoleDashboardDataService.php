@@ -198,10 +198,11 @@ final class RoleDashboardDataService
         }
 
         $code = $personal->cod_personal;
-        $table = $discipline === 'nutricion' ? 'valoraciones_nutricionales' : 'valoraciones_funcionales';
+        $table = 'valoraciones_profesionales';
         $title = $discipline === 'nutricion' ? 'Valoraciones nutricionales' : 'Valoraciones funcionales';
         $icon = $discipline === 'nutricion' ? 'ph-bowl-food' : 'ph-person-simple-walk';
-        $valuations = DB::table($table)->where('cod_personal', $code);
+        $valuations = DB::table($table)->where('cod_personal', $code)
+            ->where('tipo_evento', $discipline === 'nutricion' ? 'NUTRICIONAL' : 'FUNCIONAL');
         $care = DB::table('atenciones')->where('cod_personal', $code)
             ->where('fecha_hora', '>=', now()->subDays(90));
         $plans = DB::table('planes_cuidado')->where('cod_personal', $code)
@@ -214,9 +215,10 @@ final class RoleDashboardDataService
         $trend = (clone $valuations)->where('fecha_hora', '>=', now()->subDays(30))
             ->selectRaw('DATE(fecha_hora) as label, COUNT(*) as total')
             ->groupByRaw('DATE(fecha_hora)')->orderBy('label')->get();
-        $relatedTable = $discipline === 'nutricion' ? 'mediciones_antropometricas' : 'valoraciones_dolor';
+        $relatedTable = $discipline === 'nutricion' ? 'mediciones_clinicas' : 'valoraciones_dolor';
         $relatedTitle = $discipline === 'nutricion' ? 'Mediciones recientes' : 'Registros de dolor recientes';
         $related = DB::table($relatedTable)->where('cod_personal', $code)
+            ->when($discipline === 'nutricion', fn ($q) => $q->where('tipo_evento', 'ANTROPOMETRIA'))
             ->where('fecha_hora', '>=', now()->subDays(30))
             ->join('residentes as r', 'r.cod_residente', '=', $relatedTable.'.cod_residente')
             ->orderByDesc($relatedTable.'.fecha_hora')->limit(5)

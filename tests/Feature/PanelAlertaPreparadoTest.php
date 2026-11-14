@@ -56,7 +56,7 @@ class PanelAlertaPreparadoTest extends TestCase
             }
         }
         $this->assertDatabaseCount('atenciones', 1);
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
     }
 
     public function test_campana_rechaza_residente_fuera_de_asignacion_y_no_expone_panel(): void
@@ -69,7 +69,7 @@ class PanelAlertaPreparadoTest extends TestCase
         foreach (['verGraficos', 'verUbicacion'] as $metodo) {
             Livewire::test(CampanaNotificaciones::class)->call($metodo, $residente->getKey())->assertForbidden();
         }
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('atenciones', 0);
     }
 

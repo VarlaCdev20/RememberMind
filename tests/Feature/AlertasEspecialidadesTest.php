@@ -73,7 +73,7 @@ class AlertasEspecialidadesTest extends TestCase
                 $panel->set('capturaEspecialidad.requerimiento_hidrico', -1)->call('guardarRegistroEspecialidad')
                     ->assertHasErrors('capturaEspecialidad.requerimiento_hidrico');
                 $this->assertSame($antesAtenciones, Atencion::count());
-                $this->assertDatabaseCount('valoraciones_nutricionales', 0);
+                $this->assertSame(0, \App\Models\ValoracionNutricional::count());
                 $panel->set('capturaEspecialidad.requerimiento_hidrico', '1600.50');
             }
             $panel->call('solicitarCerrarModales')->assertSet('confirmarDescarte', true)->call('continuarCaptura');
@@ -142,7 +142,7 @@ class AlertasEspecialidadesTest extends TestCase
         $alerta = Alerta::create(['cod_residente' => $r->getKey(), 'tipo' => 'SEGUIMIENTO', 'prioridad' => 'MEDIA', 'estado' => 'ABIERTA']);
         Livewire::actingAs($admin)->test(AlertasPanel::class)->call('abrirRegistroEspecialidad', $alerta->getKey())->assertForbidden();
         $this->assertDatabaseCount('notas_clinicas', 0);
-        $this->assertDatabaseCount('valoraciones_nutricionales', 0);
+        $this->assertSame(0, \App\Models\ValoracionNutricional::count());
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
 
@@ -175,7 +175,7 @@ class AlertasEspecialidadesTest extends TestCase
         $auditoriaInicial = DB::table('activity_log')->count();
         $ejecutar();
         $this->assertDatabaseCount('atenciones', 0);
-        $this->assertDatabaseCount('valoraciones_nutricionales', 0);
+        $this->assertSame(0, \App\Models\ValoracionNutricional::count());
         $this->assertDatabaseCount('eventos_alerta', 0);
         $this->assertSame($auditoriaInicial, DB::table('activity_log')->count());
     }

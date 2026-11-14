@@ -67,7 +67,7 @@ class DesacoplamientoContextoTest extends TestCase
             } catch (HttpException $error) {
                 $this->assertSame(403, $error->getStatusCode());
             }
-            $this->assertDatabaseCount('signos_vitales', 0);
+            $this->assertSame(0, \App\Models\SignoVital::count());
             $this->assertDatabaseCount('alertas', 0);
         }
     }

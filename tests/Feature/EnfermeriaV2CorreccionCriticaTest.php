@@ -120,7 +120,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         $vista->call('$refresh')->assertSee('0 h')->assertSee('No registrado')->assertSee('Solo consulta')
             ->assertSee('Observación sintética de descanso.')->assertDontSee('Registrar sueño');
         $this->assertStringNotContainsString('<form', $vista->html());
-        $this->assertDatabaseCount('registros_sueno', 1);
+        $this->assertSame(1, \App\Models\RegistroSueno::count());
         AsignacionResidenteJornada::where('cod_residente', $residente->cod_residente)->update(['estado' => 'FINALIZADA']);
         $vista->call('$refresh')->assertStatus(403);
     }

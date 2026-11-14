@@ -62,7 +62,7 @@ final class ConsultarResumenIntegralResidente
 
         $signos = $residente->signosVitales()->where('fecha_hora', '>=', $desde)->where('fecha_hora', $operadorFinal, $hasta)
             ->whereIn('estado', ['VIGENTE', 'ACTIVO'])->with('registradoPor')
-            ->orderByDesc('fecha_hora')->orderBy('cod_signo')->get();
+            ->orderByDesc('fecha_hora')->orderBy('cod_registro_medicion')->get();
         $interpretaciones = $this->interpretacion->coleccion($signos);
         $presionRevision = $signos->filter(fn ($s) => $this->requiereRevision(
             $interpretaciones[$s->cod_signo]['metricas']['PA']['resultados']

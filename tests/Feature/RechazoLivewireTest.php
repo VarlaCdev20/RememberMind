@@ -57,7 +57,7 @@ class RechazoLivewireTest extends TestCase
             $snapshot = $respuesta->json('components.0.snapshot');
             $this->assertAuthenticatedAs($usuario);
         }
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 
@@ -69,7 +69,7 @@ class RechazoLivewireTest extends TestCase
         $snapshot = $this->snapshotDashboard();
         $usuario->update(['estado' => 'INACTIVO']);
         $this->refrescarPorHttp($snapshot)->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_permiso_retirado_se_revalida_en_la_actualizacion_http(): void
@@ -116,7 +116,7 @@ class RechazoLivewireTest extends TestCase
         $this->actingAs($usuario)->withHeader('X-Livewire', '1')->post('/prueba-rechazo-livewire', [
             'observacion' => 'Contenido clínico sintético que no debe registrarse en logs',
         ])->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_el_middleware_sigue_bloqueando_post_en_preview_y_registra_la_causa(): void

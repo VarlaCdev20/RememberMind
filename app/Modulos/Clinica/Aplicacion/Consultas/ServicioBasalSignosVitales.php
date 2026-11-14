@@ -14,7 +14,7 @@ final class ServicioBasalSignosVitales
             ->whereIn('estado', ['ACTIVO', 'VIGENTE'])
             ->where('fecha_hora', '<=', $fechaMedicion ?? now())
             ->orderByDesc('fecha_hora')->limit(min(max($limite, 1), 20))
-            ->get(['cod_signo', 'fecha_hora', 'presion_sistolica', 'presion_diastolica',
+            ->get(['cod_registro_medicion', 'fecha_hora', 'presion_sistolica', 'presion_diastolica',
                 'frecuencia_cardiaca', 'frecuencia_respiratoria', 'temperatura',
                 'saturacion_oxigeno', 'glucemia'])->toArray();
     }

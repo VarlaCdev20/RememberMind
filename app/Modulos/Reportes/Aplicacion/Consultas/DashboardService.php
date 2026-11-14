@@ -401,11 +401,11 @@ class DashboardService
             ->where('fecha_hora', '>=', now()->subDays(30))
             ->count();
 
-        $altaDependencia = DB::table('valoraciones_funcionales')
+        $altaDependencia = \App\Models\ValoracionFuncional::query()
             ->where('nivel_dependencia', 'ALTA_DEPENDENCIA')
             ->count();
 
-        $signosVitales7d = DB::table('signos_vitales')
+        $signosVitales7d = \App\Models\SignoVital::query()
             ->where('fecha_hora', '>=', now()->subDays(7))
             ->count();
 

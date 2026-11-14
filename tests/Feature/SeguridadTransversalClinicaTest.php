@@ -36,7 +36,7 @@ class SeguridadTransversalClinicaTest extends TestCase
             'conclusion' => 'Evolución favorable con acompañamiento profesional.',
         ])->assertCreated();
 
-        $this->assertDatabaseHas('valoraciones_psicologicas', [
+        $this->assertDatabaseHas('valoraciones_profesionales', ['tipo_evento' => 'PSICOLOGICA',
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $psicologa->personal()->sole()->cod_personal,
             'estado_animo' => 'ESTABLE',
@@ -63,7 +63,7 @@ class SeguridadTransversalClinicaTest extends TestCase
             'estado_animo' => 'ESTABLE',
         ])->assertForbidden();
 
-        $this->assertDatabaseCount('valoraciones_psicologicas', 0);
+        $this->assertSame(0, \App\Models\ValoracionPsicologica::count());
     }
 
     public function test_profesional_sin_asignacion_vigente_no_puede_registrar(): void
@@ -75,7 +75,7 @@ class SeguridadTransversalClinicaTest extends TestCase
             'estado_animo' => 'ESTABLE',
         ])->assertForbidden();
 
-        $this->assertDatabaseCount('valoraciones_psicologicas', 0);
+        $this->assertSame(0, \App\Models\ValoracionPsicologica::count());
     }
 
     public function test_instrumento_calcula_puntaje_desde_la_opcion_activa(): void

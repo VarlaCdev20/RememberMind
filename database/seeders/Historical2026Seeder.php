@@ -875,7 +875,8 @@ class Historical2026Seeder extends Seeder
                 'tipo_nota' => 'EVOLUCION', 'contenido' => 'Evaluación urgente y vigilancia clínica documentadas. Control posterior de pulso 70 lpm, residente alerta y sin molestias. Se mantiene seguimiento, sin diagnóstico automático.',
                 'fecha_hora' => $d.' 09:40:00', 'estado' => 'VIGENTE']);
             $recheck = (array) $source->getRawOriginal();
-            unset($recheck['cod_signo']);
+            unset($recheck[$source->getKeyName()], $recheck['tipo_evento'], $recheck['cod_medicion_antropometrica']);
+            $recheck = array_intersect_key($recheck, array_flip($source->getFillable()));
             $recheck['frecuencia_cardiaca'] = 70;
             $recheck['fecha_hora'] = $d.' 09:30:00';
             $recheck['cod_atencion'] = $at;
@@ -944,7 +945,7 @@ class Historical2026Seeder extends Seeder
                     throw new RuntimeException('Cobertura diaria o fechas inválidas en '.$table.'.');
                 }
             }
-            if (DB::table('registros_sueno')->where('cod_residente', $a->cod_residente)->count() !== $days - 1
+            if (RegistrosConsumo::consulta('registros_sueno')->where('cod_residente', $a->cod_residente)->count() !== $days - 1
                 || DB::table('controles_cognitivos')->where('cod_residente', $a->cod_residente)->count() !== (int) ceil($days / 7)
                 || DB::table('atenciones')->where('cod_residente', $a->cod_residente)->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->count() !== $days) {
                 throw new RuntimeException('Sueño, cognición o seguimiento diario incompletos.');

@@ -34,7 +34,7 @@ final class ResumenSeguimientoResidente
                 ->whereIn('estado', ['ACTIVA', 'VIGENTE', 'HISTORICA'])
                 ->whereHas('atencion', fn ($q) => $q->where('cod_residente', $residente->getKey())
                     ->whereNotIn('estado', ['ANULADA', 'ANULADO', 'CANCELADA', 'CANCELADO']))
-                ->with('registradoPor')->orderByDesc('fecha_hora')->orderBy('cod_valoracion_funcional')->get() : collect(),
+                ->with('registradoPor')->orderByDesc('fecha_hora')->orderBy('cod_valoracion_profesional')->get() : collect(),
             'instrumentos' => $instrumentosAutorizados ? $residente->evaluacionesGeriatricas()
                 ->where('fecha_hora', '>=', $desde)->where('fecha_hora', $final, $hasta)
                 ->whereIn('estado', ['ACTIVA', 'ACTIVO', 'COMPLETA', 'VIGENTE'])

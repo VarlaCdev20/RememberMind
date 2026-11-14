@@ -58,9 +58,11 @@ final class RecolectorContextoPerfilExperimental
                     continue;
                 }
                 $c = $contratos[$tabla];
-                $metadatos = array_values(array_filter([$c['pk'], 'cod_residente', 'cod_personal', 'estado', $c['fecha'], $c['episodio']]));
+                $modelo = new $c['modelo'];
+                $clave = $modelo->getKeyName();
+                $metadatos = array_values(array_filter([$clave, 'cod_residente', 'cod_personal', 'estado', $c['fecha'], $c['episodio']]));
                 $filas = $c['modelo']::on($db->getName())->select($metadatos)->where('cod_residente', $caso)
-                    ->whereIn($c['pk'], $ids)->orderBy($c['pk'])->get();
+                    ->whereIn($clave, $ids)->orderBy($clave)->get();
                 if ($filas->count() !== count($ids)) {
                     throw new RuntimeException('Una fuente no existe o pertenece a otro caso.');
                 }
@@ -74,13 +76,13 @@ final class RecolectorContextoPerfilExperimental
                     $fecha = $fila->getRawOriginal($c['fecha']);
                     $instante = $this->fecha($fecha, $c['precision']);
                     if ($instante !== null && $instante <= $corte) {
-                        $enCorte[] = $fila->getRawOriginal($c['pk']);
+                        $enCorte[] = $fila->getKey();
                     }
                 }
                 $completas = $c['modelo']::on($db->getName())->select(array_values(array_unique([...$metadatos, ...array_keys($c['campos'])])))
-                    ->where('cod_residente', $caso)->whereIn($c['pk'], $enCorte)->get()->keyBy($c['pk']);
+                    ->where('cod_residente', $caso)->whereIn($clave, $enCorte)->get()->keyBy($clave);
                 foreach ($filas as $fila) {
-                    $id = $fila->getRawOriginal($c['pk']);
+                    $id = $fila->getKey();
                     $completa = $completas[$id] ?? null;
                     $motivos = [];
                     if ($completa !== null) {

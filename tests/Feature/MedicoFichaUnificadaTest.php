@@ -176,7 +176,7 @@ class MedicoFichaUnificadaTest extends TestCase
         $modal->set('fc', '131');
         $this->assertSame('CRITICO', $modal->viewData('avisosClinicos')[0]['severidad']);
         $modal->set('fc', '75')->call('guardar')->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
         $signo = SignoVital::create(['cod_residente' => $this->residente->cod_residente,
             'cod_personal' => $this->medico->personal->cod_personal, 'fecha_hora' => now()->addMinute(),
             'saturacion_oxigeno' => 89, 'frecuencia_cardiaca' => 75, 'estado' => 'VIGENTE']);

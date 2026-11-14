@@ -88,7 +88,7 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
     {
         $this->prepararControl();
         $this->cambiarFuente('valoraciones_funcionales', 'cod_valoracion_funcional', 'SIM-BADL', 'SIM-FUNC', 'nivel_dependencia');
-        DB::table('valoraciones_funcionales')->insert(['cod_valoracion_funcional' => 'SIM-FUNC', 'cod_residente' => 'SINTETICO-RES',
+        DB::table('valoraciones_profesionales')->insert(['tipo_evento' => 'FUNCIONAL', 'cod_valoracion_profesional' => 'SIM-FUNC', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'cod_atencion' => 'SIM-AT', 'fecha_hora' => '2026-10-17 12:00:00', 'estado' => 'ACTIVA']);
         $memoria = $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
 

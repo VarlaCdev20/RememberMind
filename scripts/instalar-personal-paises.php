@@ -28,7 +28,7 @@ if (DB::table('migrations')->where('migration',$nombre)->exists()) {
 }
 foreach ($columnasNuevas as $c) if (Schema::hasColumn('personal',$c)) throw new RuntimeException('Estructura parcial o sin registro; no se sobrescribe.');
 $tablas = Schema::getTableListing(); sort($tablas);
-if (count($tablas) !== (122 - (int) Schema::hasColumn('preadmisiones', 'cod_valoracion_enfermeria') - (int) Schema::hasTable('registros_consumo') - (int) Schema::hasColumn('registros_consumo', 'tipo_eliminacion') - (int) Schema::hasTable('registros_observaciones_cuidado') - (int) Schema::hasColumn('nodos_semanticos', 'cod_criterio_dominio_resultado'))) throw new RuntimeException('Inventario distinto del aprobado; requiere diagnóstico.');
+if (count($tablas) !== (122 - (int) Schema::hasColumn('preadmisiones', 'cod_valoracion_enfermeria') - (int) Schema::hasTable('registros_consumo') - (int) Schema::hasColumn('registros_consumo', 'tipo_eliminacion') - (int) Schema::hasTable('registros_observaciones_cuidado') - (int) Schema::hasColumn('nodos_semanticos', 'cod_criterio_dominio_resultado') - (int) Schema::hasColumn('registros_observaciones_cuidado', 'horas_sueno') - (int) Schema::hasTable('mediciones_clinicas') - 2 * (int) Schema::hasTable('valoraciones_profesionales'))) throw new RuntimeException('Inventario distinto del aprobado; requiere diagnóstico.');
 $hashDdl = hash_file('sha256',base_path($ddl));
 $respaldo = storage_path('app/private/backups/personal-paises-'.now()->format('Ymd-His').'-'.bin2hex(random_bytes(4)).'.dump');
 if (! is_dir(dirname($respaldo))) mkdir(dirname($respaldo),0700,true);

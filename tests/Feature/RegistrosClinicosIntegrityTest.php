@@ -91,6 +91,6 @@ class RegistrosClinicosIntegrityTest extends TestCase
         }
 
         $this->assertDatabaseCount('personal', 0);
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 }

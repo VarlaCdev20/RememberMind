@@ -162,8 +162,8 @@ class TallaCanonicaTest extends TestCase
 
         // Intento con talla = 1.70 (en metros) debe fallar por check ck_med_ant_talla
         $this->expectException(QueryException::class);
-        DB::table('mediciones_antropometricas')->insert([
-            'cod_medicion' => 'MED_TEST_'.Str::random(5),
+        DB::table('mediciones_clinicas')->insert([
+            'tipo_evento' => 'ANTROPOMETRIA', 'cod_registro_medicion' => 'MED_TEST_'.Str::random(5),
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
@@ -186,8 +186,8 @@ class TallaCanonicaTest extends TestCase
         ]);
 
         $codMed = 'MED_TEST_'.Str::random(5);
-        DB::table('mediciones_antropometricas')->insert([
-            'cod_medicion' => $codMed,
+        DB::table('mediciones_clinicas')->insert([
+            'tipo_evento' => 'ANTROPOMETRIA', 'cod_registro_medicion' => $codMed,
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $personal->cod_personal,
             'fecha_hora' => now(),
@@ -196,7 +196,7 @@ class TallaCanonicaTest extends TestCase
             'imc' => 24.3,
         ]);
 
-        $guardado = DB::table('mediciones_antropometricas')->where('cod_medicion', $codMed)->first();
+        $guardado = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('mediciones_antropometricas')->where('cod_registro_medicion', $codMed)->first();
         $this->assertNotNull($guardado);
         $this->assertEquals(168.0, (float) $guardado->talla);
     }

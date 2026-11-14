@@ -78,7 +78,8 @@ final class InventarioExperto
         $relacionesSoporte = [['cod_valoracion_petersen', 'valoraciones_petersen_originales', 'cod_valoracion_petersen']];
         foreach (ContratoFuentesPetersen::FUENTES as $fk => [$modelo]) {
             $entidad = new $modelo;
-            $relacionesSoporte[] = [$fk, $entidad->getTable(), $entidad->getKeyName()];
+            $relacionesSoporte[] = [$fk, $entidad->getTable(), $entidad instanceof \App\Models\ValoracionPsicologica
+                ? 'cod_valoracion_psicologica_ref' : $entidad->getKeyName()];
         }
         $captura = [];
         foreach ([

@@ -46,7 +46,7 @@ final class ActividadPsicologicaGeneral extends Component
 
         $personal = $usuario->personal;
         $registros = $seccion === 'informes'
-            ? DB::table('valoraciones_psicologicas as registro')
+            ? DB::table('valoraciones_profesionales as registro')->where('registro.tipo_evento', 'PSICOLOGICA')
             : DB::table('atenciones as registro');
 
         $registros->join('residentes as residente', 'residente.cod_residente', '=', 'registro.cod_residente')
@@ -89,7 +89,7 @@ final class ActividadPsicologicaGeneral extends Component
             'residente.apellido_materno', 'registro.fecha_hora', 'registro.estado',
         ];
         if ($seccion === 'informes') {
-            $columnas[] = 'registro.cod_valoracion_psicologica as clave_registro';
+            $columnas[] = 'registro.cod_valoracion_profesional as clave_registro';
             $columnas[] = 'registro.conclusion';
             $columnas[] = 'registro.recomendacion';
         } else {
@@ -99,7 +99,7 @@ final class ActividadPsicologicaGeneral extends Component
         }
 
         $registros = $registros->orderBy('registro.fecha_hora', $seccion === 'agenda' ? 'asc' : 'desc')
-            ->orderBy('registro.'.($seccion === 'informes' ? 'cod_valoracion_psicologica' : 'cod_atencion'))
+            ->orderBy('registro.'.($seccion === 'informes' ? 'cod_valoracion_profesional' : 'cod_atencion'))
             ->paginate(12, $columnas);
 
         return view('valoraciones::livewire.valoraciones.actividad-psicologica-general', compact('registros', 'seccion'))

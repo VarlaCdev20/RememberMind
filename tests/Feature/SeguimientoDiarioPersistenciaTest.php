@@ -103,7 +103,7 @@ class SeguimientoDiarioPersistenciaTest extends TestCase
         $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'INGESTA', 'tipo_comida' => 'DESAYUNO', 'porcentaje_consumido' => 50]);
         $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'HIDRATACION', 'tipo_liquido' => 'AGUA', 'cantidad_ml' => 250]);
         $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'MOVILIDAD', 'marcha' => 'ASISTIDA', 'riesgo_caida' => 'INTENTO_CAMINAR_SOLO']);
-        $this->assertDatabaseHas('registros_sueno', ['calidad' => 'INTERRUMPIDO']);
+        $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'SUENO','calidad' => 'INTERRUMPIDO']);
         $this->assertDatabaseHas('controles_cognitivos', ['repite_preguntas' => true]);
         $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'CONDUCTA', 'estado_animo' => 'ANSIOSO', 'participacion' => 'PARCIAL']);
 

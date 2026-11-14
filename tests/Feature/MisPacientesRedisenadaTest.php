@@ -544,7 +544,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSee('Resumen del residente');
         $this->assertFalse($vista->instance()->puedeRegistrar());
         $vista->call('mostrarSelectorRegistro')->assertStatus(403);
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
     }
 
     public function test_resumen_del_directorio_sigue_disponible_al_terminar_el_horario_sin_habilitar_registro(): void
@@ -1199,7 +1199,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarSelectorModal', false)
             ->assertSee('PA 124/78');
 
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 124,
             'presion_diastolica' => 78,
@@ -1330,7 +1330,7 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->assertSame($anteriores + 1, SignoVital::query()
             ->where('cod_residente', $this->residenteEstable->cod_residente)->count());
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'frecuencia_cardiaca' => 72,
             'temperatura' => null,
@@ -1355,7 +1355,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $formulario->call('guardarSignos')->assertHasNoErrors();
             }
         }
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'temperatura' => 39.4,
         ]);
@@ -1383,7 +1383,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('signosConfirmacionPendiente', false);
 
         $this->assertSame($alertasAntes, Alerta::query()->count());
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'glucemia' => 251,
         ]);
@@ -1398,14 +1398,14 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarSignos')
             ->assertSet('signosConfirmacionPendiente', true)
             ->assertSee('Presión arterial atípica');
-        $this->assertDatabaseMissing('signos_vitales', [
+        $this->assertDatabaseMissing('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 80,
             'presion_diastolica' => 90,
         ]);
 
         $formulario->call('guardarSignos')->assertHasNoErrors();
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 80,
             'presion_diastolica' => 90,
@@ -3136,7 +3136,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('signoFC', '135')->call('limpiarCamposRegistro')->assertHasNoErrors()
             ->assertSet('signoFC', '')->assertSet('signoTemp', '')->assertSet('signoObs', '')
             ->assertSet('mostrarSelectorModal', true)->assertDispatched('signos-campos-limpiados');
-        $this->assertDatabaseMissing('signos_vitales', ['frecuencia_cardiaca' => 135]);
+        $this->assertDatabaseMissing('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','frecuencia_cardiaca' => 135]);
         $this->assertSame($signosAntes, SignoVital::query()->count());
         $this->assertSame($alertasAntes, Alerta::query()->count());
     }
@@ -3216,7 +3216,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travel(10)->minutes();
         $formulario->call('guardarSignos')->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result');
-        $this->assertDatabaseHas('signos_vitales', ['cod_residente' => $this->residenteEstable->cod_residente,
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $this->residenteEstable->cod_residente,
             'frecuencia_cardiaca' => 72, 'fecha_hora' => Carbon::parse($fecha)]);
     }
 

@@ -17,6 +17,12 @@ final class RegistrosConsumo
         'registros_eliminacion' => ['registros_consumo', 'cod_registro_consumo', 'ELIMINACION', 'cod_eliminacion'],
         'registros_movilidad' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'MOVILIDAD', 'cod_movilidad'],
         'registros_conductuales' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'CONDUCTA', 'cod_registro_conductual'],
+        'registros_sueno' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'SUENO', 'cod_registro_sueno'],
+        'signos_vitales' => ['mediciones_clinicas', 'cod_registro_medicion', 'SIGNOS', 'cod_signo'],
+        'mediciones_antropometricas' => ['mediciones_clinicas', 'cod_registro_medicion', 'ANTROPOMETRIA', 'cod_medicion'],
+        'valoraciones_psicologicas' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PSICOLOGICA', 'cod_valoracion_psicologica'],
+        'valoraciones_nutricionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'NUTRICIONAL', 'cod_valoracion_nutricional'],
+        'valoraciones_funcionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'FUNCIONAL', 'cod_valoracion_funcional'],
     ];
 
     public static function codigo(string $entidad): ?string

@@ -197,6 +197,6 @@ class AccionesModularesClinicasTest extends TestCase
             ->set('escaleras', 0)->set('uso_retrete', 0)->call('guardar')->assertHasNoErrors();
         $this->assertSame('HISTORICA', $primera->fresh()->estado);
         $this->assertStringContainsString('Barthel 80/100', ValoracionFuncional::where('estado', 'ACTIVA')->sole()->conclusion);
-        $this->assertDatabaseCount('valoraciones_funcionales', 2);
+        $this->assertSame(2, \App\Models\ValoracionFuncional::count());
     }
 }

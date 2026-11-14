@@ -43,8 +43,8 @@ class IntegridadFisicaBddV2Test extends TestCase
         $this->assertNotNull($personal);
 
         $this->expectException(QueryException::class);
-        DB::table('signos_vitales')->insert([
-            'cod_signo' => 'SIG_CRUZADO',
+        DB::table('mediciones_clinicas')->insert([
+            'tipo_evento' => 'SIGNOS', 'cod_registro_medicion' => 'SIG_CRUZADO',
             'cod_residente' => 'RES_OTRO',
             'cod_personal' => $personal->cod_personal,
             'cod_atencion' => $atencion->cod_atencion,

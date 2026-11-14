@@ -146,13 +146,18 @@ final readonly class ExtractorVariableMapeada
             }
         }
         $clase = $adaptador::MODELO;
-        $metadatos = [$adaptador::PK, 'cod_residente', 'cod_personal', $adaptador::EPISODIO, 'fecha_hora', 'estado'];
+        $pkFisica = (new $clase)->getKeyName();
+        $pkLogica = $adaptador::PK;
+        $metadatos = [$pkFisica, 'cod_residente', 'cod_personal', $adaptador::EPISODIO, 'fecha_hora', 'estado'];
+        if ($pkFisica !== $pkLogica) {
+            $metadatos[] = $pkFisica.' as '.$pkLogica;
+        }
         if ($adaptador instanceof AdaptadorInstrumentos) {
             $metadatos[] = 'cod_instrumento';
         }
         $residentId = $cabecera->getRawOriginal('cod_residente');
-        $originales = $clase::on($conexion)->select($metadatos)->where('cod_residente', $residentId)->whereIn($adaptador::PK, $ids)
-            ->orderBy($adaptador::PK)->get();
+        $originales = $clase::on($conexion)->select($metadatos)->where('cod_residente', $residentId)->whereIn($pkFisica, $ids)
+            ->orderBy($pkFisica)->get();
         if ($originales->count() !== count($ids)) {
             throw new RuntimeException('Un origen no existe o no pertenece al caso sintético solicitado.');
         }
@@ -170,7 +175,7 @@ final readonly class ExtractorVariableMapeada
         }
         $columnas = array_values(array_unique([...$metadatos, ...array_keys($adaptador::CAMPOS)]));
         $consulta = $clase::on($conexion)->select($columnas)->where('cod_residente', $residentId)
-            ->whereIn($adaptador::PK, $hastaCorte)->where('fecha_hora', '<=', $corte->setTimezone($zona)->format('Y-m-d H:i:s'));
+            ->whereIn($pkFisica, $hastaCorte)->where('fecha_hora', '<=', $corte->setTimezone($zona)->format('Y-m-d H:i:s'));
         if ($adaptador::EPISODIO === 'cod_atencion') {
             $consulta->with('atencion:cod_atencion,cod_residente');
         }

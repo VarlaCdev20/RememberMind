@@ -195,7 +195,7 @@ final class FichaPsicologicaResidenteTest extends TestCase
             ->assertHasNoErrors()
             ->assertSee('Valoración afectiva registrada correctamente');
 
-        $this->assertDatabaseHas('valoraciones_psicologicas', [
+        $this->assertDatabaseHas('valoraciones_profesionales', ['tipo_evento' => 'PSICOLOGICA',
             'cod_residente' => $this->residente->getKey(),
             'estado_animo' => 'EUTIMICO',
             'ansiedad' => 'AUSENTE',
@@ -229,7 +229,7 @@ final class FichaPsicologicaResidenteTest extends TestCase
             ->call('conservarValoracionAfectiva')->assertSet('formAfectiva.conducta', 'Observación sintética pendiente')
             ->call('alternarFormularioAfectivo')->call('descartarValoracionAfectiva')
             ->assertSet('mostrarFormAfectiva', false)->assertSet('formAfectiva.conducta', '');
-        self::assertDatabaseCount('valoraciones_psicologicas', 0);
+        self::assertSame(0, \App\Models\ValoracionPsicologica::count());
     }
 
     public function test_entrevista_muestra_referencia_educativa_sin_modificar_el_expediente(): void

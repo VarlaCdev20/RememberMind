@@ -94,7 +94,7 @@ class HistoriaResidencialSeeder extends Seeder
             'intervenciones_cuidado',
             'jornadas',
             'medicamentos',
-            'mediciones_antropometricas',
+            'mediciones_clinicas',
             'model_has_roles',
             'notas_clinicas',
             'objetivos_signos_vitales',
@@ -110,7 +110,6 @@ class HistoriaResidencialSeeder extends Seeder
             'programaciones_cuidado',
             'registros_consumo',
             'registros_observaciones_cuidado',
-            'registros_sueno',
             'residentes',
             'residentes_contactos',
             'respuestas_instrumento',
@@ -118,14 +117,11 @@ class HistoriaResidencialSeeder extends Seeder
             'seguimientos_pedagogicos',
             'seguros_residente',
             'secuencias_codigos',
-            'signos_vitales',
             'tipos_estudio_clinico',
             'turnos',
             'usuarios',
             'valoraciones_dolor',
-            'valoraciones_funcionales',
-            'valoraciones_nutricionales',
-            'valoraciones_psicologicas',
+            'valoraciones_profesionales',
             'visitas',
         ];
     }
@@ -1063,7 +1059,7 @@ class HistoriaResidencialSeeder extends Seeder
                     throw new RuntimeException('Cobertura diaria o fechas inválidas en '.$table.'.');
                 }
             }
-            if (DB::table('registros_sueno')->where('cod_residente', $a->cod_residente)->count() !== $days - 1
+            if (RegistrosConsumo::consulta('registros_sueno')->where('cod_residente', $a->cod_residente)->count() !== $days - 1
                 || DB::table('controles_cognitivos')->where('cod_residente', $a->cod_residente)->count() !== (int) ceil($days / 7)
                 || DB::table('atenciones')->where('cod_residente', $a->cod_residente)->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->count() !== $days) {
                 throw new RuntimeException('Sueño, cognición o seguimiento diario incompletos.');

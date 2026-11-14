@@ -11,7 +11,7 @@ class RegistroMovilidad extends RegistroConsumo
     protected $table = 'registros_observaciones_cuidado';
     protected $primaryKey = 'cod_observacion_cuidado';
     protected $appends = ['cod_movilidad'];
-    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta'];
+    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta', 'fecha', 'horas_sueno', 'despertares', 'insomnio', 'somnolencia_diurna', 'agitacion_nocturna', 'calidad'];
 
     public function getCodMovilidadAttribute(): ?string
     {

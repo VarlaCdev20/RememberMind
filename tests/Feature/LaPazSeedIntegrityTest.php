@@ -39,7 +39,7 @@ class LaPazSeedIntegrityTest extends TestCase
         Storage::fake('local');
         $this->seed(RolesAndPermissionsSeeder::class);
         $previa = User::factory()->create(['correo' => 'cuenta.conservada@example.invalid']);
-        $original = $previa->getRawOriginal();
+        $original = $previa->fresh()->getRawOriginal();
         // Una instalación poblada ya puede tener estos catálogos con otras PK.
         DB::table('turnos')->insert([
             ['cod_turno' => 'TUR_PRE_0', 'nombre' => 'Guardia de madrugada y mañana', 'hora_inicio' => '00:00:00', 'hora_cierre' => '12:00:00', 'orden' => 1, 'estado' => 'ACTIVO', 'observacion' => 'Texto previo que se conserva.'],
@@ -61,8 +61,8 @@ class LaPazSeedIntegrityTest extends TestCase
         $this->assertDatabaseCount('residentes', 48);
         $this->assertDatabaseCount('camas', 48);
         $this->assertSame(48, DB::table('residentes')->distinct()->count('fecha_nacimiento'));
-        $this->assertGreaterThan(10000, DB::table('signos_vitales')->count());
-        $this->assertSame('2025-01-06 08:00:00', DB::table('signos_vitales')->min('fecha_hora'));
+        $this->assertGreaterThan(10000, \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('signos_vitales')->count());
+        $this->assertSame('2025-01-06 08:00:00', \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('signos_vitales')->min('fecha_hora'));
         $this->assertFalse(DB::table('registros_consumo')->where('tipo_evento', 'HIDRATACION')->where('fecha_hora', '>', HistoriaResidencialSeeder::CUTOFF)->exists());
         $this->assertSame($original, $previa->fresh()->getRawOriginal());
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
@@ -169,7 +169,7 @@ class LaPazSeedIntegrityTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
         $this->assertDatabaseCount('residentes', 0);
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertFalse(DB::table('usuarios')->where('correo', 'like', '%@lapaz.example.invalid')->exists());
     }
 }

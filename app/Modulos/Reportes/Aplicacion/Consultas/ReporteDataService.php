@@ -282,7 +282,7 @@ class ReporteDataService
 
     public function dependenciaDistribucion(): array
     {
-        $resultados = DB::table('valoraciones_funcionales')
+        $resultados = \App\Models\ValoracionFuncional::query()->toBase()
             ->whereNotNull('nivel_dependencia')
             ->select('nivel_dependencia', DB::raw('COUNT(*) as total'))
             ->groupBy('nivel_dependencia')

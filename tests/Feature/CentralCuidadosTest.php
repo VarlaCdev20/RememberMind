@@ -176,7 +176,7 @@ class CentralCuidadosTest extends TestCase
         $this->actingAs($supervisor)->get(route('admin.enfermeria.cuidados'))->assertOk()
             ->assertDontSee('wire:click="abrirRegistro"', false);
         Livewire::actingAs($supervisor)->test(CentralCuidados::class)->call('abrirRegistro')->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_registro_no_ofrece_formularios_con_destino_sin_permiso(): void
@@ -192,8 +192,8 @@ class CentralCuidadosTest extends TestCase
         Livewire::test(CentralCuidados::class)->set('tipo', 'signos')->set('residente', $this->residente->getKey())
             ->call('abrirRegistro')->assertSet('registroTipo', 'signos')->assertSet('registroResidente', $this->residente->getKey())
             ->call('continuarRegistro')->assertRedirect(route('admin.enfermeria.pacientes', ['residente' => $this->residente->getKey(), 'cuidado' => 'signos', 'registrar' => 'cuidado']));
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->get(route('admin.enfermeria.pacientes', ['residente' => $this->residente->getKey(), 'cuidado' => 'signos', 'registrar' => 'cuidado']))->assertOk()->assertSeeHtml('rm-resident-directory__register-modal--signos');
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 }

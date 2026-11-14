@@ -162,7 +162,7 @@ class EstadoEvolucionResidenteTest extends TestCase
         $this->assertSame('200/120', $evidencia['clasificacion']['resultados'][0]['valor']);
         $this->assertSame('PA_CRITICA', $evidencia['clasificacion']['resultados'][0]['codigo_regla']);
         $this->assertDatabaseCount('alertas', 0);
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('diagnosticos', 0);
     }
 

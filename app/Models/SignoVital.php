@@ -5,10 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
-class SignoVital extends ModeloOperativo
+class SignoVital extends RegistroConsumo
 {
-    protected $table = 'signos_vitales';
-    protected $primaryKey = 'cod_signo';
+    protected const TIPO = 'SIGNOS';
+
+    protected const ENTIDAD = 'signos_vitales';
+
+    protected $table = 'mediciones_clinicas';
+
+    protected $primaryKey = 'cod_registro_medicion';
+
+    protected $appends = ['cod_signo'];
+
+    protected $hidden = ['cod_registro_medicion', 'tipo_evento', 'peso', 'talla', 'imc', 'perimetro_braquial', 'perimetro_pantorrilla', 'cod_medicion_antropometrica'];
+
+    public function getCodSignoAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodSignoAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     /**
      * Lista cerrada de columnas V2. Los formularios normalizan sus datos antes
@@ -38,6 +57,8 @@ class SignoVital extends ModeloOperativo
 
     protected static function booted(): void
     {
+        parent::booted();
+
         static::creating(function (self $signo): void {
             if (empty($signo->cod_signo)) {
                 $signo->cod_signo = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('signos_vitales', $signo->getConnectionName());

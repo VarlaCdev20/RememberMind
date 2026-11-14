@@ -44,8 +44,8 @@ final class RenumerarCodigos
                 if (! in_array($tabla, $tablas, true)) {
                     throw new RuntimeException('Inventario incompleto: '.$tabla);
                 }
-                // Los eventos consolidados conservan las identidades de ingesta e hidratación.
-                if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado'], true)) {
+                // Los registros consolidados conservan los correlativos de su entidad lógica.
+                if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado', 'mediciones_clinicas', 'valoraciones_profesionales'], true)) {
                     continue;
                 }
                 $ids = $db->table($tabla)->pluck($pk)->all();

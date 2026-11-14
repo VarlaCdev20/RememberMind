@@ -64,7 +64,7 @@ class Fase3SignosVitalesTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('general', $e->errors());
         }
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('alertas', 0);
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
@@ -74,7 +74,7 @@ class Fase3SignosVitalesTest extends TestCase
     {
         $this->postJson(route('admin.adultos-mayores.signos-vitales.store', $this->residente), $datos)
             ->assertUnprocessable()->assertJsonValidationErrors('signos');
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public static function signosValidos(): array
@@ -91,7 +91,7 @@ class Fase3SignosVitalesTest extends TestCase
         $anterior = $servicio->registrar($this->residente->cod_residente, ['temperatura' => 36.7], $this->usuario);
         $nuevo = $servicio->registrar($this->residente->cod_residente, $datos + ['cod_personal' => 'PERSONAL_AJENO'], $this->usuario);
         $this->assertSame($this->usuario->personal->cod_personal, $nuevo->cod_personal);
-        $this->assertDatabaseCount('signos_vitales', 2);
+        $this->assertSame(2, \App\Models\SignoVital::count());
         $this->assertSame(36.7, $anterior->fresh()->temperatura);
         $this->assertNotSame($anterior->cod_signo, $nuevo->cod_signo);
     }
@@ -104,7 +104,7 @@ class Fase3SignosVitalesTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('presion_arterial', $e->errors());
         }
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_fallo_en_evento_critico_revierte_signo_alerta_y_evento_con_historia_intacta(): void
@@ -118,7 +118,7 @@ class Fase3SignosVitalesTest extends TestCase
         } catch (\RuntimeException $e) {
             $this->assertSame('Fallo técnico sintético de evento', $e->getMessage());
         }
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('alertas', 0);
         $this->assertDatabaseCount('eventos_alerta', 0);
         $this->assertSame(36.7, $anterior->fresh()->temperatura);
@@ -130,7 +130,7 @@ class Fase3SignosVitalesTest extends TestCase
         SignoVital::creating(fn () => throw new \RuntimeException('SQLSTATE sintético /srv/privado.php credencial_sintetica'));
         $this->post(route('admin.adultos-mayores.signos-vitales.store', $this->residente), ['temperatura' => 36.8])
             ->assertRedirect()->assertSessionHas('error', 'No se pudieron registrar los signos vitales. Inténtelo nuevamente.');
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertStringNotContainsString('SQLSTATE', session('error'));
         $this->assertStringNotContainsString('credencial_sintetica', session('error'));
         Exceptions::assertReported(fn (\RuntimeException $e) => str_contains($e->getMessage(), 'credencial_sintetica'));
@@ -170,7 +170,7 @@ class Fase3SignosVitalesTest extends TestCase
         $this->assertSame('CRITICO', $evaluacion->severidadGlobal()->value);
         $this->assertArrayHasKey('temperatura', $evaluacion->erroresCaptura);
         $this->assertCount(1, $evaluacion->resultados);
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('alertas', 0);
     }
 
@@ -269,7 +269,7 @@ class Fase3SignosVitalesTest extends TestCase
             ->set('fc', '75')->set('saturacion', '89')
             ->assertDontSee('Saturación crítica')->call('guardar')->assertOk()
             ->assertHasNoErrors()->assertSet('mostrar', false)->assertDispatched('signos-guardados');
-        $this->assertDatabaseHas('signos_vitales', ['cod_residente' => $this->residente->cod_residente,
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $this->residente->cod_residente,
             'cod_personal' => $this->usuario->personal->cod_personal,
             'frecuencia_cardiaca' => 75, 'saturacion_oxigeno' => 89]);
         $this->assertDatabaseCount('alertas', 0);

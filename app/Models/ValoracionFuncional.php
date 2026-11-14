@@ -5,10 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ValoracionFuncional extends ModeloOperativo
+class ValoracionFuncional extends RegistroConsumo
 {
-    protected $table = 'valoraciones_funcionales';
-    protected $primaryKey = 'cod_valoracion_funcional';
+    protected const TIPO = 'FUNCIONAL';
+
+    protected const ENTIDAD = 'valoraciones_funcionales';
+
+    protected $table = 'valoraciones_profesionales';
+
+    protected $primaryKey = 'cod_valoracion_profesional';
+
+    protected $appends = ['cod_valoracion_funcional'];
+
+    protected $hidden = ['cod_valoracion_profesional', 'tipo_evento', 'estado_animo', 'afecto', 'ansiedad', 'apatia', 'percepcion', 'conducta', 'comunicacion', 'interaccion_social', 'impresion_cognitiva', 'cod_medicion', 'estado_nutricional', 'apetito', 'deglucion', 'riesgo_desnutricion', 'necesidad_asistencia', 'requerimiento_hidrico', 'restricciones_alimentarias', 'cod_valoracion_psicologica_ref'];
+
+    protected $fillable = ['cod_valoracion_funcional', 'cod_residente', 'cod_personal', 'cod_atencion', 'fecha_hora', 'marcha', 'equilibrio', 'traslado', 'fuerza_funcional', 'resistencia', 'alimentacion_autonoma', 'bano_autonomo', 'vestido_autonomo', 'higiene_autonoma', 'continencia', 'movilidad_autonoma', 'necesita_supervision', 'nivel_dependencia', 'conclusion', 'recomendacion', 'estado'];
+
+    public function getCodValoracionFuncionalAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodValoracionFuncionalAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     protected function casts(): array
     {

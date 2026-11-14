@@ -248,7 +248,7 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('guardarSignos')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $pacienteAsignado->cod_residente,
             'presion_sistolica' => 135,
             'presion_diastolica' => 85,

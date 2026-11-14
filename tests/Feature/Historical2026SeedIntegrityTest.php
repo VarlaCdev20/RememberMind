@@ -37,10 +37,10 @@ class Historical2026SeedIntegrityTest extends TestCase
         $this->assertSame(30, DB::table('residentes')->where('estado', 'ADMITIDO')->count());
         $cases = require base_path('database/seeders/data/historical2026.php');
         $expectedDays = array_sum(array_map(fn ($c) => (int) Carbon::parse($c[5])->diffInDays(Carbon::parse('2026-10-08'), true) + 1, $cases));
-        $this->assertDatabaseCount('signos_vitales', $expectedDays + 1);
-        $this->assertDatabaseCount('registros_sueno', $expectedDays - 30);
+        $this->assertSame($expectedDays + 1, \App\Models\SignoVital::count());
+        $this->assertSame($expectedDays - 30, \App\Models\RegistroSueno::count());
         $this->assertSame($expectedDays, DB::table('atenciones')->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->count());
-        $this->assertFalse(DB::table('signos_vitales')->where('fecha_hora', '>', Historical2026Seeder::CUTOFF)->exists());
+        $this->assertFalse(\App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('signos_vitales')->where('fecha_hora', '>', Historical2026Seeder::CUTOFF)->exists());
         $this->assertSame(10, DB::table('preguntas_instrumento')->where('estado', 'ACTIVA')->count());
         $this->assertFalse(DB::table('valoraciones_dolor')->where('intensidad', '>', 0)->where('respuesta', 'No refiere dolor.')->exists());
         $this->assertSame([8, 5, 3], DB::table('valoraciones_dolor')->where('cod_residente', DB::table('residentes')->where('numero_documento', '99000002')->value('cod_residente'))->whereIn('fecha_hora', [Historical2026Seeder::REFERENCE_DATE.' 07:20:00', Historical2026Seeder::REFERENCE_DATE.' 08:20:00', Historical2026Seeder::REFERENCE_DATE.' 09:20:00'])->orderBy('fecha_hora')->pluck('intensidad')->map(fn ($value) => (int) $value)->all());
@@ -57,13 +57,13 @@ class Historical2026SeedIntegrityTest extends TestCase
         $this->assertSame('EN_TURNO', $dashboard['modo']);
         $this->assertNotEmpty($dashboard['residentes']);
         $this->travelBack();
-        $before = DB::table('signos_vitales')->orderBy('cod_signo')->get()->toJson();
+        $before = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('signos_vitales')->orderBy('cod_registro_medicion')->get()->toJson();
         $password = User::where('correo', 'med@remembermind.test')->sole()->contrasena;
         $this->seed(Historical2026Seeder::class);
-        $this->assertSame($before, DB::table('signos_vitales')->orderBy('cod_signo')->get()->toJson());
+        $this->assertSame($before, \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('signos_vitales')->orderBy('cod_registro_medicion')->get()->toJson());
         $this->assertSame($password, User::where('correo', 'med@remembermind.test')->sole()->contrasena);
         // Detecta corrupción en una familia antes omitida; jamás declara verificada una carga incompleta.
-        DB::table('registros_sueno')->where('cod_registro_sueno', DB::table('registros_sueno')->value('cod_registro_sueno'))->delete();
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('registros_sueno')->where('cod_observacion_cuidado', \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('registros_sueno')->value('cod_observacion_cuidado'))->delete();
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Sueño, cognición o seguimiento diario incompletos.');
         $this->seed(Historical2026Seeder::class);

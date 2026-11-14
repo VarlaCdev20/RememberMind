@@ -110,7 +110,7 @@ class Fase3AdmisionAtomicidadTest extends TestCase
             $this->assertStringContainsString('borrado físico', $e->getMessage());
         }
         $this->assertSame($original, $signo->fresh()->getAttributes());
-        $this->assertDatabaseCount('signos_vitales', 1);
+        $this->assertSame(1, \App\Models\SignoVital::count());
     }
 
     public static function puntosDeFallo(): array

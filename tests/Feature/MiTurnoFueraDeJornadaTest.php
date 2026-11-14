@@ -275,7 +275,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             ->assertViewHas('residentes', fn ($residentes) => $residentes->isEmpty());
         Livewire::test(FichaPaciente::class, ['adulto' => $this->residenteCarlos->cod_residente])
             ->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
         $this->assertDatabaseCount('administraciones_medicacion', 0);
     }
 
@@ -290,7 +290,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $pantalla->call('$refresh')->assertSet('esModoConsulta', true)
             ->assertSet('esResidenteAsignado', false)->assertSet('mostrarPanelDetalle', true)
             ->call('mostrarSelectorRegistro')->assertForbidden();
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_historial_de_pases_no_expone_pases_de_residentes_ajenos(): void
@@ -395,7 +395,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertTrue(app()->environment('testing'));
         $this->assertNull($turnos->obtenerTurnoActivo($this->elenaUser));
         $this->assertFalse($turnos->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_enfermero_sin_personal_no_hereda_el_turno_global_del_equipo(): void
@@ -447,7 +447,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $this->assertFalse($cuidados->esPacienteAsignado($this->residenteCarlos, $this->elenaUser));
         $this->assertTrue($cuidados->obtenerPacientesAsignadosQuery($this->elenaUser)
             ->whereKey($this->residenteCarlos->cod_residente)->exists());
-        $this->assertDatabaseCount('signos_vitales', 0);
+        $this->assertSame(0, \App\Models\SignoVital::count());
     }
 
     public function test_jornada_finalizada_permanece_consultable_en_mi_turno_sin_habilitar_escritura(): void
@@ -1045,7 +1045,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             ->call('guardarSignos')
             ->assertSuccessful();
 
-        $this->assertDatabaseHas('signos_vitales', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_personal' => $superUser->personal->cod_personal,
             'presion_sistolica' => 120,
@@ -1064,6 +1064,6 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Livewire::test(DashboardTurno::class)
             ->call('abrirRegistrarSignos', $sinJornada->cod_residente)
             ->assertForbidden();
-        $this->assertDatabaseMissing('signos_vitales', ['cod_residente' => $sinJornada->cod_residente]);
+        $this->assertDatabaseMissing('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $sinJornada->cod_residente]);
     }
 }
