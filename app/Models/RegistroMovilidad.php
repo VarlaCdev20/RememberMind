@@ -4,11 +4,24 @@ namespace App\Models;
 
 use App\Modulos\Cuidados\Aplicacion\Acciones\CuidadosEnfermeriaService as Cuidados;
 
-class RegistroMovilidad extends ModeloOperativo
+class RegistroMovilidad extends RegistroConsumo
 {
-    protected $table = 'registros_movilidad';
+    protected const TIPO = 'MOVILIDAD';
+    protected const ENTIDAD = 'registros_movilidad';
+    protected $table = 'registros_observaciones_cuidado';
+    protected $primaryKey = 'cod_observacion_cuidado';
+    protected $appends = ['cod_movilidad'];
+    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta'];
 
-    protected $primaryKey = 'cod_movilidad';
+    public function getCodMovilidadAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodMovilidadAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     public const CAMPOS_CAPTURA = ['motivo_registro', 'actividad_realizada', 'marcha', 'traslado', 'tipo_apoyo',
         'dispositivo', 'distancia_metros', 'equilibrio', 'fatiga', 'tolerancia_movilidad', 'dolor_movilidad',

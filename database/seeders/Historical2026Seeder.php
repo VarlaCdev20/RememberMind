@@ -148,7 +148,7 @@ class Historical2026Seeder extends Seeder
     private function put(string $table, string $id, array $data, bool $buffer = false): void
     {
         // Solo resuelve la PK del esquema aprobado; los atributos se mapean explícitamente debajo.
-        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::TIPOS[$table]) ? CatalogoCodigos::clave($table) : DB::getSchemaBuilder()->getColumnListing($table)[0]);
+        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::ORIGENES[$table]) ? CatalogoCodigos::clave($table) : DB::getSchemaBuilder()->getColumnListing($table)[0]);
         $row = [$pk => $id] + $data;
         if (strlen($id) > 20) {
             throw new RuntimeException('Código mayor de 20 caracteres: '.$id);

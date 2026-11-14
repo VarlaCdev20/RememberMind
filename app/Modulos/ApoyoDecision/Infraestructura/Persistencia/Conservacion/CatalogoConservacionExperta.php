@@ -72,9 +72,9 @@ final class CatalogoConservacionExperta
                         'codigo_semantico' => $codigo.':'.$criterio->value, 'nombre' => $codigo.':'.$criterio->value,
                         'tipo_nodo' => 'CRITERIO', 'definicion' => self::VERSION, 'estado' => 'ACTIVO',
                         'fecha_hora_creacion' => $fecha, 'cod_usuario_creacion' => $usuario]);
-                    $db->table('criterios_dominios_resultado')->insert(['cod_criterio_dominio_resultado' => $g->siguiente('criterios_dominios_resultado', $conexion),
+                    BloquesExpertos::insertar('criterios_dominios_resultado', ['cod_criterio_dominio_resultado' => $g->siguiente('criterios_dominios_resultado', $conexion),
                         'cod_nodo_criterio' => $n, 'cod_dominio_valores' => $id, 'estado' => 'ACTIVO',
-                        'fecha_hora_creacion' => $fecha, 'cod_usuario_creacion' => $usuario]);
+                        'fecha_hora_creacion' => $fecha, 'cod_usuario_creacion' => $usuario], $conexion);
                 }
             }
         });
@@ -89,7 +89,7 @@ final class CatalogoConservacionExperta
     public static function leer(string $conexion, string $version): array
     {
         $db = ExtractorVariableMapeada::conexionSegura($conexion);
-        $filas = $db->table('nodos_semanticos as n')->join('criterios_dominios_resultado as c', 'c.cod_nodo_criterio', '=', 'n.cod_nodo_semantico')
+        $filas = $db->table('nodos_semanticos as n')->joinSub(BloquesExpertos::consulta('criterios_dominios_resultado', $conexion), 'c', 'c.cod_nodo_criterio', '=', 'n.cod_nodo_semantico')
             ->join('dominios_valores_expertos as d', 'd.cod_dominio_valores', '=', 'c.cod_dominio_valores')
             ->join('valores_semanticos as v', 'v.cod_dominio_valores', '=', 'd.cod_dominio_valores')
             ->where('n.cod_version_modelo', $version)->where('d.cod_version_modelo', $version)

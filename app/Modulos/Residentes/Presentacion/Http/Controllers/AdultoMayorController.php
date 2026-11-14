@@ -216,7 +216,12 @@ class AdultoMayorController extends Controller
     {
         $adultos = Residente::all();
         $totalEvaluaciones = AplicacionInstrumento::count();
-        $distribucionRiesgo = ['bajo' => DB::table('registros_movilidad')->where('riesgo_caida', 'BAJO')->count(), 'medio' => DB::table('registros_movilidad')->where('riesgo_caida', 'MEDIO')->count(), 'alto' => DB::table('registros_movilidad')->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])->count()];
+        $movilidad = \App\Models\RegistroMovilidad::query();
+        $distribucionRiesgo = [
+            'bajo' => (clone $movilidad)->where('riesgo_caida', 'BAJO')->count(),
+            'medio' => (clone $movilidad)->where('riesgo_caida', 'MEDIO')->count(),
+            'alto' => (clone $movilidad)->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])->count(),
+        ];
 
         return view('pages.adultos-mayores.reportes.bienestar', compact('distribucionRiesgo', 'totalEvaluaciones'));
     }

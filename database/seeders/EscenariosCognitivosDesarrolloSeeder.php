@@ -145,7 +145,7 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
                         if ($existe && ! isset($guardados[$tabla][$clave])) {
                             throw new RuntimeException('Falta una observación original del lote: '.$clave);
                         }
-                        $ids[$clave] = $existe ? $guardados[$tabla][$clave]->{isset(RegistrosConsumo::TIPOS[$tabla]) ? RegistrosConsumo::CODIGO : $pk} : app(GeneradorCodigo::class)->siguiente($tabla);
+                        $ids[$clave] = $existe ? $guardados[$tabla][$clave]->{RegistrosConsumo::codigo($tabla) ?? $pk} : app(GeneradorCodigo::class)->siguiente($tabla);
                     }
                 }
                 foreach ($plan as $tabla => $grupo) {

@@ -26,7 +26,7 @@ final class ConsultarConducta
         $resumen = (clone $periodo)->selectRaw('COUNT(*) as total, SUM(CASE WHEN agitacion = true THEN 1 ELSE 0 END) as agitacion, SUM(CASE WHEN ansiedad = true THEN 1 ELSE 0 END) as ansiedad, SUM(CASE WHEN cambio_conducta = true THEN 1 ELSE 0 END) as cambios')->first();
         $historicos = (clone $base)->when($filtro !== '', fn ($query) => $query->where($filtro, true))
             ->with('personal:cod_personal,nombres,apellido_paterno,apellido_materno')
-            ->orderByDesc('fecha_hora')->orderByDesc('cod_registro_conductual')->paginate(12, ['*'], 'conductaHistory', max(1, $pagina));
+            ->orderByDesc('fecha_hora')->orderByDesc('cod_observacion_cuidado')->paginate(12, ['*'], 'conductaHistory', max(1, $pagina));
         $items = $historicos->map(fn (RegistroConductual $item) => $this->fila($item))->all();
 
         return [

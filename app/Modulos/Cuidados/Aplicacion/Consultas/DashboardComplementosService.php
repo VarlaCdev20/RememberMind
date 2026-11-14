@@ -98,7 +98,7 @@ final class DashboardComplementosService
                 ->whereBetween('fecha_hora', [$ahora->copy()->subHours(24), $ahora])
                 ->whereIn('estado', ['VIGENTE', 'ACTIVO', 'ACTIVA'])
                 ->where(fn ($q) => $q->whereRaw("TRIM(COALESCE(estado_animo, '')) <> ''")->orWhereRaw("TRIM(COALESCE(descripcion, '')) <> ''")->orWhere('cambio_conducta', true))
-                ->orderByDesc('fecha_hora')->orderBy('cod_registro_conductual')->limit(3)->get()
+                ->orderByDesc('fecha_hora')->orderBy('cod_observacion_cuidado')->limit(3)->get()
                 ->map(fn ($nota) => [
                     'id' => $nota->cod_registro_conductual,
                     'cod_residente' => $nota->cod_residente,

@@ -413,7 +413,7 @@ class DashboardService
             ->where('fecha_hora', '>=', now()->subDays(30))
             ->count();
 
-        $riesgoCaidaAlto = DB::table('registros_movilidad')
+        $riesgoCaidaAlto = DB::table('registros_observaciones_cuidado')->where('tipo_evento', 'MOVILIDAD')
             ->whereIn('riesgo_caida', ['ALTO', 'INTENTO_CAMINAR_SOLO'])
             ->count();
 

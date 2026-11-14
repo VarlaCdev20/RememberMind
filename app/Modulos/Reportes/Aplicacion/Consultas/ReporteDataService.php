@@ -306,7 +306,7 @@ class ReporteDataService
 
     public function riesgosCaida(): array
     {
-        $resultados = DB::table('registros_movilidad')
+        $resultados = DB::table('registros_observaciones_cuidado')->where('tipo_evento', 'MOVILIDAD')
             ->whereNotNull('riesgo_caida')
             ->select('riesgo_caida', DB::raw('COUNT(*) as total'))
             ->groupBy('riesgo_caida')

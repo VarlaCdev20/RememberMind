@@ -2,10 +2,24 @@
 
 namespace App\Models;
 
-class RegistroEliminacion extends ModeloOperativo
+class RegistroEliminacion extends RegistroConsumo
 {
-    protected $table = 'registros_eliminacion';
-    protected $primaryKey = 'cod_eliminacion';
+    protected const TIPO = 'ELIMINACION';
+    protected const ENTIDAD = 'registros_eliminacion';
+    protected $table = 'registros_consumo';
+    protected $primaryKey = 'cod_registro_consumo';
+    protected $appends = ['cod_eliminacion'];
+    protected $hidden = ['cod_registro_consumo', 'tipo_evento', 'tolerancia', 'tipo_comida', 'porcentaje_consumido', 'apetito', 'dificultad_deglucion', 'cantidad_ml', 'tipo_liquido'];
+
+    public function getCodEliminacionAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodEliminacionAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
     protected $fillable = ['cod_eliminacion', 'cod_residente', 'cod_personal', 'cod_jornada', 'fecha_hora',
         'tipo_eliminacion', 'cantidad', 'caracteristica', 'continencia', 'observacion', 'estado',
         'cantidad_cualitativa', 'volumen_ml', 'color_orina', 'aspecto_orina', 'olor_orina', 'tipo_miccion',

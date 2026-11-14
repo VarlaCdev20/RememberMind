@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // sistema experto 4.16.15; restricciones físicas D-137.
-class CriterioDominioResultado extends ModeloExperto
+class CriterioDominioResultado extends ModeloBloqueExperto
 {
-    protected $table = 'criterios_dominios_resultado';
+    protected const BLOQUE = 'criterios_dominios_resultado';
+
+    protected $table = 'nodos_semanticos';
 
     protected $primaryKey = 'cod_criterio_dominio_resultado';
 

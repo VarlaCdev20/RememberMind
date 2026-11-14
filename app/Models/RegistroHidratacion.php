@@ -8,7 +8,7 @@ class RegistroHidratacion extends RegistroConsumo
 
     protected const ENTIDAD = 'registros_hidratacion';
 
-    protected $hidden = ['cod_registro_consumo', 'tipo_evento', 'tipo_comida', 'porcentaje_consumido', 'apetito', 'dificultad_deglucion'];
+    protected $hidden = ['cod_registro_consumo', 'tipo_evento', 'tipo_comida', 'porcentaje_consumido', 'apetito', 'dificultad_deglucion', 'tipo_eliminacion', 'cantidad', 'caracteristica', 'continencia', 'cantidad_cualitativa', 'volumen_ml', 'color_orina', 'aspecto_orina', 'olor_orina', 'tipo_miccion', 'tipo_bristol', 'color_heces', 'esfuerzo_defecacion', 'presencia_sangre', 'presencia_moco', 'molestia_eliminacion', 'descripcion_molestia'];
 
     protected $appends = ['cod_hidratacion'];
 

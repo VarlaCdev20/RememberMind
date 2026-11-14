@@ -63,7 +63,7 @@ try {
             ->get()->map(fn ($fila): array => (array) $fila)->all() : [];
     $catalogoReglas = [];
     $tablasCatalogo = ['reglas_expertas', 'versiones_modelo_experto', 'condiciones_regla_experta',
-        'consecuencias_regla_experta', 'nodos_semanticos', 'valores_semanticos', 'criterios_dominios_resultado'];
+        'consecuencias_regla_experta', 'nodos_semanticos', 'valores_semanticos'];
     $catalogoDisponible = count(array_filter($tablasCatalogo, fn ($tabla) => $esquema->hasTable($tabla))) === count($tablasCatalogo)
         && $esquema->hasColumn('nodos_semanticos', 'cod_variable_experta');
     if ($catalogoDisponible) {
@@ -75,7 +75,7 @@ try {
             ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as variable', 'v.codigo_valor as valor_esperado'])
             ->groupBy('cod_regla_experta');
         $consecuencias = $conexion->table('consecuencias_regla_experta as c')
-            ->join('criterios_dominios_resultado as d', 'd.cod_criterio_dominio_resultado', '=', 'c.cod_criterio_dominio_resultado')
+            ->joinSub(\App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('criterios_dominios_resultado'), 'd', 'd.cod_criterio_dominio_resultado', '=', 'c.cod_criterio_dominio_resultado')
             ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'd.cod_nodo_criterio')
             ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')
             ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as criterio', 'v.codigo_valor as valor_emitido'])

@@ -2425,7 +2425,7 @@ class MisPacientes extends Component
         $base = RegistroMovilidad::query()->where('cod_residente', $this->movResidenteContexto)
             ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
         $this->movHayMasHistorial = (clone $base)->count() > $this->movLimiteHistorial;
-        $this->movHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_movilidad')->limit($this->movLimiteHistorial)->get()
+        $this->movHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_observacion_cuidado')->limit($this->movLimiteHistorial)->get()
             ->map(fn ($registro) => $registro->resumenOperacional())->all();
         $jornada = app(MiTurnoService::class)->resolverJornadaActual(Auth::user()->personal, now());
         if ($jornada) {
@@ -2474,10 +2474,10 @@ class MisPacientes extends Component
         }
         $base = RegistroEliminacion::query()->where('cod_residente', $this->elimResidenteContexto)
             ->where('estado', 'VIGENTE')->where('fecha_hora', '<=', now());
-        $this->elimHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_eliminacion')->limit(40)->get()
+        $this->elimHistorial = (clone $base)->orderByDesc('fecha_hora')->orderByDesc('cod_registro_consumo')->limit(40)->get()
             ->map(fn ($registro) => $registro->resumenOperacional())->all();
         foreach (['URINARIA', 'INTESTINAL'] as $tipo) {
-            $ultimo = (clone $base)->where('tipo_eliminacion', $tipo)->orderByDesc('fecha_hora')->orderByDesc('cod_eliminacion')->first();
+            $ultimo = (clone $base)->where('tipo_eliminacion', $tipo)->orderByDesc('fecha_hora')->orderByDesc('cod_registro_consumo')->first();
             if ($ultimo) {
                 $this->elimUltimos[$tipo] = $ultimo->resumenOperacional();
             }

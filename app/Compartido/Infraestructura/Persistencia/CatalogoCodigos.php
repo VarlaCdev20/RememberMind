@@ -43,7 +43,6 @@ final class CatalogoCodigos
         'contactos' => ['cod_contacto', 'CTO'],
         'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
         'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
-        'criterios_dominios_resultado' => ['cod_criterio_dominio_resultado', 'CDR'],
         'curaciones_herida' => ['cod_curacion', 'CUR'],
         'derivaciones' => ['cod_derivacion', 'DER'],
         'diagnosticos' => ['cod_diagnostico', 'DIA'],
@@ -90,10 +89,8 @@ final class CatalogoCodigos
         'preguntas_instrumento' => ['cod_pregunta', 'PRG'],
         'prescripciones' => ['cod_prescripcion', 'PRS'],
         'programaciones_cuidado' => ['cod_programacion', 'PRC'],
+        'registros_observaciones_cuidado' => ['cod_observacion_cuidado', 'ROC'],
         'registros_consumo' => ['cod_registro_consumo', 'RCS'],
-        'registros_conductuales' => ['cod_registro_conductual', 'RCO'],
-        'registros_eliminacion' => ['cod_eliminacion', 'REL'],
-        'registros_movilidad' => ['cod_movilidad', 'RMO'],
         'registros_sueno' => ['cod_registro_sueno', 'RSU'],
         'reglas_expertas' => ['cod_regla_experta', 'REX'],
         'relaciones_evidencias_evaluacion' => ['cod_relacion_evidencia', 'REE'],
@@ -119,6 +116,10 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'criterios_dominios_resultado' => ['cod_criterio_dominio_resultado', 'CDR'],
+        'registros_conductuales' => ['cod_registro_conductual', 'RCO'],
+        'registros_eliminacion' => ['cod_eliminacion', 'REL'],
+        'registros_movilidad' => ['cod_movilidad', 'RMO'],
         'registros_hidratacion' => ['cod_hidratacion', 'RHI'],
         'registros_ingesta' => ['cod_ingesta', 'RIN'],
         'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],

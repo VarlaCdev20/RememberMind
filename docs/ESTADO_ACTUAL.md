@@ -33,7 +33,7 @@ Flujo institucional: **preadmisión → revisión → aprobación/rechazo → ad
 
 ## BDD y decisiones vigentes
 
-Inventario tras las consolidaciones del 14/11/2026, incluida la [unión de ingesta e hidratación](base-de-datos/DECISION_CONSOLIDACION_CONSUMO_2026_11_14.md): **79 tablas operativas + 25 expertas = 104 de negocio**, más **16 técnicas**, para **120 físicas**. Los 70 del diccionario describen el núcleo original. Los archivos Eloquent incluyen proyecciones e identidades alternativas de relaciones consolidadas.
+Inventario tras la [consolidación de cuidados y criterios](base-de-datos/DECISION_CONSOLIDACION_CUIDADOS_Y_CRITERIOS_2026_11_14.md) del 14/11/2026. Hay **77 tablas operativas + 24 expertas = 101 de negocio**, más **16 técnicas**, para **117 físicas**. Las 70 tablas del diccionario describen el núcleo original. Eloquent conserva las proyecciones e identidades de los registros consolidados.
 
 - [Prohibición de crear tablas adicionales, 27/10](base-de-datos/DECISION_SIN_NUEVAS_TABLAS_2026_10_27.md). Ampliar campos exige el alcance autorizado y preservar grano e integridad.
 - [Gerencia35/37, 27/10](base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) y [aviso compartido instalado](base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md).

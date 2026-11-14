@@ -29,17 +29,19 @@ DB::beginTransaction();
 DB::statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
 try {
     $inventario = InventarioExperto::diagnosticar(DB::connection());
-    if ($inventario['expertas_presentes'] !== 25 || $inventario['expertas_ausentes'] !== []) {
+    if ($inventario['expertas_presentes'] !== 24 || $inventario['expertas_ausentes'] !== []) {
         throw new RuntimeException('El inventario experto instalado está incompleto.');
     }
-    foreach (BloquesExpertos::DEFINICIONES as $entidad => $d) {
+    foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado'] as $entidad) {
         if (Schema::hasTable($entidad) || Schema::hasView($entidad)) {
             throw new RuntimeException('Una relación retirada permanece como tabla o vista.');
         }
     }
-    foreach (TransicionBloquesExpertos::REFERENCIAS as [$tabla, $cols, $entidad, $destinos]) {
+    $referencias = [...TransicionBloquesExpertos::REFERENCIAS,
+        ['consecuencias_regla_experta', ['cod_criterio_dominio_resultado'], 'criterios_dominios_resultado', ['cod_criterio_dominio_resultado']]];
+    foreach ($referencias as [$tabla, $cols, $entidad, $destinos]) {
         $fks = array_values(array_filter(Schema::getForeignKeys($tabla), static fn ($f) => $f['columns'] === $cols));
-        if (count($fks) !== 1 || $fks[0]['foreign_table'] !== BloquesExpertos::DEFINICIONES[$entidad]['tabla'] || $fks[0]['foreign_columns'] !== $destinos) {
+        if (count($fks) !== 1 || $fks[0]['foreign_table'] !== BloquesExpertos::tablaFisica($entidad) || $fks[0]['foreign_columns'] !== $destinos) {
             throw new RuntimeException('Una FK trasladada no coincide con el contrato.');
         }
     }
@@ -73,11 +75,11 @@ try {
             $simulacionesRecuperadas++;
         }
     }
-    echo json_encode(['expertas_presentes' => 25, 'tablas_fisicas' => $inventario['tablas_fisicas'],
+    echo json_encode(['expertas_presentes' => $inventario['expertas_presentes'], 'tablas_fisicas' => $inventario['tablas_fisicas'],
         'columnas_propietarios' => array_map(static fn ($t) => count(Schema::getColumnListing($t)),
             array_combine(['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'], ['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'])),
         'filas_recuperadas_eloquent' => $filas, 'versiones_conocimiento_leidas' => $versiones,
-        'fk_entrantes_verificadas' => count(TransicionBloquesExpertos::REFERENCIAS),
+        'fk_entrantes_verificadas' => count($referencias),
         'clasificaciones_sinteticas_recuperadas' => $simulacionesRecuperadas,
         'solo_lectura' => true], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL;
 } finally {

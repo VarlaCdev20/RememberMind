@@ -45,7 +45,7 @@ final class RenumerarCodigos
                     throw new RuntimeException('Inventario incompleto: '.$tabla);
                 }
                 // Los eventos consolidados conservan las identidades de ingesta e hidratación.
-                if ($tabla === 'registros_consumo') {
+                if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado'], true)) {
                     continue;
                 }
                 $ids = $db->table($tabla)->pluck($pk)->all();

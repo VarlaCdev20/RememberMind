@@ -37,6 +37,8 @@ class ConsolidacionRegistrosConsumoTest extends TestCase
             'cod_jornada' => $jornada->getKey(), 'fecha_hora' => '2026-11-10 08:10:00', 'estado' => 'VIGENTE',
         ];
         $migracion = require database_path('migrations/2026_11_14_000002_consolidate_registros_consumo.php');
+        $eliminacion = require database_path('migrations/2026_11_14_000003_consolidate_eliminacion_en_consumo.php');
+        $eliminacion->down();
         $migracion->down();
 
         DB::table('registros_ingesta')->insert($base + ['cod_ingesta' => 'EVENTO_01', 'tipo_comida' => 'DESAYUNO', 'porcentaje_consumido' => 75.5, 'dificultad_deglucion' => false]);
@@ -77,5 +79,6 @@ class ConsolidacionRegistrosConsumoTest extends TestCase
         $migracion->down();
         $this->assertEquals($originales, $filas());
         $migracion->up();
+        $eliminacion->up();
     }
 }

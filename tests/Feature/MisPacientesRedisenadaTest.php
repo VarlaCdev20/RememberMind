@@ -2742,7 +2742,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->formularioEliminacion()->assertSee('Eliminación urinaria')->assertSee('Eliminación intestinal')
             ->call('guardarEliminacion')->assertHasErrors('tipo_eliminacion');
         $this->formularioEliminacion()->set('elimTipo', 'AMBAS')->call('guardarEliminacion')->assertHasErrors('tipo_eliminacion');
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_cambiar_tipo_limpia_campos_urinarios_e_intestinales(): void
@@ -2766,7 +2766,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'INTESTINAL')->set('elimDatos.tipo_bristol', 4)
             ->set('elimDatos.volumen_ml', '999')->call('guardarEliminacion')->assertHasErrors('volumen_ml');
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_rechaza_cantidad_negativa_y_continencia_invalida(): void
@@ -2776,7 +2776,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarEliminacion')->assertHasErrors('volumen_ml');
         $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'INTESTINAL')->set('elimDatos.continencia', 'INCONTINENCIA_URINARIA')
             ->call('guardarEliminacion')->assertHasErrors('continencia');
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_guarda_campos_reales_con_autoria_y_observaciones(): void
@@ -2786,7 +2786,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('elimDatos.color_orina', 'AMBAR')->set('elimDatos.continencia', 'CONTINENTE')
             ->set('elimDatos.observacion', '  Requirió asistencia.  ')->call('guardarEliminacion')->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result');
-        $this->assertDatabaseHas('registros_eliminacion', ['cod_residente' => $this->residenteEstable->cod_residente,
+        $this->assertDatabaseHas('registros_consumo', ['tipo_evento' => 'ELIMINACION', 'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal, 'cod_jornada' => 'JOR_MIS_PACIENTES', 'tipo_eliminacion' => 'URINARIA',
             'volumen_ml' => '250.50', 'color_orina' => 'AMBAR', 'continencia' => 'CONTINENTE', 'cantidad' => null, 'caracteristica' => null,
             'observacion' => 'Requirió asistencia.', 'estado' => 'VIGENTE']);
@@ -2807,7 +2807,7 @@ class MisPacientesRedisenadaTest extends TestCase
         Role::findByName('ENFERMEROS')->revokePermissionTo('registros_eliminacion.crear');
         Livewire::test(MisPacientes::class)->call('seleccionarResidente', $this->residenteEstable->cod_residente)
             ->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'eliminacion')->assertStatus(403);
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
     }
 
     private function formularioMovilidad()
@@ -2841,7 +2841,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->formularioMovilidad()
             ->set('movMarcha', 'CAMINATA_INVENTADA')
             ->call('guardarCuidado')->assertHasErrors('marcha');
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_rechaza_catalogos_invalidos_de_traslado_ayuda_y_resultado(): void
@@ -2859,7 +2859,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 ->set($propiedad, 'FUERA_CATALOGO')
                 ->call('guardarCuidado')->assertHasErrors($error);
         }
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_no_muestra_campos_sin_persistencia_ni_crea_incidente(): void
@@ -2906,7 +2906,7 @@ class MisPacientesRedisenadaTest extends TestCase
             $this->assertArrayHasKey('datos', $e->errors());
         }
 
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
         $this->assertDatabaseCount('incidentes', 0);
     }
 
@@ -2925,8 +2925,8 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarCuidado')->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result')->assertSee('Movilidad registrada');
 
-        $this->assertDatabaseHas('registros_movilidad', [
-            'cod_residente' => $this->residenteEstable->cod_residente,
+        $this->assertDatabaseHas('registros_observaciones_cuidado', [
+            'tipo_evento' => 'MOVILIDAD', 'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal,
             'cod_jornada' => 'JOR_MIS_PACIENTES',
             'marcha' => 'ASISTIDA',
@@ -3532,7 +3532,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $form = $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'URINARIA')
             ->set('elimDatos.color_orina', 'OTRO')->call('guardarEliminacion')
             ->assertHasErrors('color_orina_otro')->assertSet('elimDatos.color_orina', 'OTRO');
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
         $form->set('elimDatos.color_orina_otro', 'Matiz observado')->call('solicitarTipoEliminacion', 'INTESTINAL')
             ->call('confirmarTipoEliminacion')->assertSet('elimDatos.color_orina_otro', '');
     }
@@ -3587,13 +3587,13 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('solicitarLimpiezaRegistro')->call('limpiarCamposRegistro')->assertSet('elimTipo', '')->assertSet('elimDatos.volumen_ml', '')
             ->call('solicitarTipoEliminacion', 'URINARIA')->call('guardarEliminacion')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result')
             ->assertSee('Eliminación registrada')->call('guardarEliminacion')->assertStatus(403);
-        $this->assertDatabaseCount('registros_eliminacion', 1);
+        $this->assertSame(1, \App\Models\RegistroEliminacion::count());
         $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'URINARIA')->set('elimDatos.observacion', 'Conservar')
             ->call('cerrarSelectorRegistro')->assertSet('confirmarDescarte', true)->call('cancelarDescarte')->assertSet('elimDatos.observacion', 'Conservar');
         $form = $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'URINARIA');
         Role::findByName('ENFERMEROS')->revokePermissionTo('registros_eliminacion.crear');
         $form->call('guardarEliminacion')->assertStatus(403);
-        $this->assertDatabaseCount('registros_eliminacion', 1);
+        $this->assertSame(1, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_v2_migracion_aditiva_rollback_y_reaplicar_conservan_historia(): void
@@ -3601,7 +3601,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->formularioEliminacion();
         $columns = ['cantidad_cualitativa', 'volumen_ml', 'color_orina', 'aspecto_orina', 'olor_orina', 'tipo_miccion', 'tipo_bristol', 'color_heces', 'esfuerzo_defecacion', 'presencia_sangre', 'presencia_moco', 'molestia_eliminacion', 'descripcion_molestia'];
-        $schema = Schema::getColumns('registros_eliminacion');
+        $tabla = 'registros_consumo';
+        $schema = Schema::getColumns($tabla);
         foreach ($columns as $name) {
             $column = collect($schema)->firstWhere('name', $name);
             $this->assertNotNull($column);
@@ -3611,14 +3612,24 @@ class MisPacientesRedisenadaTest extends TestCase
             'cod_personal' => $this->personal->cod_personal, 'cod_jornada' => 'JOR_MIS_PACIENTES', 'fecha_hora' => now(), 'tipo_eliminacion' => 'URINARIA',
             'cantidad' => '350', 'caracteristica' => 'Amarillo claro', 'estado' => 'VIGENTE']);
         $tables = Schema::getTableListing();
-        $migration = require database_path('migrations/2026_10_09_000200_extend_registros_eliminacion_v2.php');
-        $migration->down();
-        $this->assertSame(count($schema) - 13, count(Schema::getColumns('registros_eliminacion')));
-        $this->assertDatabaseHas('registros_eliminacion', ['cod_eliminacion' => $row->cod_eliminacion, 'cantidad' => '350', 'caracteristica' => 'Amarillo claro']);
-        $migration->up();
+        $consolidacion = require database_path('migrations/2026_11_14_000003_consolidate_eliminacion_en_consumo.php');
+        $consolidacion->down();
+        try {
+            $migration = require database_path('migrations/2026_10_09_000200_extend_registros_eliminacion_v2.php');
+            $columnasSeparadas = count(Schema::getColumns('registros_eliminacion'));
+            $migration->down();
+            try {
+                $this->assertSame($columnasSeparadas - 13, count(Schema::getColumns('registros_eliminacion')));
+                $this->assertDatabaseHas('registros_eliminacion', ['cod_eliminacion' => $row->cod_eliminacion, 'cantidad' => '350', 'caracteristica' => 'Amarillo claro']);
+            } finally {
+                $migration->up();
+            }
+        } finally {
+            $consolidacion->up();
+        }
         $this->assertSame($tables, Schema::getTableListing());
         $this->assertNull($row->fresh()->volumen_ml);
-        $this->assertSame(count($schema), count(Schema::getColumns('registros_eliminacion')));
+        $this->assertSame(count($schema), count(Schema::getColumns($tabla)));
     }
 
     public function test_eliminacion_v2_fallo_real_db_preserva_captura_y_no_finge_exito(): void
@@ -3628,16 +3639,16 @@ class MisPacientesRedisenadaTest extends TestCase
         }
         $this->actingAs($this->enfermero);
         $form = $this->formularioEliminacion()->call('solicitarTipoEliminacion', 'URINARIA')->set('elimDatos.volumen_ml', '350');
-        DB::unprepared("CREATE TRIGGER eliminacion_qa_failure BEFORE INSERT ON registros_eliminacion BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
+        DB::unprepared("CREATE TRIGGER eliminacion_qa_failure BEFORE INSERT ON registros_consumo WHEN NEW.tipo_evento = 'ELIMINACION' BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
         try {
             $form->call('guardarEliminacion')->assertHasErrors('eliminacion_guardado')->assertSet('elimDatos.volumen_ml', '350')
                 ->assertSet('drawerPaso', 'register-form')->assertSet('elimResultado', []);
-            $this->assertDatabaseCount('registros_eliminacion', 0);
+            $this->assertSame(0, \App\Models\RegistroEliminacion::count());
         } finally {
             DB::unprepared('DROP TRIGGER eliminacion_qa_failure');
         }
         $form->call('guardarEliminacion')->assertHasNoErrors()->assertSet('drawerPaso', 'register-result');
-        $this->assertDatabaseCount('registros_eliminacion', 1);
+        $this->assertSame(1, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_v2_autorizacion_personal_jornada_y_roles_no_conceden_escritura(): void
@@ -3676,7 +3687,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertSame(403, $e->getStatusCode());
             }
         }
-        $this->assertDatabaseCount('registros_eliminacion', 0);
+        $this->assertSame(0, \App\Models\RegistroEliminacion::count());
     }
 
     public function test_eliminacion_v2_ultimo_global_por_tipo_y_historial_sin_permiso(): void
@@ -3722,7 +3733,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertDatabaseCount('incidentes', 0);
         $this->assertDatabaseCount('alertas', 1);
         $ui->call('guardarCuidado')->assertStatus(403);
-        $this->assertDatabaseCount('registros_movilidad', 1);
+        $this->assertSame(1, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_v2_rechaza_todos_los_catalogos_y_payload_server_owned(): void
@@ -3747,7 +3758,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertArrayHasKey('datos', $e->errors());
             }
         }
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_v2_distancia_decimal_triestados_y_dispositivo_ninguno(): void
@@ -3784,7 +3795,7 @@ class MisPacientesRedisenadaTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('distancia_metros', $e->errors());
         }
-        $this->assertDatabaseCount('registros_movilidad', 7);
+        $this->assertSame(7, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_otro_exige_detalles_y_preserva_captura_sin_persistir(): void
@@ -3796,7 +3807,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('movDatos.motivo_otro', '   ')->set('movObservacion', 'Datos conservados')
             ->call('guardarCuidado')->assertHasErrors(['motivo_otro', 'dispositivo_otro'])
             ->assertSet('drawerPaso', 'register-form')->assertSet('movObservacion', 'Datos conservados');
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
 
         $ui->set('movDatos.motivo_otro', '  Revisión tras descanso  ')
             ->set('movDatos.dispositivo_otro', '  Apoyo de antebrazo  ')
@@ -3833,7 +3844,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertArrayHasKey($error, $exception->errors());
             }
         }
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_al_cambiar_otro_o_limpiar_no_quedan_detalles_residuales(): void
@@ -3906,13 +3917,13 @@ class MisPacientesRedisenadaTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('datos', $e->errors());
         }
-        $this->assertDatabaseCount('registros_movilidad', 1);
+        $this->assertSame(1, \App\Models\RegistroMovilidad::count());
         $painCount = ValoracionDolor::count();
         Livewire::test(RegistrosEnfermeria::class, ['codResidente' => $this->residenteEstable->cod_residente])
             ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'BASTON')
             ->set('dolor', 5)->call('guardarCuidado')->assertHasNoErrors();
-        $this->assertDatabaseCount('registros_movilidad', 2);
-        $this->assertDatabaseHas('registros_movilidad', ['cod_residente' => $this->residenteEstable->cod_residente, 'dispositivo' => 'BASTON', 'marcha' => 'ASISTIDA']);
+        $this->assertSame(2, \App\Models\RegistroMovilidad::count());
+        $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'MOVILIDAD', 'cod_residente' => $this->residenteEstable->cod_residente, 'dispositivo' => 'BASTON', 'marcha' => 'ASISTIDA']);
         $this->assertSame($painCount, ValoracionDolor::count());
     }
 
@@ -3947,7 +3958,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 DB::rollBack();
             }
         }
-        $this->assertDatabaseCount('registros_movilidad', 0);
+        $this->assertSame(0, \App\Models\RegistroMovilidad::count());
     }
 
     public function test_movilidad_v2_fallo_real_preserva_formulario_y_no_finge_exito(): void
@@ -3957,7 +3968,7 @@ class MisPacientesRedisenadaTest extends TestCase
         }
         $this->travelTo(today()->setTime(10, 0));
         $this->actingAs($this->enfermero);
-        DB::unprepared("CREATE TRIGGER movilidad_qa_failure BEFORE INSERT ON registros_movilidad BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
+        DB::unprepared("CREATE TRIGGER movilidad_qa_failure BEFORE INSERT ON registros_observaciones_cuidado WHEN NEW.tipo_evento = 'MOVILIDAD' BEGIN SELECT RAISE(ABORT, 'qa insert failure'); END");
         try {
             $this->formularioMovilidad()->set('movMarcha', 'ASISTIDA')->set('movDatos.dispositivo', 'ANDADOR')
                 ->set('movObservacion', 'Captura que debe conservarse')->call('guardarCuidado')
@@ -3965,7 +3976,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 ->assertSet('mostrarSelectorModal', true)->assertSet('movMarcha', 'ASISTIDA')
                 ->assertSet('movDatos.dispositivo', 'ANDADOR')->assertSet('movObservacion', 'Captura que debe conservarse')
                 ->assertSet('movResultado', [])->assertSee('Conservamos los datos')->assertDontSee('qa insert failure');
-            $this->assertDatabaseCount('registros_movilidad', 0);
+            $this->assertSame(0, \App\Models\RegistroMovilidad::count());
         } finally {
             DB::unprepared('DROP TRIGGER movilidad_qa_failure');
         }

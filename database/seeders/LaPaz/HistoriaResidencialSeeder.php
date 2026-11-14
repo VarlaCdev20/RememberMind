@@ -108,10 +108,8 @@ class HistoriaResidencialSeeder extends Seeder
             'preguntas_instrumento',
             'prescripciones',
             'programaciones_cuidado',
-            'registros_conductuales',
-            'registros_eliminacion',
             'registros_consumo',
-            'registros_movilidad',
+            'registros_observaciones_cuidado',
             'registros_sueno',
             'residentes',
             'residentes_contactos',
@@ -275,7 +273,7 @@ class HistoriaResidencialSeeder extends Seeder
             $data['cod_tipo_estudio'] = $this->tipoGlucemia;
         }
         // Solo resuelve la PK del esquema aprobado; los atributos se mapean explícitamente debajo.
-        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::TIPOS[$table]) ? CatalogoCodigos::clave($table) : collect(DB::getSchemaBuilder()->getIndexes($table))->firstWhere('primary', true)['columns'][0]);
+        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::ORIGENES[$table]) ? CatalogoCodigos::clave($table) : collect(DB::getSchemaBuilder()->getIndexes($table))->firstWhere('primary', true)['columns'][0]);
         $row = [$pk => $id] + $data;
         $this->filasInsertadas[$table] = ($this->filasInsertadas[$table] ?? 0) + 1;
         if (strlen($id) > 20) {

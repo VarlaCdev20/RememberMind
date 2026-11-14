@@ -29,9 +29,9 @@ try {
     $conteos = $vinculos = $estados = $fechas = $autores = [];
     $corte = now();
     foreach ($tablas as $tabla) {
-        $q = DB::table($tabla)->where('cod_residente', $residente);
+        $q = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta($tabla)->where('cod_residente', $residente);
         $conteos[$tabla] = $q->count();
-        $columnas = Schema::getColumnListing($tabla);
+        $columnas = Schema::getColumnListing($q->from);
         if (in_array('estado', $columnas, true)) {
             $estados[$tabla] = (clone $q)->select('estado')->selectRaw('count(*) as cantidad')->groupBy('estado')->orderBy('estado')->get()->all();
         }
@@ -44,13 +44,13 @@ try {
         }
         if (in_array('cod_personal', $columnas, true)) {
             $autores[$tabla] = ['sin_autor_documentado' => (clone $q)->whereNull('cod_personal')->count(),
-                'referencia_a_autor_inexistente' => DB::table($tabla.' as f')->leftJoin('personal as p', 'p.cod_personal', '=', 'f.cod_personal')
+                'referencia_a_autor_inexistente' => DB::query()->fromSub($q, 'f')->leftJoin('personal as p', 'p.cod_personal', '=', 'f.cod_personal')
                     ->where('f.cod_residente', $residente)->whereNotNull('f.cod_personal')->whereNull('p.cod_personal')->count()];
         }
-        if (Schema::hasColumn($tabla, 'cod_atencion') && $tabla !== 'atenciones') {
+        if (in_array('cod_atencion', $columnas, true) && $tabla !== 'atenciones') {
             $vinculos[$tabla] = [
                 'sin_atencion' => (clone $q)->whereNull('cod_atencion')->count(),
-                'atencion_ajena_o_inexistente' => DB::table($tabla.' as f')
+                'atencion_ajena_o_inexistente' => DB::query()->fromSub($q, 'f')
                     ->leftJoin('atenciones as a', 'a.cod_atencion', '=', 'f.cod_atencion')
                     ->where('f.cod_residente', $residente)->whereNotNull('f.cod_atencion')
                     ->where(fn ($w) => $w->whereNull('a.cod_atencion')->orWhere('a.cod_residente', '!=', $residente))->count(),

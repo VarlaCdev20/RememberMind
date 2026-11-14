@@ -63,9 +63,9 @@ class RegistroConductaTest extends TestCase
         foreach (RegistrarConducta::INDICADORES as $campo) {
             $this->assertNull($registro->fresh()->{$campo});
         }
-        $this->assertDatabaseHas('registros_conductuales', ['cod_personal' => 'PER_CONDUCTA', 'cod_residente' => 'RES_CONDUCTA', 'cod_jornada' => 'JOR_CONDUCTA', 'estado' => 'VIGENTE']);
+        $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'CONDUCTA', 'cod_personal' => 'PER_CONDUCTA', 'cod_residente' => 'RES_CONDUCTA', 'cod_jornada' => 'JOR_CONDUCTA', 'estado' => 'VIGENTE']);
         $this->assertTrue($registro->fecha_hora->equalTo(now()));
-        $this->assertDatabaseCount('registros_conductuales', 1);
+        $this->assertSame(1, \App\Models\RegistroConductual::count());
         $this->assertDatabaseHas('activity_log', ['subject_id' => $registro->getKey(), 'causer_id' => $this->enfermera->getKey()]);
     }
 
@@ -96,7 +96,7 @@ class RegistroConductaTest extends TestCase
         $this->assertSame('Registro original', $primero->fresh()->descripcion);
         $this->assertSame('Activa', $segundo->participacion);
         $this->assertFalse($segundo->cambio_conducta);
-        $this->assertDatabaseCount('registros_conductuales', 2);
+        $this->assertSame(2, \App\Models\RegistroConductual::count());
         $this->assertSame([$segundo->getKey(), $primero->getKey()], array_column(app(ConsultarConducta::class)->ejecutar($this->enfermera, 'RES_CONDUCTA')['historial'], 'codigo'));
     }
 
@@ -114,7 +114,7 @@ class RegistroConductaTest extends TestCase
         } catch (ValidationException $error) {
             $this->assertArrayHasKey($campo, $error->errors());
         }
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
     }
 
     public function test_texto_vacio_y_booleano_vacio_se_normalizan_a_null(): void
@@ -152,7 +152,7 @@ class RegistroConductaTest extends TestCase
             ->set('datos.descripcion', 'Pendiente')->set('datos.agitacion', true)->call('limpiarCaptura')
             ->assertSet('datos.descripcion', null)->assertSet('datos.agitacion', null)->assertDispatched('conducta-captura-reiniciada');
         $this->assertSame('Original', $registro->fresh()->descripcion);
-        $this->assertDatabaseCount('registros_conductuales', 1);
+        $this->assertSame(1, \App\Models\RegistroConductual::count());
     }
 
     public function test_atencion_de_otro_residente_no_se_vincula(): void
@@ -165,7 +165,7 @@ class RegistroConductaTest extends TestCase
         } catch (ValidationException $error) {
             $this->assertArrayHasKey('cod_atencion', $error->errors());
         }
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
     }
 
     public static function contextosDenegados(): array
@@ -191,7 +191,7 @@ class RegistroConductaTest extends TestCase
         } catch (HttpExceptionInterface $error) {
             $this->assertSame(403, $error->getStatusCode());
         }
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
     }
 
     public function test_lectura_ajena_denegada_y_fuera_turno_solo_asignados(): void
@@ -200,7 +200,7 @@ class RegistroConductaTest extends TestCase
         Livewire::test(RegistroConducta::class, ['codResidente' => 'RES_OTRO', 'emergente' => true])->assertForbidden();
         $this->travelTo(now()->startOfDay()->addHours(22));
         Livewire::test(RegistroConducta::class, ['codResidente' => 'RES_CONDUCTA', 'emergente' => true])->assertSee('Solo consulta')->assertDontSee('Confirmar y registrar')->call('guardar')->assertForbidden();
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
     }
 
     public function test_popup_conserva_residente_y_devuelve_al_selector(): void
@@ -209,7 +209,7 @@ class RegistroConductaTest extends TestCase
             ->assertSeeHtml("abrirFormularioRegistro('conducta')")
             ->call('abrirFormularioRegistro', 'conducta')->assertSet('registroTipo', 'conducta')->assertSee('Registro de conducta')->assertSee('Sin datos en este periodo')
             ->call('cerrarPopupConducta')->assertSet('registroTipo', null)->assertSet('drawerPaso', 'register-selector');
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
     }
 
     public function test_volver_al_residente_refresca_el_seguimiento_confirmado(): void
@@ -218,7 +218,7 @@ class RegistroConductaTest extends TestCase
         $this->registrar(['descripcion' => 'Conducta confirmada sintética']);
         $test->call('cerrarPopupConducta', true)->assertSet('mostrarPanelDetalle', true)->assertSet('mostrarSelectorModal', false)
             ->assertSee('Registro de conducta')->assertSee('Conducta confirmada sintética');
-        $this->assertDatabaseCount('registros_conductuales', 1);
+        $this->assertSame(1, \App\Models\RegistroConductual::count());
     }
 
     public function test_livewire_validacion_preserva_datos_y_confirmacion_impide_doble_envio(): void
@@ -226,33 +226,33 @@ class RegistroConductaTest extends TestCase
         $test = Livewire::test(RegistroConducta::class, ['codResidente' => 'RES_CONDUCTA', 'emergente' => true])
             ->set('datos.descripcion', 'Captura pendiente')->set('datos.estado_animo', str_repeat('x', 41))->call('guardar')
             ->assertHasErrors('datos.estado_animo')->assertSet('mostrarFormulario', true)->assertSet('resultado', [])->assertSet('datos.descripcion', 'Captura pendiente')->assertNotDispatched('conducta-registrada');
-        $this->assertDatabaseCount('registros_conductuales', 0);
+        $this->assertSame(0, \App\Models\RegistroConductual::count());
         $test->set('datos.estado_animo', 'TRANQUILO')->call('guardar')->assertHasNoErrors()->assertDispatched('conducta-registrada')->assertSee('Conducta registrada correctamente')->assertSet('datos.descripcion', null);
-        $this->assertDatabaseCount('registros_conductuales', 1);
+        $this->assertSame(1, \App\Models\RegistroConductual::count());
         $test->call('guardar')->assertStatus(409);
-        $this->assertDatabaseCount('registros_conductuales', 1);
+        $this->assertSame(1, \App\Models\RegistroConductual::count());
     }
 
     public function test_fallo_real_de_persistencia_conserva_captura_sin_exito_falso(): void
     {
         if (DB::getDriverName() === 'sqlite') {
-            DB::statement("CREATE TRIGGER conducta_testing_failure BEFORE INSERT ON registros_conductuales BEGIN SELECT RAISE(ABORT, 'synthetic persistence failure'); END");
+            DB::statement("CREATE TRIGGER conducta_testing_failure BEFORE INSERT ON registros_observaciones_cuidado WHEN NEW.tipo_evento = 'CONDUCTA' BEGIN SELECT RAISE(ABORT, 'synthetic persistence failure'); END");
         } else {
             DB::statement("CREATE FUNCTION conducta_testing_failure() RETURNS trigger AS $$ BEGIN RAISE EXCEPTION 'synthetic persistence failure'; END; $$ LANGUAGE plpgsql");
-            DB::statement('CREATE TRIGGER conducta_testing_failure BEFORE INSERT ON registros_conductuales FOR EACH ROW EXECUTE FUNCTION conducta_testing_failure()');
+            DB::statement('CREATE TRIGGER conducta_testing_failure BEFORE INSERT ON registros_observaciones_cuidado FOR EACH ROW EXECUTE FUNCTION conducta_testing_failure()');
         }
         try {
             Livewire::test(RegistroConducta::class, ['codResidente' => 'RES_CONDUCTA', 'emergente' => true])
                 ->set('datos.descripcion', 'Conservar esta captura')->set('datos.agitacion', true)->call('guardar')
                 ->assertHasErrors('persistencia')->assertSet('datos.descripcion', 'Conservar esta captura')->assertSet('datos.agitacion', true)
                 ->assertSet('mostrarFormulario', true)->assertSet('resultado', [])->assertNotDispatched('conducta-registrada')->assertSee('Tus datos siguen aquí')->assertDontSee('synthetic persistence failure');
-            $this->assertDatabaseCount('registros_conductuales', 0);
+            $this->assertSame(0, \App\Models\RegistroConductual::count());
             $this->assertDatabaseMissing('activity_log', ['log_name' => 'conducta']);
         } finally {
             if (DB::getDriverName() === 'sqlite') {
                 DB::statement('DROP TRIGGER conducta_testing_failure');
             } else {
-                DB::statement('DROP TRIGGER conducta_testing_failure ON registros_conductuales');
+                DB::statement('DROP TRIGGER conducta_testing_failure ON registros_observaciones_cuidado');
                 DB::statement('DROP FUNCTION conducta_testing_failure()');
             }
         }

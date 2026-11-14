@@ -33,10 +33,19 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
                     'cod_nodo_propietario_primario' => 'nodos_semanticos', 'cod_dominio_valores' => 'dominios_valores_expertos', 'cod_usuario_creacion' => 'usuarios'];
                 continue;
             }
+            if ($tabla === 'criterios_dominios_resultado') {
+                $referencias[$tabla] = ['cod_nodo_criterio' => 'nodos_semanticos',
+                    'cod_dominio_valores' => 'dominios_valores_expertos', 'cod_usuario_creacion' => 'usuarios'];
+                continue;
+            }
             foreach (DB::getSchemaBuilder()->getForeignKeys($tabla) as $fk) {
                 foreach ($fk['columns'] as $i => $campo) {
                     if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_variable_experta') {
                         $referencias[$tabla][$campo] = 'variables_expertas';
+                        continue;
+                    }
+                    if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_criterio_dominio_resultado') {
+                        $referencias[$tabla][$campo] = 'criterios_dominios_resultado';
                         continue;
                     }
                     if ((C::ENTIDADES[$fk['foreign_table']][0] ?? null) === $fk['foreign_columns'][$i]) {

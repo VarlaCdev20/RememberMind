@@ -8,7 +8,7 @@ use DomainException;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
-/** Proyección de cuatro entidades singulares sobre su propietario físico; no crea vistas ni tablas paralelas. */
+/** Proyección de entidades singulares sobre su propietario físico. */
 final class BloquesExpertos
 {
     public const DEFINICIONES = [
@@ -33,13 +33,37 @@ final class BloquesExpertos
                 'funcionalidad_revisor_sintetico_id' => 'funcionalidad_revisor_sintetico_id', 'funcionalidad_justificacion' => 'funcionalidad_justificacion']],
     ];
 
+    private const CRITERIO_DOMINIO = [
+        'tabla' => 'nodos_semanticos', 'propietario' => 'cod_nodo_criterio', 'id' => 'cod_criterio_dominio_resultado',
+        'campos' => ['cod_criterio_dominio_resultado' => 'cod_criterio_dominio_resultado', 'cod_nodo_criterio' => 'cod_nodo_semantico',
+            'cod_dominio_valores' => 'criterio_cod_dominio_valores', 'estado' => 'criterio_estado',
+            'fecha_hora_creacion' => 'criterio_fecha_hora_creacion', 'cod_usuario_creacion' => 'criterio_cod_usuario_creacion',
+            'observacion' => 'criterio_observacion'],
+    ];
+
+    private static function definicion(string $entidad): ?array
+    {
+        return $entidad === 'criterios_dominios_resultado' ? self::CRITERIO_DOMINIO : (self::DEFINICIONES[$entidad] ?? null);
+    }
+
+    public static function tablaFisica(string $entidad): string
+    {
+        return self::definicion($entidad)['tabla'] ?? $entidad;
+    }
+
+    public static function columnasLogicas(string $entidad): ?array
+    {
+        $definicion = self::definicion($entidad);
+
+        return $definicion === null ? null : array_keys($definicion['campos']);
+    }
+
     public static function consulta(string $entidad, ?string $conexion = null): Builder
     {
         $db = DB::connection($conexion);
-        if (! isset(self::DEFINICIONES[$entidad])) {
+        if (($d = self::definicion($entidad)) === null) {
             return $db->table($entidad);
         }
-        $d = self::DEFINICIONES[$entidad];
         $columnas = array_map(static fn ($col, $nombre) => $col.' as '.$nombre, $d['campos'], array_keys($d['campos']));
         $origen = $db->table($d['tabla'])->select($columnas)->whereNotNull($d['id']);
 
@@ -53,18 +77,17 @@ final class BloquesExpertos
         }
         $filas = array_is_list($filas) ? $filas : [$filas];
         $db = DB::connection($conexion);
-        if (! isset(self::DEFINICIONES[$entidad])) {
+        if (($d = self::definicion($entidad)) === null) {
             $db->table($entidad)->insert($filas);
 
             return;
         }
-        $d = self::DEFINICIONES[$entidad];
         $db->transaction(function () use ($db, $d, $filas): void {
             foreach ($filas as $fila) {
                 if (array_diff(array_keys($fila), array_keys($d['campos'])) || ! isset($fila[$d['id']], $fila[$d['propietario']])) {
                     throw new DomainException('El bloque experto requiere identidad, propietario y columnas declaradas.');
                 }
-                $q = $db->table($d['tabla'])->where($d['propietario'], $fila[$d['propietario']])->whereNull($d['id']);
+                $q = $db->table($d['tabla'])->where($d['campos'][$d['propietario']], $fila[$d['propietario']])->whereNull($d['id']);
                 if (isset($fila['cod_version_modelo'])) {
                     $q->where('cod_version_modelo', $fila['cod_version_modelo']);
                 }

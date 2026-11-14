@@ -63,6 +63,7 @@ final class EscenarioRepositorios
         $filas = $visitados = [];
         self::reunir($raiz, $filas, $visitados);
         $orden = InventarioExperto::TABLAS;
+        array_splice($orden, array_search('reglas_expertas', $orden, true), 0, ['criterios_dominios_resultado']);
         array_splice($orden, array_search('fuentes_datos_expertas', $orden, true), 0, ['variables_expertas']);
         array_splice($orden, array_search('evaluaciones_reglas', $orden, true), 0, ['resultados_criterio', 'trazas_inferencia']);
         foreach ($orden as $tabla) {
@@ -181,7 +182,7 @@ final class EscenarioRepositorios
         // Solo se completan metadatos de fixtures, nunca valores clínicos faltantes.
         // El filtro evita añadir timestamps u otras columnas ajenas al esquema.
         $datos = array_intersect_key(array_replace($comunes, $extras, $modelo->getAttributes()),
-            array_flip(isset(BloquesExpertos::DEFINICIONES[$tabla]) ? array_keys(BloquesExpertos::DEFINICIONES[$tabla]['campos']) : Schema::getColumnListing($tabla)));
+            array_flip(BloquesExpertos::columnasLogicas($tabla) ?? Schema::getColumnListing($tabla)));
         BloquesExpertos::insertar($tabla, $datos);
     }
 }

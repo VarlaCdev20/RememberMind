@@ -97,8 +97,8 @@ final class ConservacionDatos
             if (! in_array($entidad, self::GENERADAS, true) || $despues <= $antes) {
                 throw new RuntimeException('Cambio no permitido en una secuencia de códigos.');
             }
-            $tabla = isset(RegistrosConsumo::TIPOS[$entidad]) ? RegistrosConsumo::TABLA : $entidad;
-            $pk = $tabla === $entidad ? CatalogoCodigos::clave($entidad) : RegistrosConsumo::CODIGO;
+            $tabla = RegistrosConsumo::ORIGENES[$entidad][0] ?? $entidad;
+            $pk = RegistrosConsumo::codigo($entidad) ?? CatalogoCodigos::clave($entidad);
             $previas = array_fill_keys(array_column(array_column($this->originales[$tabla] ?? [], 'clave'), $pk), true);
             for ($inicio = $antes + 1; $inicio <= $despues; $inicio += 150) {
                 $codigos = array_map(fn ($n) => CatalogoCodigos::formatear($entidad, $n), range($inicio, min($inicio + 149, $despues)));
