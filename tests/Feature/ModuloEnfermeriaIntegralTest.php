@@ -286,8 +286,8 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             ->call('recibirTurno')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('asignaciones_personal', [
-            'cod_asignacion_personal' => 'ASP_TEST_INT',
+        $this->assertDatabaseHas('asignaciones_jornada', ['tipo_evento' => 'PERSONAL',
+            'cod_asignacion_jornada' => 'ASP_TEST_INT',
             'cod_jornada' => $this->jornada->cod_jornada,
             'cod_personal' => $this->personal->cod_personal,
             'cod_area' => 'ARE_TEST_INT',
@@ -296,7 +296,7 @@ class ModuloEnfermeriaIntegralTest extends TestCase
             'Recibo residentes y pendientes',
             (string) AsignacionPersonal::findOrFail('ASP_TEST_INT')->observacion
         );
-        $this->assertDatabaseMissing('asignaciones_personal', ['cod_area' => 'ARE_ENF']);
+        $this->assertDatabaseMissing('asignaciones_jornada', ['tipo_evento' => 'PERSONAL','cod_area' => 'ARE_ENF']);
     }
 
     public function test_agenda_no_expone_residentes_si_el_enfermero_no_tiene_asignacion(): void

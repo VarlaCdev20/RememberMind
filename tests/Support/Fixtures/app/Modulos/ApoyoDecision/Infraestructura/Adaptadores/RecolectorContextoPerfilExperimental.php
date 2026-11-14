@@ -142,10 +142,10 @@ final class RecolectorContextoPerfilExperimental
             'fecha' => 'fecha_hora', 'precision' => 'INSTANTE_SQL', 'episodio' => 'cod_atencion', 'estados' => null,
             'campos' => array_fill_keys(['estado_animo', 'afecto', 'ansiedad', 'apatia', 'percepcion', 'conducta',
                 'comunicacion', 'interaccion_social', 'impresion_cognitiva', 'conclusion', 'recomendacion'], 'texto')];
-        $contratos['diagnosticos'] = ['modelo' => Diagnostico::class, 'pk' => 'cod_diagnostico', 'fecha' => 'fecha_hora',
+        $contratos['diagnosticos'] = ['modelo' => Diagnostico::class, 'pk' => 'cod_registro_clinico', 'fecha' => 'fecha_hora',
             'precision' => 'INSTANTE_SQL', 'episodio' => 'cod_atencion', 'estados' => null,
             'campos' => array_fill_keys(['codigo_clinico', 'nombre', 'tipo', 'certeza', 'observacion'], 'texto')];
-        $contratos['antecedentes_clinicos'] = ['modelo' => AntecedenteClinico::class, 'pk' => 'cod_antecedente',
+        $contratos['antecedentes_clinicos'] = ['modelo' => AntecedenteClinico::class, 'pk' => 'cod_registro_clinico',
             'fecha' => 'fecha_referencia', 'precision' => 'DIA', 'episodio' => null, 'estados' => null,
             'campos' => array_fill_keys(['tipo_antecedente', 'descripcion', 'fuente_informacion', 'observacion'], 'texto')];
         $contratos['registros_sueno'] = ['modelo' => RegistroSueno::class, 'pk' => 'cod_registro_sueno', 'fecha' => 'fecha',

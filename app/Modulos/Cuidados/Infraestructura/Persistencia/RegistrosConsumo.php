@@ -12,6 +12,12 @@ final class RegistrosConsumo
     public const CODIGO = 'cod_registro_consumo';
 
     public const ORIGENES = [
+        'antecedentes_clinicos' => ['registros_clinicos', 'cod_registro_clinico', 'ANTECEDENTE', 'cod_antecedente'],
+        'diagnosticos' => ['registros_clinicos', 'cod_registro_clinico', 'DIAGNOSTICO', 'cod_diagnostico'],
+        'alergias' => ['registros_clinicos', 'cod_registro_clinico', 'ALERGIA', 'cod_alergia'],
+        'dispositivos_clinicos' => ['registros_clinicos', 'cod_registro_clinico', 'DISPOSITIVO', 'cod_dispositivo'],
+        'asignaciones_personal' => ['asignaciones_jornada', 'cod_asignacion_jornada', 'PERSONAL', 'cod_asignacion_personal'],
+        'asignaciones_residente_jornada' => ['asignaciones_jornada', 'cod_asignacion_jornada', 'RESIDENTE', 'cod_asignacion'],
         'registros_ingesta' => [self::TABLA, self::CODIGO, 'INGESTA', 'cod_ingesta'],
         'registros_hidratacion' => [self::TABLA, self::CODIGO, 'HIDRATACION', 'cod_hidratacion'],
         'registros_eliminacion' => ['registros_consumo', 'cod_registro_consumo', 'ELIMINACION', 'cod_eliminacion'],
@@ -32,11 +38,11 @@ final class RegistrosConsumo
         return self::ORIGENES[$entidad][1] ?? null;
     }
 
-    public static function consulta(string $entidad): Builder
+    public static function consulta(string $entidad, ?string $alias = null): Builder
     {
         return isset(self::ORIGENES[$entidad])
-            ? DB::table(self::ORIGENES[$entidad][0])->where('tipo_evento', self::ORIGENES[$entidad][2])
-            : DB::table($entidad);
+            ? DB::table(self::ORIGENES[$entidad][0], $alias)->where(($alias ? $alias.'.' : '').'tipo_evento', self::ORIGENES[$entidad][2])
+            : DB::table($entidad, $alias);
     }
 
     public static function insertar(string $entidad, array $filas): void

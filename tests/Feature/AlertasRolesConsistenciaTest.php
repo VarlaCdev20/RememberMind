@@ -482,8 +482,7 @@ class AlertasRolesConsistenciaTest extends TestCase
                     ->assertStatus(200)->assertSet('drawerUbicacion', true)
                     ->assertDontSee('Riesgos Clínicos')->assertDontSee('Moderado');
                 $consultas = collect(DB::getQueryLog())->pluck('query')->implode(' ');
-                $this->assertStringNotContainsString('"alergias"', $consultas);
-                $this->assertStringNotContainsString('"diagnosticos"', $consultas);
+                $this->assertStringNotContainsString('"registros_clinicos"', $consultas);
             } finally {
                 DB::disableQueryLog();
             }

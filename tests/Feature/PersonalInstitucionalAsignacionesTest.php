@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -59,7 +60,7 @@ class PersonalInstitucionalAsignacionesTest extends TestCase
         }
 
         self::assertSame($original, $asignacion->fresh()->getRawOriginal());
-        self::assertDatabaseCount('asignaciones_personal', 1);
+        self::assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
         self::assertDatabaseCount('jornadas', 1);
     }
 
@@ -68,6 +69,6 @@ class PersonalInstitucionalAsignacionesTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
         $this->get(route('admin.personal-institucional'))->assertForbidden();
-        self::assertDatabaseCount('asignaciones_personal', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 }

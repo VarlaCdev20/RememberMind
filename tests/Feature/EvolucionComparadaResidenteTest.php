@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
@@ -184,7 +185,7 @@ class EvolucionComparadaResidenteTest extends TestCase
         $this->assertSame(1, $evolucion['actual']['resumen']['presion_revision']);
         $this->assertSame(0, $evolucion['anterior']['resumen']['presion_revision']);
         $this->assertDatabaseCount('alertas', 0);
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     /** Un objetivo histórico reemplazado se aplica a su toma y no convierte ausencia en normalidad. */

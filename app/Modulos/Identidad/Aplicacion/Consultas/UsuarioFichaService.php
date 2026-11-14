@@ -32,7 +32,7 @@ class UsuarioFichaService
                 ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', '>=', today())
                     ->whereIn('estado', ['ABIERTA', 'ACTIVA', 'EN_CURSO', 'ACTIVO']))
                 ->with(['area', 'jornada.turno'])
-                ->orderBy(\App\Models\Jornada::select('fecha_jornada')->whereColumn('jornadas.cod_jornada', 'asignaciones_personal.cod_jornada'))
+                ->orderBy(\App\Models\Jornada::select('fecha_jornada')->whereColumn('jornadas.cod_jornada', 'asignaciones_jornada.cod_jornada'))
                 ->orderBy('cod_asignacion_personal');
             $totalAsignaciones = (clone $query)->count();
             $asignaciones = $query->limit(5)->get();

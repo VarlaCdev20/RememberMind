@@ -38,6 +38,15 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
                     'cod_dominio_valores' => 'dominios_valores_expertos', 'cod_usuario_creacion' => 'usuarios'];
                 continue;
             }
+            if (in_array($tabla, ['condiciones_regla_experta', 'consecuencias_regla_experta'], true)) {
+                $referencias[$tabla] = [
+                    'cod_regla_experta' => 'reglas_expertas',
+                    'cod_valor_semantico' => 'valores_semanticos',
+                ] + ($tabla === 'condiciones_regla_experta'
+                    ? ['cod_variable_experta' => 'variables_expertas']
+                    : ['cod_criterio_dominio_resultado' => 'criterios_dominios_resultado']);
+                continue;
+            }
             foreach (DB::getSchemaBuilder()->getForeignKeys($tabla) as $fk) {
                 foreach ($fk['columns'] as $i => $campo) {
                     if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_variable_experta') {

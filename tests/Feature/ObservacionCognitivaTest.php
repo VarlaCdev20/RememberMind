@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -85,7 +86,7 @@ class ObservacionCognitivaTest extends TestCase
         $this->assertSame('Registro objetivo', $registro->observacion);
         $this->assertTrue($registro->fecha_hora->equalTo(now()));
         $this->assertDatabaseCount('alertas', 0);
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     public static function invalidos(): array

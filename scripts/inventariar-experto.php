@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 // Inventario de catálogos y estructura de entrada. No consulta filas de residentes, hechos ni evaluaciones.
 require dirname(__DIR__).'/vendor/autoload.php';
 
@@ -35,7 +37,7 @@ try {
         'nodos_semanticos', 'relaciones_semanticas'];
     $disponibles = [];
     foreach ($tablas as $tabla) {
-        $disponibles[$tabla] = $esquema->hasTable($tabla);
+        $disponibles[$tabla] = $esquema->hasTable(BloquesExpertos::tablaFisica($tabla));
     }
     $preguntas = $disponibles['preguntas_instrumento']
         ? $conexion->table('preguntas_instrumento')->select('cod_instrumento')->selectRaw('COUNT(*) as cantidad')
@@ -54,7 +56,7 @@ try {
             ->get(['cod_version_modelo', 'codigo_version', 'estado'])->map(fn ($fila): array => (array) $fila)->all() : [];
     $resumen = [];
     foreach (['reglas_expertas', 'condiciones_regla_experta', 'consecuencias_regla_experta', 'nodos_semanticos', 'relaciones_semanticas'] as $tabla) {
-        $resumen[$tabla] = $disponibles[$tabla] ? $conexion->table($tabla)->count() : null;
+        $resumen[$tabla] = $disponibles[$tabla] ? BloquesExpertos::consulta($tabla, $conexion->getName())->count() : null;
     }
     $reglasPorVersion = $disponibles['reglas_expertas']
         ? $conexion->table('reglas_expertas')->select(['cod_version_modelo', 'estado', 'estado_revision'])
@@ -64,17 +66,17 @@ try {
     $catalogoReglas = [];
     $tablasCatalogo = ['reglas_expertas', 'versiones_modelo_experto', 'condiciones_regla_experta',
         'consecuencias_regla_experta', 'nodos_semanticos', 'valores_semanticos'];
-    $catalogoDisponible = count(array_filter($tablasCatalogo, fn ($tabla) => $esquema->hasTable($tabla))) === count($tablasCatalogo)
+    $catalogoDisponible = count(array_filter($tablasCatalogo, fn ($tabla) => $esquema->hasTable(BloquesExpertos::tablaFisica($tabla)))) === count($tablasCatalogo)
         && $esquema->hasColumn('nodos_semanticos', 'cod_variable_experta');
     if ($catalogoDisponible) {
         $visibles = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo::institucionales()
             ->pluck('cod_version_modelo')->all();
-        $condiciones = $conexion->table('condiciones_regla_experta as c')
+        $condiciones = $conexion->query()->fromSub(BloquesExpertos::consulta('condiciones_regla_experta', $conexion->getName()), 'c')
             ->join('nodos_semanticos as n', 'n.cod_variable_experta', '=', 'c.cod_variable_experta')
             ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')
             ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as variable', 'v.codigo_valor as valor_esperado'])
             ->groupBy('cod_regla_experta');
-        $consecuencias = $conexion->table('consecuencias_regla_experta as c')
+        $consecuencias = $conexion->query()->fromSub(BloquesExpertos::consulta('consecuencias_regla_experta', $conexion->getName()), 'c')
             ->joinSub(\App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('criterios_dominios_resultado'), 'd', 'd.cod_criterio_dominio_resultado', '=', 'c.cod_criterio_dominio_resultado')
             ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'd.cod_nodo_criterio')
             ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')

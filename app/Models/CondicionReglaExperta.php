@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // sistema experto 4.16.18; restricciones físicas D-137.
-class CondicionReglaExperta extends ModeloExperto
+class CondicionReglaExperta extends ModeloBloqueExperto
 {
+    protected const BLOQUE = 'condiciones_regla_experta';
+
     protected $table = 'condiciones_regla_experta';
 
     protected $primaryKey = 'cod_condicion_regla';

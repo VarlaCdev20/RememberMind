@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Compartido\Aplicacion\Contratos\ContextoEjecucion;
 use App\Models\Documento;
@@ -219,7 +220,7 @@ class ExploradorAdministrativoService
         if (! $campos) {
             return [];
         }
-        $registro = DB::table($tabla)->where($pk, $codigo)->first(array_keys($campos));
+        $registro = RegistrosConsumo::consulta($tabla)->where($pk, $codigo)->first(array_keys($campos));
 
         return collect($campos)->mapWithKeys(fn ($etiqueta, $campo) => [$etiqueta => $registro->{$campo} ?? null])->all();
     }

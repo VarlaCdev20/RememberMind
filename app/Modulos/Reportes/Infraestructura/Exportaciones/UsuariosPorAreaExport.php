@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Reportes\Infraestructura\Exportaciones;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -29,7 +30,7 @@ class UsuariosPorAreaExport implements FromCollection, ShouldAutoSize, WithHeadi
      */
     public function collection()
     {
-        return User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->leftJoin('asignaciones_personal', 'personal.cod_personal', '=', 'asignaciones_personal.cod_personal')->with(['roles', 'personal'])->where('asignaciones_personal.cod_area', $this->codArea)->orderBy('personal.nombres')->select('usuarios.*')->get();
+        return User::query()->leftJoin('personal', 'usuarios.cod_usuario', '=', 'personal.cod_usuario')->leftJoinSub(RegistrosConsumo::consulta('asignaciones_personal'), 'asignaciones_personal', 'personal.cod_personal', '=', 'asignaciones_personal.cod_personal')->with(['roles', 'personal'])->where('asignaciones_personal.cod_area', $this->codArea)->orderBy('personal.nombres')->select('usuarios.*')->get();
     }
 
     public function title(): string

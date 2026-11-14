@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades\PersonalInstitucionalHorarios;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -47,7 +48,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
 
         $personal = $user->personal()->firstOrFail();
         $this->assertCount(2, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->get());
-        $this->assertDatabaseHas('asignaciones_personal', [
+        $this->assertDatabaseHas('asignaciones_jornada', ['tipo_evento' => 'PERSONAL',
             'cod_personal' => $personal->cod_personal,
             'cod_area' => $area->cod_area,
             'estado' => 'ACTIVO',
@@ -93,7 +94,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
         $this->assertSame(4, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'ACTIVO')->count());
         $this->assertSame(0, AsignacionPersonal::where('cod_personal', $personal->cod_personal)->where('estado', 'INACTIVO')->count());
         $this->assertSame(2,AsignacionPersonal::where('cod_personal',$personal->cod_personal)->whereHas('jornada',fn($q)=>$q->where('fecha_jornada','<','2026-06-15'))->where('estado','ACTIVO')->count());
-        $this->assertDatabaseHas('asignaciones_personal', [
+        $this->assertDatabaseHas('asignaciones_jornada', ['tipo_evento' => 'PERSONAL',
             'cod_personal' => $personal->cod_personal,
             'cod_area' => $area->cod_area,
             'estado' => 'ACTIVO',

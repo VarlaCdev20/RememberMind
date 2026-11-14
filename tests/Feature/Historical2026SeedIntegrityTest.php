@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Cuidados\Aplicacion\Consultas\MiTurnoService;
 use App\Models\User;
 use Carbon\Carbon;
@@ -51,7 +52,7 @@ class Historical2026SeedIntegrityTest extends TestCase
         $this->assertFalse(DB::table('registros_observaciones_cuidado')->where('tipo_evento', 'MOVILIDAD')->whereNotIn('traslado', ['INDEPENDIENTE', 'SUPERVISION', 'AYUDA_UNA_PERSONA', 'AYUDA_DOS_PERSONAS', 'GRUA'])->exists());
         $this->assertFalse(User::where('correo', 'enfermeria.01@remembermind.test')->sole()->can('prescripciones.crear'));
         $this->assertTrue(User::where('correo', 'med@remembermind.test')->sole()->can('prescripciones.crear'));
-        $nurse = DB::table('asignaciones_residente_jornada')->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->where('j.fecha_jornada', '2026-10-08')->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->sole(['j.cod_jornada'])->cod_jornada)->first()->cod_personal;
+        $nurse = RegistrosConsumo::consulta('asignaciones_residente_jornada')->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->where('j.fecha_jornada', '2026-10-08')->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->sole(['j.cod_jornada'])->cod_jornada)->first()->cod_personal;
         $this->travelTo(Carbon::parse(Historical2026Seeder::CUTOFF));
         $dashboard = app(MiTurnoService::class)->obtenerDatosDashboard(\App\Models\Personal::findOrFail($nurse)->usuario);
         $this->assertSame('EN_TURNO', $dashboard['modo']);

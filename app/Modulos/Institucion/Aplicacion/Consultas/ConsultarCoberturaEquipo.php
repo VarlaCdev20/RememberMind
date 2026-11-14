@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +37,7 @@ final class ConsultarCoberturaEquipo
         $fecha = $vigente ? $ahora->toDateString() : ($filtros['fecha'] ?? $ahora->toDateString());
         $anterior = $ahora->copy()->subDay()->toDateString();
         $estados = $vigente ? self::ESTADOS_JORNADA['abierta'] : (self::ESTADOS_JORNADA[$filtros['estado'] ?? ''] ?? []);
-        $filas = DB::table('asignaciones_personal as ap')->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
+        $filas = RegistrosConsumo::consulta('asignaciones_personal', 'ap')->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
             ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
             ->where(fn ($q) => $q->whereDate('j.fecha_jornada', $fecha)
@@ -76,7 +77,7 @@ final class ConsultarCoberturaEquipo
             'turnos' => $filas->pluck('cod_turno')->unique()->count(), 'asignaciones' => $filas->count()];
         $fechasArea = ['anterior' => null, 'siguiente' => null];
         if ($incluirFechasArea && ! empty($filtros['area'])) {
-            $jornadasArea = DB::table('asignaciones_personal as ap')->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
+            $jornadasArea = RegistrosConsumo::consulta('asignaciones_personal', 'ap')->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
                 ->where('ap.cod_area', $filtros['area'])->whereIn('ap.estado', ['ACTIVA', 'ACTIVO'])
                 ->when($filtros['turno'] ?? null, fn ($q, $turno) => $q->where('j.cod_turno', $turno));
             $anterior = (clone $jornadasArea)->whereDate('j.fecha_jornada', '<', $fecha)->max('j.fecha_jornada');

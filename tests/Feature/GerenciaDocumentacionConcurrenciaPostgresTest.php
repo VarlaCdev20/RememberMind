@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\Personal;
 use App\Models\Residente;
@@ -108,7 +109,7 @@ class GerenciaDocumentacionConcurrenciaPostgresTest extends TestCase
                     $this->assertDatabaseCount('residentes_contactos', 1);
                     $this->assertDatabaseCount('versiones_vinculo_contacto', 1);
                 } elseif ($modo === 'horario') {
-                    $this->assertDatabaseCount('asignaciones_personal', 1);
+                    $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
                     $this->assertDatabaseCount('jornadas', 1);
                     $this->assertDatabaseCount('eventos_asignacion_personal', 1);
                 } else {

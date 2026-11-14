@@ -430,7 +430,7 @@ class ReporteDataService
                 'p.estado',
                 // V2 no guarda fecha de ingreso en personal. Se deriva de la
                 // primera asignación institucional registrada para la persona.
-                DB::raw('(SELECT MIN(ap.fecha_asignacion) FROM asignaciones_personal ap WHERE ap.cod_personal = p.cod_personal) AS fecha_ingreso')
+                DB::raw('(SELECT MIN(ap.fecha_asignacion) FROM asignaciones_jornada ap WHERE ap.tipo_evento = \'PERSONAL\' AND ap.cod_personal = p.cod_personal) AS fecha_ingreso')
             )
             ->orderBy('p.apellido_paterno')
             ->limit($limite)
@@ -451,8 +451,8 @@ class ReporteDataService
                 'p.estado',
                 // El área vigente se obtiene de la asignación más reciente;
                 // áreas no tiene una columna responsable ni personal directo.
-                DB::raw('(SELECT a.nombre FROM asignaciones_personal ap JOIN areas a ON a.cod_area = ap.cod_area WHERE ap.cod_personal = p.cod_personal ORDER BY ap.fecha_asignacion DESC LIMIT 1) AS area_nombre'),
-                DB::raw('(SELECT MIN(ap.fecha_asignacion) FROM asignaciones_personal ap WHERE ap.cod_personal = p.cod_personal) AS fecha_ingreso')
+                DB::raw('(SELECT a.nombre FROM asignaciones_jornada ap JOIN areas a ON a.cod_area = ap.cod_area WHERE ap.tipo_evento = \'PERSONAL\' AND ap.cod_personal = p.cod_personal ORDER BY ap.fecha_asignacion DESC LIMIT 1) AS area_nombre'),
+                DB::raw('(SELECT MIN(ap.fecha_asignacion) FROM asignaciones_jornada ap WHERE ap.tipo_evento = \'PERSONAL\' AND ap.cod_personal = p.cod_personal) AS fecha_ingreso')
             )
             ->orderBy('p.apellido_paterno')
             ->limit($limite)

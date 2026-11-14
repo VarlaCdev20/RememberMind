@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -40,7 +41,7 @@ class GerenciaAreasEquipoTest extends TestCase
             ->set('fechaEquipo', '2026-10-27')->assertSee('Sin asignaciones para esta fecha');
         $panel->call('cerrarFicha')->call('editarArea', $area->getKey())->set('nombre', 'Área renombrada')->set('estado', 'INACTIVO')->call('guardarArea');
         $this->assertDatabaseHas('areas', ['cod_area' => $area->getKey(), 'nombre' => 'ÁREA RENOMBRADA', 'estado' => 'ACTIVA']);
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_sin_lectura_de_areas_no_serializa_datos(): void
@@ -164,7 +165,7 @@ class GerenciaAreasEquipoTest extends TestCase
         Role::findByName('GERENTE', 'web')->revokePermissionTo('asignaciones_personal.ver');
         $panel->call('$refresh')->assertDontSee('Equipo restringido Prueba');
         $this->assertNull($panel->viewData('equipo'));
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
     public function test_gerencia_reutiliza_tarjetas_y_filtros_de_superadmin_sin_exponer_su_ficha_o_reportes(): void
     {

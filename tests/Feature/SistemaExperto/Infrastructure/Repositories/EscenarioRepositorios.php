@@ -63,6 +63,8 @@ final class EscenarioRepositorios
         $filas = $visitados = [];
         self::reunir($raiz, $filas, $visitados);
         $orden = InventarioExperto::TABLAS;
+        array_splice($orden, array_search('componentes_regla_experta', $orden, true), 1,
+            ['condiciones_regla_experta', 'consecuencias_regla_experta']);
         array_splice($orden, array_search('vinculos_evidencia_experta', $orden, true), 1,
             ['evidencias_criterio_evaluacion', 'evidencias_soporte_condicion']);
         array_splice($orden, array_search('reglas_expertas', $orden, true), 0, ['criterios_dominios_resultado']);

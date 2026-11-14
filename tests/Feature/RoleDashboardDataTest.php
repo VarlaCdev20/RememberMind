@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -61,11 +62,11 @@ class RoleDashboardDataTest extends TestCase
         DB::table('areas')->insert(['cod_area' => 'ARE_KPI', 'nombre' => 'Cuidados de prueba', 'estado' => 'ACTIVA']);
         DB::table('turnos')->insert(['cod_turno' => 'TUR_KPI', 'nombre' => 'Mañana', 'hora_inicio' => '07:00', 'hora_cierre' => '15:00', 'orden' => 1, 'estado' => 'ACTIVO']);
         DB::table('jornadas')->insert(['cod_jornada' => 'JOR_KPI', 'cod_turno' => 'TUR_KPI', 'fecha_jornada' => today(), 'estado' => 'ABIERTA']);
-        DB::table('asignaciones_personal')->insert([
+        RegistrosConsumo::insertar('asignaciones_personal', [[
             'cod_asignacion_personal' => 'ASP_KPI', 'cod_jornada' => 'JOR_KPI',
             'cod_personal' => 'PER_KPI', 'cod_area' => 'ARE_KPI', 'tipo_asignacion' => 'REGULAR',
             'fecha_asignacion' => now(), 'estado' => 'ACTIVA',
-        ]);
+        ]]);
 
         $data = app(RoleDashboardDataService::class)->forRole($usuario, 'SUPERADMINISTRADOR');
 

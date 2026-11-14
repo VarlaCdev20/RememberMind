@@ -260,11 +260,11 @@ class EstabilizacionExpertoContinuidadTest extends TestCase
         Role::findByName('ENFERMEROS')->revokePermissionTo('diagnosticos.ver');
         $sql = [];
         DB::listen(static function ($q) use (&$sql): void {
-            $sql[] = $q->sql;
+            $sql[] = [$q->sql, $q->bindings];
         });
         $panel->call('$refresh')->assertDontSee('DIAGNOSTICO_RESERVADO_TEST');
         self::assertFalse($panel->viewData('puedeVerDiagnosticos'));
-        self::assertSame([], array_values(array_filter($sql, static fn ($q) => preg_match('/from ["`]diagnosticos["`]/i', $q))));
+        self::assertSame([], array_values(array_filter($sql, static fn (array $q) => str_contains($q[0], 'registros_clinicos') && in_array('DIAGNOSTICO', $q[1], true))));
         self::assertSame(1, Diagnostico::count());
     }
 

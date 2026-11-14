@@ -82,7 +82,7 @@ final class ReglaExpertaEloquentRepositoryTest extends RepositoriosTestCase
     public function test_no_devuelve_una_regla_parcial_sin_consecuencia(): void
     {
         EscenarioRepositorios::guardarGrafo(F::regla());
-        DB::table('consecuencias_regla_experta')->delete();
+        DB::table('componentes_regla_experta')->where('tipo_evento', 'CONSECUENCIA')->delete();
 
         $this->expectException(DomainException::class);
         $this->reglas()->porVersion('SIM-V1');

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\AplicacionInstrumento;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\ControlCognitivo;
@@ -124,7 +125,7 @@ class InformeCognitivoTest extends TestCase
             ->call('irASeccion', 'decision-desglose')
             ->assertDispatched('decision-navigate', seccion: 'decision-desglose');
         $this->assertSame($antes, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->get()->toJson());
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
         $this->assertDatabaseCount('alertas', 0);
         $this->exportar($codigo, $componente);
     }

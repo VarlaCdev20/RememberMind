@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -61,13 +62,13 @@ class CentroCoordinacionService
         $alertasPorPrioridad = (clone $alertas)->select('prioridad')->get()->countBy(fn ($fila) => strtoupper((string) $fila->prioridad));
         $jornada = DB::table('jornadas')->whereDate('fecha_jornada', $hoy)->whereIn('estado', ['ABIERTA', 'ACTIVA'])
             ->orderBy('cod_jornada')->first();
-        $cobertura = $jornada ? DB::table('asignaciones_personal as ap')
+        $cobertura = $jornada ? RegistrosConsumo::consulta('asignaciones_personal', 'ap')
             ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
             ->where('ap.cod_jornada', $jornada->cod_jornada)
             ->where('ap.estado', 'ACTIVA')
             ->select('a.nombre as area', DB::raw('COUNT(DISTINCT ap.cod_personal) as asignados'))
             ->groupBy('a.nombre')->orderBy('a.nombre')->get() : collect();
-        $personalAsignado = $jornada ? DB::table('asignaciones_personal')
+        $personalAsignado = $jornada ? RegistrosConsumo::consulta('asignaciones_personal')
             ->where('cod_jornada', $jornada->cod_jornada)->where('estado', 'ACTIVA')
             ->distinct('cod_personal')->count('cod_personal') : null;
 

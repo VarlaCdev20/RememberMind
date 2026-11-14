@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -81,7 +82,7 @@ class AsignacionesJornadaPlanificadaTest extends TestCase
         }
         $panel->call('guardar')->assertHasNoErrors();
         $this->assertDatabaseCount('jornadas', 1);
-        $this->assertDatabaseHas('asignaciones_residente_jornada', ['cod_residente' => 'RES_PLAN', 'cod_jornada' => 'JOR_PLAN', 'cod_personal' => 'PER_PLAN', 'nivel_supervision' => $nivel, 'estado' => 'ACTIVA']);
+        $this->assertDatabaseHas('asignaciones_jornada', ['tipo_evento' => 'RESIDENTE','cod_residente' => 'RES_PLAN', 'cod_jornada' => 'JOR_PLAN', 'cod_personal' => 'PER_PLAN', 'nivel_supervision' => $nivel, 'estado' => 'ACTIVA']);
         $audit = Activity::where('log_name', 'asignaciones_jornada')->sole();
         $this->assertSame($this->actor->getKey(), $audit->causer_id);
         $this->assertTrue($audit->properties['planificada']);
@@ -117,7 +118,7 @@ class AsignacionesJornadaPlanificadaTest extends TestCase
             app(GestionarAsignacionesJornada::class)->guardar($this->actor, $this->entrada());
             $this->fail('La planificación incoherente fue aceptada.');
         } catch (ValidationException|HttpException $error) {
-            $this->assertDatabaseCount('asignaciones_residente_jornada', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_residente_jornada')->count());
             $this->assertSame(0, Activity::where('log_name', 'asignaciones_jornada')->count());
             $this->assertDatabaseCount('jornadas', 1);
         }
@@ -131,7 +132,7 @@ class AsignacionesJornadaPlanificadaTest extends TestCase
             $action->guardar($this->actor, $this->entrada('CRITICO'));
             $this->fail('Se aceptó una asignación duplicada.');
         } catch (ValidationException $error) {
-            $this->assertDatabaseCount('asignaciones_residente_jornada', 1);
+            $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_residente_jornada')->count());
             $this->assertSame('ESTANDAR', AsignacionResidenteJornada::sole()->nivel_supervision);
             $this->assertSame(1, Activity::where('log_name', 'asignaciones_jornada')->count());
         }
@@ -154,6 +155,6 @@ class AsignacionesJornadaPlanificadaTest extends TestCase
 
         $this->jornada->update(['estado' => 'CERRADA']);
         $panel->call('guardar')->assertHasErrors('fechaInicio');
-        $this->assertDatabaseCount('asignaciones_residente_jornada', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_residente_jornada')->count());
     }
 }

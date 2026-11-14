@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -163,7 +164,7 @@ class EstadoEvolucionResidenteTest extends TestCase
         $this->assertSame('PA_CRITICA', $evidencia['clasificacion']['resultados'][0]['codigo_regla']);
         $this->assertDatabaseCount('alertas', 0);
         $this->assertSame(1, \App\Models\SignoVital::count());
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     /** Respeta objetivos históricos, incluso reemplazados, y no interpreta valores sin regla. */

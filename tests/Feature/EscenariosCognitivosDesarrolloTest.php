@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\Cama;
@@ -145,7 +146,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
     public function test_rechaza_residente_fuera_del_alcance_actual(): void
     {
         $this->preparar();
-        DB::table('asignaciones_residente_jornada')->where('cod_residente', Residente::where('numero_documento', '99000001')->value('cod_residente'))
+        RegistrosConsumo::consulta('asignaciones_residente_jornada')->where('cod_residente', Residente::where('numero_documento', '99000001')->value('cod_residente'))
             ->update(['estado' => 'INACTIVA']);
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('fuera del alcance');

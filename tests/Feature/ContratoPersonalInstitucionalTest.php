@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Mail\PersonalInstitucionalBienvenidaMail;
 use App\Models\Contacto;
 use App\Models\Personal;
@@ -69,7 +70,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
         $this->assertSame(today()->toDateString(), $usuario->personal->fecha_ingreso->toDateString());
         $this->assertTrue($usuario->hasRole('ADMINISTRADOR'));
         $this->assertSame($contactosAntes, Contacto::count());
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('documentos', 3);
         $this->assertArrayNotHasKey('nombres', $usuario->getAttributes());
         $this->assertArrayNotHasKey('created_at', $usuario->getAttributes());

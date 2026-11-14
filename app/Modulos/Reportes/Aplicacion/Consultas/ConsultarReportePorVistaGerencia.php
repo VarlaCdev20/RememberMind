@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Reportes\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\Contacto;
 use App\Models\FotografiaInstitucional;
@@ -194,7 +195,7 @@ final class ConsultarReportePorVistaGerencia
         $area = isset($filtros['area']) ? Area::find($filtros['area'])?->nombre : null;
         $turno = isset($filtros['turno']) ? Turno::find($filtros['turno'])?->nombre : null;
         $ambito = ($area ?? 'Todas las áreas').' · '.($turno ?? 'Todos los turnos');
-        $consulta = DB::table('asignaciones_personal as ap')->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
+        $consulta = RegistrosConsumo::consulta('asignaciones_personal', 'ap')->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
             ->whereDate('j.fecha_jornada', '>=', $inicio->toDateString())->whereDate('j.fecha_jornada', '<=', $fin->toDateString())
             ->whereIn('ap.estado', ['ACTIVO', 'ACTIVA'])
             ->when($filtros['area'] ?? null, fn ($q, $codigo) => $q->where('ap.cod_area', $codigo))

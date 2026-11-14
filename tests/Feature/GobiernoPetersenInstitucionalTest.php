@@ -83,12 +83,15 @@ final class GobiernoPetersenInstitucionalTest extends TestCase
         $antes = app(ConocimientoVersionado::class)->instantanea($version);
         $this->assertNotEmpty($antes['criterios_dominios_resultado']);
         $this->assertFalse(Schema::hasTable('criterios_dominios_resultado'));
+        $componentes = require database_path('migrations/2026_11_14_000013_consolidate_componentes_regla.php');
         $transicion = require database_path('migrations/2026_11_14_000005_consolidate_criterios_dominio_nodos.php');
+        $componentes->down();
         $transicion->down();
         try {
             $this->assertDatabaseCount('criterios_dominios_resultado', count($antes['criterios_dominios_resultado']));
         } finally {
             $transicion->up();
+            $componentes->up();
         }
         $this->assertSame($antes, app(ConocimientoVersionado::class)->instantanea($version));
     }

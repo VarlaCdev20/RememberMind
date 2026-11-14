@@ -3,13 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 use LogicException;
 
-class AsignacionPersonal extends ModeloOperativo
+class AsignacionPersonal extends RegistroConsumo
 {
-    protected $table = 'asignaciones_personal';
-    protected $primaryKey = 'cod_asignacion_personal';
+    protected const TIPO = 'PERSONAL';
+
+    protected const ENTIDAD = 'asignaciones_personal';
+
+    protected $table = 'asignaciones_jornada';
+
+    protected $primaryKey = 'cod_asignacion_jornada';
+
+    protected $appends = ['cod_asignacion_personal'];
+
+    protected $hidden = ['cod_asignacion_jornada', 'tipo_evento', 'cod_residente', 'nivel_supervision', 'fecha_hora'];
+
+    public function getCodAsignacionPersonalAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodAsignacionPersonalAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     /**
      * Solo se permiten columnas físicas de la BDD V2. La aplicación debe resolver
@@ -27,6 +45,8 @@ class AsignacionPersonal extends ModeloOperativo
 
     protected static function booted(): void
     {
+        parent::booted();
+
         static::creating(function (self $asig): void {
             if (empty($asig->cod_asignacion_personal)) {
                 $asig->cod_asignacion_personal = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('asignaciones_personal', $asig->getConnectionName());

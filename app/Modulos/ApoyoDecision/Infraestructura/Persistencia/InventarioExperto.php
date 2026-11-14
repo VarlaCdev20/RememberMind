@@ -30,8 +30,7 @@ final class InventarioExperto
         'mapeos_variables_fuente',
         'mapeos_valores_fuente',
         'reglas_expertas',
-        'condiciones_regla_experta',
-        'consecuencias_regla_experta',
+        'componentes_regla_experta',
         'evaluaciones_expertas',
         'evidencias_evaluacion',
         'relaciones_evidencias_evaluacion',
@@ -77,8 +76,10 @@ final class InventarioExperto
         $relacionesSoporte = [['cod_valoracion_petersen', 'valoraciones_petersen_originales', 'cod_valoracion_petersen']];
         foreach (ContratoFuentesPetersen::FUENTES as $fk => [$modelo]) {
             $entidad = new $modelo;
-            $relacionesSoporte[] = [$fk, $entidad->getTable(), $entidad instanceof \App\Models\ValoracionPsicologica
-                ? 'cod_valoracion_psicologica_ref' : $entidad->getKeyName()];
+            $relacionesSoporte[] = [$fk, $entidad->getTable(), match ($fk) {
+                'cod_valoracion_psicologica', 'cod_antecedente', 'cod_diagnostico' => $fk.'_ref',
+                default => $entidad->getKeyName(),
+            }];
         }
         $captura = [];
         foreach ([

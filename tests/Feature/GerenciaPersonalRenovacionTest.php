@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Mail\PersonalInstitucionalBienvenidaMail;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\AutorizarGestionPersonal;
@@ -181,7 +182,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->call('abrirModalNuevo')->assertSee('Pasos del registro')->assertSee('Identidad y contacto')
             ->call('cerrarModal')->assertSet('modalGestionAbierto', false);
         $this->assertFalse($actor->can('usuarios.crear'));
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_gerencia_crea_trabajador_sin_permisos_globales_y_sin_mora_para_opcionales(): void
@@ -400,7 +401,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertSame('SUSPENDIDO', $destino->fresh()->estado);
         $accion->ejecutar($actor, $destino, 'SUSPENDIDO');
         $this->assertSame('ACTIVO', $destino->fresh()->estado);
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseHas('activity_log', ['subject_id' => $destino->getKey(), 'event' => 'acceso_personal']);
     }
 

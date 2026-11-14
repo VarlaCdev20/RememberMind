@@ -126,7 +126,7 @@ class EnfermeriaV2Test extends TestCase
             ->call('guardar')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('asignaciones_residente_jornada', [
+        $this->assertDatabaseHas('asignaciones_jornada', ['tipo_evento' => 'RESIDENTE',
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $enfermera->personal->cod_personal,
             'estado' => 'ACTIVA',

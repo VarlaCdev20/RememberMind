@@ -28,9 +28,10 @@ return new class extends Migration
             CHECK ((numero_version=1 AND cod_version_anterior IS NULL) OR (numero_version>1 AND cod_version_anterior IS NOT NULL))
         )');
         DB::statement('CREATE INDEX ger_vinculo_autor_idx ON versiones_vinculo_contacto(cod_usuario_acto,fecha_hora_acto)');
+        $asignaciones = Schema::hasTable('asignaciones_jornada') ? 'asignaciones_jornada' : 'asignaciones_personal';
         DB::statement("CREATE TABLE eventos_asignacion_personal (
             cod_evento_asignacion varchar(20) PRIMARY KEY,
-            cod_asignacion_personal varchar(20) NOT NULL REFERENCES asignaciones_personal(cod_asignacion_personal) ON DELETE RESTRICT,
+            cod_asignacion_personal varchar(20) NOT NULL REFERENCES {$asignaciones}(cod_asignacion_personal) ON DELETE RESTRICT,
             numero_evento integer NOT NULL CHECK(numero_evento>0),
             cod_evento_anterior varchar(20) NULL,
             tipo_evento varchar(20) NOT NULL CHECK(tipo_evento IN ('ALTA','FINALIZACION','CANCELACION','RECTIFICACION')),

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Institucion\Aplicacion\Consultas\CentroCoordinacionService;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
@@ -221,8 +222,8 @@ class DashboardAdministracionIntegracionVisualTest extends TestCase
         $this->assertDatabaseCount('ocupaciones_cama', 1);
         $this->assertDatabaseHas('seguros_residente', ['entidad' => 'Seguro de prueba', 'plan' => 'Plan institucional']);
         $this->assertDatabaseCount('atenciones', 0);
-        $this->assertDatabaseCount('diagnosticos', 0);
-        $this->assertDatabaseCount('alergias', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
+        $this->assertSame(0, RegistrosConsumo::consulta('alergias')->count());
     }
 
     public function test_admision_rechaza_cama_de_otra_habitacion(): void

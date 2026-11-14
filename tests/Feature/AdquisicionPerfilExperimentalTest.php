@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\User;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarEjecucionesExperimentales;
 use App\Modulos\ApoyoDecision\Aplicacion\Contratos\AlmacenEjecucionesExperimentales;
@@ -35,10 +36,10 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
             'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']);
         DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'FUNCIONAL', 'cod_valoracion_profesional' => 'SIM-FUNC', 'estado' => 'ACTIVA']);
-        DB::table('diagnosticos')->insert($comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']);
-        DB::table('antecedentes_clinicos')->insert(['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
+        RegistrosConsumo::insertar('diagnosticos', [$comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']]);
+        RegistrosConsumo::insertar('antecedentes_clinicos', [['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'tipo_antecedente' => 'PRUEBA_TECNICA', 'descripcion' => 'Antecedente ficticio.',
-            'fecha_referencia' => '2026-10-15', 'estado' => 'VIGENTE']);
+            'fecha_referencia' => '2026-10-15', 'estado' => 'VIGENTE']]);
         DB::table('registros_observaciones_cuidado')->insert(['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SIM-SUE', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'fecha' => '2026-10-16', 'horas_sueno' => '0.00', 'despertares' => 0,
             'insomnio' => false, 'somnolencia_diurna' => null, 'estado' => 'VIGENTE']);
@@ -100,7 +101,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
     {
         [$autor, $selecciones] = $this->prepararFuentes();
         \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('valoraciones_psicologicas')->where('cod_valoracion_profesional', 'SIM-PSI')->update(['fecha_hora' => '2026-10-18 12:00:00']);
-        DB::table('antecedentes_clinicos')->where('cod_antecedente', 'SIM-ANT')->update(['fecha_referencia' => null]);
+        RegistrosConsumo::consulta('antecedentes_clinicos')->where('cod_registro_clinico', 'SIM-ANT')->update(['fecha_referencia' => null]);
         $fuentes = (new Recolector)->recoger($autor, 'SINTETICO-RES', 'SIM-INTEGRAL-01',
             new DateTimeImmutable('2026-10-17T23:59:59-04:00'), array_intersect_key($selecciones, ['valoraciones_psicologicas' => true, 'antecedentes_clinicos' => true]));
         self::assertSame([], $fuentes[0]['valores']);

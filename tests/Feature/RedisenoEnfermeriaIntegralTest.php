@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -500,7 +501,7 @@ class RedisenoEnfermeriaIntegralTest extends TestCase
         $this->assertEquals('NO_REALIZADA', $omision->fresh()->estado);
 
         // NO se crean órdenes médicas ni diagnósticos automáticos
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     public function test_informe_cognitivo_panel_lateral_muestra_diagnostico_medico_solo_si_autorizado_y_cuidados_pendientes(): void

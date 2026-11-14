@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\{Area, AsignacionPersonal, Atencion, ControlFuncionalIadl as Iadl, Jornada, Personal, Residente, Turno, User};
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarAutonomiaDescriptiva;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
@@ -162,7 +163,7 @@ final class FuncionamientoCotidianoTest extends TestCase
             'cuenta' => $this->psicologo->update(['estado' => 'INACTIVO']),
             'personal' => $this->psicologo->personal->update(['estado' => 'INACTIVO']),
             'profesion' => $this->psicologo->personal->update(['profesion' => 'MEDICINA']),
-            'jornada' => DB::table('asignaciones_personal')->update(['estado' => 'INACTIVA']),
+            'jornada' => RegistrosConsumo::consulta('asignaciones_personal')->update(['estado' => 'INACTIVA']),
             'residente' => $this->residente->update(['estado' => 'EGRESADO']),
             'preview' => session()->put(RolePreviewService::SESSION_KEY, 'PSICOLOGO/A'),
         };

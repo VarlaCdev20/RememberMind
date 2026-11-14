@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\AsignacionResidenteJornada;
 use App\Models\ControlCognitivo;
 use App\Models\Jornada;
@@ -119,7 +120,7 @@ class ResumenCognitivoResidenteTest extends TestCase
         $this->assertStringContainsString('su cantidad no demuestra pérdida de memoria ni evidencia independiente', $resumen['por_que']);
         $this->assertNull($resumen['experto']);
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
         $this->assertDatabaseCount('alertas', 0);
     }
 
@@ -326,7 +327,7 @@ class ResumenCognitivoResidenteTest extends TestCase
         $this->assertSame('Dificultad evidenciada', $resumen['experto']['observacion']);
         $this->assertStringContainsString('no establece por sí sola un diagnóstico clínico', $resumen['experto']['alcance']);
         $this->assertSame($antes, DB::table('evaluaciones_expertas')->get()->toJson());
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
         $this->assertDatabaseCount('alertas', 0);
         $this->exportar('sustentado', $resumen);
     }

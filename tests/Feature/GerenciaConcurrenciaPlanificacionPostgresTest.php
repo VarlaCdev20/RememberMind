@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\Jornada;
 use App\Models\Turno;
@@ -81,7 +82,7 @@ class GerenciaConcurrenciaPlanificacionPostgresTest extends TestCase
             $proceso->wait();
             $this->assertTrue($proceso->isSuccessful(), $proceso->getErrorOutput());
             $this->assertSame('RECHAZADO', json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR)['estado']);
-            $this->assertDatabaseCount('asignaciones_personal', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
             $this->assertDatabaseCount('eventos_asignacion_personal', 0);
             $this->assertSame($estado, DB::table($tabla)->where($pk, $codigo)->value('estado'));
         } finally {

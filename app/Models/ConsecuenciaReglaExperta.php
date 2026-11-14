@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 // sistema experto 4.16.19; restricciones físicas D-137.
-class ConsecuenciaReglaExperta extends ModeloExperto
+class ConsecuenciaReglaExperta extends ModeloBloqueExperto
 {
+    protected const BLOQUE = 'consecuencias_regla_experta';
+
     protected $table = 'consecuencias_regla_experta';
 
     protected $primaryKey = 'cod_consecuencia_regla';

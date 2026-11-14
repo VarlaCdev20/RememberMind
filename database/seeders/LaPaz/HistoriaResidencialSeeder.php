@@ -1045,7 +1045,7 @@ class HistoriaResidencialSeeder extends Seeder
                     throw new RuntimeException('Número de registros incompleto en '.$tabla.'.');
                 }
             }
-            if (! DB::table('diagnosticos')->where('cod_residente', $a->cod_residente)->exists()
+            if (! RegistrosConsumo::consulta('diagnosticos')->where('cod_residente', $a->cod_residente)->exists()
                 || ! DB::table('residentes_contactos')->where('cod_residente', $a->cod_residente)->where('estado', 'ACTIVO')->exists()) {
                 throw new RuntimeException('Falta antecedente clínico o vínculo familiar.');
             }
@@ -1077,7 +1077,7 @@ class HistoriaResidencialSeeder extends Seeder
         }
         $ids = $admissions->pluck('cod_residente');
         if (DB::table('residentes')->whereIn('cod_residente', $ids)->distinct()->count('fecha_nacimiento') !== 48
-            || DB::table('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', $this->jornada(self::REFERENCE_DATE, 1))->where('estado', 'ACTIVA')->count() !== 48) {
+            || RegistrosConsumo::consulta('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', $this->jornada(self::REFERENCE_DATE, 1))->where('estado', 'ACTIVA')->count() !== 48) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
         }
         if (DB::table('administraciones_medicacion as a')->join('prescripciones as p', 'p.cod_prescripcion', '=', 'a.cod_prescripcion')

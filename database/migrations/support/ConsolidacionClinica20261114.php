@@ -17,6 +17,11 @@ abstract class ConsolidacionClinica20261114 extends Migration
 
     protected function despuesDeMover(bool $subir): void {}
 
+    protected function referencias(): array
+    {
+        return static::REFERENCIAS;
+    }
+
     final public function up(): void
     {
         DB::transaction(function (): void {
@@ -36,7 +41,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
                 Schema::drop(static::DESTINO);
             }
             Schema::rename($temporal, static::DESTINO);
-            foreach (static::REFERENCIAS as [$tabla, $columna, $nombre, $origen, $clave, $claveNueva]) {
+            foreach ($this->referencias() as [$tabla, $columna, $nombre, $origen, $clave, $claveNueva]) {
                 $this->cambiarReferencia($tabla, $columna, $nombre, $origen, $clave, static::DESTINO, $claveNueva);
             }
             foreach (array_diff($tablas, [static::DESTINO]) as $tabla) {
@@ -65,7 +70,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
             foreach (static::ORIGENES as $tabla => [$tipo, $columnas]) {
                 $this->transferir($tabla, $origen, $tipo, $columnas, false);
             }
-            foreach (static::REFERENCIAS as [$tabla, $columna, $nombre, $destino, $clave, $claveNueva]) {
+            foreach ($this->referencias() as [$tabla, $columna, $nombre, $destino, $clave, $claveNueva]) {
                 $this->cambiarReferencia($tabla, $columna, $nombre, static::DESTINO, $claveNueva, $destino, $clave);
             }
             Schema::drop($origen);
@@ -100,7 +105,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
     private function bloquear(array $tablas): void
     {
         if (DB::getDriverName() === 'pgsql') {
-            $dependientes = array_column(static::REFERENCIAS, 0);
+            $dependientes = array_column($this->referencias(), 0);
             DB::statement("SET LOCAL lock_timeout = '5s'");
             DB::statement('LOCK TABLE '.implode(', ', array_unique([...$tablas, ...$dependientes])).' IN ACCESS EXCLUSIVE MODE');
         } elseif (DB::getDriverName() !== 'sqlite') {
@@ -111,7 +116,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
     private function verificarReferencias(array $tablas, bool $reversion): void
     {
         $esperadas = [];
-        foreach (static::REFERENCIAS as [$tabla, $columna, , $origen, $clave, $claveNueva]) {
+        foreach ($this->referencias() as [$tabla, $columna, , $origen, $clave, $claveNueva]) {
             $esperadas[] = [$tabla, [$columna], $reversion ? static::DESTINO : $origen, [$reversion ? $claveNueva : $clave]];
         }
         $reales = [];
@@ -148,13 +153,26 @@ abstract class ConsolidacionClinica20261114 extends Migration
         $copia = $tabla.'_fk_copia';
         DB::statement(preg_replace('/^CREATE TABLE\s+"?'.preg_quote($tabla, '/').'"?/i', 'CREATE TABLE "'.$copia.'"', $definicion));
         DB::statement("INSERT INTO $copia ($columnas) SELECT $columnas FROM $tabla");
-        Schema::drop($tabla);
-        Schema::rename($copia, $tabla);
-        foreach ($objetos as $objeto) {
-            DB::unprepared($objeto);
+        // Una tabla hija (por ejemplo un respaldo de condición) puede conservar filas
+        // referidas a esta misma tabla mientras la copia ocupa momentáneamente otro nombre.
+        $diferidas = (int) DB::scalar('PRAGMA defer_foreign_keys');
+        if (! $diferidas && DB::select('PRAGMA foreign_key_check') !== []) {
+            throw new RuntimeException('SQLite tiene referencias inválidas antes de reconstruir '.$tabla);
         }
-        if (DB::select("PRAGMA foreign_key_check('$tabla')") !== []) {
-            throw new RuntimeException('La referencia reconstruida de '.$tabla.' es inválida.');
+        DB::statement('PRAGMA defer_foreign_keys = ON');
+        try {
+            Schema::drop($tabla);
+            Schema::rename($copia, $tabla);
+            foreach ($objetos as $objeto) {
+                DB::unprepared($objeto);
+            }
+            if (DB::select('PRAGMA foreign_key_check') !== []) {
+                throw new RuntimeException('La referencia reconstruida de '.$tabla.' es inválida.');
+            }
+        } finally {
+            if (! $diferidas) {
+                DB::statement('PRAGMA defer_foreign_keys = OFF');
+            }
         }
     }
 

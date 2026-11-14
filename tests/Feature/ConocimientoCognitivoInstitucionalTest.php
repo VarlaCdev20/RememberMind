@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use MotorExperto\conservacion\IdentificadoresHistoricos;
 
 use App\Models\AplicacionInstrumento;
@@ -728,7 +729,7 @@ final class ConocimientoCognitivoInstitucionalTest extends TestCase
         $id = app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario);
         self::assertSame($id, app(RegistrarConocimientoInstitucional::class)->ejecutar($this->usuario));
         self::assertSame(17, DB::table('reglas_expertas')->where('cod_version_modelo', $id)->count());
-        self::assertSame(47, DB::table('condiciones_regla_experta')->whereIn('cod_regla_experta', DB::table('reglas_expertas')->where('cod_version_modelo', $id)->select('cod_regla_experta'))->count());
+        self::assertSame(47, BloquesExpertos::consulta('condiciones_regla_experta')->whereIn('cod_regla_experta', DB::table('reglas_expertas')->where('cod_version_modelo', $id)->select('cod_regla_experta'))->count());
         self::assertSame(17, DB::table('reglas_expertas')->where('cod_version_modelo', $id)->where('estado_revision', 'PENDIENTE')->whereNull('cod_usuario_revision')->count());
         self::assertSame(1, DB::table('activity_log')->where('event', 'contrato_institucional_registrado')->count());
         $r = $this->consultar();

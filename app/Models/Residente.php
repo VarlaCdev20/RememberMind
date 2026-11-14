@@ -61,7 +61,7 @@ class Residente extends ModeloOperativo {
     public function incidentes(): HasMany { return $this->hasMany(Alerta::class,'cod_residente','cod_residente')->whereIn('tipo',['INCIDENTE','CAIDA','EVENTO_ADVERSO']); }
     public function tareasActuales(): HasMany { return $this->ejecucionesCuidado(); }
     public function asignacionesTurno(): HasMany { return $this->asignacionesJornada(); }
-    public function asignacionTurnoActiva(): HasOne { return $this->hasOne(AsignacionResidenteJornada::class, 'cod_residente', 'cod_residente')->where('asignaciones_residente_jornada.estado', 'ACTIVA'); }
+    public function asignacionTurnoActiva(): HasOne { return $this->hasOne(AsignacionResidenteJornada::class, 'cod_residente', 'cod_residente')->where('asignaciones_jornada.estado', 'ACTIVA'); }
     public function cama(): HasOneThrough { return $this->hasOneThrough(Cama::class,OcupacionCama::class,'cod_residente','cod_cama','cod_residente','cod_cama')->whereIn('ocupaciones_cama.estado',['ACTIVA','ACTIVO']); }
     public function getHabitacionAttribute(): ?Habitacion { return $this->cama?->habitacion; }
     public function getApPaternoAttribute(): string { return (string) $this->apellido_paterno; }

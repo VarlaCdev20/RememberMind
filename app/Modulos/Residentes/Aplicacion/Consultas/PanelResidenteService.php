@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Residentes\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\Residente;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
@@ -31,7 +32,7 @@ class PanelResidenteService
             ->orderBy('rc.cod_residente_contacto')
             ->first(['co.nombres', 'co.apellido_paterno', 'co.apellido_materno', 'co.celular', 'co.telefono', 'co.correo', 'rc.parentesco']);
 
-        $asignacion = DB::table('asignaciones_residente_jornada as arj')
+        $asignacion = RegistrosConsumo::consulta('asignaciones_residente_jornada', 'arj')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'arj.cod_jornada')
             ->where('arj.cod_residente', $codigo)
             ->whereDate('j.fecha_jornada', today())

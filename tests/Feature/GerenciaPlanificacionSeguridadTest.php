@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -59,7 +60,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         } catch (ValidationException $error) {
             $this->assertArrayHasKey('f_dias_semana', $error->errors());
         }
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 1);
     }
 
@@ -70,7 +71,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $jornada = Jornada::create(['cod_turno' => $noche->getKey(), 'fecha_jornada' => '2026-10-25', 'estado' => 'ABIERTA']);
         AsignacionPersonal::create(['cod_jornada' => $jornada->getKey(), 'cod_personal' => $this->trabajador->personal->getKey(), 'cod_area' => $this->area->getKey(), 'estado' => 'ACTIVO']);
         app(GestionarHorariosPersonal::class)->guardar($this->entrada($manana));
-        $this->assertDatabaseCount('asignaciones_personal', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->get(route('admin.cobertura-equipo.index', ['fecha' => '2026-10-25']))
             ->assertOk()->assertSeeText('26/10 08:00')->assertSeeText('Persona Sintetica');
     }
@@ -84,7 +85,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $calendario = Livewire::test(TurnosAsignacionesPanel::class)->assertSet('tipoPlanilla', 'general')->assertSet('vistaCalendario', 'semana')
             ->assertSee('Planificación del equipo')->assertSee('Persona Sintetica')->assertSee('27/10 08:00')->assertDontSee('Turnos por cubrir');
         $calendario->call('cambiarVista', 'mes')->assertSee('personas con asignación')->call('seleccionarFecha', '2026-10-26')->assertSet('vistaCalendario', 'dia')->assertSee('Turno nocturno');
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_lectura_de_personal_no_concede_mutar_horarios_y_revocacion_se_revalida(): void
@@ -99,7 +100,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         } catch (HttpException $error) {
             $this->assertSame(403, $error->getStatusCode());
         }
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_cobertura_requiere_los_dos_permisos_y_no_es_el_catalogo_de_turnos(): void
@@ -129,7 +130,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->get(route('admin.turnos-asignaciones.index', $contexto))->assertOk()->assertSeeText('Persona Sintetica');
         $this->travel(30)->minutes();
         $this->get(route($ruta, ['modo' => 'vigente']))->assertOk()->assertDontSeeText('Persona Sintetica');
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_cobertura_muestra_errores_en_sus_campos_y_conserva_filtros_validos(): void
@@ -166,7 +167,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('f_fecha_inicio', $e->errors());
         }
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 1);
     }
 
@@ -188,7 +189,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         }
         $this->assertSame('ACTIVO', $previa->fresh()->estado);
         $this->assertSame('ACTIVO', $editar->fresh()->estado);
-        $this->assertDatabaseCount('asignaciones_personal', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('eventos_asignacion_personal', 0);
     }
 
@@ -207,7 +208,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         } catch (HttpException $error) {
             $this->assertSame(422, $error->getStatusCode());
         }
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 1);
     }
 
@@ -285,12 +286,12 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         } finally {
             AsignacionPersonal::setEventDispatcher($dispatcher);
         }
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 0);
         $this->assertDatabaseCount('eventos_asignacion_personal', 0);
         $this->assertSame($antes, Activity::count());
         app(GestionarHorariosPersonal::class)->guardar($entrada);
-        $this->assertDatabaseCount('asignaciones_personal', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 2);
         $this->assertDatabaseCount('eventos_asignacion_personal', 2);
     }
@@ -307,7 +308,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
             ->assertSee('06/11 08:00')->assertSee('Gestionar horarios')->assertDispatched('planificacion-detalle-seleccionado');
         $panel->set('filtroTurno','Otro turno')->assertSet('asignacionSeleccionada',null)->assertViewHas('detalleAgenda',null);
         $this->assertSame($auditorias,Activity::count());
-        $this->assertDatabaseCount('asignaciones_personal',1); $this->assertDatabaseCount('jornadas',1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count()); $this->assertDatabaseCount('jornadas',1);
         $panel->call('limpiarFiltros')->call('seleccionarAsignacion',$asignacion->getKey());
         Role::findByName('GERENTE','web')->revokePermissionTo('asignaciones_personal.ver');
         $panel->call('seleccionarAsignacion',$asignacion->getKey())->assertForbidden();
@@ -326,7 +327,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$visible->getKey())
             ->assertSee('Asignación registrada; no confirma asistencia.')->assertDontSee('Gestionar horarios');
         Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$fuera->getKey())->assertNotFound();
-        $this->assertDatabaseCount('asignaciones_personal',2);
+        $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_visual_detecta_cruce_nocturno_entre_dias_y_no_marca_el_fin_contiguo(): void
@@ -342,7 +343,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $noche->update(['hora_cierre'=>'08:00']);
         Livewire::test(TurnosAsignacionesPanel::class)->call('seleccionarAsignacion',$asignacion->getKey())
             ->assertViewHas('detalleAgenda',fn ($detalle)=>$detalle['estado'] !== 'CONFLICTO');
-        $this->assertDatabaseCount('asignaciones_personal',2);
+        $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
 }

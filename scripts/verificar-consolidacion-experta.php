@@ -29,18 +29,19 @@ DB::beginTransaction();
 DB::statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
 try {
     $inventario = InventarioExperto::diagnosticar(DB::connection());
-    if ($inventario['expertas_presentes'] !== 23 || $inventario['expertas_ausentes'] !== []) {
+    if ($inventario['expertas_presentes'] !== 22 || $inventario['expertas_ausentes'] !== []) {
         throw new RuntimeException('El inventario experto instalado está incompleto.');
     }
-    foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado'] as $entidad) {
+    foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado', 'condiciones_regla_experta', 'consecuencias_regla_experta'] as $entidad) {
         if (Schema::hasTable($entidad) || Schema::hasView($entidad)) {
             throw new RuntimeException('Una relación retirada permanece como tabla o vista.');
         }
     }
     $referencias = [...TransicionBloquesExpertos::REFERENCIAS,
-        ['consecuencias_regla_experta', ['cod_criterio_dominio_resultado'], 'criterios_dominios_resultado', ['cod_criterio_dominio_resultado']]];
+        ['consecuencias_regla_experta', ['cod_criterio_dominio_resultado'], 'criterios_dominios_resultado', ['cod_criterio_dominio_resultado']],
+        ['evaluaciones_condiciones_regla', ['cod_condicion_regla'], 'condiciones_regla_experta', ['cod_condicion_regla_ref']]];
     foreach ($referencias as [$tabla, $cols, $entidad, $destinos]) {
-        $fks = array_values(array_filter(Schema::getForeignKeys($tabla), static fn ($f) => $f['columns'] === $cols));
+        $fks = array_values(array_filter(Schema::getForeignKeys(BloquesExpertos::tablaFisica($tabla)), static fn ($f) => $f['columns'] === $cols));
         if (count($fks) !== 1 || $fks[0]['foreign_table'] !== BloquesExpertos::tablaFisica($entidad) || $fks[0]['foreign_columns'] !== $destinos) {
             throw new RuntimeException('Una FK trasladada no coincide con el contrato.');
         }

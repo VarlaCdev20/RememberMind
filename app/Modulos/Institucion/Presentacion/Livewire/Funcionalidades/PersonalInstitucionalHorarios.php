@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Turno;
@@ -409,7 +410,7 @@ class PersonalInstitucionalHorarios extends Component
         $this->detalleAsignacion['historia'] = [];
         if (app(ConservarEventoAsignacion::class)->disponible()) {
             $this->detalleAsignacion['historia'] = DB::table('eventos_asignacion_personal as e')
-                ->join('asignaciones_personal as a', 'a.cod_asignacion_personal', '=', 'e.cod_asignacion_personal')
+                ->joinSub(RegistrosConsumo::consulta('asignaciones_personal'), 'a', 'a.cod_asignacion_personal', '=', 'e.cod_asignacion_personal')
                 ->join('personal as titular', 'titular.cod_personal', '=', 'a.cod_personal')
                 ->leftJoin('personal as autor', 'autor.cod_usuario', '=', 'e.cod_usuario_registro')
                 ->where('titular.cod_usuario', $this->usuarioId)->where('a.cod_asignacion_personal', $cod)->orderBy('e.numero_evento')

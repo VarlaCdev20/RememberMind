@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Personal;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
@@ -35,10 +36,10 @@ class GerenciaDashboardTest extends TestCase
             'fecha_jornada' => today(), 'estado' => 'EN_CURSO']);
         for ($i = 1; $i <= 9; $i++) {
             DB::table('areas')->insert(['cod_area' => 'ARE_GER_'.$i, 'nombre' => 'Área de prueba '.$i, 'estado' => 'ACTIVA']);
-            DB::table('asignaciones_personal')->insert(['cod_asignacion_personal' => 'ASP_GER_'.$i,
+            RegistrosConsumo::insertar('asignaciones_personal', [['cod_asignacion_personal' => 'ASP_GER_'.$i,
                 'cod_personal' => 'PER_GER_TEST', 'cod_jornada' => 'JOR_GER_TEST', 'cod_area' => 'ARE_GER_'.$i,
                 'tipo_asignacion' => 'REGULAR', 'fecha_asignacion' => now(),
-                'estado' => $i % 2 ? 'ACTIVO' : 'ACTIVA']);
+                'estado' => $i % 2 ? 'ACTIVO' : 'ACTIVA']]);
         }
 
         $service = app(RoleDashboardDataService::class);
@@ -76,7 +77,7 @@ class GerenciaDashboardTest extends TestCase
             ->assertSeeText('Para revisar hoy')->assertSeeText('Camas ocupadas')->assertSeeText('Avisos documentales');
         $this->assertFalse($gerente->can('prescripciones.crear'));
         $this->assertFalse($gerente->can('usuarios.gestionar'));
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     #[DataProvider('horariosSaludo')]

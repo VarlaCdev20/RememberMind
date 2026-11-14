@@ -3,13 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 use LogicException;
 
-class AsignacionResidenteJornada extends ModeloOperativo
+class AsignacionResidenteJornada extends RegistroConsumo
 {
-    protected $table = 'asignaciones_residente_jornada';
-    protected $primaryKey = 'cod_asignacion';
+    protected const TIPO = 'RESIDENTE';
+
+    protected const ENTIDAD = 'asignaciones_residente_jornada';
+
+    protected $table = 'asignaciones_jornada';
+
+    protected $primaryKey = 'cod_asignacion_jornada';
+
+    protected $appends = ['cod_asignacion'];
+
+    protected $hidden = ['cod_asignacion_jornada', 'tipo_evento', 'cod_asignacion_personal', 'cod_area', 'funcion', 'tipo_asignacion', 'fecha_asignacion'];
+
+    public function getCodAsignacionAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodAsignacionAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     /** Columnas exactas de asignaciones_residente_jornada en PostgreSQL V2. */
     protected $fillable = [
@@ -24,6 +42,8 @@ class AsignacionResidenteJornada extends ModeloOperativo
 
     protected static function booted(): void
     {
+        parent::booted();
+
         static::creating(function (self $asig): void {
             if (empty($asig->cod_asignacion)) {
                 $asig->cod_asignacion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('asignaciones_residente_jornada', $asig->getConnectionName());

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Cama;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Modulos\Residentes\Aplicacion\Consultas\DirectorioResidentesService;
@@ -172,7 +173,7 @@ class ConsultaOperativaService
             case 'jornadas':
                 return $this->armar(
                     DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')
-                        ->leftJoinSub(DB::table('asignaciones_personal')->where('estado', 'ACTIVA')
+                        ->leftJoinSub(RegistrosConsumo::consulta('asignaciones_personal')->where('estado', 'ACTIVA')
                             ->select('cod_jornada', DB::raw('COUNT(DISTINCT cod_personal) as asignados'))
                             ->groupBy('cod_jornada'), 'ap', 'ap.cod_jornada', '=', 'j.cod_jornada')
                         ->select('j.cod_jornada as codigo', 't.nombre as titulo', 'j.cod_jornada as detalle',
@@ -183,7 +184,7 @@ class ConsultaOperativaService
                 );
             case 'asignaciones':
                 return $this->armar(
-                    DB::table('asignaciones_personal as ap')->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
+                    RegistrosConsumo::consulta('asignaciones_personal', 'ap')->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
                         ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')
                         ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
                         ->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')

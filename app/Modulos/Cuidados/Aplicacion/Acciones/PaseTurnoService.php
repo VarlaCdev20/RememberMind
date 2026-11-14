@@ -92,8 +92,8 @@ class PaseTurnoService
                 ->where('cod_personal', $personal->cod_personal)
                 ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
                 ->where(fn ($jornadas) => $jornadas
-                    ->whereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_saliente')
-                    ->orWhereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'))));
+                    ->whereColumn('asignaciones_jornada.cod_jornada', 'pases_turno.cod_jornada_saliente')
+                    ->orWhereColumn('asignaciones_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'))));
     }
 
     public function validarContextoEmision(User $usuario, string $codResidente, array $datos): void
@@ -357,7 +357,7 @@ class PaseTurnoService
                     ->orWhereHas('residente.asignacionesJornada', fn ($a) => $a
                         ->where('cod_personal', $personalEntrante->getKey())
                         ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-                        ->whereColumn('asignaciones_residente_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'));
+                        ->whereColumn('asignaciones_jornada.cod_jornada', 'pases_turno.cod_jornada_entrante'));
             })
             ->with(['residente.cama.habitacion', 'personalSaliente.usuario', 'jornadaSaliente.turno', 'jornadaEntrante.turno']);
 

@@ -964,7 +964,7 @@ class Historical2026Seeder extends Seeder
         }
         $ids = $admissions->pluck('cod_residente');
         if (DB::table('residentes')->whereIn('cod_residente', $ids)->distinct()->count('fecha_nacimiento') !== 30
-            || DB::table('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('usuarios as u', 'u.cod_usuario', '=', 'j.cod_usuario_apertura')->where('j.fecha_jornada', self::REFERENCE_DATE)->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->where('u.correo', 'admisiones@remembermind.test')->sole(['j.cod_jornada'])->cod_jornada)->where('estado', 'ACTIVA')->count() !== 30) {
+            || RegistrosConsumo::consulta('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('usuarios as u', 'u.cod_usuario', '=', 'j.cod_usuario_apertura')->where('j.fecha_jornada', self::REFERENCE_DATE)->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->where('u.correo', 'admisiones'.self::DOMINIO_CORREO)->sole(['j.cod_jornada'])->cod_jornada)->where('estado', 'ACTIVA')->count() !== 30) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
         }
         if (DB::table('administraciones_medicacion as a')->join('prescripciones as p', 'p.cod_prescripcion', '=', 'a.cod_prescripcion')

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Actividad;
 use App\Models\Alerta;
 use App\Models\Area;
@@ -279,7 +280,7 @@ class ExploradorAdministrativoTest extends TestCase
         $this->get(route('admin.administracion.asignaciones', ['vista' => 'cobertura']))->assertOk()->assertSee('Cobertura por área')->assertSee('Área de prueba');
         $this->get(route('admin.administracion.incidentes', ['vista' => 'tablero']))->assertSessionHasErrors('vista');
         $this->assertDatabaseCount('alertas', 1);
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $series = [['etiqueta' => 'Grupo A', 'cantidad' => 3, 'url' => '/consulta?a=1'], ['etiqueta' => 'Grupo B', 'cantidad' => 1, 'url' => '/consulta?a=2']];
         $html = Blade::render('<x-ui.grafico-operativo tipo="anillo" :datos="$series" etiqueta="Distribución sintética" />', compact('series'));
         $this->assertStringContainsString('75%', $html);

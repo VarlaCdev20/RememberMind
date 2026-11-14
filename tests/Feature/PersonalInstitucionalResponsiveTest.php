@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -34,7 +35,7 @@ class PersonalInstitucionalResponsiveTest extends TestCase
         Livewire::test(PersonalInstitucionalPanel::class)->assertSee($personal->correo)->assertSee($turno->nombre)
             ->call('cambiarVistaListadoResumen', 'tarjetas')->assertSee($turno->nombre);
         $this->assertSame($antes, $asignacion->fresh()->getAttributes());
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     public function test_secciones_de_superadministracion_conservan_filtros_y_acciones_al_renderizar(): void
@@ -101,7 +102,7 @@ class PersonalInstitucionalResponsiveTest extends TestCase
         $this->exportar('asignaciones', $horarios->html());
 
         $panel->call('cerrarModal')->assertSet('modalGestionAbierto', false);
-        $this->assertDatabaseCount('asignaciones_personal', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertTrue($gerente->can('usuarios.crear'));
     }
 
@@ -126,7 +127,7 @@ class PersonalInstitucionalResponsiveTest extends TestCase
         $panel->call('limpiarFiltrosResumen')->call('nextPage', 'personalPage')
             ->call('cambiarVistaListadoResumen', 'tarjetas')->assertSee('staff14@remembermind.test');
         $panel->set('estadoResumen', 'activo')->assertSet('paginators.personalPage', 1);
-        $this->assertDatabaseCount('asignaciones_personal', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertFalse($gerente->can('usuarios.crear'));
     }
 

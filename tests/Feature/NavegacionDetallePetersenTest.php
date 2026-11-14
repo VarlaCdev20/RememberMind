@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -45,7 +46,7 @@ class NavegacionDetallePetersenTest extends TestCase
             ->assertDispatched('decision-navigate', seccion: 'decision-petersen-detalle');
 
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     public function test_destino_desconocido_sigue_rechazado(): void

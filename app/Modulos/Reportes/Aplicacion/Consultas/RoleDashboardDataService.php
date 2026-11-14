@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Reportes\Aplicacion\Consultas;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\User;
 use App\Modulos\Alertas\Aplicacion\Consultas\BandejaAlertas;
@@ -80,7 +81,7 @@ final class RoleDashboardDataService
     {
         $today = today();
         $activeAlerts = app(BandejaAlertas::class)->pendientes($user);
-        $staffToday = DB::table('asignaciones_personal as ap')
+        $staffToday = RegistrosConsumo::consulta('asignaciones_personal', 'ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
             ->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
             ->whereDate('j.fecha_jornada', $today)
@@ -150,7 +151,7 @@ final class RoleDashboardDataService
     {
         $gerencia = app(ConsultarIndicadoresGerencia::class)->consultar($user);
         $today = today();
-        $assignments = DB::table('asignaciones_personal as ap')
+        $assignments = RegistrosConsumo::consulta('asignaciones_personal', 'ap')
             ->join('jornadas as j', 'j.cod_jornada', '=', 'ap.cod_jornada')
             ->join('personal as p', 'p.cod_personal', '=', 'ap.cod_personal')
             ->join('areas as a', 'a.cod_area', '=', 'ap.cod_area')

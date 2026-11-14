@@ -24,6 +24,11 @@ abstract class RegistroConsumo extends ModeloOperativo
         });
     }
 
+    protected function getAttributesForInsert()
+    {
+        return ['tipo_evento' => static::TIPO] + parent::getAttributesForInsert();
+    }
+
     public function entidadCodigo(): string
     {
         return static::ENTIDAD;

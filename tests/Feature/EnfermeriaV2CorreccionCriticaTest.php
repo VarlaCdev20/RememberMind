@@ -198,7 +198,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             ->call('guardarDispositivo')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('dispositivos_clinicos', [
+        $this->assertDatabaseHas('registros_clinicos', ['tipo_evento' => 'DISPOSITIVO',
             'cod_residente' => $residente->cod_residente,
             'tipo' => 'SONDA_VESICAL',
             'estado' => 'ACTIVO',
@@ -212,8 +212,8 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
             ->call('retirarDispositivo', $disp->cod_dispositivo)
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('dispositivos_clinicos', [
-            'cod_dispositivo' => $disp->cod_dispositivo,
+        $this->assertDatabaseHas('registros_clinicos', ['tipo_evento' => 'DISPOSITIVO',
+            'cod_registro_clinico' => $disp->cod_dispositivo,
             'estado' => 'RETIRADO',
         ]);
     }

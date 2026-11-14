@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Atencion;
@@ -82,7 +83,7 @@ final class ObservacionesVariadasSinteticasTest extends TestCase
         self::assertFalse($informe['persistido']);
         self::assertArrayNotHasKey('patron', $informe);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
-        self::assertDatabaseCount('diagnosticos', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
         foreach ($informe['resultados'] as $salida) {
             self::assertSame($p->getKey(), $salida['fuente']['autor']);
             self::assertSame($r->getKey(), $salida['fuente']['residente']);

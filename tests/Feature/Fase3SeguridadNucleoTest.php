@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Modulos\Clinica\Aplicacion\Acciones\AccesoClinicoTemporalService;
 use App\Models\Area;
@@ -178,7 +179,7 @@ class Fase3SeguridadNucleoTest extends TestCase
         $administrador->givePermissionTo('diagnosticos.crear');
         $residente = Residente::factory()->create();
         $this->actingAs($administrador)->postJson(route('admin.clinica.store', [$residente, 'diagnostico']), [])->assertForbidden();
-        $this->assertDatabaseCount('diagnosticos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('diagnosticos')->count());
     }
 
     public function test_superadmin_sin_excepcion_no_escribe_clinica_por_su_rol(): void
