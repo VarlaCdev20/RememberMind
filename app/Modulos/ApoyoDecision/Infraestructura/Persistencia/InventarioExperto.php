@@ -36,7 +36,6 @@ final class InventarioExperto
         'relaciones_evidencias_evaluacion',
         'evaluacion_criterios',
         'evaluaciones_reglas',
-        'evaluaciones_condiciones_regla',
         'vinculos_evidencia_experta',
     ];
 
@@ -44,7 +43,6 @@ final class InventarioExperto
         'hechos_instantanea_experta',
         'motivos_dcl_instantanea',
         'reglas_aplicadas_dcl_instantanea',
-        'condiciones_regla_instantanea',
     ];
 
     /** Dictámenes humanos separados, extensión aprobada el 17/10/2026. */

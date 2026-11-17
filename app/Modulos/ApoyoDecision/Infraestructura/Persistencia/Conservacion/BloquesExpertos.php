@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 final class BloquesExpertos
 {
     private const TIPADOS = [
+        'evaluaciones_reglas' => ['evaluaciones_reglas', 'cod_elemento_evaluacion', 'REGLA', 'cod_evaluacion_regla', ['cod_traza_inferencia', 'cod_regla_experta', 'estado_regla', 'fecha_hora_evaluacion']],
+        'evaluaciones_condiciones_regla' => ['evaluaciones_reglas', 'cod_elemento_evaluacion', 'CONDICION', 'cod_evaluacion_condicion', ['cod_evaluacion_regla_padre as cod_evaluacion_regla', 'cod_condicion_regla', 'estado_condicion', 'fecha_hora_evaluacion']],
+        'reglas_aplicadas_dcl_instantanea' => ['reglas_aplicadas_dcl_instantanea', 'cod_elemento_regla_dcl', 'REGLA', 'cod_regla_aplicada_dcl', ['cod_clasificacion_dcl_instantanea', 'cod_regla_experta', 'id_regla_dominio', 'fuente', 'habilitada', 'concepto_consecuencia', 'consecuencia_tipo', 'consecuencia_texto', 'consecuencia_entero', 'consecuencia_real_ieee754', 'consecuencia_logico', 'orden']],
+        'condiciones_regla_instantanea' => ['reglas_aplicadas_dcl_instantanea', 'cod_elemento_regla_dcl', 'CONDICION', 'cod_condicion_instantanea', ['cod_regla_propietaria as cod_regla_aplicada_dcl', 'cod_condicion_padre', 'operador', 'variable', 'literal_tipo', 'literal_texto', 'literal_entero', 'literal_real_ieee754', 'literal_logico', 'orden']],
         'condiciones_regla_experta' => ['componentes_regla_experta', 'cod_componente_regla', 'CONDICION',
             'cod_condicion_regla', ['cod_regla_experta', 'cod_variable_experta', 'cod_valor_semantico']],
         'consecuencias_regla_experta' => ['componentes_regla_experta', 'cod_componente_regla', 'CONSECUENCIA',
@@ -22,6 +26,9 @@ final class BloquesExpertos
         'evidencias_soporte_condicion' => ['vinculos_evidencia_experta', 'cod_vinculo_evidencia', 'CONDICION', 'cod_evidencia_soporte_condicion', ['cod_evaluacion_condicion',
             'cod_evidencia_evaluacion']],
     ];
+
+    private const PARENTESCOS = ['evaluaciones_condiciones_regla' => ['cod_evaluacion_regla' => 'cod_evaluacion_regla_padre'],
+        'condiciones_regla_instantanea' => ['cod_regla_aplicada_dcl' => 'cod_regla_propietaria']];
 
     public const DEFINICIONES = [
         'resultados_criterio' => ['tabla' => 'evaluacion_criterios', 'propietario' => 'cod_evaluacion_criterio', 'id' => 'cod_resultado_criterio',
@@ -79,7 +86,7 @@ final class BloquesExpertos
         return $definicion === null ? null : array_keys($definicion['campos']);
     }
 
-    public static function consulta(string $entidad, ?string $conexion = null): Builder
+    public static function consulta(string $entidad, ?string $conexion = null, ?string $alias = null): Builder
     {
         $db = DB::connection($conexion);
         if (isset(self::TIPADOS[$entidad])) {
@@ -87,15 +94,15 @@ final class BloquesExpertos
             $origen = $db->table($tabla)->where('tipo_evento', $tipo)
                 ->select([$codigo.' as '.$clave, ...$columnas]);
 
-            return $db->query()->fromSub($origen, $entidad);
+            return $db->query()->fromSub($origen, $alias ?? $entidad);
         }
         if (($d = self::definicion($entidad)) === null) {
-            return $db->table($entidad);
+            return $db->table($entidad, $alias);
         }
         $columnas = array_map(static fn ($col, $nombre) => $col.' as '.$nombre, $d['campos'], array_keys($d['campos']));
         $origen = $db->table($d['tabla'])->select($columnas)->whereNotNull($d['id']);
 
-        return $db->query()->fromSub($origen, $entidad);
+        return $db->query()->fromSub($origen, $alias ?? $entidad);
     }
 
     public static function insertar(string $entidad, array $filas, ?string $conexion = null): void
@@ -107,10 +114,17 @@ final class BloquesExpertos
         $db = DB::connection($conexion);
         if (isset(self::TIPADOS[$entidad])) {
             [$tabla, $codigo, $tipo, $clave] = self::TIPADOS[$entidad];
-            $db->table($tabla)->insert(array_map(
-                static fn (array $fila): array => ['tipo_evento' => $tipo, $codigo => $fila[$clave]]
-                    + array_diff_key($fila, [$clave => true]), $filas,
-            ));
+            $db->table($tabla)->insert(array_map(static function (array $fila) use ($entidad, $codigo, $tipo, $clave): array {
+                $datos = array_diff_key($fila, [$clave => true]);
+                foreach (self::PARENTESCOS[$entidad] ?? [] as $logico => $fisico) {
+                    if (array_key_exists($logico, $datos)) {
+                        $datos[$fisico] = $datos[$logico];
+                        unset($datos[$logico]);
+                    }
+                }
+
+                return ['tipo_evento' => $tipo, $codigo => $fila[$clave]] + $datos;
+            }, $filas));
 
             return;
         }

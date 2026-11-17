@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\ControlCognitivo;
 use App\Models\Personal;
 use App\Models\Residente;
@@ -83,7 +85,7 @@ final class RevisionObservacionalExpertaTest extends TestCase
     public function test_traza_alterada_impide_consultar_y_firmar_sin_escrituras(): void
     {
         $id = $this->ejecutar();
-        DB::table('evaluaciones_reglas')->update(['estado_regla' => 'NO_CUMPLE']);
+        DB::table('evaluaciones_reglas')->where('tipo_evento', 'REGLA')->update(['estado_regla' => 'NO_CUMPLE']);
         foreach (['consulta', 'firma'] as $operacion) {
             try {
                 $operacion === 'consulta' ? app(ConsultarRevisionesValoracionExperta::class)->consultar($this->medico, $id)

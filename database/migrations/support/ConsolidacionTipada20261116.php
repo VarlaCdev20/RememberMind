@@ -38,6 +38,9 @@ abstract class ConsolidacionTipada20261116 extends Migration
                     throw new RuntimeException('La estructura de '.$tabla.' difiere del contrato autorizado.');
                 }
                 $this->verificarClavesOriginales($tabla, $definicion);
+            }
+            // Validar todas las fuentes antes de que un rename actualice las FK entre ellas.
+            foreach (array_keys($fuentes) as $tabla) {
                 Schema::rename($tabla, $tabla.'_antes16');
             }
             $this->crearFusion($fuentes);

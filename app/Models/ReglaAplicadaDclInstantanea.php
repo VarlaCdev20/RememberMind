@@ -30,8 +30,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * No ejecuta reglas ni inventa conocimiento para llenar una colección vacía.
  * Hereda la prohibición de sobrescritura y borrado ordinario de ModeloExperto.
  */
-final class ReglaAplicadaDclInstantanea extends ModeloExperto
+final class ReglaAplicadaDclInstantanea extends ModeloBloqueExperto
 {
+    protected const BLOQUE = 'reglas_aplicadas_dcl_instantanea';
+
     protected $table = 'reglas_aplicadas_dcl_instantanea';
 
     protected $primaryKey = 'cod_regla_aplicada_dcl';

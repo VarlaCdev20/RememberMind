@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\Alergia;
 use App\Models\AntecedenteClinico;
 use App\Models\Area;
@@ -100,7 +102,7 @@ class ConsolidacionRegistrosAsignacionesReglasTest extends TestCase
             'cod_traza_inferencia' => 'FUSION-TRAZA', 'traza_estado_inferencia' => 'FINALIZADA',
             'traza_fecha_hora_inicio' => $fecha['fecha_hora'],
         ]);
-        DB::table('evaluaciones_reglas')->insert([
+        BloquesExpertos::insertar('evaluaciones_reglas', [
             'cod_evaluacion_regla' => 'FUSION-EVAL-REGLA', 'cod_traza_inferencia' => 'FUSION-TRAZA', 'cod_regla_experta' => 'SIM-R',
             'estado_regla' => 'ACTIVA', 'fecha_hora_evaluacion' => $fecha['fecha_hora'],
         ]);
@@ -109,9 +111,21 @@ class ConsolidacionRegistrosAsignacionesReglasTest extends TestCase
             'cod_evaluacion_condicion' => 'FUSION-EVAL-COND', 'cod_evaluacion_regla' => 'FUSION-EVAL-REGLA',
             'estado_condicion' => 'CUMPLE', 'fecha_hora_evaluacion' => $fecha['fecha_hora'],
         ];
-        $this->rechazar(fn () => DB::table('evaluaciones_condiciones_regla')->insert($evaluacionCondicion + ['cod_condicion_regla' => 'SIM-CONS']));
-        DB::table('evaluaciones_condiciones_regla')->insert($evaluacionCondicion + ['cod_condicion_regla' => $condicion]);
+        $this->rechazar(fn () => BloquesExpertos::insertar('evaluaciones_condiciones_regla', $evaluacionCondicion + ['cod_condicion_regla' => 'SIM-CONS']));
+        BloquesExpertos::insertar('evaluaciones_condiciones_regla', $evaluacionCondicion + ['cod_condicion_regla' => $condicion]);
 
+        $regla = \App\Models\EvaluacionRegla::query()->with('evaluacionesCondicionesRegla')->findOrFail('FUSION-EVAL-REGLA');
+        $condicionEvaluada = $regla->evaluacionesCondicionesRegla->sole();
+        $this->assertSame('FUSION-EVAL-COND', $condicionEvaluada->getKey());
+        $this->assertSame($regla->getKey(), $condicionEvaluada->evaluacionRegla->getKey());
+        $this->assertNull(\App\Models\EvaluacionRegla::find($condicionEvaluada->getKey()));
+        $this->rechazar(fn () => DB::table('evaluaciones_reglas')->where('cod_evaluacion_condicion', $condicionEvaluada->getKey())
+            ->update(['cod_evaluacion_regla_padre' => $condicionEvaluada->getKey()]));
+        $this->rechazar(fn () => DB::table('evaluaciones_reglas')->where('cod_evaluacion_condicion', $condicionEvaluada->getKey())
+            ->update(['estado_regla' => 'CUMPLE']));
+
+        $evaluaciones = require database_path('migrations/2026_11_17_000003_consolidate_evaluaciones_reglas.php');
+        $evaluaciones->down();
         $migraciones = array_map(static fn ($ruta) => require $ruta, glob(database_path('migrations/2026_11_14_00001[123]*.php')));
         foreach (array_reverse($migraciones) as $migracion) {
             $migracion->down();
@@ -129,12 +143,13 @@ class ConsolidacionRegistrosAsignacionesReglasTest extends TestCase
             }
         }
 
+        $evaluaciones->up();
         $this->assertSame('PENDIENTE', $diagnostico->fresh()->certeza);
         $this->assertSame('MINIMO', $asignacionResidente->fresh()->nivel_supervision);
         $this->assertDatabaseHas('eventos_asignacion_personal', ['cod_evento_asignacion' => 'EV-SINTETICO',
             'cod_asignacion_personal' => $asignacionPersonal->getKey()]);
         $this->assertDatabaseHas('soportes_valoracion_petersen', ['cod_soporte_petersen' => 'SVP-DIA', 'cod_diagnostico' => $diagnostico->getKey()]);
-        $this->assertDatabaseHas('evaluaciones_condiciones_regla', $evaluacionCondicion + ['cod_condicion_regla' => $condicion]);
+        $this->assertTrue(BloquesExpertos::consulta('evaluaciones_condiciones_regla')->where($evaluacionCondicion + ['cod_condicion_regla' => $condicion])->exists());
         $this->assertFalse(Schema::hasTable('diagnosticos'));
     }
 

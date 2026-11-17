@@ -29,17 +29,21 @@ DB::beginTransaction();
 DB::statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
 try {
     $inventario = InventarioExperto::diagnosticar(DB::connection());
-    if ($inventario['expertas_presentes'] !== 22 || $inventario['expertas_ausentes'] !== []) {
+    if ($inventario['expertas_presentes'] !== 20 || $inventario['expertas_ausentes'] !== []) {
         throw new RuntimeException('El inventario experto instalado está incompleto.');
     }
-    foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado', 'condiciones_regla_experta', 'consecuencias_regla_experta'] as $entidad) {
+    foreach ([...array_keys(BloquesExpertos::DEFINICIONES), 'criterios_dominios_resultado', 'condiciones_regla_experta', 'consecuencias_regla_experta', 'evaluaciones_condiciones_regla', 'condiciones_regla_instantanea'] as $entidad) {
         if (Schema::hasTable($entidad) || Schema::hasView($entidad)) {
             throw new RuntimeException('Una relación retirada permanece como tabla o vista.');
         }
     }
     $referencias = [...TransicionBloquesExpertos::REFERENCIAS,
         ['consecuencias_regla_experta', ['cod_criterio_dominio_resultado'], 'criterios_dominios_resultado', ['cod_criterio_dominio_resultado']],
-        ['evaluaciones_condiciones_regla', ['cod_condicion_regla'], 'condiciones_regla_experta', ['cod_condicion_regla_ref']]];
+        ['evaluaciones_condiciones_regla', ['cod_condicion_regla'], 'condiciones_regla_experta', ['cod_condicion_regla_ref']],
+        ['evaluaciones_condiciones_regla', ['cod_evaluacion_regla_padre'], 'evaluaciones_reglas', ['cod_evaluacion_regla']],
+        ['evidencias_soporte_condicion', ['cod_evaluacion_condicion'], 'evaluaciones_condiciones_regla', ['cod_evaluacion_condicion']],
+        ['condiciones_regla_instantanea', ['cod_regla_propietaria'], 'reglas_aplicadas_dcl_instantanea', ['cod_regla_aplicada_dcl']],
+        ['condiciones_regla_instantanea', ['cod_condicion_padre'], 'condiciones_regla_instantanea', ['cod_condicion_instantanea']]];
     foreach ($referencias as [$tabla, $cols, $entidad, $destinos]) {
         $fks = array_values(array_filter(Schema::getForeignKeys(BloquesExpertos::tablaFisica($tabla)), static fn ($f) => $f['columns'] === $cols));
         if (count($fks) !== 1 || $fks[0]['foreign_table'] !== BloquesExpertos::tablaFisica($entidad) || $fks[0]['foreign_columns'] !== $destinos) {

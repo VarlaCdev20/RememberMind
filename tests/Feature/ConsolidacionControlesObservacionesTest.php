@@ -98,7 +98,7 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         if ($this->triggersOriginales !== null) {
             $this->assertSame($this->triggersOriginales, DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson());
         }
-        $this->assertCount(94, Schema::getTableListing()); // Núcleo 93 y tabla de referencias del ensayo.
+        $this->assertCount(92, Schema::getTableListing()); // Núcleo 91 y tabla de referencias del ensayo.
         $this->assertSame(1, ControlCognitivo::count());
         $this->assertSame(2, ControlFuncionalIadl::count());
         $this->assertSame(1, RegistroMovilidad::count());

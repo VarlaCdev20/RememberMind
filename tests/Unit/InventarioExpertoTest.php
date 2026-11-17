@@ -16,13 +16,13 @@ class InventarioExpertoTest extends TestCase
             'expert_runs_no_aprobada'], InventarioExperto::excluirDelInventarioOperativo($tablas));
     }
 
-    public function test_las_17_relaciones_base_expertas_no_ocultan_una_tabla_operativa_ausente(): void
+    public function test_las_16_relaciones_base_expertas_no_ocultan_una_tabla_operativa_ausente(): void
     {
         $dict = file_get_contents(dirname(__DIR__, 2).'/docs/base-de-datos/REMEMBERMIND_BDD_70_TABLAS.md');
         preg_match_all('/^## \d+\. `([a-z_]+)`/m', $dict, $matches);
         $operativas = [...$matches[1], 'objetivos_signos_vitales'];
         $this->assertCount(71, $operativas);
-        $this->assertCount(17, InventarioExperto::TABLAS);
+        $this->assertCount(16, InventarioExperto::TABLAS);
         $this->assertSame($operativas,
             InventarioExperto::excluirDelInventarioOperativo([...$operativas, ...InventarioExperto::TABLAS]));
 
@@ -31,18 +31,18 @@ class InventarioExpertoTest extends TestCase
             InventarioExperto::excluirDelInventarioOperativo([...$operativas, ...InventarioExperto::TABLAS]));
     }
 
-    public function test_consolidacion_deja_21_expertas_antes_de_revision_sin_ocultar_tablas_desconocidas(): void
+    public function test_consolidacion_deja_19_expertas_antes_de_revision_sin_ocultar_tablas_desconocidas(): void
     {
-        $this->assertCount(4, InventarioExperto::CONSERVACION);
-        $this->assertCount(21, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION]);
+        $this->assertCount(3, InventarioExperto::CONSERVACION);
+        $this->assertCount(19, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION]);
         $this->assertSame(['residentes', 'tabla_no_aprobada'], InventarioExperto::excluirDelInventarioOperativo([
             'residentes', ...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION, 'tabla_no_aprobada',
         ]));
     }
 
-    public function test_revision_profesional_y_consolidacion_dejan_22_expertas(): void
+    public function test_revision_profesional_y_consolidacion_dejan_20_expertas(): void
     {
-        $this->assertCount(22, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION, ...InventarioExperto::REVISION_PROFESIONAL]);
+        $this->assertCount(20, [...InventarioExperto::TABLAS, ...InventarioExperto::CONSERVACION, ...InventarioExperto::REVISION_PROFESIONAL]);
         $this->assertSame(['residentes', 'no_aprobada'], InventarioExperto::excluirDelInventarioOperativo([
             'residentes', 'revisiones_evaluacion_experta', 'no_aprobada',
         ]));

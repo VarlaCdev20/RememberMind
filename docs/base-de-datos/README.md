@@ -15,7 +15,9 @@ runtime_verified: false
 
 ## Estado vigente
 
-**Corte posterior vigente del 17/11/2026 — 60 operativas:** la [unión autorizada e instalada de controles cognitivos e IADL](DECISION_60_OPERATIVAS_CONTROLES_2026_11_17.md) conserva los 327 registros afectados y deja **60 operativas + 22 expertas = 82 de negocio**, más **16 técnicas: 98 físicas**. Los cortes siguientes conservan su fecha histórica.
+**Corte vigente del 17/11/2026 — 20 expertas.** La [unión instalada de evaluaciones e instantáneas de reglas](DECISION_20_EXPERTAS_REGLAS_2026_11_17.md) conserva 206 registros y deja **60 operativas, 20 expertas y 16 técnicas**, para un total de **96 tablas físicas**.
+
+**Corte anterior del 17/11/2026 — 60 operativas:** la [unión autorizada e instalada de controles cognitivos e IADL](DECISION_60_OPERATIVAS_CONTROLES_2026_11_17.md) conserva los 327 registros afectados y deja **60 operativas + 22 expertas = 82 de negocio**, más **16 técnicas: 98 físicas**. Los cortes siguientes conservan su fecha histórica.
 
 **Corte vigente del 17/11/2026 — pases de turno y textos clínicos:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_PASES_TEXTOS_2026_11_17.md) conserva los 136 registros originales y deja **62 operativas + 22 expertas = 84 de negocio**, más **16 técnicas: 100 tablas físicas**. Las pruebas específicas pasan en SQLite y PostgreSQL; el informe separa cuatro fallos de la ejecución ampliada. Los cortes siguientes son históricos.
 

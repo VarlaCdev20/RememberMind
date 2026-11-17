@@ -174,6 +174,23 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $nuevo = $this->repo()->obtenerClasificacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha(), $perfil->versionContrato);
         self::assertSame(Codec::huella($r), Codec::huella($nuevo));
         self::assertCount(1, $nuevo->reglasAplicadas);
+
+        $fila = \App\Models\ReglaAplicadaDclInstantanea::query()->with('condiciones')->sole();
+        self::assertCount(6, $fila->condiciones);
+        $raiz = $fila->condiciones->firstWhere('cod_condicion_padre', null);
+        self::assertSame('Y', $raiz->operador);
+        self::assertSame($fila->getKey(), $raiz->regla->getKey());
+        self::assertCount(3, $raiz->hijas);
+        self::assertNull(\App\Models\ReglaAplicadaDclInstantanea::find($raiz->getKey()));
+        self::assertArrayNotHasKey('operador', $fila->toArray());
+
+        $migracion = require database_path('migrations/2026_11_17_000004_consolidate_instantaneas_reglas.php');
+        $migracion->down();
+        self::assertSame(6, DB::table('condiciones_regla_instantanea')->where('cod_regla_aplicada_dcl', $fila->getKey())->count());
+        self::assertSame($raiz->getKey(), DB::table('condiciones_regla_instantanea')->whereNull('cod_condicion_padre')->value('cod_condicion_instantanea'));
+        $migracion->up();
+        $reaplicado = $this->repo()->obtenerClasificacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha(), $perfil->versionContrato);
+        self::assertSame(Codec::huella($r), Codec::huella($reaplicado));
     }
 
     public function test_rechaza_corte_con_otra_zona_aunque_sea_el_mismo_instante(): void
@@ -220,6 +237,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         [$modelo] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
+        (require database_path('migrations/2026_11_17_000004_consolidate_instantaneas_reglas.php'))->down();
+        (require database_path('migrations/2026_11_17_000003_consolidate_evaluaciones_reglas.php'))->down();
         foreach (['000013_consolidate_componentes_regla', '000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
             (require database_path('migrations/2026_11_14_'.$posterior.'.php'))->down();
         }

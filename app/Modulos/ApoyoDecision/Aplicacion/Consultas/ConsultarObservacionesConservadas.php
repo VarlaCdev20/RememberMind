@@ -35,7 +35,7 @@ final class ConsultarObservacionesConservadas
             return null;
         }
         $versionada = $cabecera->version_conservacion === 'OBS-SNAP-2';
-        $idsReglas = $versionada ? DB::table('evaluaciones_reglas as r')
+        $idsReglas = $versionada ? BloquesExpertos::consulta('evaluaciones_reglas', null, 'r')
             ->joinSub(BloquesExpertos::consulta('trazas_inferencia'), 't', 't.cod_traza_inferencia', '=', 'r.cod_traza_inferencia')
             ->join('evaluacion_criterios as c', 'c.cod_evaluacion_criterio', '=', 't.cod_evaluacion_criterio')
             ->where('c.cod_evaluacion_experta', $cabecera->getKey())->pluck('r.cod_regla_experta')->all() : [];
@@ -128,8 +128,8 @@ final class ConsultarObservacionesConservadas
     {
         $criterios = DB::table('evaluacion_criterios')->where('cod_evaluacion_experta', $id)->get();
         $trazas = BloquesExpertos::consulta('trazas_inferencia')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
-        $reglas = DB::table('evaluaciones_reglas')->whereIn('cod_traza_inferencia', $trazas->pluck('cod_traza_inferencia'))->get();
-        $condiciones = DB::table('evaluaciones_condiciones_regla')->whereIn('cod_evaluacion_regla', $reglas->pluck('cod_evaluacion_regla'))->get();
+        $reglas = BloquesExpertos::consulta('evaluaciones_reglas')->whereIn('cod_traza_inferencia', $trazas->pluck('cod_traza_inferencia'))->get();
+        $condiciones = BloquesExpertos::consulta('evaluaciones_condiciones_regla')->whereIn('cod_evaluacion_regla', $reglas->pluck('cod_evaluacion_regla'))->get();
         $soportes = BloquesExpertos::consulta('evidencias_soporte_condicion')->whereIn('cod_evaluacion_condicion', $condiciones->pluck('cod_evaluacion_condicion'))->get();
         $participaciones = BloquesExpertos::consulta('evidencias_criterio_evaluacion')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
         $resultados = BloquesExpertos::consulta('resultados_criterio')->whereIn('cod_evaluacion_criterio', $criterios->pluck('cod_evaluacion_criterio'))->get();
@@ -216,8 +216,8 @@ final class ConsultarObservacionesConservadas
     private function verificarTraza(string $id, array $paquete, array $informe, array $registros): void
     {
         $trazas = DB::table('evaluacion_criterios as c')->joinSub(BloquesExpertos::consulta('trazas_inferencia'), 't', 't.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
-            ->join('evaluaciones_reglas as r', 'r.cod_traza_inferencia', '=', 't.cod_traza_inferencia')
-            ->join('evaluaciones_condiciones_regla as d', 'd.cod_evaluacion_regla', '=', 'r.cod_evaluacion_regla')
+            ->joinSub(BloquesExpertos::consulta('evaluaciones_reglas'), 'r', 'r.cod_traza_inferencia', '=', 't.cod_traza_inferencia')
+            ->joinSub(BloquesExpertos::consulta('evaluaciones_condiciones_regla'), 'd', 'd.cod_evaluacion_regla', '=', 'r.cod_evaluacion_regla')
             ->leftJoinSub(BloquesExpertos::consulta('resultados_criterio'), 's', 's.cod_evaluacion_criterio', '=', 'c.cod_evaluacion_criterio')
             ->where('c.cod_evaluacion_experta', $id)->get(['c.cod_evaluacion_criterio', 'c.cod_nodo_criterio', 'c.tipo_registro', 'c.estado_evaluabilidad', 't.estado_inferencia',
                 'r.cod_regla_experta', 'r.estado_regla', 'd.cod_condicion_regla', 'd.estado_condicion', 'd.cod_evaluacion_condicion',

@@ -439,7 +439,7 @@ final readonly class AlmacenInstantaneas
 
     private function ordenadas(string $tabla, string $campo, string $id): array
     {
-        $r = $this->db()->table($tabla)->where($campo, $id)->orderBy('orden')->get()->all();
+        $r = BloquesExpertos::consulta($tabla, $this->conexion)->where($campo, $id)->orderBy('orden')->get()->all();
         $this->validarOrden($r, 'orden');
 
         return $r;
@@ -614,7 +614,7 @@ final readonly class AlmacenInstantaneas
                 || ! $db->table('reglas_expertas')->where('cod_regla_experta', $v->cod_regla_experta)->where('cod_version_modelo', $version)->exists())) {
                 throw new DomainException('Referencia original de regla ajena o de otra versión.');
             }
-            $filas = $db->table('condiciones_regla_instantanea')->where('cod_regla_aplicada_dcl', $v->cod_regla_aplicada_dcl)->get()->all();
+            $filas = BloquesExpertos::consulta('condiciones_regla_instantanea', $db->getName())->where('cod_regla_aplicada_dcl', $v->cod_regla_aplicada_dcl)->get()->all();
             $visitados = [];
             $ast = $this->leerCondicion($filas, null, $visitados, 0);
             if (count($visitados) !== count($filas)) {

@@ -79,7 +79,7 @@ class ConsolidacionPasesTextosTest extends TestCase
 
     public function test_ida_vuelta_poblada_conserva_entrega_recepcion_correccion_y_codigos(): void
     {
-        $this->assertCount(93, Schema::getTableListing());
+        $this->assertCount(91, Schema::getTableListing());
         $pase = PaseTurno::sole();
         foreach ($this->pase as $campo => $valor) {
             $this->assertEquals($valor, in_array($campo, ['fecha_hora', 'fecha_hora_recepcion'], true)

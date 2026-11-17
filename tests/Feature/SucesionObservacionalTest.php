@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\ControlCognitivo;
 use App\Models\Personal;
 use App\Models\Residente;
@@ -107,7 +109,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertDatabaseCount('evidencias_evaluacion', 3);
         self::assertDatabaseCount('evaluacion_criterios', 3);
         self::assertSame(1, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
-        self::assertDatabaseCount('evaluaciones_reglas', 4);
+        self::assertSame(4, BloquesExpertos::consulta('evaluaciones_reglas')->count());
         self::assertSame(4, \App\Models\EvidenciaSoporteCondicion::count());
         self::assertSame('OBSERVACIONAL', DB::table('reglas_expertas')->where('codigo_regla', 'OBS-MEM-NUEVA')->value('tipo_regla'));
     }
@@ -132,7 +134,7 @@ final class SucesionObservacionalTest extends TestCase
         self::assertSame([], $r['resultados']);
         self::assertDatabaseCount('hechos_instantanea_experta', 4);
         self::assertDatabaseCount('evidencias_evaluacion', 3);
-        self::assertDatabaseCount('evaluaciones_reglas', 0);
+        self::assertSame(0, BloquesExpertos::consulta('evaluaciones_reglas')->count());
         self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
     }
 

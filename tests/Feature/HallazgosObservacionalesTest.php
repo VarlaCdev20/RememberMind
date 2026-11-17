@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\Area;
 use App\Models\Atencion;
 use App\Models\ControlCognitivo;
@@ -128,8 +130,8 @@ final class HallazgosObservacionalesTest extends TestCase
         self::assertSame($id, app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, $solicitud));
         self::assertDatabaseCount('evaluaciones_expertas', 1);
         self::assertDatabaseCount('hechos_instantanea_experta', 4);
-        self::assertDatabaseCount('evaluaciones_reglas', 3);
-        self::assertDatabaseCount('evaluaciones_condiciones_regla', 3);
+        self::assertSame(3, BloquesExpertos::consulta('evaluaciones_reglas')->count());
+        self::assertSame(3, BloquesExpertos::consulta('evaluaciones_condiciones_regla')->count());
         self::assertSame(3, \App\Models\EvidenciaSoporteCondicion::count());
         $r = app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
         self::assertTrue($r['persistido']);
@@ -237,9 +239,14 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         // Las migraciones históricas se revierten en orden: primero la consolidación posterior.
         $paquete = app(PaqueteObservacional::class)->preparar($this->medico);
+        foreach (array_reverse(glob(database_path('migrations/2026_11_17_00000[234]_*.php'))) as $posterior) {
+            (require $posterior)->down();
+        }
+        foreach (['000013_consolidate_componentes_regla', '000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
+            (require database_path('migrations/2026_11_14_'.$posterior.'.php'))->down();
+        }
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $reduccion = new TransicionReduccionConservacion;
-        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         $reduccion->bajar();
         InformeCognitivoFixture::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'cod_version_modelo' => $paquete['version'], 'cod_residente' => $this->residente->getKey(), 'origen_activacion' => 'PRUEBA_TECNICA']);
@@ -282,7 +289,7 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        DB::table('evaluaciones_condiciones_regla')->where('estado_condicion', 'CUMPLE')->update(['estado_condicion' => 'NO_CUMPLE']);
+        DB::table('evaluaciones_reglas')->where('tipo_evento', 'CONDICION')->where('estado_condicion', 'CUMPLE')->update(['estado_condicion' => 'NO_CUMPLE']);
         $this->expectException(DomainException::class);
         app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
     }

@@ -22,8 +22,7 @@ final class CatalogoCodigos
         'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
         'hechos_instantanea_experta' => ['cod_hecho_instantanea', 'HIX'],
         'motivos_dcl_instantanea' => ['cod_motivo_dcl_instantanea', 'MIX'],
-        'reglas_aplicadas_dcl_instantanea' => ['cod_regla_aplicada_dcl', 'RIX'],
-        'condiciones_regla_instantanea' => ['cod_condicion_instantanea', 'COX'],
+        'reglas_aplicadas_dcl_instantanea' => ['cod_elemento_regla_dcl', 'RIX'],
         'actividades' => ['cod_actividad', 'ACT'],
         'administraciones_medicacion' => ['cod_administracion', 'AMED'],
         'admisiones' => ['cod_admision', 'ADM'],
@@ -42,9 +41,8 @@ final class CatalogoCodigos
         'ejecuciones_cuidado' => ['cod_ejecucion', 'EJC'],
         'estudios_clinicos' => ['cod_estudio', 'EST'],
         'evaluacion_criterios' => ['cod_evaluacion_criterio', 'ECR'],
-        'evaluaciones_condiciones_regla' => ['cod_evaluacion_condicion', 'ECO'],
         'evaluaciones_expertas' => ['cod_evaluacion_experta', 'EEX'],
-        'evaluaciones_reglas' => ['cod_evaluacion_regla', 'ERG'],
+        'evaluaciones_reglas' => ['cod_elemento_evaluacion', 'ERG'],
         'eventos_alerta' => ['cod_evento_alerta', 'EAL'],
         'evidencias_evaluacion' => ['cod_evidencia_evaluacion', 'EVE'],
         'fuentes_datos_expertas' => ['cod_fuente_dato_experta', 'FDE'],
@@ -97,6 +95,8 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'condiciones_regla_instantanea' => ['cod_condicion_instantanea', 'COX'],
+        'evaluaciones_condiciones_regla' => ['cod_evaluacion_condicion', 'ECO'],
         'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
         'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
         'pases_turno' => ['cod_pase', 'PAS'],
@@ -144,7 +144,12 @@ final class CatalogoCodigos
 
     public static function clave(string $tabla): string
     {
-        return self::definicion($tabla)[0];
+        // El contrato lógico de estas cabeceras conserva su código original.
+        return match ($tabla) {
+            'evaluaciones_reglas' => 'cod_evaluacion_regla',
+            'reglas_aplicadas_dcl_instantanea' => 'cod_regla_aplicada_dcl',
+            default => self::definicion($tabla)[0],
+        };
     }
 
     public static function formatear(string $tabla, int $numero): string

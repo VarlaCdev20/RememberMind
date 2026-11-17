@@ -30,9 +30,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * No evalúa expresiones de texto ni convierte la gramática en código ejecutable.
  * Hereda la prohibición de sobrescritura y borrado ordinario de ModeloExperto.
  */
-final class CondicionReglaInstantanea extends ModeloExperto
+final class CondicionReglaInstantanea extends ModeloBloqueExperto
 {
-    protected $table = 'condiciones_regla_instantanea';
+    protected const BLOQUE = 'condiciones_regla_instantanea';
+
+    protected $table = 'reglas_aplicadas_dcl_instantanea';
 
     protected $primaryKey = 'cod_condicion_instantanea';
 

@@ -96,12 +96,12 @@ class GerenciaHistoriaNominalTest extends TestCase
     public function test_inventario_y_reversion_sin_datos_deja_modelo_original(): void
     {
         $antes = Schema::getTableListing();
-        $this->assertCount(98, $antes);
+        $this->assertCount(96, $antes);
         (require base_path('database/propuestas/gerencia/2026_11_16_000004_consolidacion_historia_laboral.php'))->down();
         (require base_path('database/propuestas/gerencia/2026_10_27_000003_campos_aviso_evento_asignacion.php'))->down();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->down();
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->down();
-        $this->assertCount(93, Schema::getTableListing());
+        $this->assertCount(91, Schema::getTableListing());
     }
 
     public function test_historia_guardada_no_se_sobrescribe_ni_se_retiра_con_rollback(): void

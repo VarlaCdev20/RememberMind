@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -78,7 +80,7 @@ class ExploradorExpertoTest extends TestCase
     {
         F::evaluacion($this->residente, $this->personal, 'UNO', valor: 'RES_M');
         $lectura = $this->lectura('E_UNO');
-        $antes = DB::table('evaluaciones_condiciones_regla')->get()->toJson();
+        $antes = BloquesExpertos::consulta('evaluaciones_condiciones_regla')->get()->toJson();
         $servicio = new GrafoInferenciaHistorica;
         $grafo = $servicio->presentar($lectura, true);
         $this->assertSame($grafo, $servicio->presentar($lectura, true));
@@ -90,7 +92,7 @@ class ExploradorExpertoTest extends TestCase
             $this->assertContains($arista['destino'], array_column($grafo['nodos'], 'id'));
         }
         $this->assertSame('No conservado en esta evaluación', $grafo['nodos'][0]['datos']['Valor original']);
-        $this->assertSame($antes, DB::table('evaluaciones_condiciones_regla')->get()->toJson());
+        $this->assertSame($antes, BloquesExpertos::consulta('evaluaciones_condiciones_regla')->get()->toJson());
     }
 
     public function test_red_semantica_incluye_componentes_y_variables_entrantes_sin_invertir_aristas(): void
@@ -115,8 +117,8 @@ class ExploradorExpertoTest extends TestCase
     {
         F::evaluacion($this->residente, $this->personal, 'NO');
         DB::table('vinculos_evidencia_experta')->where('tipo_evento', 'CONDICION')->delete();
-        DB::table('evaluaciones_condiciones_regla')->update(['estado_condicion' => 'NO_CUMPLE']);
-        DB::table('evaluaciones_reglas')->update(['estado_regla' => 'NO_CUMPLE']);
+        DB::table('evaluaciones_reglas')->where('tipo_evento', 'CONDICION')->update(['estado_condicion' => 'NO_CUMPLE']);
+        DB::table('evaluaciones_reglas')->where('tipo_evento', 'REGLA')->update(['estado_regla' => 'NO_CUMPLE']);
         $g = (new GrafoInferenciaHistorica)->presentar($this->lectura('E_NO'), true);
         $this->assertSame('NO_CUMPLE', $g['reglas'][0]['estado']);
         $this->assertEmpty(array_filter($g['aristas'], fn ($a) => $a['destino'] === 'resultado'));

@@ -2,6 +2,8 @@
 
 namespace App\Modulos\ApoyoDecision\Aplicacion\Acciones;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
+
 use App\Models\AplicacionInstrumento;
 use App\Models\ControlCognitivo;
 use App\Models\Instrumento;
@@ -96,11 +98,11 @@ final class PersistirEvaluacionTecnica
                 'estado_inferencia' => 'PRUEBA_FINALIZADA', 'fecha_hora_inicio' => $inicio, 'fecha_hora_fin' => $fecha]);
             foreach ($resultado['traza']['reglas'] as $r) {
                 $er = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluaciones_reglas');
-                DB::table('evaluaciones_reglas')->insert(['cod_evaluacion_regla' => $er, 'cod_traza_inferencia' => $traza,
+                BloquesExpertos::insertar('evaluaciones_reglas', ['cod_evaluacion_regla' => $er, 'cod_traza_inferencia' => $traza,
                     'cod_regla_experta' => $r['regla'], 'estado_regla' => $r['estado'], 'fecha_hora_evaluacion' => $fecha]);
                 foreach ($r['condiciones'] as $cond) {
                     $ece = app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evaluaciones_condiciones_regla');
-                    DB::table('evaluaciones_condiciones_regla')->insert(['cod_evaluacion_condicion' => $ece, 'cod_evaluacion_regla' => $er,
+                    BloquesExpertos::insertar('evaluaciones_condiciones_regla', ['cod_evaluacion_condicion' => $ece, 'cod_evaluacion_regla' => $er,
                         'cod_condicion_regla' => $cond['condicion'], 'estado_condicion' => $cond['estado'], 'fecha_hora_evaluacion' => $fecha]);
                     foreach ($cond['soportes'] as $evidencia) {
                         \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::insertar('evidencias_soporte_condicion', ['cod_evidencia_soporte_condicion' => app(\App\Compartido\Aplicacion\Contratos\CodigosEntidad::class)->siguiente('evidencias_soporte_condicion'),
