@@ -69,7 +69,7 @@ class ConsolidacionHistoriaLaboralTest extends TestCase
 
     public function test_copia_reversion_poblada_y_reaplicacion_conservan_identidades_y_avisos(): void
     {
-        $this->assertCount(100, Schema::getTableListing());
+        $this->assertCount(98, Schema::getTableListing());
         $this->assertFalse(Schema::hasTable('movimientos_laborales_personal'));
         $this->assertFalse(Schema::hasTable('eventos_asignacion_personal'));
         $this->assertSame(1, MovimientoLaboralPersonal::count());

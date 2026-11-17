@@ -20,7 +20,7 @@ final readonly class AdaptadorIadlExperimental
     /** Modelo original de la extensión aprobada. */
     public const MODELO = ControlFuncionalIadl::class;
 
-    /** Tabla del diccionario aprobado PR #16. */
+    /** Identidad lógica de la fuente aprobada; el modelo resuelve su almacenamiento tipado. */
     public const TABLA = 'controles_funcionales_iadl';
 
     /** PK original, sin identidades paralelas. */
@@ -47,7 +47,8 @@ final readonly class AdaptadorIadlExperimental
         $esquema = ExtractorVariableMapeada::conexionSegura($conexion)->getSchemaBuilder();
         $columnas = [self::PK, 'cod_residente', 'cod_personal', 'cod_usuario_registro', self::EPISODIO,
             'cod_control_anterior', 'fecha_hora', 'estado', 'registrado_en', ...array_keys(self::CAMPOS)];
-        $disponible = $esquema->hasTable(self::TABLA) && $esquema->hasColumns(self::TABLA, $columnas);
+        $tabla = (new ControlFuncionalIadl)->getTable();
+        $disponible = $esquema->hasTable($tabla) && $esquema->hasColumns($tabla, $columnas);
 
         return ['disponible' => $disponible, 'motivo' => $disponible
             ? 'Fuente IADL descriptiva disponible; no acredita C03.'

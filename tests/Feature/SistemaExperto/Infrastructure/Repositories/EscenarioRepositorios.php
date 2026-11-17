@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\ControlCognitivo;
 use App\Models\EvaluacionExperta;
 use App\Models\EvidenciaCriterioEvaluacion;
@@ -87,8 +89,8 @@ final class EscenarioRepositorios
     {
         [$fila, $origen] = F::evidencia();
         self::guardarGrafo($fila);
-        DB::table('controles_cognitivos')->insert(array_replace($origen->getAttributes(),
-            ['cod_personal' => 'SIM-PER', 'memoria_reciente' => 'OBSERVACION_FICTICIA'], $cambios));
+        RegistrosConsumo::insertar('controles_cognitivos', [array_replace($origen->getAttributes(),
+            ['cod_personal' => 'SIM-PER', 'memoria_reciente' => 'OBSERVACION_FICTICIA'], $cambios)]);
 
         return ControlCognitivo::query()->whereKey('SIM-CTRL')->firstOrFail();
     }

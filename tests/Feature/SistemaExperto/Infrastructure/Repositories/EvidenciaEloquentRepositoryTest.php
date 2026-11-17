@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -87,9 +89,9 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
         $this->evidencias()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
         $cantidad = count(DB::connection()->getQueryLog());
 
-        $control = (array) DB::table('controles_cognitivos')->where('cod_control_cognitivo', 'SIM-CTRL')->first();
+        $control = (array) RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', 'SIM-CTRL')->first();
         $control['cod_control_cognitivo'] = 'SIM-CTRL-2';
-        DB::table('controles_cognitivos')->insert($control);
+        RegistrosConsumo::insertar('controles_cognitivos', [$control]);
         $evidencia = (array) DB::table('evidencias_evaluacion')->where('cod_evidencia_evaluacion', 'SIM-EVID')->first();
         $evidencia['cod_evidencia_evaluacion'] = 'SIM-EVID-2';
         $evidencia['cod_registro_fuente'] = 'SIM-CTRL-2';
@@ -154,7 +156,7 @@ final class EvidenciaEloquentRepositoryTest extends RepositoriosTestCase
     public function test_no_consulta_una_fuente_iadl_con_metadatos_de_otra_tabla(): void
     {
         EscenarioRepositorios::evidencia();
-        self::assertTrue(Schema::hasTable('controles_funcionales_iadl'));
+        self::assertTrue(Schema::hasColumn((new \App\Models\ControlFuncionalIadl)->getTable(), 'cod_control_iadl'));
         DB::table('fuentes_datos_expertas')->update(['tabla_raiz' => 'controles_funcionales_iadl']);
         $this->expectException(DomainException::class);
         $this->evidencias(static function (): never {

@@ -90,13 +90,13 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
         self::assertSame(1200, $resultado['tablas']['registros_hidratacion']);
         self::assertSame(8, $resultado['tablas']['incidentes']);
         self::assertSame($historiaAnterior, $previo->fresh()->getAttributes());
-        self::assertSame(15, DB::table('controles_cognitivos')->whereNull('memoria_reciente')->count());
-        self::assertSame(300, DB::table('controles_cognitivos')->where('confusion', false)->count());
+        self::assertSame(15, RegistrosConsumo::consulta('controles_cognitivos')->whereNull('memoria_reciente')->count());
+        self::assertSame(300, RegistrosConsumo::consulta('controles_cognitivos')->where('confusion', false)->count());
         self::assertSame(240, RegistrosConsumo::consulta('valoraciones_dolor')->where('intensidad', 0)->count());
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
         self::assertSame(0, DB::table('reglas_expertas')->count());
         self::assertSame([], config('sistema_experto.lectura_clinica'));
-        self::assertFalse(DB::table('controles_cognitivos')->where('fecha_hora', '>', now())->exists());
+        self::assertFalse(RegistrosConsumo::consulta('controles_cognitivos')->where('fecha_hora', '>', now())->exists());
         self::assertFalse(DB::table('notas_clinicas as n')->join('atenciones as a', 'n.cod_atencion', '=', 'a.cod_atencion')
             ->whereColumn('n.cod_residente', '!=', 'a.cod_residente')->exists());
         self::assertFalse(DB::table('valoraciones_profesionales as v')->where('v.tipo_evento', 'FUNCIONAL')->join('atenciones as a', 'v.cod_atencion', '=', 'a.cod_atencion')
@@ -124,7 +124,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
                 self::fail('Se permitió un destino no confirmado.');
             } catch (RuntimeException $e) {
                 self::assertStringContainsString('prohibida', $e->getMessage());
-                self::assertSame(0, DB::table('controles_cognitivos')->count());
+                self::assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
                 self::assertSame(0, DB::table('usuarios')->count());
             }
         }
@@ -153,7 +153,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
         try {
             app(Carga::class)->ejecutar(...$this->entrada);
         } finally {
-            self::assertSame(0, DB::table('controles_cognitivos')->count());
+            self::assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
         }
     }
 
@@ -161,15 +161,15 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
     {
         $this->preparar();
         app(Carga::class)->ejecutar(...$this->entrada);
-        $id = DB::table('controles_cognitivos')->orderBy('cod_control_cognitivo')->value('cod_control_cognitivo');
-        DB::table('controles_cognitivos')->where('cod_control_cognitivo', $id)->update(['memoria_reciente' => 'MODIFICADO']);
+        $id = RegistrosConsumo::consulta('controles_cognitivos')->orderBy('cod_control_cognitivo')->value('cod_control_cognitivo');
+        RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', $id)->update(['memoria_reciente' => 'MODIFICADO']);
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('no se sobrescribirá');
         try {
             app(Carga::class)->ejecutar(...$this->entrada);
         } finally {
-            self::assertSame('MODIFICADO', DB::table('controles_cognitivos')->where('cod_control_cognitivo', $id)->value('memoria_reciente'));
-            self::assertSame(300, DB::table('controles_cognitivos')->count());
+            self::assertSame('MODIFICADO', RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', $id)->value('memoria_reciente'));
+            self::assertSame(300, RegistrosConsumo::consulta('controles_cognitivos')->count());
         }
     }
 
@@ -188,7 +188,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
             app(Carga::class)->ejecutar(...$this->entrada);
         } finally {
             self::assertSame(0, DB::table('atenciones')->count());
-            self::assertSame(0, DB::table('controles_cognitivos')->count());
+            self::assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
             self::assertSame(0, DB::table('incidentes')->count());
             self::assertSame($antes, DB::table('secuencias_codigos')->orderBy('entidad')->get()->toJson());
         }

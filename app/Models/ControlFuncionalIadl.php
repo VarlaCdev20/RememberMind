@@ -17,13 +17,38 @@ use LogicException;
  * RESTRICCIONES: Rectificar requiere otra fila; no se sobrescribe ni borra historia.
  * TRAZABILIDAD: Diccionario PR #16, aprobación explícita de esta tarea.
  */
-class ControlFuncionalIadl extends ModeloOperativo
+class ControlFuncionalIadl extends RegistroConsumo
 {
     /** Tabla aprobada, sin alias de compatibilidad. */
-    protected $table = 'controles_funcionales_iadl';
+    protected const TIPO = 'IADL';
+
+    protected const ENTIDAD = 'controles_funcionales_iadl';
+
+    protected $table = 'registros_observaciones_cuidado';
+
+    protected $appends = ['cod_control_iadl'];
+
+    protected $attributes = ['estado' => 'REGISTRADO'];
+
+    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'cod_jornada', 'marcha', 'equilibrio', 'traslado', 'tipo_apoyo', 'dispositivo', 'fatiga', 'riesgo_caida', 'motivo_registro', 'actividad_realizada', 'distancia_metros', 'dolor_movilidad', 'mareo', 'disnea', 'debilidad', 'cambio_habitual', 'tolerancia_movilidad', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta', 'fecha', 'horas_sueno', 'despertares', 'insomnio', 'somnolencia_diurna', 'agitacion_nocturna', 'calidad', 'cod_control_cognitivo', 'orientacion_persona', 'orientacion_lugar', 'orientacion_tiempo', 'memoria_reciente', 'memoria_remota', 'atencion', 'comprension', 'lenguaje', 'sigue_instrucciones', 'repite_preguntas', 'olvida_indicaciones', 'reconoce_personas', 'reconoce_entorno', 'confusion', 'cambio_cognitivo'];
 
     /** Identidad string canónica; generación correlativa técnica heredada. */
-    protected $primaryKey = 'cod_control_iadl';
+    protected $primaryKey = 'cod_observacion_cuidado';
+
+    public function getKey()
+    {
+        return parent::getKey() ?? ($this->attributes['cod_control_iadl'] ?? null);
+    }
+
+    public function getCodControlIadlAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodControlIadlAttribute(?string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     /** Actividades del contrato aprobado; no constituyen baremos. */
     public const ACTIVIDADES = ['MEDICACION', 'PERTENENCIAS', 'RUTINAS', 'CITAS', 'COMUNICACION', 'FINANZAS', 'COMPRAS', 'TRANSPORTE'];
@@ -72,6 +97,14 @@ class ControlFuncionalIadl extends ModeloOperativo
     /** Impide sobrescrituras de la evidencia; el padre ya impide borrados ordinarios. */
     protected static function booted(): void
     {
+        parent::booted();
+        // Evita que campos exclusivos de otra clase oculten relaciones originales como atencion.
+        static::addGlobalScope('campos_iadl', static function ($query): void {
+            if ($query->getQuery()->columns === null) {
+                $query->select(array_map(fn ($campo) => $query->getModel()->qualifyColumn($campo), ['cod_observacion_cuidado', 'tipo_evento', 'cod_control_iadl', 'cod_residente', 'cod_personal', 'cod_usuario_registro', 'cod_atencion', 'cod_control_anterior', 'fecha_hora', 'actividad', 'oportunidad', 'desempeno', 'tipo_ayuda', 'causa_ayuda', 'nivel_previo', 'fuente', 'estado', 'observacion', 'registrado_en']));
+            }
+        });
+
         static::updating(static function (): never {
             throw new LogicException('IADL es inmutable: registrar una rectificación sin sobrescribir el original.');
         });

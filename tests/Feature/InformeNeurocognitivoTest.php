@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\ControlCognitivo;
 use App\Models\ControlFuncionalIadl;
 use App\Models\EvaluacionExperta;
@@ -191,7 +193,7 @@ final class InformeNeurocognitivoTest extends TestCase
         self::assertCount(1, $a['actividades']);
         self::assertSame('Corrección vigente', $a['actividades'][0]['observacion']);
         self::assertFalse($a['acredita_independencia']);
-        self::assertDatabaseCount('controles_funcionales_iadl', 5);
+        self::assertSame(5, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_iadl_posterior_no_completa_una_evaluacion_historica(): void

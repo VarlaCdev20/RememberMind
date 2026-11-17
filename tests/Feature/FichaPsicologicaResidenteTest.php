@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -216,7 +218,7 @@ final class FichaPsicologicaResidenteTest extends TestCase
         Livewire::test(FichaPsicologicaResidente::class, ['residente' => $this->residente])
             ->call('cambiarTab', 'funcionamiento')->assertDontSee('Nueva observación IADL');
         self::assertFalse(method_exists(FichaPsicologicaResidente::class, 'guardarControlIadl'));
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_formulario_afectivo_no_precarga_hallazgos_y_conserva_cambios_al_cancelar(): void

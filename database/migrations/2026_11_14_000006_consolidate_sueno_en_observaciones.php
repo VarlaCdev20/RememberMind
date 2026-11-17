@@ -29,6 +29,13 @@ return new class extends ConsolidacionClinica20261114
 
     protected const REFERENCIAS = [];
 
+    protected function protegerReversion(): void
+    {
+        if (\Illuminate\Support\Facades\Schema::hasColumn(static::DESTINO, 'cod_control_iadl')) {
+            throw new LogicException('Revierta primero la consolidación de controles cognitivos e IADL.');
+        }
+    }
+
     protected function crearDestino(string $tabla): void
     {
         DB::statement(<<<SQL

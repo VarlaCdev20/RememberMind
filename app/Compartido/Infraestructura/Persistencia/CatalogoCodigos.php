@@ -35,8 +35,6 @@ final class CatalogoCodigos
         'componentes_estudio' => ['cod_componente', 'COM'],
         'consentimientos' => ['cod_consentimiento', 'CNS'],
         'contactos' => ['cod_contacto', 'CTO'],
-        'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
-        'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
         'curaciones_herida' => ['cod_curacion', 'CUR'],
         'derivaciones' => ['cod_derivacion', 'DER'],
         'documentos' => ['cod_documento', 'DOC'],
@@ -99,6 +97,8 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
+        'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
         'pases_turno' => ['cod_pase', 'PAS'],
         'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
         'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],

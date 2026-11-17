@@ -12,6 +12,8 @@ final class RegistrosConsumo
     public const CODIGO = 'cod_registro_consumo';
 
     public const ORIGENES = [
+        'controles_cognitivos' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'COGNITIVO', 'cod_control_cognitivo'],
+        'controles_funcionales_iadl' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'IADL', 'cod_control_iadl'],
         'pases_turno' => ['registros_textuales_clinicos', 'cod_registro_textual', 'PASE', 'cod_pase'],
         'seguimientos_pedagogicos' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
         'documentos' => ['documentos', 'cod_documento', 'ADMINISTRATIVO', 'cod_documento'],
@@ -57,8 +59,14 @@ final class RegistrosConsumo
         if (isset(self::ORIGENES[$entidad])) {
             [$tabla, $codigo, $tipo, $campo] = self::ORIGENES[$entidad];
             foreach ($filas as &$fila) {
+                if ($entidad === 'controles_funcionales_iadl' && ! array_key_exists('estado', $fila)) {
+                    $fila['estado'] = 'REGISTRADO';
+                }
                 $fila[$codigo] = $fila[$campo];
                 $fila['tipo_evento'] = $tipo;
+                if (in_array($entidad, ['controles_cognitivos', 'controles_funcionales_iadl'], true)) {
+                    unset($fila['cod_control_cognitivo'], $fila['cod_control_iadl']);
+                }
                 if ($campo !== $codigo) {
                     unset($fila[$campo]);
                 }

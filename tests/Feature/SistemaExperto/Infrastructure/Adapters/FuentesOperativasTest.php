@@ -133,29 +133,22 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
 
-    /** @throws DomainException SQLite alcanza la guarda del adaptador; PostgreSQL impide antes el estado mediante su FK compuesta. */
+    /** @throws DomainException SQLite y PostgreSQL impiden la mezcla mediante la FK compuesta. */
     public function test_rechaza_atencion_de_otro_residente(): void
     {
         $this->prepararControl();
         DB::table('residentes')->insert(['cod_residente' => 'SINTETICO-OTRO', 'nombres' => 'Otro caso ficticio',
             'apellido_paterno' => 'Prueba', 'fecha_nacimiento' => '1940-01-01', 'estado' => 'ADMITIDO']);
-        if (DB::getDriverName() === 'pgsql') {
-            // El savepoint permite comprobar el estado posterior al rechazo SQL
-            // sin dejar abortada la transacción de aislamiento de la prueba.
-            try {
-                DB::transaction(static fn () => DB::table('atenciones')->where('cod_atencion', 'SIM-AT')
-                    ->update(['cod_residente' => 'SINTETICO-OTRO']));
-                self::fail('La FK compuesta debe impedir mezclar residentes.');
-            } catch (QueryException $error) {
-                self::assertSame('23503', $error->errorInfo[0]);
-            }
-            self::assertSame('SINTETICO-RES', DB::table('atenciones')->where('cod_atencion', 'SIM-AT')->value('cod_residente'));
-
-            return;
+        // El savepoint permite comprobar el estado posterior al rechazo SQL
+        // sin dejar abortada la transacción de aislamiento de la prueba.
+        try {
+            DB::transaction(static fn () => DB::table('atenciones')->where('cod_atencion', 'SIM-AT')
+                ->update(['cod_residente' => 'SINTETICO-OTRO']));
+            self::fail('La FK compuesta debe impedir mezclar residentes.');
+        } catch (QueryException $error) {
+            self::assertContains($error->errorInfo[0], ['23000', '23503']);
         }
-        DB::table('atenciones')->where('cod_atencion', 'SIM-AT')->update(['cod_residente' => 'SINTETICO-OTRO']);
-        $this->expectException(DomainException::class);
-        $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
+        self::assertSame('SINTETICO-RES', DB::table('atenciones')->where('cod_atencion', 'SIM-AT')->value('cod_residente'));
     }
 
     /** Dos fuentes del mismo episodio se conservan sin tratarlas como independientes */
@@ -166,9 +159,9 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         DB::connection()->flushQueryLog();
         $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
         $cantidad = count(DB::connection()->getQueryLog());
-        $control = (array) DB::table('controles_cognitivos')->where('cod_control_cognitivo', 'SIM-CTRL')->first();
+        $control = (array) RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', 'SIM-CTRL')->first();
         $control['cod_control_cognitivo'] = 'SIM-CTRL-2';
-        DB::table('controles_cognitivos')->insert($control);
+        RegistrosConsumo::insertar('controles_cognitivos', [$control]);
         $evidencia = (array) DB::table('evidencias_evaluacion')->where('cod_evidencia_evaluacion', 'SIM-EVID')->first();
         $evidencia['cod_evidencia_evaluacion'] = 'SIM-EVID-2';
         $evidencia['cod_registro_fuente'] = 'SIM-CTRL-2';

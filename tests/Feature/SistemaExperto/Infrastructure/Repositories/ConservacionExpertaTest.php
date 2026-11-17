@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\EvaluacionExperta;
 use App\Models\HechoInstantaneaExperta;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta as Catalogo;
@@ -195,7 +197,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $m = $this->evidencias()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
         $vector = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
         $this->repo()->guardar($vector);
-        DB::table('controles_cognitivos')->update(['memoria_reciente' => 'FUENTE_MODIFICADA_DESPUES']);
+        RegistrosConsumo::consulta('controles_cognitivos')->update(['memoria_reciente' => 'FUENTE_MODIFICADA_DESPUES']);
         $r = $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
         self::assertSame(Codec::huella($vector), Codec::huella($r));
         self::assertNotSame('FUENTE_MODIFICADA_DESPUES', $r->memoria->hechos['SIM-EVID']->valor);
@@ -218,10 +220,12 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         [$modelo] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
+        foreach (['000013_consolidate_componentes_regla', '000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
+            (require database_path('migrations/2026_11_14_'.$posterior.'.php'))->down();
+        }
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         $antes = DB::table('resultados_criterio')->orderBy('cod_resultado_criterio')->get()->all();
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
-        (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         (new TransicionReduccionConservacion)->bajar();
         $migracion->down();
         self::assertFalse(DB::getSchemaBuilder()->hasTable('hechos_instantanea_experta'));
@@ -329,7 +333,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         EscenarioRepositorios::evidencia();
         $m = $this->evidencias()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
-        DB::table('controles_cognitivos')->update(['memoria_reciente' => 'CAMBIO_ANTES_DE_GUARDAR']);
+        RegistrosConsumo::consulta('controles_cognitivos')->update(['memoria_reciente' => 'CAMBIO_ANTES_DE_GUARDAR']);
         $vector = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
         try {
             $this->repo()->guardar($vector);

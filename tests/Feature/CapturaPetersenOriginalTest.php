@@ -697,13 +697,13 @@ final class CapturaPetersenOriginalTest extends TestCase
             $archivos->shouldNotReceive('existe');
             $archivos->shouldNotReceive('hash');
         });
-        if ($caso === 'atencion_ajena' && DB::getDriverName() === 'pgsql') {
-            // PostgreSQL conserva la FK compuesta: se prueba el rechazo, sin debilitarla para llegar al lector.
+        if ($caso === 'atencion_ajena') {
+            // Ambos motores conservan la FK compuesta; se prueba el rechazo sin debilitarla.
             try {
                 $doc->update($cambios);
                 self::fail('La FK debe impedir atribuir el documento a una atención ajena.');
             } catch (QueryException $ex) {
-                self::assertSame('23503', $ex->getCode());
+                self::assertContains($ex->getCode(), ['23000', '23503']);
             }
             self::assertNull($doc->fresh()->cod_atencion);
             self::assertDatabaseCount('valoraciones_petersen_originales', 1);
@@ -866,7 +866,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         $this->travelTo(CarbonImmutable::parse('2026-10-19T12:02:00-04:00'));
         $consultasIadl = 0;
         DB::listen(static function ($consulta) use (&$consultasIadl): void {
-            if (preg_match('/^select .*from "controles_funcionales_iadl"/s', $consulta->sql)) {
+            if (preg_match('/^select .*from "registros_observaciones_cuidado"/s', $consulta->sql) && in_array('IADL', $consulta->bindings, true)) {
                 $consultasIadl++;
             }
         });
@@ -920,7 +920,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertTrue($incompatible->checkPermissionTo('controles_funcionales_iadl.ver', 'web'));
         $consultasIadl = 0;
         DB::listen(static function ($consulta) use (&$consultasIadl): void {
-            if (preg_match('/^select .*from ["`]?controles_funcionales_iadl["`]?/s', $consulta->sql)) {
+            if (preg_match('/^select .*from ["`]?registros_observaciones_cuidado["`]?/s', $consulta->sql) && in_array('IADL', $consulta->bindings, true)) {
                 $consultasIadl++;
             }
         });

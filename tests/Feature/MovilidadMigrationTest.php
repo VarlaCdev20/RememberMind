@@ -24,6 +24,8 @@ class MovilidadMigrationTest extends TestCase
         RegistroMovilidad::create(['cod_movilidad' => 'MOV_OLD_TEST', 'cod_residente' => $resident->getKey(),
             'cod_personal' => $user->personal()->firstOrFail()->getKey(), 'fecha_hora' => now(),
             'marcha' => 'ASISTIDA', 'dispositivo' => 'Andador anterior en texto libre', 'observacion' => 'Historia preservada.', 'estado' => 'VIGENTE']);
+        $controles = require database_path('migrations/2026_11_17_000002_consolidate_controles_observaciones.php');
+        $controles->down();
         $sueno = require database_path('migrations/2026_11_14_000006_consolidate_sueno_en_observaciones.php');
         $sueno->down();
         $consolidacion = require database_path('migrations/2026_11_14_000004_consolidate_observaciones_cuidado.php');
@@ -48,6 +50,7 @@ class MovilidadMigrationTest extends TestCase
         $this->assertEqualsCanonicalizing($keys, Schema::getForeignKeys('registros_movilidad'));
         $consolidacion->up();
         $sueno->up();
+        $controles->up();
         $record = RegistroMovilidad::findOrFail('MOV_OLD_TEST');
         foreach ($added as $field) {
             $this->assertNull($record->{$field});

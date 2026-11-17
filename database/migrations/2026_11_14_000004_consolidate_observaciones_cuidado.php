@@ -101,6 +101,9 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (Schema::hasColumn(self::DESTINO, 'cod_control_iadl')) {
+            throw new LogicException('Revierta primero la consolidación de controles cognitivos e IADL.');
+        }
         DB::transaction(function (): void {
             $this->bloquear([self::DESTINO]);
             $this->verificarReferencias([self::DESTINO]);

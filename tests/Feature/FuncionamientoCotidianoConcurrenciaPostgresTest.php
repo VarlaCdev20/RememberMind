@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\{Area, AsignacionPersonal, ControlFuncionalIadl as Iadl, Jornada, Personal, Residente, Turno, User};
 use App\Modulos\Valoraciones\Aplicacion\Acciones\RegistrarControlFuncionalIadl as Registrar;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -80,7 +82,7 @@ final class FuncionamientoCotidianoConcurrenciaPostgresTest extends TestCase
             }
             sort($salidas);
             self::assertSame($operacion === 'reintento' ? ['OK', 'OK'] : ['OK', 'RECHAZADO'], $salidas);
-            self::assertDatabaseCount('controles_funcionales_iadl', $operacion === 'reintento' ? 1 : 2);
+            self::assertSame($operacion === 'reintento' ? 1 : 2, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
             if ($anterior !== null) self::assertSame(1, Iadl::query()->where('cod_control_anterior', $anterior)->count());
         } finally {
             flock($barrera, LOCK_UN); fclose($barrera);

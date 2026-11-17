@@ -79,9 +79,11 @@ final readonly class MapeadorEvidencias
         }
         // Los nombres de tabla/PK solo se contrastan. Nunca se usan en consultas
         // ni para leer una columna escogida por el cliente.
-        $tablaOrigen = $origen instanceof ValoracionFuncional || $origen instanceof SeguimientoPedagogico
+        $tablaOrigen = $origen instanceof \App\Models\RegistroConsumo
             ? $origen->entidadCodigo() : $origen->getTable();
         $claveOrigen = match (true) {
+            $origen instanceof ControlCognitivo => 'cod_control_cognitivo',
+            $origen instanceof ControlFuncionalIadl => 'cod_control_iadl',
             $origen instanceof ValoracionFuncional => 'cod_valoracion_funcional',
             $origen instanceof SeguimientoPedagogico => 'cod_seguimiento_pedagogico',
             default => $origen->getKeyName(),
@@ -90,7 +92,7 @@ final readonly class MapeadorEvidencias
             || self::texto($fuente, 'campo_pk_raiz') !== $claveOrigen
             || self::texto($fuente, 'campo_residente') !== 'cod_residente'
             || self::texto($fuente, 'campo_temporal') !== 'fecha_hora'
-            || self::texto($fila, 'cod_registro_fuente') !== self::texto($origen, $origen->getKeyName())
+            || self::texto($fila, 'cod_registro_fuente') !== $origen->getKey()
             || self::texto($origen, 'cod_residente') !== $residenteId
             || ! in_array(self::texto($origen, 'estado'), match (true) {
                 $origen instanceof AplicacionInstrumento => ['COMPLETA'],

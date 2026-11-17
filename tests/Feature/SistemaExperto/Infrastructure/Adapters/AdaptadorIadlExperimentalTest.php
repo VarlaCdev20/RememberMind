@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Adapters;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\ControlFuncionalIadl;
 use App\Modulos\ApoyoDecision\Infraestructura\Adaptadores\FuentesOperativas\AdaptadorIadlExperimental;
 use DateTimeZone;
@@ -79,7 +81,7 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
         $this->prepararIadl();
         DB::table('residentes')->insert(['cod_residente' => 'SINTETICO-OTRO', 'nombres' => 'Otro sintético',
             'apellido_paterno' => 'Prueba', 'fecha_nacimiento' => '1940-01-01', 'estado' => 'ADMITIDO']);
-        DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_residente' => 'SINTETICO-OTRO']);
+        RegistrosConsumo::consulta('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_residente' => 'SINTETICO-OTRO', 'cod_atencion' => null]);
         $this->expectException(RuntimeException::class);
         $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
     }
@@ -93,9 +95,13 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
         DB::table('atenciones')->insert(['cod_atencion' => 'SIM-OTRA-AT', 'cod_residente' => 'SINTETICO-OTRO',
             'cod_personal' => 'SIM-PER', 'cod_area' => 'SIM-AREA', 'tipo_atencion' => 'PRUEBA_TECNICA',
             'fecha_hora' => '2026-10-17 12:00:00', 'estado' => 'VIGENTE']);
-        DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_atencion' => 'SIM-OTRA-AT']);
-        $this->expectException(DomainException::class);
-        $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
+        try {
+            DB::transaction(fn () => RegistrosConsumo::consulta('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_atencion' => 'SIM-OTRA-AT']));
+            self::fail('La FK compuesta debe impedir una atención de otro residente.');
+        } catch (QueryException $error) {
+            self::assertContains($error->getCode(), ['23000', '23503']);
+        }
+        self::assertSame('SIM-AT', RegistrosConsumo::consulta('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->value('cod_atencion'));
     }
 
     /** La FK física a la cuenta técnica rechaza una referencia inexistente. */
@@ -103,7 +109,7 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
     {
         $this->prepararIadl();
         $this->expectException(QueryException::class);
-        DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_usuario_registro' => 'SIM-INEXISTENTE']);
+        RegistrosConsumo::consulta('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->update(['cod_usuario_registro' => 'SIM-INEXISTENTE']);
     }
 
     /** El modelo conserva la observación cuando se intenta sobrescribirla. */
@@ -118,7 +124,7 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
         } catch (LogicException $error) {
             self::assertStringContainsString('rectificación', $error->getMessage());
         }
-        self::assertNull(DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->value('observacion'));
+        self::assertNull(RegistrosConsumo::consulta('controles_funcionales_iadl')->where('cod_control_iadl', 'SIM-IADL-1')->value('observacion'));
     }
 
     /** El modelo impide el borrado ordinario y conserva físicamente el original. */
@@ -132,7 +138,7 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
         } catch (LogicException $error) {
             self::assertStringContainsString('historia', $error->getMessage());
         }
-        self::assertSame(1, DB::table('controles_funcionales_iadl')->count());
+        self::assertSame(1, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     /**
@@ -143,12 +149,12 @@ final class AdaptadorIadlExperimentalTest extends AdaptadoresTestCase
     {
         $this->prepararControl();
         $this->cambiarFuente('controles_funcionales_iadl', 'cod_control_iadl', 'SIM-IADL', 'SIM-IADL-1', $campo);
-        DB::table('controles_funcionales_iadl')->insert(array_replace([
+        RegistrosConsumo::insertar('controles_funcionales_iadl', [array_replace([
             'cod_control_iadl' => 'SIM-IADL-1', 'cod_residente' => 'SINTETICO-RES', 'cod_personal' => 'SIM-PER',
             'cod_usuario_registro' => 'SIM-USU', 'cod_atencion' => 'SIM-AT', 'cod_control_anterior' => null,
             'fecha_hora' => '2026-10-17 12:00:00', 'actividad' => 'RUTINAS', 'oportunidad' => 'SIN_OPORTUNIDAD',
             'desempeno' => 'NO_EVALUABLE', 'tipo_ayuda' => 'NO_APLICA', 'causa_ayuda' => 'NO_APLICA',
             'nivel_previo' => 'DESCONOCIDO', 'fuente' => 'EQUIPO_CUIDADOS', 'estado' => 'REGISTRADO',
-            'observacion' => null, 'registrado_en' => '2026-10-17 12:05:00'], $cambios));
+            'observacion' => null, 'registrado_en' => '2026-10-17 12:05:00'], $cambios)]);
     }
 }

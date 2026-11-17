@@ -99,7 +99,7 @@ class ObservacionCognitivaTest extends TestCase
     {
         try { $this->registrar([$campo => $valor]); $this->fail('Debe validar'); }
         catch (ValidationException $error) { $this->assertArrayHasKey($campo, $error->errors()); }
-        $this->assertDatabaseCount('controles_cognitivos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public function test_una_respuesta_no_es_significativa_y_no_observado_es_null(): void
@@ -115,9 +115,9 @@ class ObservacionCognitivaTest extends TestCase
         $primero = $this->registrar(['observacion' => 'Original'], 'COD_CCO_000001');
         $repetido = $this->registrar(['observacion' => 'Original'], 'COD_CCO_000001');
         $this->assertSame($primero->getKey(), $repetido->getKey());
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $this->registrar(['observacion' => 'Nuevo seguimiento']);
-        $this->assertDatabaseCount('controles_cognitivos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $this->assertSame('Original', $primero->fresh()->observacion);
     }
 
@@ -127,7 +127,7 @@ class ObservacionCognitivaTest extends TestCase
         Atencion::create(['cod_atencion' => 'ATE_OTRA', 'cod_residente' => $otro->getKey(), 'cod_personal' => 'PER_COG', 'cod_area' => 'ARE_COG', 'tipo_atencion' => 'ENFERMERIA', 'fecha_hora' => now(), 'estado' => 'REGISTRADA']);
         try { $this->registrar(['observacion' => 'No debe persistir', 'cod_atencion' => 'ATE_OTRA']); $this->fail('Debe rechazar atención ajena'); }
         catch (ValidationException $e) { $this->assertArrayHasKey('cod_atencion', $e->errors()); }
-        $this->assertDatabaseCount('controles_cognitivos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public static function denegados(): array
@@ -149,7 +149,7 @@ class ObservacionCognitivaTest extends TestCase
         };
         try { $this->registrar(['observacion' => 'Rechazar']); $this->fail('Debe denegar'); }
         catch (HttpExceptionInterface $e) { $this->assertSame(403, $e->getStatusCode()); }
-        $this->assertDatabaseCount('controles_cognitivos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public function test_lectura_fuera_de_turno_solo_residente_propio_y_superadmin_global(): void
@@ -179,7 +179,7 @@ class ObservacionCognitivaTest extends TestCase
         $this->assertCount(2, $this->consulta(['dias' => 0, 'desde' => today()->toDateString(), 'hasta' => today()->toDateString()])['series']);
         $this->assertStringContainsString('Conservada', $this->consulta()['resumenDominios']['memoria']['resumen']);
         $this->assertNull($this->consulta()['resumenDominios']['lenguaje']);
-        $this->assertDatabaseCount('controles_cognitivos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('controles_cognitivos')->count());
         for ($i = 0; $i < 13; $i++) { $this->registrar(['observacion' => 'Registro sintético '.$i]); }
         $this->assertCount(12, $this->consulta()['historial']);
         $this->assertCount(3, $this->consulta(['pagina' => 2])['historial']);
@@ -194,7 +194,7 @@ class ObservacionCognitivaTest extends TestCase
         $this->enfermera->givePermissionTo('controles_cognitivos.ver');
         $this->enfermera->update(['estado' => 'INACTIVO']);
         Livewire::test(ObservacionCognitiva::class, ['codResidente' => 'RES_COG'])->assertForbidden();
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public function test_filtros_invalidos_no_borran_captura_y_tienen_recuperacion(): void
@@ -203,26 +203,26 @@ class ObservacionCognitivaTest extends TestCase
             ->set('datos.observacion', 'Descripción pendiente')->set('dias', 0)->set('desde', 'fecha inválida')
             ->assertSee('Revisa los filtros')->assertSet('datos.confusion', false)->assertSet('datos.observacion', 'Descripción pendiente')
             ->set('desde', today()->toDateString())->assertDontSee('Revisa los filtros')->assertHasNoErrors('desde');
-        $this->assertDatabaseCount('controles_cognitivos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public function test_modal_vacio_un_historico_guardado_limpieza_y_error_conservan_datos(): void
     {
         $vacio = Livewire::test(ObservacionCognitiva::class, ['codResidente' => 'RES_COG'])->assertSee('Observación cognitiva')->assertSee('Todavía no existen observaciones cognitivas');
         $this->exportar('empty', $vacio);
-        $this->assertDatabaseCount('controles_cognitivos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $vacio->set('datos.observacion', ' ')->call('guardar')->assertHasErrors('datos.observacion');
         $this->registrar(['memoria_reciente' => 'CONSERVADA']);
         $uno = Livewire::test(ObservacionCognitiva::class, ['codResidente' => 'RES_COG'])->assertSee('Un registro guardado')->set('datos.confusion', true)->set('datos.observacion', 'Captura pendiente');
         $this->exportar('one', $uno);
         $uno->call('limpiarCaptura')->assertSet('datos.confusion', null)->assertSet('datos.observacion', null);
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $dispatcher = clone ControlCognitivo::getEventDispatcher();
         ControlCognitivo::created(fn () => throw new \RuntimeException('Fallo controlado sintético'));
         try {
             $uno->set('datos.observacion', 'Conservar texto')->call('guardar')->assertHasErrors('persistencia')->assertSet('datos.observacion', 'Conservar texto')->assertSet('resultado', [])->assertSet('mostrarFormulario', true);
             $this->exportar('error', $uno);
-            $this->assertDatabaseCount('controles_cognitivos', 1);
+            $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
         } finally { ControlCognitivo::setEventDispatcher($dispatcher); }
     }
 
@@ -232,7 +232,7 @@ class ObservacionCognitivaTest extends TestCase
         ControlCognitivo::created(fn () => throw new \RuntimeException('Fallo después de insert en testing'));
         try {
             Livewire::test(ObservacionCognitiva::class, ['codResidente' => 'RES_COG'])->set('datos.confusion', false)->set('datos.observacion', 'Dato conservado')->call('guardar')->assertHasErrors('persistencia')->assertSet('datos.confusion', false)->assertSet('datos.observacion', 'Dato conservado')->assertSet('resultado', []);
-            $this->assertDatabaseCount('controles_cognitivos', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('controles_cognitivos')->count());
         } finally { ControlCognitivo::setEventDispatcher($dispatcher); }
     }
 
@@ -246,17 +246,17 @@ class ObservacionCognitivaTest extends TestCase
                 ->set('datos.observacion', 'Pendiente')->set('datos.confusion', false);
         } finally { ControlCognitivo::setEventDispatcher($dispatcher); }
         $modal->call('reintentarConsulta')->assertDontSee('No se pudo consultar el historial')->assertSet('datos.observacion', 'Pendiente')->assertSet('datos.confusion', false);
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     public function test_guardado_livewire_confirmado_y_selector_contextual(): void
     {
         $modal = Livewire::test(ObservacionCognitiva::class, ['codResidente' => 'RES_COG'])->set('datos.sigue_instrucciones', false)->call('guardar')->assertDispatched('cognicion-registrada')->assertSee('Observación cognitiva registrada')->assertDontSeeHtml('id="cognicion-form"');
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $modal->assertSee('Registro confirmado')->assertDontSee('Sin guardar · Respuestas seleccionadas')
             ->assertDontSee('Captura pendiente · No forma parte del historial');
         $modal->call('guardar')->assertStatus(409);
-        $this->assertDatabaseCount('controles_cognitivos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('controles_cognitivos')->count());
         Livewire::test(MisPacientes::class)->call('seleccionarResidente', 'RES_COG')->call('mostrarSelectorRegistro')->call('abrirFormularioRegistro', 'cognicion')->assertSet('registroTipo', 'cognicion')->assertSee('Observación cognitiva')->call('cerrarPopupCognicion')->assertSet('drawerPaso', 'register-selector');
     }
 }

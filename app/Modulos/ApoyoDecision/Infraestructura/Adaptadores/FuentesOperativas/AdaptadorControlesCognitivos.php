@@ -20,10 +20,10 @@ final readonly class AdaptadorControlesCognitivos
     /** Modelo existente; nunca se obtiene de una cadena suministrada por el cliente. */
     public const MODELO = ControlCognitivo::class;
 
-    /** Tabla física aprobada. */
+    /** Identidad lógica conservada de la fuente; el modelo resuelve la tabla física. */
     public const TABLA = 'controles_cognitivos';
 
-    /** PK física aprobada. */
+    /** Código original de la fuente, conservado como clave tipada. */
     public const PK = 'cod_control_cognitivo';
 
     /** Vínculo original empleado como episodio, sin fallback. */

@@ -1059,7 +1059,7 @@ class HistoriaResidencialSeeder extends Seeder
                 }
             }
             if (RegistrosConsumo::consulta('registros_sueno')->where('cod_residente', $a->cod_residente)->count() !== $days - 1
-                || DB::table('controles_cognitivos')->where('cod_residente', $a->cod_residente)->count() !== (int) ceil($days / 7)
+                || RegistrosConsumo::consulta('controles_cognitivos')->where('cod_residente', $a->cod_residente)->count() !== (int) ceil($days / 7)
                 || DB::table('atenciones')->where('cod_residente', $a->cod_residente)->where('tipo_atencion', 'SEGUIMIENTO_DIARIO')->count() !== $days) {
                 throw new RuntimeException('Sueño, cognición o seguimiento diario incompletos.');
             }

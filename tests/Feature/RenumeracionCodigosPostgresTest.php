@@ -51,7 +51,7 @@ class RenumeracionCodigosPostgresTest extends TestCase
         ]);
         $contratoAntes = DB::select("SELECT conname,pg_get_constraintdef(oid) AS definicion FROM pg_constraint WHERE contype='f' ORDER BY conname");
         $resultado = app(RenumerarCodigos::class)->ejecutar(DB::connection(), $this->directorio);
-        $this->assertSame(68, $resultado['entidades']);
+        $this->assertSame(66, $resultado['entidades']);
         $this->assertFalse($resultado['revertido']);
         $usuario = User::findOrFail('COD_USU_000001');
         $this->assertTrue($usuario->hasRole('ROL_TECNICO_IDENTIDAD'));

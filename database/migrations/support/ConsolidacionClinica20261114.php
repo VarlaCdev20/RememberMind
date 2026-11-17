@@ -15,6 +15,8 @@ abstract class ConsolidacionClinica20261114 extends Migration
 
     protected function antesDeMover(bool $subir): void {}
 
+    protected function protegerReversion(): void {}
+
     protected function despuesDeMover(bool $subir): void {}
 
     protected function referencias(): array
@@ -56,6 +58,7 @@ abstract class ConsolidacionClinica20261114 extends Migration
     {
         DB::transaction(function (): void {
             $this->bloquear([static::DESTINO]);
+            $this->protegerReversion();
             $this->verificarReferencias([static::DESTINO], true);
             $this->antesDeMover(false);
             $origen = static::DESTINO;

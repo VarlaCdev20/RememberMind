@@ -232,12 +232,16 @@ abstract class ConsolidacionTipada20261116 extends Migration
     private function declaracionesColumnas(array $columnas, array $pk): array
     {
         $sql = [];
-        foreach ($columnas as $nombre => [$tipo, $nullable, $generada]) {
+        foreach ($columnas as $nombre => $definicion) {
+            [$tipo, $nullable, $generada] = $definicion;
             $declaracion = $nombre.' '.$tipo;
             if ($generada !== null) {
                 $declaracion .= ' GENERATED ALWAYS AS ('.$generada.') STORED';
             } elseif (! $nullable) {
                 $declaracion .= ' NOT NULL';
+            }
+            if ($generada === null && isset($definicion[3])) {
+                $declaracion .= ' DEFAULT '.$definicion[3];
             }
             $sql[] = $declaracion;
         }
@@ -298,6 +302,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
             'valoraciones_profesionales' => "'PSICOLOGICA', 'NUTRICIONAL', 'FUNCIONAL'",
             'mediciones_clinicas' => "'SIGNOS', 'ANTROPOMETRIA'",
             'registros_textuales_clinicos' => "'NOTA', 'INDICACION'",
+            'registros_observaciones_cuidado' => "'MOVILIDAD', 'CONDUCTA', 'SUENO'",
             default => throw new RuntimeException('Familia consolidada desconocida.'),
         };
     }
@@ -376,15 +381,24 @@ abstract class ConsolidacionTipada20261116 extends Migration
         }
         $copia = $tabla.'_fk16';
         $sql = preg_replace('/^CREATE TABLE\s+"?'.preg_quote($tabla, '/').'"?/i', 'CREATE TABLE '.$copia, $sql);
-        $objetos = DB::table('sqlite_master')->where('tbl_name', $tabla)->whereIn('type', ['index', 'trigger'])->whereNotNull('sql')->pluck('sql');
+        $objetos = DB::table('sqlite_master')->where('tbl_name', $tabla)->where('type', 'index')->whereNotNull('sql')->pluck('sql');
         $columnas = array_column(array_filter(Schema::getColumns($tabla), fn ($c) => empty($c['generation'])), 'name');
         DB::statement($sql);
         DB::statement('INSERT INTO '.$copia.' ('.implode(', ', $columnas).') SELECT '.implode(', ', $columnas).' FROM '.$tabla);
         DB::statement('PRAGMA defer_foreign_keys = ON');
+        // SQLite valida triggers ajenos al renombrar; conservar solo los que dependen de esta tabla.
+        $triggers = DB::table('sqlite_master')->where('type', 'trigger')->get(['name', 'tbl_name', 'sql'])
+            ->filter(fn ($t) => $t->tbl_name === $tabla || preg_match('/\\b'.preg_quote($tabla, '/').'\\b/i', $t->sql));
+        foreach ($triggers as $trigger) {
+            DB::unprepared('DROP TRIGGER "'.str_replace('"', '""', $trigger->name).'"');
+        }
         Schema::drop($tabla);
         Schema::rename($copia, $tabla);
         foreach ($objetos as $objeto) {
             DB::unprepared($objeto);
+        }
+        foreach ($triggers as $trigger) {
+            DB::unprepared($trigger->sql);
         }
         $this->verificarSQLite();
         DB::statement('PRAGMA defer_foreign_keys = OFF');

@@ -50,10 +50,10 @@ class GerenciaDocumentacionEstructuraTest extends TestCase
             'model_has_roles', 'role_has_permissions', 'secuencias_codigos'];
         $tablas = array_map(fn (string $tabla) => (string) str($tabla)->afterLast('.'), Schema::getTableListing());
         $this->assertCount(16, array_intersect($tablas, $tecnicas));
-        $this->assertCount(83, array_diff($tablas, $tecnicas));
+        $this->assertCount(81, array_diff($tablas, $tecnicas));
         $this->transicion->down();
         $anteriores = array_map(fn (string $tabla) => (string) str($tabla)->afterLast('.'), Schema::getTableListing());
-        $this->assertCount(79, array_diff($anteriores, $tecnicas));
+        $this->assertCount(77, array_diff($anteriores, $tecnicas));
         $this->assertCount(16, array_intersect($anteriores, $tecnicas));
     }
 

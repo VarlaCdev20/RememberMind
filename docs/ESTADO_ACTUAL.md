@@ -13,6 +13,8 @@ runtime_verified: false
 
 # Estado actual de RememberMind
 
+**Corte posterior vigente del 17/11/2026 — 60 operativas:** la [unión autorizada e instalada de controles cognitivos e IADL](base-de-datos/DECISION_60_OPERATIVAS_CONTROLES_2026_11_17.md) conserva los 327 registros afectados y deja **60 operativas + 22 expertas = 82 de negocio**, más **16 técnicas: 98 físicas**. Los cortes siguientes conservan su fecha histórica.
+
 **Corte vigente del 17/11/2026 — pases de turno y textos clínicos:** la [unión autorizada e instalada](base-de-datos/DECISION_CONSOLIDACION_PASES_TEXTOS_2026_11_17.md) conserva los 136 registros originales y deja **62 operativas + 22 expertas = 84 de negocio**, más **16 técnicas: 100 tablas físicas**. Las pruebas específicas pasan en SQLite y PostgreSQL; el informe separa cuatro fallos de la ejecución ampliada. Los cortes siguientes son históricos.
 
 **Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](base-de-datos/DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.

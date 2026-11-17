@@ -11,7 +11,7 @@ class RegistroMovilidad extends RegistroConsumo
     protected $table = 'registros_observaciones_cuidado';
     protected $primaryKey = 'cod_observacion_cuidado';
     protected $appends = ['cod_movilidad'];
-    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta', 'fecha', 'horas_sueno', 'despertares', 'insomnio', 'somnolencia_diurna', 'agitacion_nocturna', 'calidad'];
+    protected $hidden = ['cod_observacion_cuidado', 'tipo_evento', 'estado_animo', 'apatia', 'agitacion', 'agresividad', 'ansiedad', 'aislamiento', 'deambulacion', 'participacion', 'cambio_conducta', 'descripcion', 'intervencion', 'respuesta', 'fecha', 'horas_sueno', 'despertares', 'insomnio', 'somnolencia_diurna', 'agitacion_nocturna', 'calidad', 'cod_control_cognitivo', 'orientacion_persona', 'orientacion_lugar', 'orientacion_tiempo', 'memoria_reciente', 'memoria_remota', 'atencion', 'comprension', 'lenguaje', 'sigue_instrucciones', 'repite_preguntas', 'olvida_indicaciones', 'reconoce_personas', 'reconoce_entorno', 'confusion', 'cambio_cognitivo', 'cod_control_iadl', 'cod_usuario_registro', 'cod_control_anterior', 'actividad', 'oportunidad', 'desempeno', 'tipo_ayuda', 'causa_ayuda', 'nivel_previo', 'fuente', 'registrado_en'];
 
     public function getCodMovilidadAttribute(): ?string
     {

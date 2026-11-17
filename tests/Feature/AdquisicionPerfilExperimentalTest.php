@@ -47,10 +47,10 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
             'tipo' => 'PRUEBA_TECNICA', 'nombre' => 'Actividad ficticia', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE']);
         RegistrosConsumo::insertar('seguimientos_pedagogicos', [['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'cod_actividad' => 'SIM-ACT', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE', 'atencion' => '0']]);
-        DB::table('controles_funcionales_iadl')->insert($comun + ['cod_control_iadl' => 'SIM-IADL',
+        RegistrosConsumo::insertar('controles_funcionales_iadl', [$comun + ['cod_control_iadl' => 'SIM-IADL',
             'cod_usuario_registro' => $autor->getKey(), 'actividad' => 'TELEFONO', 'oportunidad' => 'NO_OBSERVADA',
             'desempeno' => 'NO_DETERMINADO', 'tipo_ayuda' => 'NO_DETERMINADA', 'causa_ayuda' => 'NO_DETERMINADA',
-            'nivel_previo' => 'DESCONOCIDO', 'fuente' => 'OBSERVACION', 'estado' => 'REGISTRADO', 'registrado_en' => '2026-10-17 12:00:00']);
+            'nivel_previo' => 'DESCONOCIDO', 'fuente' => 'OBSERVACION', 'estado' => 'REGISTRADO', 'registrado_en' => '2026-10-17 12:00:00']]);
         $selecciones = ['controles_cognitivos' => [$control->getKey()], 'valoraciones_psicologicas' => ['SIM-PSI'],
             'valoraciones_funcionales' => ['SIM-FUNC'], 'diagnosticos' => ['SIM-DIAG'], 'antecedentes_clinicos' => ['SIM-ANT'],
             'registros_sueno' => ['SIM-SUE'], 'seguimientos_pedagogicos' => ['SIM-SEG'], 'controles_funcionales_iadl' => ['SIM-IADL']];
@@ -85,7 +85,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         $this->app->bind(AlmacenEjecucionesExperimentales::class, ArchivoEjecucionesExperimentales::class);
         $archivo = app(GestionarEjecucionesExperimentales::class);
         $conservado = $archivo->ejecutar($autor, $caso);
-        DB::table('controles_cognitivos')->where('cod_control_cognitivo', $selecciones['controles_cognitivos'][0])
+        RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', $selecciones['controles_cognitivos'][0])
             ->update(['repite_preguntas' => true]);
         $historico = $archivo->consultar($autor, 'SINTETICO-RES', 'SIM-INTEGRAL-01');
         self::assertSame($conservado, $historico);

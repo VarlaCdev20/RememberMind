@@ -435,7 +435,7 @@ class InformeCognitivoTest extends TestCase
         $this->assertNull($lectura['preparacion_memoria'], 'La preparación piloto ya no se carga.');
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('Control registrado en el expediente.')->assertDontSee('SIM-SE')->assertDontSee('SIM-IADL');
-        $this->assertDatabaseCount('controles_cognitivos', 6);
+        $this->assertSame(6, RegistrosConsumo::consulta('controles_cognitivos')->count());
     }
 
     /** El instrumento reservado de QA no se abre desde una fuente normal aunque se manipulen flags. */

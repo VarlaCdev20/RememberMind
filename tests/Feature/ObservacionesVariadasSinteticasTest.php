@@ -61,7 +61,7 @@ final class ObservacionesVariadasSinteticasTest extends TestCase
                 }
             }
         }
-        self::assertDatabaseCount('controles_cognitivos', 20);
+        self::assertSame(20, RegistrosConsumo::consulta('controles_cognitivos')->count());
         self::assertSame(20, ControlCognitivo::query()->distinct()->count('fecha_hora'));
         self::assertSame(20, Atencion::query()->count());
         $escrituras = [];

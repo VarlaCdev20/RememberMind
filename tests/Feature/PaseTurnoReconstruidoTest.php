@@ -76,7 +76,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->assertDontSee('Control anulado invisible')->assertDontSee('Control de otro residente')
             ->assertDontSee('Conducta anulada invisible')
             ->assertDontSee('Sin registro%')->assertDontSee('Sin registro ml');
-        $this->assertDatabaseCount('controles_cognitivos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('controles_cognitivos')->count());
         $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 

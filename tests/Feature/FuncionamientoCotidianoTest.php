@@ -70,7 +70,7 @@ final class FuncionamientoCotidianoTest extends TestCase
             self::assertNull($registro->cod_atencion);
             self::assertSame('2026-10-28 10:00:00', $registro->fecha_hora->format('Y-m-d H:i:s'));
         }
-        self::assertDatabaseCount('controles_funcionales_iadl', 2);
+        self::assertSame(2, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
         self::assertDatabaseCount('atenciones', 0);
         self::assertDatabaseCount('evaluaciones_expertas', 0);
         $resultado = app(ConsultarAutonomiaDescriptiva::class)->capturar($this->psicologo, $this->residente, now()->toImmutable());
@@ -84,7 +84,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         self::assertSame($uno->getKey(), $this->registrar()->getKey());
         try { $this->registrar(cambios: ['observacion' => 'Otra captura sintética.']); self::fail('Debe rechazar el reintento divergente.'); }
         catch (ValidationException $e) { self::assertArrayHasKey('registro', $e->errors()); }
-        self::assertDatabaseCount('controles_funcionales_iadl', 1);
+        self::assertSame(1, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
         self::assertSame('Relato sintético con oportunidad limitada.', $uno->fresh()->observacion);
     }
 
@@ -101,7 +101,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         self::assertTrue($lectura['registros'][1]['admisible_como_fuente_descriptiva']);
         try { $this->registrar('IAD_QA_003', anterior: $original->getKey()); self::fail('No puede bifurcar la rectificación.'); }
         catch (ValidationException $e) { self::assertArrayHasKey('registro', $e->errors()); }
-        self::assertDatabaseCount('controles_funcionales_iadl', 2);
+        self::assertSame(2, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_rechaza_atencion_de_otro_residente_sin_efectos(): void
@@ -110,7 +110,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         $atencion = Atencion::create(['cod_residente' => $otro->getKey(), 'cod_personal' => $this->medico->personal->getKey(), 'cod_area' => 'ARE_FUN', 'tipo_atencion' => 'SEGUIMIENTO', 'fecha_hora' => now(), 'estado' => 'FINALIZADA']);
         $this->expectException(ValidationException::class);
         try { $this->registrar(cambios: ['cod_atencion' => $atencion->getKey()]); }
-        finally { self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        finally { self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     #[DataProvider('entradasInvalidas')]
@@ -118,7 +118,7 @@ final class FuncionamientoCotidianoTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         try { $this->registrar(cambios: [$campo => $valor]); }
-        finally { self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        finally { self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     public static function entradasInvalidas(): array
@@ -139,7 +139,7 @@ final class FuncionamientoCotidianoTest extends TestCase
     {
         $this->psicologo->roles->first()->revokePermissionTo('controles_funcionales_iadl.crear');
         $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
-        try { $this->registrar(); } finally { self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        try { $this->registrar(); } finally { self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     #[DataProvider('rolesAjenos')]
@@ -148,7 +148,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         $this->psicologo->syncRoles([$rol]);
         $this->psicologo->givePermissionTo(['controles_funcionales_iadl.ver', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar']);
         $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
-        try { $this->registrar(); } finally { self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        try { $this->registrar(); } finally { self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     public static function rolesAjenos(): array
@@ -168,7 +168,7 @@ final class FuncionamientoCotidianoTest extends TestCase
             'preview' => session()->put(RolePreviewService::SESSION_KEY, 'PSICOLOGO/A'),
         };
         $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
-        try { $this->registrar(); } finally { self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        try { $this->registrar(); } finally { self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     public static function contextosInvalidos(): array
@@ -182,7 +182,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         Event::listen($evento, static fn () => throw new \RuntimeException('Fallo sintético de auditoría'));
         $this->expectException(\RuntimeException::class);
         try { $this->registrar(); }
-        finally { Event::forget($evento); self::assertDatabaseCount('controles_funcionales_iadl', 0); }
+        finally { Event::forget($evento); self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count()); }
     }
 
     public function test_livewire_revisa_conserva_corrige_y_no_guarda_sin_confirmar(): void
@@ -191,15 +191,15 @@ final class FuncionamientoCotidianoTest extends TestCase
         $ui = Livewire::test(Panel::class, ['residente' => $this->residente])->call('nuevo');
         self::assertSame('', $ui->get('form')['desempeno']);
         $ui->set('form', $this->entrada())->call('guardar')->assertHasErrors('registro');
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
         $ui->call('revisar')->assertSet('revision', true)->assertSee('No se pudo evaluar');
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
         $ui->call('volver')->assertSet('revision', false)->assertSet('form.nivel_previo', 'DESCONOCIDO');
         $ui->call('revisar')->call('guardar')->assertHasNoErrors()->assertSee('Observación de funcionamiento cotidiano registrada.');
         $id = Iadl::sole()->getKey();
         $ui->call('rectificar', $id)->call('revisar')->assertHasErrors('form.observacion');
         $ui->set('form.observacion', 'Motivo sintético de la rectificación.')->call('revisar')->call('guardar')->assertHasNoErrors();
-        self::assertDatabaseCount('controles_funcionales_iadl', 2);
+        self::assertSame(2, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
         self::assertSame('SIN_OPORTUNIDAD', Iadl::findOrFail($id)->oportunidad);
     }
 
@@ -209,7 +209,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         Livewire::test(Panel::class, ['residente' => $this->residente])->call('nuevo')->set('form', $this->entrada())
             ->call('cerrar')->assertSet('confirmarDescarte', true)->assertSet('form.fuente', 'EQUIPO_CUIDADOS')
             ->call('volver')->assertSet('confirmarDescarte', false)->call('descartar')->assertSet('abierto', false)->assertSet('form', []);
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_ruta_autorizada_y_rectificacion_de_otro_residente_rechazada(): void
@@ -219,7 +219,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
         $this->actingAs($this->psicologo);
         Livewire::test(Panel::class, ['residente' => $otro])->call('rectificar', $r->getKey())->assertNotFound();
-        self::assertDatabaseCount('controles_funcionales_iadl', 1);
+        self::assertSame(1, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_instalador_acotado_es_idempotente_y_preserva_roles_ajenos(): void
@@ -270,7 +270,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         $ui = Livewire::test(Panel::class, ['residente' => $this->residente])->call('nuevo')->set('form', $this->entrada())->call('revisar');
         Role::findByName('PSICOLOGO/A')->revokePermissionTo('controles_funcionales_iadl.crear');
         $ui->call('guardar')->assertForbidden();
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_cambiar_datos_despues_de_revisar_requiere_nueva_confirmacion(): void
@@ -278,7 +278,7 @@ final class FuncionamientoCotidianoTest extends TestCase
         $this->actingAs($this->psicologo);
         Livewire::test(Panel::class, ['residente' => $this->residente])->call('nuevo')->set('form', $this->entrada())->call('revisar')
             ->set('form.observacion', 'Otro relato sintético.')->assertSet('revision', false)->call('guardar')->assertHasErrors('registro');
-        self::assertDatabaseCount('controles_funcionales_iadl', 0);
+        self::assertSame(0, RegistrosConsumo::consulta('controles_funcionales_iadl')->count());
     }
 
     public function test_etiquetas_cubren_exactamente_el_catalogo_existente(): void
