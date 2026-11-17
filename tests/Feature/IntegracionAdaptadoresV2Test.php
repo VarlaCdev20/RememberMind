@@ -51,7 +51,7 @@ class IntegracionAdaptadoresV2Test extends TestCase
             UploadedFile::fake()->create('identidad.pdf', 32, 'application/pdf'),
         );
 
-        $this->assertDatabaseHas('documentos', [
+        $this->assertDatabaseHas('documentos', ['tipo_evento' => 'ADMINISTRATIVO',
             'cod_documento' => $documento->cod_documento,
             'cod_usuario' => $usuario->cod_usuario,
             'tipo_documento' => 'CI',

@@ -53,7 +53,7 @@ final class RoleDashboardDataService
         $prescriptions = DB::table('prescripciones')->where('cod_personal', $code)
             ->select('estado as label')->selectRaw('COUNT(*) as total')
             ->groupBy('estado')->orderByDesc('total')->get();
-        $recentNotes = DB::table('notas_clinicas as n')->join('residentes as r', 'r.cod_residente', '=', 'n.cod_residente')
+        $recentNotes = RegistrosConsumo::consulta('notas_clinicas', 'n')->join('residentes as r', 'r.cod_residente', '=', 'n.cod_residente')
             ->where('n.cod_personal', $code)->orderByDesc('n.fecha_hora')->limit(5)
             ->get(['r.nombres', 'r.apellido_paterno', 'n.tipo_nota', 'n.fecha_hora'])
             ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => $row->tipo_nota.' · '.date('d/m H:i', strtotime($row->fecha_hora))])->all();
@@ -139,7 +139,7 @@ final class RoleDashboardDataService
                     'label' => 'Administraciones registradas', 'detail' => 'Últimos siete días', 'value' => $administrations,
                 ]] : [], 'No hay administraciones registradas en el período.', 'ph-pill'),
                 $this->panel('Incidentes por tipo · 30 días', 'bars', $this->countItems($incidents), 'No hay incidentes registrados en el período.', 'ph-warning', subtitle: 'Incidentes registrados por tipo', period: '30 días'),
-                $this->panel('Documentos validados recientes', 'list', DB::table('documentos')->whereNotNull('fecha_validacion')
+                $this->panel('Documentos validados recientes', 'list', RegistrosConsumo::consulta('documentos')->whereNotNull('fecha_validacion')
                     ->orderByDesc('fecha_validacion')->limit(5)->get(['nombre', 'tipo_documento', 'fecha_validacion'])
                     ->map(fn ($row) => ['label' => $row->nombre, 'detail' => $row->tipo_documento.' · '.date('d/m/Y', strtotime($row->fecha_validacion))])->all(),
                     'No hay documentos validados recientemente.', 'ph-file-text'),
@@ -216,10 +216,10 @@ final class RoleDashboardDataService
         $trend = (clone $valuations)->where('fecha_hora', '>=', now()->subDays(30))
             ->selectRaw('DATE(fecha_hora) as label, COUNT(*) as total')
             ->groupByRaw('DATE(fecha_hora)')->orderBy('label')->get();
-        $relatedTable = $discipline === 'nutricion' ? 'mediciones_clinicas' : 'valoraciones_dolor';
+        $relatedTable = 'mediciones_clinicas';
         $relatedTitle = $discipline === 'nutricion' ? 'Mediciones recientes' : 'Registros de dolor recientes';
         $related = DB::table($relatedTable)->where('cod_personal', $code)
-            ->when($discipline === 'nutricion', fn ($q) => $q->where('tipo_evento', 'ANTROPOMETRIA'))
+            ->where('tipo_evento', $discipline === 'nutricion' ? 'ANTROPOMETRIA' : 'DOLOR')
             ->where('fecha_hora', '>=', now()->subDays(30))
             ->join('residentes as r', 'r.cod_residente', '=', $relatedTable.'.cod_residente')
             ->orderByDesc($relatedTable.'.fecha_hora')->limit(5)
@@ -259,13 +259,13 @@ final class RoleDashboardDataService
 
         $code = $personal->cod_personal;
         $activities = DB::table('actividades')->where('cod_personal', $code);
-        $followups = DB::table('seguimientos_pedagogicos')->where('cod_personal', $code);
+        $followups = RegistrosConsumo::consulta('seguimientos_pedagogicos')->where('cod_personal', $code);
         $todayActivities = (clone $activities)->whereDate('fecha_hora', today())
             ->whereIn('estado', ['PROGRAMADA', 'ACTIVA', 'EN_CURSO']);
         $participants = (clone $activities)->join('participantes_actividad as pa', 'pa.cod_actividad', '=', 'actividades.cod_actividad');
-        $recent = (clone $followups)->join('residentes as r', 'r.cod_residente', '=', 'seguimientos_pedagogicos.cod_residente')
-            ->orderByDesc('seguimientos_pedagogicos.fecha_hora')->limit(6)
-            ->get(['r.nombres', 'r.apellido_paterno', 'seguimientos_pedagogicos.fecha_hora'])
+        $recent = (clone $followups)->join('residentes as r', 'r.cod_residente', '=', 'valoraciones_profesionales.cod_residente')
+            ->orderByDesc('valoraciones_profesionales.fecha_hora')->limit(6)
+            ->get(['r.nombres', 'r.apellido_paterno', 'valoraciones_profesionales.fecha_hora'])
             ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => date('d/m/Y H:i', strtotime($row->fecha_hora))])->all();
         $participation = (clone $participants)->select('actividades.nombre as label')
             ->selectRaw('COUNT(pa.cod_participante) as total')

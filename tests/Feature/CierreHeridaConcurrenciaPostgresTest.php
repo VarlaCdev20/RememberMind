@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -96,7 +97,7 @@ class CierreHeridaConcurrenciaPostgresTest extends TestCase
             $this->assertStringContainsString('Motivo concurrente '.$ganador, $guardada->observacion);
             $this->assertDatabaseCount('heridas', 1);
             $this->assertDatabaseCount('curaciones_herida', 0);
-            $this->assertDatabaseCount('documentos_clinicos', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
             fwrite(STDOUT, "\nCIERRE_HERIDA_RACE ".json_encode(['waiting_locks' => $esperando, 'results' => array_column($resultados, 'result')])."\n");
         } finally {
             if ($observador->inTransaction()) {

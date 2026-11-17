@@ -17,6 +17,8 @@ Entrada vigente de navegación documental, revisada el **04/11/2026**. El produc
 
 ## Empezar aquí
 
+Persistencia actualizada el **16/11/2026**: [cuatro uniones instaladas y evidencia](base-de-datos/DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md), **86 tablas de negocio + 16 técnicas**. Los inventarios anteriores describen su corte.
+
 - [Estado actual](ESTADO_ACTUAL.md): capacidades presentes, límites y evidencia por alcance.
 - [Inventario actual](sistema/INVENTARIO_ACTUAL.md):12 módulos,10 roles, código, rutas y versiones de los locks.
 - [Catálogo de toda la documentación](INDICE_DOCUMENTAL.md): fuentes vigentes, decisiones, propuestas e historia.

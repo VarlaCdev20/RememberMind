@@ -5,11 +5,34 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Validation\ValidationException;
 
-class DocumentoClinico extends ModeloOperativo
+class DocumentoClinico extends RegistroConsumo
 {
-    protected $table = 'documentos_clinicos';
+    protected const TIPO = 'CLINICO';
 
-    protected $primaryKey = 'cod_documento_clinico';
+    protected const ENTIDAD = 'documentos_clinicos';
+
+    protected $appends = ['cod_documento_clinico'];
+
+    protected $hidden = ['cod_documento', 'tipo_evento', 'cod_preadmision', 'cod_usuario', 'cod_contacto', 'cod_documento_anterior', 'cod_usuario_validacion', 'nombre', 'tipo_archivo', 'fecha_vencimiento', 'fecha_validacion', 'cod_usuario_carga', 'fecha_hora_carga', 'fecha_emision', 'cod_usuario_anulacion', 'fecha_hora_anulacion', 'motivo_anulacion'];
+
+    public function getKey()
+    {
+        return parent::getKey() ?? ($this->attributes['cod_documento_clinico'] ?? null);
+    }
+
+    public function getCodDocumentoClinicoAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodDocumentoClinicoAttribute(string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
+
+    protected $table = 'documentos';
+
+    protected $primaryKey = 'cod_documento';
 
     protected function casts(): array
     {
@@ -28,6 +51,7 @@ class DocumentoClinico extends ModeloOperativo
 
     protected static function booted(): void
     {
+        parent::booted();
         static::saving(function (self $documento): void {
             if ($documento->exists && $documento->getOriginal('tipo_documento') === 'FOTO_HERIDA'
                 && $documento->isDirty(['cod_residente', 'cod_herida', 'cod_curacion', 'cod_personal', 'ruta_archivo', 'hash_archivo', 'formato', 'tamano_bytes', 'fecha_hora', 'origen', 'tipo_documento'])) {

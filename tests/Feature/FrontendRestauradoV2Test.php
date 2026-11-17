@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\User;
 use App\Models\Residente;
 use App\Models\Instrumento;
@@ -161,7 +162,7 @@ class FrontendRestauradoV2Test extends TestCase
             'estado' => 'PENDIENTE',
         ]);
         $this->assertDatabaseHas('contactos', ['numero_documento' => 'FAM-778899']);
-        $this->assertDatabaseCount('documentos', 7);
+        $this->assertSame(7, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_pestanas_clinicas_originales_cargan_un_residente_v2(): void
@@ -278,7 +279,7 @@ class FrontendRestauradoV2Test extends TestCase
             ->call('guardarNuevoDocumento')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('documentos', [
+        $this->assertDatabaseHas('documentos', ['tipo_evento' => 'ADMINISTRATIVO',
             'cod_residente' => $residente->cod_residente,
             'cod_usuario' => $usuario->cod_usuario,
             'nombre' => 'Documento de identidad',
@@ -307,7 +308,7 @@ class FrontendRestauradoV2Test extends TestCase
             ->call('guardarNuevoDocumento')
             ->assertHasErrors(['nuevoDocArchivo']);
 
-        $this->assertDatabaseMissing('documentos', [
+        $this->assertDatabaseMissing('documentos', ['tipo_evento' => 'ADMINISTRATIVO',
             'cod_residente' => $residente->cod_residente,
             'nombre' => 'Documento inexistente',
         ]);

@@ -78,6 +78,7 @@ final class InventarioExperto
             $entidad = new $modelo;
             $relacionesSoporte[] = [$fk, $entidad->getTable(), match ($fk) {
                 'cod_valoracion_psicologica', 'cod_antecedente', 'cod_diagnostico' => $fk.'_ref',
+                'cod_documento_clinico' => 'cod_documento_clinico',
                 default => $entidad->getKeyName(),
             }];
         }

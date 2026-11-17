@@ -2,6 +2,7 @@
 
 namespace App\Compartido\Infraestructura\Persistencia;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -47,7 +48,7 @@ final class RenumerarCodigos
                 // Los registros consolidados conservan los correlativos de su entidad lógica.
                 if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado', 'mediciones_clinicas',
                     'valoraciones_profesionales', 'registros_estudio', 'vinculos_evidencia_experta',
-                    'registros_clinicos', 'asignaciones_jornada', 'componentes_regla_experta'], true)) {
+                    'registros_clinicos', 'asignaciones_jornada', 'componentes_regla_experta', 'documentos', 'registros_textuales_clinicos'], true)) {
                     continue;
                 }
                 $ids = $db->table($tabla)->pluck($pk)->all();
@@ -315,8 +316,8 @@ final class RenumerarCodigos
         }
         if ($tabla === 'evidencias_evaluacion' && $fila['cod_registro_fuente'] !== null) {
             $fuente = $db->table('mapeos_variables_fuente as m')->join('fuentes_datos_expertas as f', 'f.cod_fuente_dato_experta', '=', 'm.cod_fuente_dato_experta')->where('m.cod_mapeo_variable_fuente', $antes['cod_mapeo_variable_fuente'])->value('f.tabla_raiz');
-            $registro = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::ORIGENES[$fuente] ?? null;
-            if (($registro[0] ?? null) === 'registros_clinicos') {
+            $registro = RegistrosConsumo::ORIGENES[$fuente] ?? null;
+            if ($registro !== null) {
                 if (! $db->table($registro[0])->where('tipo_evento', $registro[2])
                     ->where($registro[1], $fila['cod_registro_fuente'])->exists()) {
                     throw new RuntimeException('La evidencia tiene una fuente clínica no resoluble.');

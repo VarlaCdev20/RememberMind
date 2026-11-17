@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Documento;
 use App\Models\Personal;
 use App\Models\User;
@@ -61,7 +62,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->assertSee('Vista previa PDF')->assertSee('Ficha del documento')
             ->assertDontSee('documentos_personal_privados/')
             ->call('cerrarVistaPrevia')->assertSet('documentoSeleccionado', null);
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame('CARGADO', $documento->fresh()->estado);
     }
 
@@ -76,7 +77,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->set('estadoArchivo', 'VALIDADO')->assertSee('Título de prueba')->assertDontSee('Título anterior')
             ->call('limpiarFiltros')->assertSet('estadoArchivo', '')->assertSet('busqueda', '')
             ->assertSee('Título anterior')->assertSee('Reemplazado');
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_desplegables_combinan_persona_rol_formato_y_estado_sin_ampliar_acceso(): void
@@ -120,7 +121,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->call('verArchivo', $propio->getKey())->assertSet('vistaPreviaAbierta', true)
             ->call('verArchivo', $ajeno->getKey())->assertNotFound();
         $this->get(route('admin.personal.documento.archivo', $ajeno))->assertForbidden();
-        $this->assertDatabaseCount('documentos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_gerencia_no_lista_cuentas_fuera_del_alcance_y_superadmin_si_puede_consultar(): void
@@ -149,7 +150,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
         $this->actingAs($familiar);
         Livewire::test(DocumentacionPersonalPanel::class)->assertForbidden();
         $this->get(route('admin.personal.documento.archivo', $documento))->assertForbidden();
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_archivo_ausente_y_formato_sin_preview_se_distinguen(): void
@@ -187,7 +188,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->assertSee('Volver a carpetas')->assertDontSee('Documento de otra persona')
             ->call('gotoPage',2,'archivosPage')->assertViewHas('archivos',fn ($p)=>$p->count()===1)
             ->call('cerrarCarpetaUsuario')->assertSet('carpetaUsuario',null)->assertDispatched('personal-carpeta-cerrada');
-        $this->assertDatabaseCount('documentos',14);
+        $this->assertSame(14, RegistrosConsumo::consulta('documentos')->count());
         Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario',$this->titular->getKey())
             ->call('verArchivo',$ajeno->getKey())->assertNotFound();
     }
@@ -202,7 +203,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
         $panel = Livewire::test(DocumentacionPersonalPanel::class)->call('abrirCarpetaUsuario',$this->titular->getKey());
         $this->gerente->forceFill(['estado'=>'SUSPENDIDO'])->save();
         $panel->call('abrirCarpetaUsuario',$otro->getKey())->assertForbidden();
-        $this->assertDatabaseCount('documentos',2);
+        $this->assertSame(2, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_filtro_de_documentos_se_aplica_al_conteo_y_contenido_de_las_carpetas(): void
@@ -242,7 +243,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
             ->set('estadoArchivo', 'VALIDADO')->assertSee('Certificado solicitado')
             ->call('verPendienteCarpeta', $destino->getKey())->assertSet('vista', 'archivos')->assertSet('detalleAbierto', true)
             ->call('cerrarDetalle')->assertSet('carpetaUsuario', $this->titular->getKey());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertDatabaseCount('entregas_solicitud_documental', 0);
     }
 

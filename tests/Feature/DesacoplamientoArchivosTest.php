@@ -55,7 +55,7 @@ class DesacoplamientoArchivosTest extends TestCase
         $this->assertDatabaseHas('preadmisiones', ['estado' => 'PENDIENTE', 'numero_documento' => '1234567']);
         $this->assertDatabaseCount('residentes', 0);
         if ($generado) {
-            $this->assertDatabaseHas('documentos', ['tipo_documento' => 'SOLICITUD', 'estado' => 'VIGENTE']);
+            $this->assertDatabaseHas('documentos', ['tipo_evento' => 'ADMINISTRATIVO', 'tipo_documento' => 'SOLICITUD', 'estado' => 'VIGENTE']);
         }
     }
 

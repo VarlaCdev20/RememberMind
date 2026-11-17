@@ -55,7 +55,7 @@ class PanelResidenteService
                     ->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()
                 : null,
             'documentos' => $tab === 'documentos'
-                ? DB::table('documentos')->where('cod_residente', $codigo)
+                ? RegistrosConsumo::consulta('documentos')->where('cod_residente', $codigo)
                     ->orderBy('nombre')->get(['nombre', 'tipo_documento', 'fecha_vencimiento', 'estado'])
                 : collect(),
             'historial' => $tab === 'historial'

@@ -17,7 +17,7 @@ class SignoVital extends RegistroConsumo
 
     protected $appends = ['cod_signo'];
 
-    protected $hidden = ['cod_registro_medicion', 'tipo_evento', 'peso', 'talla', 'imc', 'perimetro_braquial', 'perimetro_pantorrilla', 'cod_medicion_antropometrica'];
+    protected $hidden = ['cod_valoracion_dolor', 'intensidad', 'ubicacion', 'tipo_dolor', 'duracion', 'desencadenante', 'intervencion', 'respuesta', 'cod_valoracion_origen', 'frecuencia', 'factores_alivio', 'cod_registro_medicion', 'tipo_evento', 'peso', 'talla', 'imc', 'perimetro_braquial', 'perimetro_pantorrilla', 'cod_medicion_antropometrica'];
 
     public function getCodSignoAttribute(): ?string
     {

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Reportes\Presentacion\Http\Controllers;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
@@ -212,7 +213,7 @@ class BitacoraController extends Controller
                 'App\\Models\\AdultoMayor', 'App\\Models\\Residente' => DB::table('residentes')->where('cod_residente', $log->subject_id)->value(DB::raw("TRIM(nombres || ' ' || apellido_paterno)")) ?? "Residente: $log->subject_id",
                 'App\\Models\\User' => DB::table('personal')->where('cod_usuario', $log->subject_id)->value(DB::raw("TRIM(nombres || ' ' || apellido_paterno)")) ?? "Usuario: $log->subject_id",
                 'App\\Models\\Contacto' => DB::table('contactos')->where('cod_contacto', $log->subject_id)->value(DB::raw("TRIM(nombres || ' ' || apellido_paterno)")) ?? "Contacto: $log->subject_id",
-                'App\\Models\\Documento' => 'Doc: '.(DB::table('documentos')->where('cod_documento', $log->subject_id)->value('nombre') ?? $log->subject_id),
+                'App\\Models\\Documento' => 'Doc: '.(RegistrosConsumo::consulta('documentos')->where('cod_documento', $log->subject_id)->value('nombre') ?? $log->subject_id),
                 'App\\Models\\Prescripcion' => 'Prescripción: '.(DB::table('prescripciones')->where('cod_prescripcion', $log->subject_id)->value('indicacion') ?? $log->subject_id),
                 'Spatie\\Permission\\Models\\Role' => 'Rol: '.(DB::table('roles')->where('id', $log->subject_id)->value('name') ?? $log->subject_id),
                 default => class_basename($log->subject_type)." #$log->subject_id",

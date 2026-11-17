@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Personal;
 use App\Models\Residente;
 use App\Models\User;
@@ -35,15 +36,17 @@ class DolorMigrationTest extends TestCase
                 'cod_valoracion_origen' => $index ? 'VD_DDL_0' : null,
                 'fecha_hora' => now()->subMinutes(2 - $index), 'intensidad' => $value, 'estado' => 'VIGENTE']);
         }
+        $union = require database_path('migrations/2026_11_16_000003_consolidate_dolor.php');
+        $union->down();
         $count = count(Schema::getTables());
         $triggers = $this->triggers();
         if (DB::getDriverName() === 'sqlite') {
-            $this->assertCount(2, $triggers, 'Conservar triggers V2 atención/residente.');
+            $this->assertTrue(collect(Schema::getForeignKeys('valoraciones_dolor'))->contains(fn ($fk) => $fk['columns'] === ['cod_atencion', 'cod_residente']));
         }
         $migration = require database_path('migrations/2026_10_09_100500_add_followup_fields_to_valoraciones_dolor_table.php');
         $migration->down();
         $this->assertFalse(Schema::hasColumn('valoraciones_dolor', 'cod_valoracion_origen'));
-        $this->assertDatabaseCount('valoraciones_dolor', 2);
+        $this->assertSame(2, DB::table('valoraciones_dolor')->count());
         $this->assertSame($triggers, $this->triggers());
         $migration->up();
         $this->assertTrue(Schema::hasColumns('valoraciones_dolor', ['cod_valoracion_origen', 'frecuencia', 'factores_alivio']));
@@ -52,10 +55,13 @@ class DolorMigrationTest extends TestCase
         $this->assertDatabaseHas('valoraciones_dolor', ['cod_valoracion_dolor' => 'VD_DDL_0', 'intensidad' => 8]);
         $this->assertDatabaseHas('valoraciones_dolor', ['cod_valoracion_dolor' => 'VD_DDL_1', 'intensidad' => 5]);
         $this->assertSame($triggers, $this->triggers());
+        $union->up();
     }
 
     public function test_dolor_v2_does_not_duplicate_an_existing_history_index(): void
     {
+        $union = require database_path('migrations/2026_11_16_000003_consolidate_dolor.php');
+        $union->down();
         $migration = require database_path('migrations/2026_10_09_100500_add_followup_fields_to_valoraciones_dolor_table.php');
         $migration->down();
         Schema::table('valoraciones_dolor', fn ($table) => $table->index(['cod_residente', 'fecha_hora'], 'idx_dolor_historial_previo_qa'));
@@ -69,6 +75,7 @@ class DolorMigrationTest extends TestCase
         $migration->down();
         $this->assertTrue(Schema::hasIndex('valoraciones_dolor', 'idx_dolor_historial_previo_qa'));
         $migration->up();
+        $union->up();
     }
 
     private function triggers(): array

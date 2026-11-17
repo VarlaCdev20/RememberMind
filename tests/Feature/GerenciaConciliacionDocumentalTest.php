@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Contacto;
 use App\Models\Documento;
 use App\Models\Preadmision;
@@ -192,7 +193,7 @@ class GerenciaConciliacionDocumentalTest extends TestCase
         } catch (HttpException $error) {
             $this->assertSame(403, $error->getStatusCode());
         }
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
         $this->assertSame([], Storage::disk('public')->allFiles());
     }
@@ -241,14 +242,14 @@ class GerenciaConciliacionDocumentalTest extends TestCase
             ->assertHasErrors($campo)->assertSet($modal, true)
             ->assertSee('El documento cambió mientras estaba abierto este formulario');
         $this->assertNotNull($componentes[1]->get($campo));
-        $this->assertDatabaseCount('documentos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame($archivosAntes, Storage::disk('local')->allFiles());
         $this->assertSame('REEMPLAZADO', $original->fresh()->estado);
         $this->assertSame('CARGADO', $sucesor->fresh()->estado);
         // Abrir expresamente la versión vigente permite una corrección posterior legítima.
         $componentes[1]->call($abrir, 'FOTO_DOC')->assertSet('referenciaDocumento.cod_documento', $sucesor->getKey())
             ->set($campo, UploadedFile::fake()->image('posterior.jpg'))->call($guardar)->assertHasNoErrors()->assertSet($modal, false);
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame(1, Documento::where('estado', 'CARGADO')->count());
         $this->assertSame($sucesor->getKey(), Documento::where('estado', 'CARGADO')->sole()->cod_documento_anterior);
         $this->assertSame([], Storage::disk('public')->allFiles());
@@ -270,7 +271,7 @@ class GerenciaConciliacionDocumentalTest extends TestCase
                 $this->assertArrayHasKey('file', $error->errors());
             }
         }
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame('OBSERVADO', $original->fresh()->estado);
         $this->assertSame($archivos, Storage::disk('local')->allFiles());
     }
@@ -285,7 +286,7 @@ class GerenciaConciliacionDocumentalTest extends TestCase
         } catch (ValidationException $error) {
             $this->assertArrayHasKey('file', $error->errors());
         }
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame('FOTO_DOC', $original->fresh()->tipo_documento);
         $this->assertSame('CARGADO', $original->fresh()->estado);
         $this->assertFalse(Documento::where('tipo_documento', 'FOTO')->exists());
@@ -302,7 +303,7 @@ class GerenciaConciliacionDocumentalTest extends TestCase
         } catch (\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException) {
             $this->addToAssertionCount(1);
         }
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame('CARGADO', $original->fresh()->estado);
     }
 }

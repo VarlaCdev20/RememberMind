@@ -50,10 +50,11 @@ return new class extends Migration
                 OR (fecha_limite_prorrogada IS NOT NULL AND cod_usuario_prorroga IS NOT NULL AND fecha_hora_prorroga IS NOT NULL AND motivo_prorroga IS NOT NULL AND length(trim(motivo_prorroga)) > 0 AND origen_plazo = 'ALTA')
             )
         )");
+        $documentoAdministrativo = Schema::hasColumn('documentos', 'cod_documento_ref') ? 'cod_documento_ref' : 'cod_documento';
         DB::statement('CREATE TABLE entregas_solicitud_documental (
             cod_entrega_documental varchar(20) PRIMARY KEY,
             cod_destinatario_documental varchar(20) NOT NULL REFERENCES destinatarios_solicitud_documental(cod_destinatario_documental) ON DELETE RESTRICT,
-            cod_documento varchar(20) NOT NULL REFERENCES documentos(cod_documento) ON DELETE RESTRICT,
+            cod_documento varchar(20) NOT NULL REFERENCES documentos('.$documentoAdministrativo.') ON DELETE RESTRICT,
             cod_usuario_registro varchar(20) NOT NULL REFERENCES usuarios(cod_usuario) ON DELETE RESTRICT,
             fecha_hora_registro timestamp NOT NULL,
             UNIQUE(cod_destinatario_documental,cod_documento)

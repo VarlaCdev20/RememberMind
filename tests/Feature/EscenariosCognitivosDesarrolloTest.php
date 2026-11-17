@@ -92,7 +92,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
         self::assertSame($historiaAnterior, $previo->fresh()->getAttributes());
         self::assertSame(15, DB::table('controles_cognitivos')->whereNull('memoria_reciente')->count());
         self::assertSame(300, DB::table('controles_cognitivos')->where('confusion', false)->count());
-        self::assertSame(240, DB::table('valoraciones_dolor')->where('intensidad', 0)->count());
+        self::assertSame(240, RegistrosConsumo::consulta('valoraciones_dolor')->where('intensidad', 0)->count());
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
         self::assertSame(0, DB::table('reglas_expertas')->count());
         self::assertSame([], config('sistema_experto.lectura_clinica'));

@@ -68,7 +68,7 @@ class BddOperativaV2Test extends TestCase
         sort($esperadas);
         sort($reales);
 
-        $this->assertCount(62, $reales);
+        $this->assertCount(58, $reales);
         $this->assertSame($esperadas, $reales);
         foreach ($esperadas as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla), "Falta la tabla operativa {$tabla}");
@@ -409,7 +409,7 @@ class BddOperativaV2Test extends TestCase
             'fotografias_institucionales',
             'controles_funcionales_iadl',
             'usuarios', 'personal', 'areas', 'turnos', 'contactos', 'residentes', 'habitaciones', 'camas', 'tipos_estudio_clinico', 'medicamentos', 'instrumentos',
-            'jornadas', 'preadmisiones', 'admisiones', 'historial_estados_residente', 'documentos', 'consentimientos', 'atenciones', 'notas_clinicas', 'registros_clinicos', 'seguros_residente', 'mediciones_clinicas', 'objetivos_signos_vitales', 'valoraciones_dolor', 'estudios_clinicos', 'registros_estudio', 'documentos_clinicos', 'derivaciones', 'incidentes', 'indicaciones_clinicas', 'controles_cognitivos', 'registros_observaciones_cuidado', 'registros_consumo', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado', 'ejecuciones_cuidado', 'prescripciones', 'administraciones_medicacion', 'aplicaciones_instrumento', 'valoraciones_profesionales', 'seguimientos_pedagogicos', 'actividades', 'visitas', 'alertas', 'eventos_alerta',
+            'jornadas', 'preadmisiones', 'admisiones', 'historial_estados_residente', 'documentos', 'consentimientos', 'atenciones', 'registros_textuales_clinicos', 'registros_clinicos', 'seguros_residente', 'mediciones_clinicas', 'objetivos_signos_vitales', 'estudios_clinicos', 'registros_estudio', 'derivaciones', 'incidentes', 'controles_cognitivos', 'registros_observaciones_cuidado', 'registros_consumo', 'heridas', 'curaciones_herida', 'pases_turno', 'planes_cuidado', 'ejecuciones_cuidado', 'prescripciones', 'administraciones_medicacion', 'aplicaciones_instrumento', 'valoraciones_profesionales', 'actividades', 'visitas', 'alertas', 'eventos_alerta',
             'asignaciones_jornada', 'residentes_contactos', 'ocupaciones_cama', 'respuestas_instrumento', 'participantes_actividad',
             'componentes_estudio', 'intervenciones_cuidado', 'programaciones_cuidado', 'horarios_prescripcion', 'preguntas_instrumento', 'opciones_pregunta',
         ];

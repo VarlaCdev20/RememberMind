@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Identidad\Presentacion\Navegacion;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Modulos\Cuidados\Aplicacion\Consultas\TurnoEnfermeriaService;
 use App\Modulos\Cuidados\Presentacion\Navegacion\NavegacionCuidadosService;
@@ -611,7 +612,7 @@ class SidebarService
                 'admisiones' => $badge(DB::table('preadmisiones as pre')->where('pre.estado', 'APROBADA')
                     ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('admisiones as ad')
                         ->whereColumn('ad.cod_preadmision', 'pre.cod_preadmision'))->count()),
-                'documentacion' => $badge(DB::table('documentos')->whereIn('estado', ['PENDIENTE', 'POR_VALIDAR'])->count()),
+                'documentacion' => $badge(RegistrosConsumo::consulta('documentos')->whereIn('estado', ['PENDIENTE', 'POR_VALIDAR'])->count()),
                 'alertas' => $badge(DB::table('alertas')->whereIn('estado', Alerta::ESTADOS_ACTIVOS)->count()),
             ];
         });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -629,7 +630,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
             'futuro' => ['fecha_hora' => now()->addMinute()],
             default => ['estado' => 'INACTIVO'],
         };
-        DB::table('documentos_clinicos')->where('cod_documento_clinico', $entrada['cod_documento_clinico'])->update($cambios);
+        RegistrosConsumo::consulta('documentos_clinicos')->where('cod_documento_clinico', $entrada['cod_documento_clinico'])->update($cambios);
         $this->mock(\App\Compartido\Aplicacion\Contratos\ArchivosAplicacion::class, static function ($archivos): void {
             $archivos->shouldNotReceive('existe');
             $archivos->shouldNotReceive('hash');
@@ -1023,6 +1024,8 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
     public function test_migracion_revierte_solo_sin_metadatos_y_conserva_historia_y_referencias(): void
     {
         $a = $this->aplicar();
+        $unionDocumental = require database_path('migrations/2026_11_16_000002_consolidate_documentos.php');
+        $unionDocumental->down();
         $m = require database_path('migrations/2026_10_19_010000_add_procedencia_aplicaciones_instrumento.php');
         try {
             $m->down();
@@ -1037,6 +1040,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertFalse(Schema::hasColumn('aplicaciones_instrumento', 'cod_documento_clinico'));
         self::assertSame($respuestas, DB::table('respuestas_instrumento')->orderBy('cod_respuesta')->get()->map(fn ($fila) => (array) $fila)->all());
         $m->up();
+        $unionDocumental->up();
         self::assertNull(AplicacionInstrumento::query()->findOrFail($a->getKey())->cod_usuario_registro);
         self::assertDatabaseCount('aplicaciones_instrumento', 1);
         self::assertDatabaseCount('respuestas_instrumento', 11);

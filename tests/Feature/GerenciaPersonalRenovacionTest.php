@@ -75,7 +75,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->set('contrasena_temporal', 'Sintetica#12345')->set('pasoActual', 4)->call('guardar')
             ->assertHasErrors(['archivos_temporales.CI', 'archivos_temporales.FOTO_DOC', 'archivos_temporales.CV'])->assertSet('pasoActual', 4);
         $this->assertDatabaseMissing('usuarios', ['correo'=>'validacion-integral@remembermind.test']);
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_recorrido_completo_llega_a_revision_sin_guardar_antes_de_confirmar(): void
@@ -90,7 +90,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->call('avanzarPaso')->assertSet('pasoActual', 4)->assertHasNoErrors()->assertSee('Resumen del registro')
             ->assertSee('Documentación')->assertSee('recorrido@remembermind.test');
         $this->assertDatabaseMissing('usuarios', ['correo'=>'recorrido@remembermind.test']);
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_documentos_tienen_estados_por_campo_y_quitar_limpia_el_error(): void
@@ -200,7 +200,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertSame('ACTIVO', $usuario->estado);
         $this->assertSame('ADMINISTRADOR', $usuario->personal->profesion);
         $this->assertTrue($usuario->hasRole('ADMINISTRADOR'));
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
         $antes = \App\Models\Documento::where('cod_usuario', $usuario->getKey())->orderBy('cod_documento')->get()->map->getAttributes()->all();
         $foto = collect(app(\App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService::class)->obtenerChecklistUsuario($usuario))->firstWhere('cod_tipo_doc', 'FOTO');
         $this->assertTrue($foto['cargado']);
@@ -246,7 +246,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         }
         $this->assertSame($antes + 2, User::count());
         $this->assertSame(['ENFERMEROS'], $enfermero->fresh()->getRoleNames()->all());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_alta_de_trabajador_reutiliza_modal_centrado_para_cuentas_autorizadas(): void
@@ -315,7 +315,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             }
         }
         $this->assertSame($cantidad, User::count());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_alta_con_solo_apellido_materno_normaliza_y_persiste_sin_cambiar_credenciales(): void
@@ -359,7 +359,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         ])->call('guardar')->assertHasErrors(['archivos_temporales.CI', 'archivos_temporales.FOTO_DOC', 'archivos_temporales.CV'])
             ->assertSet('pasoActual', 4)->assertSee('Adjunte')->assertNotDispatched('cerrar-modal-gestion-personal');
         $this->assertDatabaseMissing('usuarios', ['correo' => 'faltantes@remembermind.test']);
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_fotografia_del_formulario_rechaza_archivos_no_validos_sin_avanzar(): void
@@ -379,7 +379,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
             ->assertSet('pasoActual', 1)->call('gotoStep', 4)->assertSet('pasoActual', 1);
         $actor->removeRole('GERENTE');
         $form->call('guardar')->assertForbidden();
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_cambio_de_acceso_preserva_trabajo_y_rechaza_reintento_obsoleto(): void
@@ -424,7 +424,7 @@ class GerenciaPersonalRenovacionTest extends TestCase
         $this->assertNotEmpty($foto);
         Storage::disk('public')->assertExists($foto);
         $this->assertDatabaseHas('personal', ['nombres' => 'ALTA SINTÉTICA', 'numero_documento' => '56789123']);
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_pais_documento_y_prefijo_telefonico_se_conservan_al_editar(): void

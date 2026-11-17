@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Mail\PersonalInstitucionalBienvenidaMail;
 use App\Models\DestinatarioSolicitudDocumental;
 use App\Models\SolicitudDocumentalPersonal;
@@ -100,7 +101,7 @@ class AltaPersonalDocumentalTest extends TestCase
         try { app(GuardarPersonalInstitucional::class)->guardar($this->gerente,$this->entrada(['documentos_con_plazo'=>['DOMICILIO'],'fecha_limite_documentacion'=>'2026-11-20'])); $this->fail('Debe revertirse el alta completa.'); }
         catch (\RuntimeException $error) { $this->assertSame('Fallo sintético del expediente.',$error->getMessage()); }
         $this->assertDatabaseMissing('usuarios',['correo'=>'alta-documental@remembermind.test']);
-        $this->assertDatabaseCount('documentos',0); $this->assertDatabaseCount('destinatarios_solicitud_documental',0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count()); $this->assertDatabaseCount('destinatarios_solicitud_documental',0);
         $this->assertSame([],Storage::disk('local')->allFiles()); $this->assertSame([],Storage::disk('public')->allFiles()); Mail::assertNothingSent();
     }
 

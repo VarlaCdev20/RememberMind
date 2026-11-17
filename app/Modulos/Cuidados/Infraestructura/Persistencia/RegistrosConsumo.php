@@ -12,6 +12,12 @@ final class RegistrosConsumo
     public const CODIGO = 'cod_registro_consumo';
 
     public const ORIGENES = [
+        'seguimientos_pedagogicos' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
+        'documentos' => ['documentos', 'cod_documento', 'ADMINISTRATIVO', 'cod_documento'],
+        'documentos_clinicos' => ['documentos', 'cod_documento', 'CLINICO', 'cod_documento_clinico'],
+        'valoraciones_dolor' => ['mediciones_clinicas', 'cod_registro_medicion', 'DOLOR', 'cod_valoracion_dolor'],
+        'notas_clinicas' => ['registros_textuales_clinicos', 'cod_registro_textual', 'NOTA', 'cod_nota'],
+        'indicaciones_clinicas' => ['registros_textuales_clinicos', 'cod_registro_textual', 'INDICACION', 'cod_indicacion'],
         'antecedentes_clinicos' => ['registros_clinicos', 'cod_registro_clinico', 'ANTECEDENTE', 'cod_antecedente'],
         'diagnosticos' => ['registros_clinicos', 'cod_registro_clinico', 'DIAGNOSTICO', 'cod_diagnostico'],
         'alergias' => ['registros_clinicos', 'cod_registro_clinico', 'ALERGIA', 'cod_alergia'],
@@ -52,7 +58,9 @@ final class RegistrosConsumo
             foreach ($filas as &$fila) {
                 $fila[$codigo] = $fila[$campo];
                 $fila['tipo_evento'] = $tipo;
-                unset($fila[$campo]);
+                if ($campo !== $codigo) {
+                    unset($fila[$campo]);
+                }
             }
             unset($fila);
             DB::table($tabla)->insert($filas);

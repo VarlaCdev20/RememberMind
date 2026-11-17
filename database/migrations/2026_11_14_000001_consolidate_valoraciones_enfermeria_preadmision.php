@@ -51,7 +51,7 @@ return new class extends Migration
             $this->bloquear(false);
             $definiciones = [
                 'cod_valoracion_enfermeria varchar(20) NOT NULL PRIMARY KEY',
-                'cod_preadmision varchar(20) NOT NULL UNIQUE REFERENCES preadmisiones(cod_preadmision) ON DELETE RESTRICT',
+                'cod_preadmision varchar(20) NOT NULL'.(DB::getDriverName() === 'pgsql' ? ' UNIQUE' : '').' REFERENCES preadmisiones(cod_preadmision) ON DELETE RESTRICT',
             ];
             foreach (Bloque::TIPOS as $campo => $tipo) {
                 if ($campo === Bloque::CODIGO) {
@@ -66,6 +66,9 @@ return new class extends Migration
                 $definiciones[] = $campo.' '.$tipo.$regla.$this->referencia($campo, restaurar: true);
             }
             DB::statement('CREATE TABLE '.Bloque::ORIGEN.' ('.implode(', ', $definiciones).')');
+            if (DB::getDriverName() === 'sqlite') {
+                DB::statement('CREATE UNIQUE INDEX valoracion_inicial_preadmision_u ON '.Bloque::ORIGEN.' (cod_preadmision)');
+            }
             $indice = DB::getDriverName() === 'pgsql'
                 ? 'valoraciones_enfermeria_preadmision_cod_personal_valorador_inde'
                 : 'valoraciones_enfermeria_preadmision_cod_personal_valorador_index';

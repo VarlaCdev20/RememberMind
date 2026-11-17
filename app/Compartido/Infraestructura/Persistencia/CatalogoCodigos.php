@@ -17,6 +17,7 @@ final class CatalogoCodigos
         'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
     ];
     public const ENTIDADES = [
+        'registros_textuales_clinicos' => ['cod_registro_textual', 'RTC'],
         'valoraciones_petersen_originales' => ['cod_valoracion_petersen', 'VPO'],
         'soportes_valoracion_petersen' => ['cod_soporte_petersen', 'SVP'],
         'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
@@ -40,7 +41,6 @@ final class CatalogoCodigos
         'curaciones_herida' => ['cod_curacion', 'CUR'],
         'derivaciones' => ['cod_derivacion', 'DER'],
         'documentos' => ['cod_documento', 'DOC'],
-        'documentos_clinicos' => ['cod_documento_clinico', 'DCL'],
         'dominios_valores_expertos' => ['cod_dominio_valores', 'DVE'],
         'ejecuciones_cuidado' => ['cod_ejecucion', 'EJC'],
         'estudios_clinicos' => ['cod_estudio', 'EST'],
@@ -57,7 +57,6 @@ final class CatalogoCodigos
         'historial_estados_residente' => ['cod_historial_estado', 'HES'],
         'horarios_prescripcion' => ['cod_horario_prescripcion', 'HPR'],
         'incidentes' => ['cod_incidente', 'INC'],
-        'indicaciones_clinicas' => ['cod_indicacion', 'IND'],
         'instrumentos' => ['cod_instrumento', 'INS'],
         'intervenciones_cuidado' => ['cod_intervencion', 'INT'],
         'jornadas' => ['cod_jornada', 'JOR'],
@@ -66,7 +65,6 @@ final class CatalogoCodigos
         'medicamentos' => ['cod_medicamento', 'MED'],
         'mediciones_clinicas' => ['cod_registro_medicion', 'MCL'],
         'nodos_semanticos' => ['cod_nodo_semantico', 'NSE'],
-        'notas_clinicas' => ['cod_nota', 'NOT'],
         'objetivos_signos_vitales' => ['cod_objetivo_signo', 'OSV'],
         'ocupaciones_cama' => ['cod_ocupacion', 'OCU'],
         'opciones_pregunta' => ['cod_opcion', 'OPC'],
@@ -87,12 +85,10 @@ final class CatalogoCodigos
         'residentes_contactos' => ['cod_residente_contacto', 'RCT'],
         'respuestas_instrumento' => ['cod_respuesta', 'RSP'],
         'registros_estudio' => ['cod_registro_estudio', 'RESC'],
-        'seguimientos_pedagogicos' => ['cod_seguimiento_pedagogico', 'SPD'],
         'seguros_residente' => ['cod_seguro', 'SEG'],
         'tipos_estudio_clinico' => ['cod_tipo_estudio', 'TEC'],
         'turnos' => ['cod_turno', 'TUR'],
         'usuarios' => ['cod_usuario', 'USU'],
-        'valoraciones_dolor' => ['cod_valoracion_dolor', 'VDL'],
         'valoraciones_profesionales' => ['cod_valoracion_profesional', 'VPR'],
         'valores_semanticos' => ['cod_valor_semantico', 'VSE'],
         'versiones_modelo_experto' => ['cod_version_modelo', 'VME'],
@@ -105,6 +101,11 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'documentos_clinicos' => ['cod_documento_clinico', 'DCL'],
+        'indicaciones_clinicas' => ['cod_indicacion', 'IND'],
+        'notas_clinicas' => ['cod_nota', 'NOT'],
+        'seguimientos_pedagogicos' => ['cod_seguimiento_pedagogico', 'SPD'],
+        'valoraciones_dolor' => ['cod_valoracion_dolor', 'VDL'],
         'alergias' => ['cod_alergia', 'ALG'],
         'antecedentes_clinicos' => ['cod_antecedente', 'ANT'],
         'asignaciones_personal' => ['cod_asignacion_personal', 'ASP'],

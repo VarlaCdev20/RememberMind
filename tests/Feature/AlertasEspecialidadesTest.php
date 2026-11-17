@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -141,7 +142,7 @@ class AlertasEspecialidadesTest extends TestCase
         $r = Residente::factory()->create();
         $alerta = Alerta::create(['cod_residente' => $r->getKey(), 'tipo' => 'SEGUIMIENTO', 'prioridad' => 'MEDIA', 'estado' => 'ABIERTA']);
         Livewire::actingAs($admin)->test(AlertasPanel::class)->call('abrirRegistroEspecialidad', $alerta->getKey())->assertForbidden();
-        $this->assertDatabaseCount('notas_clinicas', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('notas_clinicas')->count());
         $this->assertSame(0, \App\Models\ValoracionNutricional::count());
         $this->assertDatabaseCount('eventos_alerta', 0);
     }

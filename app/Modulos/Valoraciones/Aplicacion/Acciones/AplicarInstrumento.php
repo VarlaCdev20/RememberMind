@@ -176,7 +176,7 @@ final class AplicarInstrumento
             && $usuario->checkPermissionTo('respuestas_instrumento.ver', 'web'), 403);
         Gate::forUser($usuario)->authorize('view', $residente);
         $d = Validator::make($entrada, ['cod_personal_original' => ['required', 'string', 'exists:personal,cod_personal'],
-            'cod_documento_clinico' => ['required', 'string', 'exists:documentos_clinicos,cod_documento_clinico'],
+            'cod_documento_clinico' => ['required', 'string', 'exists:documentos,cod_documento_clinico'],
             'localizador_fuente' => ['required', 'string', 'max:120'], 'original_cotejado' => ['required', 'accepted'],
             'cod_aplicacion_anterior' => ['nullable', 'string', 'exists:aplicaciones_instrumento,cod_aplicacion'],
             'cod_aplicacion_existente' => ['nullable', 'string', 'exists:aplicaciones_instrumento,cod_aplicacion'],

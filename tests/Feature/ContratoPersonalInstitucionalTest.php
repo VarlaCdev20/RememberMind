@@ -71,7 +71,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
         $this->assertTrue($usuario->hasRole('ADMINISTRADOR'));
         $this->assertSame($contactosAntes, Contacto::count());
         $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
         $this->assertArrayNotHasKey('nombres', $usuario->getAttributes());
         $this->assertArrayNotHasKey('created_at', $usuario->getAttributes());
         Mail::assertSent(PersonalInstitucionalBienvenidaMail::class, fn ($mail) => $mail->usuario->personal->numero_documento === '12345678');
@@ -116,7 +116,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
             }
         }
         $this->assertSame($usuariosAntes, User::count());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('public')->allFiles());
         Mail::assertNothingSent();
     }
@@ -226,7 +226,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
         $this->assertFalse($resultado['correo_enviado']);
         $this->assertDatabaseHas('usuarios', ['cod_usuario' => $resultado['usuario']->getKey(), 'correo' => 'nuevo-personal@example.test']);
         $this->assertDatabaseHas('personal', ['cod_usuario' => $resultado['usuario']->getKey(), 'numero_documento' => '12345678']);
-        $this->assertDatabaseCount('documentos', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_fallo_final_revierte_cuenta_personal_roles_documentos_y_archivos(): void
@@ -249,7 +249,7 @@ class ContratoPersonalInstitucionalTest extends TestCase
         }
         $this->assertSame($usuariosAntes, User::count());
         $this->assertSame($personalAntes, Personal::count());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('public')->allFiles());
         Mail::assertNothingSent();
     }

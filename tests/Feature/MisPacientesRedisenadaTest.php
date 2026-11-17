@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\AdministracionMedicacion;
 use App\Models\Admision;
 use App\Models\Alergia;
@@ -1848,7 +1849,7 @@ class MisPacientesRedisenadaTest extends TestCase
             $this->formularioDolor()->set('dolorEva', $eva)
                 ->call('guardarDolor')->assertHasErrors('intensidad');
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_localizacion_excedida_y_duracion_no_positiva_se_rechazan(): void
@@ -1892,7 +1893,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertNotEmpty($e->errors());
             }
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_valoracion_de_dolor_guarda_campos_reales_y_autoria(): void
@@ -1916,7 +1917,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('dolorResultado.mediciones.0.valor', '6 / 10')
             ->call('volverResidenteDesdeDolor')->assertSet('drawerPaso', 'resident-summary');
 
-        $this->assertDatabaseHas('valoraciones_dolor', [
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal,
             'intensidad' => 6,
@@ -1934,7 +1935,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $this->formularioDolor()->set('dolorEva', '0')->call('guardarDolor')
             ->assertHasNoErrors();
-        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 0, 'intervencion' => null]);
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR', 'intensidad' => 0, 'intervencion' => null]);
     }
 
     public function test_dolor_error_conserva_captura_y_no_emite_exito(): void
@@ -1948,7 +1949,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSeeHtml('id="dolor-unidad-error"')
             ->assertSeeHtml('aria-invalid="true"')
             ->assertNotDispatched('dolor-registrado');
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_sucesivo_conserva_valoracion_anterior(): void
@@ -1958,9 +1959,9 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarDolor')->assertHasNoErrors()->assertDispatched('dolor-registrado');
         $this->formularioDolor()->set('dolorEva', '2')->set('dolorUbicacion', 'Rodilla derecha')
             ->call('guardarDolor')->assertHasNoErrors()->assertDispatched('dolor-registrado');
-        $this->assertDatabaseCount('valoraciones_dolor', 2);
-        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 5, 'estado' => 'VIGENTE']);
-        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 2, 'estado' => 'VIGENTE']);
+        $this->assertSame(2, RegistrosConsumo::consulta('valoraciones_dolor')->count());
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR', 'intensidad' => 5, 'estado' => 'VIGENTE']);
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR', 'intensidad' => 2, 'estado' => 'VIGENTE']);
     }
 
     public function test_dolor_fecha_del_cliente_es_rechazada_y_el_registro_usa_el_reloj_del_servidor(): void
@@ -1975,7 +1976,7 @@ class MisPacientesRedisenadaTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('fecha_hora', $e->errors());
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
         $formulario = $this->formularioDolor();
         $this->travel(2)->minutes();
         $formulario->set('dolorEva', '6')->call('guardarDolor')->assertHasNoErrors();
@@ -1983,7 +1984,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertTrue($registro->fecha_hora->equalTo(now()));
         $this->assertSame($this->personal->cod_personal, $registro->cod_personal);
         $formulario->call('guardarDolor')->assertStatus(403);
-        $this->assertDatabaseCount('valoraciones_dolor', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_fecha_livewire_esta_bloqueada(): void
@@ -2029,7 +2030,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('dolorDuracionUnidad', 'minutos')->call('guardarDolor')->assertHasErrors('duracion_valor');
         $this->formularioDolor()->set('dolorEva', '4')->set('dolorDuracionValor', str_repeat('1', 25))
             ->set('dolorDuracionUnidad', str_repeat('x', 60))->call('guardarDolor')->assertHasErrors('duracion_valor');
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_descarte_protege_captura_y_resetea_historial_sin_persistir(): void
@@ -2041,7 +2042,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('cancelarDescarte')->assertSet('drawerPaso', 'register-form')
             ->call('volverPanelDetalle')->assertSet('confirmarDescarte', true)
             ->call('descartarCambios')->assertSet('drawerPaso', 'register-selector');
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_eva_diez_no_crea_severidad_ni_alerta_automatica(): void
@@ -2050,7 +2051,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $alertas = Alerta::count();
         $this->formularioDolor()->set('dolorEva', '10')->call('guardarDolor')
             ->assertHasNoErrors()->assertSee('Valoración de dolor registrada');
-        $this->assertDatabaseHas('valoraciones_dolor', ['intensidad' => 10, 'respuesta' => null]);
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR', 'intensidad' => 10, 'respuesta' => null]);
         $this->assertSame($alertas, Alerta::count());
     }
 
@@ -2070,7 +2071,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('dolorUbicacion', 'Rodilla derecha')->assertSet('dolorIntervencion', 'Reposo')
             ->assertSee('Conservamos los datos')->assertDontSee('Synthetic persistence failure')
             ->assertNotDispatched('dolor-registrado')->assertNotDispatched('rm-toast');
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_revalida_cuenta_y_asignacion_antes_de_persistir(): void
@@ -2079,13 +2080,13 @@ class MisPacientesRedisenadaTest extends TestCase
         $formulario = $this->formularioDolor()->set('dolorEva', '6');
         $this->enfermero->update(['estado' => 'INACTIVO']);
         $formulario->call('guardarDolor')->assertStatus(403);
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
         $this->enfermero->update(['estado' => 'ACTIVO']);
         $formulario = $this->formularioDolor()->set('dolorEva', '6');
         AsignacionResidenteJornada::where('cod_residente', $this->residenteEstable->cod_residente)
             ->update(['estado' => 'INACTIVA']);
         $formulario->call('guardarDolor')->assertStatus(403);
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_episodio_8_5_3_conserva_origen_y_autoria_sin_sobrescribir(): void
@@ -2122,7 +2123,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->assertTrue($c->fecha_hora->equalTo(now()));
         $this->assertCount(2, $a->reevaluaciones);
         $this->assertTrue($b->origen->is($a));
-        $this->assertDatabaseCount('valoraciones_dolor', 3);
+        $this->assertSame(3, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_origen_ajeno_inexistente_futuro_anulado_y_ciclico_no_persisten(): void
@@ -2147,7 +2148,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertArrayHasKey('cod_valoracion_origen', $exception->errors());
             }
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 4);
+        $this->assertSame(4, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_origen_locked_y_respuesta_inicial_prohibida(): void
@@ -2155,7 +2156,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->actingAs($this->enfermero);
         $vista = $this->formularioDolor()->set('dolorEva', '4')->set('dolorRespuesta', 'Texto sin episodio')
             ->call('guardarDolor')->assertHasErrors('respuesta');
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
         $this->expectException(CannotUpdateLockedPropertyException::class);
         $vista->set('dolorCodOrigen', 'VD_INVENTADO');
     }
@@ -2169,7 +2170,7 @@ class MisPacientesRedisenadaTest extends TestCase
             $this->formularioDolor()->set($campo, 'Texto')->call('cerrarSelectorRegistro')
                 ->assertSet('confirmarDescarte', true)->call('cancelarDescarte')->assertSet($campo, 'Texto');
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_reevaluar_protege_captura_y_conserva_residente(): void
@@ -2185,7 +2186,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('modalCodResidente', $this->residenteEstable->getKey())
             ->set('dolorEva', '4')->call('guardarDolor')->assertHasNoErrors()
             ->assertSet('dolorResultado.mediciones.3.valor', '+0 puntos');
-        $this->assertDatabaseCount('valoraciones_dolor', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_reevaluacion_revalida_permiso_lectura_y_asignacion(): void
@@ -2197,7 +2198,7 @@ class MisPacientesRedisenadaTest extends TestCase
         Role::findByName('ENFERMEROS')->revokePermissionTo('valoraciones_dolor.ver');
         $this->enfermero->unsetRelation('roles')->unsetRelation('permissions');
         $vista->call('guardarDolor')->assertForbidden();
-        $this->assertDatabaseCount('valoraciones_dolor', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_fk_impide_vinculo_ajeno_incluso_por_sql(): void
@@ -2206,16 +2207,16 @@ class MisPacientesRedisenadaTest extends TestCase
         $origen = app(CuidadosEnfermeriaService::class)
             ->registrarValoracionDolor($this->residenteEstable->getKey(), ['intensidad' => 4], $this->enfermero);
         try {
-            DB::transaction(fn () => DB::table('valoraciones_dolor')->insert([
+            DB::transaction(fn () => RegistrosConsumo::insertar('valoraciones_dolor', [[
                 'cod_valoracion_dolor' => 'VD_CRUCE_SQL', 'cod_valoracion_origen' => $origen->getKey(),
                 'cod_residente' => $this->residenteCritico->getKey(), 'cod_personal' => $this->personal->getKey(),
                 'fecha_hora' => now(), 'intensidad' => 3, 'estado' => 'VIGENTE',
-            ]));
+            ]]));
             $this->fail('La FK debe impedir otro residente incluso por SQL directo.');
         } catch (QueryException $exception) {
             $this->assertNotEmpty($exception->getCode());
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_contexto_no_puede_cambiar_silenciosamente_de_residente(): void
@@ -2229,7 +2230,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $detail['cod_residente'] = $this->residenteCritico->getKey();
         $vista->set('detalleResidente', $detail)->set('modalCodResidente', $this->residenteCritico->getKey())
             ->call('guardarDolor')->assertForbidden();
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_no_tiene_guardado_alternativo_fuera_de_la_captura(): void
@@ -2238,7 +2239,7 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->formularioDolor()->set('dolorEva', '4')
             ->set('mostrarSelectorModal', false)->set('drawerPaso', 'resident-summary')
             ->call('guardarDolor')->assertForbidden();
-        $this->assertDatabaseCount('valoraciones_dolor', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('valoraciones_dolor')->count());
     }
 
     public function test_dolor_v2_fk_restringe_borrado_y_origen_inexistente(): void
@@ -2251,9 +2252,9 @@ class MisPacientesRedisenadaTest extends TestCase
             try {
                 DB::transaction(function () use ($case, $a, $b) {
                     if ($case === 'delete') {
-                        DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', $a->getKey())->delete();
+                        RegistrosConsumo::consulta('valoraciones_dolor')->where('cod_valoracion_dolor', $a->getKey())->delete();
                     } else {
-                        DB::table('valoraciones_dolor')->where('cod_valoracion_dolor', $b->getKey())->update(['cod_valoracion_origen' => 'VD_NO_EXISTE']);
+                        RegistrosConsumo::consulta('valoraciones_dolor')->where('cod_valoracion_dolor', $b->getKey())->update(['cod_valoracion_origen' => 'VD_NO_EXISTE']);
                     }
                 });
                 $this->fail('La FK debía rechazar la operación.');
@@ -2261,7 +2262,7 @@ class MisPacientesRedisenadaTest extends TestCase
                 $this->assertNotEmpty($exception->getCode());
             }
         }
-        $this->assertDatabaseCount('valoraciones_dolor', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('valoraciones_dolor')->count());
         $this->assertSame($a->getKey(), $b->fresh()->cod_valoracion_origen);
     }
 

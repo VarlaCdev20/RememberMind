@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Documento;
 use App\Models\Personal;
 use App\Models\User;
@@ -126,7 +127,7 @@ class GerenciaAltaSustitucionConcurrentePostgresTest extends TestCase
                 $this->assertSame(['DENEGADO', 'DENEGADO'], array_column($salidas, 'estado'));
                 $this->assertSame($cuentasAntes, User::count());
                 $this->assertSame($personasAntes, Personal::count());
-                $this->assertDatabaseCount('documentos', 0);
+                $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
                 $this->assertSame([], Storage::disk('local')->allFiles());
                 $this->assertSame([], Storage::disk('public')->allFiles());
                 $this->assertSame(0, array_sum(array_column($salidas, 'bienvenidas')));
@@ -142,7 +143,7 @@ class GerenciaAltaSustitucionConcurrentePostgresTest extends TestCase
             if ($modo === 'alta_personal') {
                 $this->assertSame($cuentasAntes + 1, User::count());
                 $this->assertSame($personasAntes + 1, Personal::count());
-                $this->assertDatabaseCount('documentos', 3);
+                $this->assertSame(3, RegistrosConsumo::consulta('documentos')->count());
                 $this->assertSame(1, array_sum(array_column($salidas, 'bienvenidas')));
                 $this->assertSame(1, DB::table('activity_log')->where('event', 'personal')->count());
                 $ganador = User::findOrFail(collect($salidas)->firstWhere('estado', 'CONFIRMADO')['codigo']);

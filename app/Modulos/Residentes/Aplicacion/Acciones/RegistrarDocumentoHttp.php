@@ -24,7 +24,7 @@ final class RegistrarDocumentoHttp
             'archivo' => ['required', 'file', 'max:20480'],
             'fecha_vencimiento' => ['nullable', 'date'],
             'observacion' => ['nullable', 'string'],
-            'cod_documento_anterior' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento')
+            'cod_documento_anterior' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento_ref')
                 ->where('cod_residente', $residente->getKey())],
         ], ['cod_documento_anterior.exists' => 'Selecciona un documento anterior del expediente de este residente.'])->validate();
         $archivo = data_get($entrada, 'archivo');

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -95,7 +96,7 @@ class FotografiasHeridasTest extends TestCase
         $this->assertSame('Procedimiento conservado', $componente->accionLesion);
         $this->assertCount(1, $componente->fotografias);
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_selector_heridas_abre_popup_en_el_directorio_y_regresa_sin_escribir(): void
@@ -110,7 +111,7 @@ class FotografiasHeridasTest extends TestCase
             ->assertSet('registroTipo', null)->assertSet('mostrarSelectorModal', true);
         $this->assertDatabaseCount('heridas', 1);
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_popup_elige_curacion_activa_y_sin_heridas_abre_identificacion(): void
@@ -134,7 +135,7 @@ class FotografiasHeridasTest extends TestCase
         $this->enfermera->roles->first()->revokePermissionTo('curaciones_herida.crear');
         Livewire::test(RegistrosEnfermeria::class, ['codResidente' => 'RES_FOTO', 'emergente' => true])->assertForbidden();
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_ficha_abre_el_mismo_popup_sin_cambiar_tab_ni_persistir(): void
@@ -145,7 +146,7 @@ class FotografiasHeridasTest extends TestCase
             ->call('cerrarPopupHeridas')->assertSet('modalHeridas', false);
         $this->assertDatabaseCount('heridas', 1);
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_preparar_otra_herida_limpia_captura_sin_modificar_la_herida_existente(): void
@@ -316,7 +317,7 @@ class FotografiasHeridasTest extends TestCase
             }
             $curacion = app(RegistrarCuidadosDeTurno::class)->guardarSeguimientoLesion($this->enfermera, $this->entrada($fotos));
             $this->assertDatabaseCount('curaciones_herida', 1);
-            $this->assertDatabaseCount('documentos_clinicos', 5);
+            $this->assertSame(5, RegistrosConsumo::consulta('documentos_clinicos')->count());
             foreach (DocumentoClinico::all() as $documento) {
                 $this->assertSame($curacion->getKey(), $documento->cod_curacion);
                 $this->assertSame(8192 * 1024, $documento->tamano_bytes);
@@ -330,7 +331,7 @@ class FotografiasHeridasTest extends TestCase
             file_put_contents($grande, 'X', FILE_APPEND);
             $rechazo = $cliente->attach('files[]', fopen($grande, 'rb'), 'excede-limite.png')->post($url);
             $this->assertSame(422, $rechazo->status(), $rechazo->body());
-            $this->assertDatabaseCount('documentos_clinicos', 5);
+            $this->assertSame(5, RegistrosConsumo::consulta('documentos_clinicos')->count());
         } finally {
             $proceso->stop();
             URL::forceRootUrl(null);
@@ -434,7 +435,7 @@ class FotografiasHeridasTest extends TestCase
         $nueva = app(RegistrarCuidadosDeTurno::class)->guardarSeguimientoLesion($this->enfermera, $this->entrada(array_map(fn () => UploadedFile::fake()->image('nueva.png'), range(1, $cantidad))));
         $this->assertSame($anterior, DocumentoClinico::find($anterior['cod_documento_clinico'])->getAttributes());
         $this->assertCount($cantidad, $nueva->documentosClinicos);
-        $this->assertDatabaseCount('documentos_clinicos', $cantidad + 1);
+        $this->assertSame($cantidad + 1, DocumentoClinico::count());
         $this->assertDatabaseCount('curaciones_herida', 2);
         $this->assertSame('ACTIVA', $this->herida->fresh()->estado);
     }
@@ -472,7 +473,7 @@ class FotografiasHeridasTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertNotEmpty($e->errors());
         }
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
         $this->assertDatabaseCount('curaciones_herida', 0);
         $this->assertSame([], Storage::disk('local')->allFiles());
     }
@@ -525,7 +526,7 @@ class FotografiasHeridasTest extends TestCase
             DocumentoClinico::clearBootedModels();
         }
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
         $this->assertSame(0, DB::table('activity_log')->where('log_name', 'evidencia_heridas')->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
     }
@@ -541,7 +542,7 @@ class FotografiasHeridasTest extends TestCase
                 DocumentoClinico::create(array_replace($base, ['cod_documento_clinico' => 'DOC_RECHAZADO'], $cambio));
                 $this->fail('Debe rechazar relación.');
             } catch (ValidationException) {
-                $this->assertDatabaseCount('documentos_clinicos', 1);
+                $this->assertSame(1, RegistrosConsumo::consulta('documentos_clinicos')->count());
             }
         }
     }
@@ -565,7 +566,7 @@ class FotografiasHeridasTest extends TestCase
             'superadmin' => $this->enfermera->syncRoles(['ADMINISTRADOR']),
         };
         $this->get(route('admin.cuidados.fotografias.ver', ['RES_FOTO', $doc->getKey()]))->assertForbidden();
-        $this->assertDatabaseCount('documentos_clinicos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_residente_cruzado_en_url_y_reemplazo_historico_denegados(): void
@@ -605,7 +606,7 @@ class FotografiasHeridasTest extends TestCase
             $this->fail('La mutación no debe estar autorizada.');
         } catch (HttpException|AuthorizationException|ModelNotFoundException $error) {
             $this->assertDatabaseCount('curaciones_herida', 0);
-            $this->assertDatabaseCount('documentos_clinicos', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
             $this->assertSame([], Storage::disk('local')->allFiles());
         }
     }
@@ -628,7 +629,7 @@ class FotografiasHeridasTest extends TestCase
         $component->call('quitarFotografia', 0);
         $this->assertCount(1, $component->get('fotografias'));
         $component->call('descartarFotosHerida')->assertSet('fotografias', [])->assertSet('loteFotografias', []);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 
     public function test_livewire_error_conserva_captura_fotos_y_galeria_sin_ruta_fisica(): void
@@ -648,6 +649,6 @@ class FotografiasHeridasTest extends TestCase
             ->call('seleccionarHerida', 'HER_FOTO')->assertSet('lesionId', 'HER_FOTO')
             ->assertSet('aspectoLesion', '')->assertSet('accionLesion', '')->assertSet('fotografias', []);
         $this->assertDatabaseCount('curaciones_herida', 0);
-        $this->assertDatabaseCount('documentos_clinicos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos_clinicos')->count());
     }
 }

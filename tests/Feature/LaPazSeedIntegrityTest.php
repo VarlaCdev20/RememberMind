@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LaPaz\ConservacionDatos;

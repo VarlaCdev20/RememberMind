@@ -79,8 +79,13 @@ final readonly class MapeadorEvidencias
         }
         // Los nombres de tabla/PK solo se contrastan. Nunca se usan en consultas
         // ni para leer una columna escogida por el cliente.
-        $tablaOrigen = $origen instanceof ValoracionFuncional ? $origen->entidadCodigo() : $origen->getTable();
-        $claveOrigen = $origen instanceof ValoracionFuncional ? 'cod_valoracion_funcional' : $origen->getKeyName();
+        $tablaOrigen = $origen instanceof ValoracionFuncional || $origen instanceof SeguimientoPedagogico
+            ? $origen->entidadCodigo() : $origen->getTable();
+        $claveOrigen = match (true) {
+            $origen instanceof ValoracionFuncional => 'cod_valoracion_funcional',
+            $origen instanceof SeguimientoPedagogico => 'cod_seguimiento_pedagogico',
+            default => $origen->getKeyName(),
+        };
         if (self::texto($fuente, 'tabla_raiz') !== $tablaOrigen
             || self::texto($fuente, 'campo_pk_raiz') !== $claveOrigen
             || self::texto($fuente, 'campo_residente') !== 'cod_residente'

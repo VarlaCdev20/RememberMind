@@ -219,7 +219,8 @@ final class ConsultarPetersenInstitucional
                     if ($fecha->greaterThan($f->fecha_hora)) {
                         $vigente = false;
                     }
-                    $soportes[] = new Fuente($o->getTable(), $o->getKey(), $residente->getKey(), $o->cod_personal,
+                    $tablaFuente = $o instanceof \App\Models\RegistroConsumo ? $o->entidadCodigo() : $o->getTable();
+                    $soportes[] = new Fuente($tablaFuente, $o->getKey(), $residente->getKey(), $o->cod_personal,
                         CarbonImmutable::instance($fecha)->toDateTimeImmutable(), $episodio, $s->tipo_soporte, $vigente, $datos);
                 }
                 if ($incompatible) {

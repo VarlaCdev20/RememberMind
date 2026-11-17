@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -84,7 +85,7 @@ class AccionesModularesClinicasTest extends TestCase
             }
         }
         $this->assertSame($antes, [User::count(), Activity::count(), Residente::count()]);
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertDatabaseCount('preadmisiones', 0);
     }
 
@@ -110,7 +111,7 @@ class AccionesModularesClinicasTest extends TestCase
             }
         }
         $this->assertSame($antes, Activity::count());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     #[DataProvider('decisiones')]

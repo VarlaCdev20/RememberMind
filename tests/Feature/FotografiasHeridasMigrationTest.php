@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\CuracionHerida;
 use App\Models\DocumentoClinico;
 use App\Models\Herida;
@@ -22,13 +23,15 @@ class FotografiasHeridasMigrationTest extends TestCase
     {
         $residente = Residente::factory()->create();
         DocumentoClinico::create(['cod_documento_clinico' => 'DOC_GENERAL_DDL', 'cod_residente' => $residente->getKey(), 'tipo_documento' => 'GENERAL', 'titulo' => 'Documento anterior', 'ruta_archivo' => 'documento.pdf', 'formato' => 'application/pdf', 'hash_archivo' => str_repeat('a', 64), 'fecha_hora' => now(), 'estado' => 'VIGENTE']);
+        $union = require database_path('migrations/2026_11_16_000002_consolidate_documentos.php');
+        $union->down();
         $tables = count(Schema::getTables());
         $columns = Schema::getColumnListing('documentos_clinicos');
         $migration = require database_path('migrations/2026_10_11_230000_add_evidencia_heridas_to_documentos_clinicos.php');
         $migration->down();
         $this->assertSame(2, count($columns) - count(Schema::getColumnListing('documentos_clinicos')));
         $this->assertFalse(Schema::hasColumn('documentos_clinicos', 'cod_herida'));
-        $this->assertDatabaseCount('documentos_clinicos', 1);
+        $this->assertSame(1, DB::table('documentos_clinicos')->count());
         $migration->up();
         $this->assertEqualsCanonicalizing($columns, Schema::getColumnListing('documentos_clinicos'));
         $this->assertSame($tables, count(Schema::getTables()));
@@ -39,6 +42,7 @@ class FotografiasHeridasMigrationTest extends TestCase
         foreach ($foreigns as $fk) {
             $this->assertSame('restrict', strtolower($fk['on_delete']));
         }
+        $union->up();
         $this->assertNull(DocumentoClinico::sole()->cod_herida);
         $this->assertNull(DocumentoClinico::sole()->cod_curacion);
     }
@@ -60,13 +64,13 @@ class FotografiasHeridasMigrationTest extends TestCase
                 $this->assertDatabaseHas($table, [$column => $id]);
             }
         }
-        $this->assertDatabaseCount('documentos_clinicos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('documentos_clinicos')->count());
         // La FK también rechaza un código inexistente sin pasar por eventos Eloquent.
         try {
-            DB::transaction(fn () => DB::table('documentos_clinicos')->insert($base + ['cod_documento_clinico' => 'DOC_FOTO_INVALID', 'cod_herida' => 'NO_EXISTE']));
+            DB::transaction(fn () => RegistrosConsumo::insertar('documentos_clinicos', [$base + ['cod_documento_clinico' => 'DOC_FOTO_INVALID', 'cod_herida' => 'NO_EXISTE']]));
             $this->fail('Debe rechazar FK inválida.');
         } catch (QueryException) {
-            $this->assertDatabaseCount('documentos_clinicos', 2);
+            $this->assertSame(2, RegistrosConsumo::consulta('documentos_clinicos')->count());
         }
     }
 }

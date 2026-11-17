@@ -92,7 +92,7 @@ try {
         $procedencia['sin_vinculo_documental'] += (int) ! $documento;
         $procedencia['pareja_documental_incompleta'] += (int) ($documento !== $localizador);
         if ($documento) {
-            $doc = DB::table('documentos_clinicos')->where('cod_documento_clinico', $a->cod_documento_clinico)
+            $doc = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('documentos_clinicos')->where('cod_documento_clinico', $a->cod_documento_clinico)
                 ->first(['cod_residente', 'ruta_archivo', 'hash_archivo']);
             if ($doc === null || $doc->cod_residente !== $residente) {
                 $procedencia['documento_ajeno_o_inexistente']++;

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\DestinatarioSolicitudDocumental;
 use App\Models\Documento;
 use App\Models\EntregaSolicitudDocumental;
@@ -421,7 +422,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         } finally {
             $fallar = false;
         }
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertDatabaseCount('entregas_solicitud_documental', 0);
         $this->assertSame([], Storage::disk('local')->allFiles());
         $this->assertDatabaseCount('solicitudes_documentales_personal', 1);
@@ -525,7 +526,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
             $this->assertSame(403, $error->getStatusCode());
         }
         $this->assertDatabaseCount('entregas_solicitud_documental', 0);
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
         $entrega = app(RegistrarArchivoSolicitudDocumental::class)->ejecutar($this->trabajador, $destino->getKey(), UploadedFile::fake()->create('propio.pdf', 10, 'application/pdf'));
         $this->trabajador->givePermissionTo('documentos.gestionar');
@@ -554,7 +555,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
                 $this->assertArrayHasKey('archivo', $error->errors());
             }
             $this->assertDatabaseCount('entregas_solicitud_documental', 0);
-            $this->assertDatabaseCount('documentos', 0);
+            $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
             $this->assertSame([], Storage::disk('local')->allFiles());
         }
     }

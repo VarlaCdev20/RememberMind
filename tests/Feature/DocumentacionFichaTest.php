@@ -142,7 +142,7 @@ class DocumentacionFichaTest extends TestCase
             ->assertSet('modalSubirDoc', false)
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('documentos', [
+        $this->assertDatabaseHas('documentos', ['tipo_evento' => 'ADMINISTRATIVO',
             'cod_residente' => $this->residente->cod_residente,
             'nombre' => 'Evaluación Psicológica Trimestral',
         ]);

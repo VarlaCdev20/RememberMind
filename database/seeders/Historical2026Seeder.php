@@ -985,15 +985,15 @@ class Historical2026Seeder extends Seeder
             }
         }
         foreach (['documentos', 'documentos_clinicos'] as $table) {
-            foreach (DB::table($table)->whereIn('cod_residente', $ids)->get() as $document) {
+            foreach (RegistrosConsumo::consulta($table)->whereIn('cod_residente', $ids)->get() as $document) {
                 if (! Storage::disk('local')->exists($document->ruta_archivo)
                     || hash('sha256', Storage::disk('local')->get($document->ruta_archivo)) !== $document->hash_archivo) {
                     throw new RuntimeException('Archivo clínico ausente o alterado.');
                 }
             }
         }
-        if (DB::table('documentos')->whereIn('cod_residente', $ids)->count() !== 30
-            || DB::table('documentos_clinicos')->whereIn('cod_residente', $ids)->count() !== 2
+        if (RegistrosConsumo::consulta('documentos')->whereIn('cod_residente', $ids)->count() !== 30
+            || RegistrosConsumo::consulta('documentos_clinicos')->whereIn('cod_residente', $ids)->count() !== 2
             || DB::table('objetivos_signos_vitales')->whereIn('cod_residente', $ids)->count() !== 2) {
             throw new RuntimeException('Expedientes, informes u objetivos individuales incompletos.');
         }

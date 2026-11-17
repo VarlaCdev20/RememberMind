@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Residentes\Presentacion\Http\Controllers;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Http\Controllers\Controller;
 use App\Models\Residente;
 use Illuminate\Http\Request;
@@ -58,7 +59,7 @@ class ResidenteAdministrativoController extends Controller
                 ->get(['c.nombres', 'c.apellido_paterno', 'c.celular', 'rc.parentesco', 'rc.responsable_principal', 'rc.estado'])
                 ->map(fn ($r) => $this->fila($r->nombres.' '.$r->apellido_paterno,
                     $r->parentesco.($r->responsable_principal ? ' · Responsable principal' : '').($r->celular ? ' · '.$r->celular : ''), null, $r->estado)),
-            'documentacion' => DB::table('documentos')->where('cod_residente', $codigo)
+            'documentacion' => RegistrosConsumo::consulta('documentos')->where('cod_residente', $codigo)
                 ->orderBy('nombre')->get(['nombre', 'tipo_documento', 'fecha_vencimiento', 'estado'])
                 ->map(fn ($r) => $this->fila($r->nombre, $r->tipo_documento, $r->fecha_vencimiento, $r->estado)),
             'consentimientos' => DB::table('consentimientos')->where('cod_residente', $codigo)

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\AdministracionMedicacion;
 use App\Models\Admision;
 use App\Models\Alerta;
@@ -347,7 +348,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             $this->assertSame(403, $error->getStatusCode());
         }
 
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
     }
 
@@ -360,8 +361,8 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         $documento = app(IncorporarDocumentosExpediente::class)
             ->guardarNuevoDocumento($this->elenaUser, $this->entradaDocumentoSintetico());
 
-        $this->assertDatabaseCount('documentos', 1);
-        $this->assertDatabaseHas('documentos', [
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
+        $this->assertDatabaseHas('documentos', ['tipo_evento' => 'ADMINISTRATIVO',
             'cod_documento' => $documento->getKey(),
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_usuario' => $this->elenaUser->getKey(),

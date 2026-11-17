@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
 use App\Models\Admision;
 use App\Models\Cama;
@@ -87,7 +88,7 @@ class Fase3AdmisionAtomicidadTest extends TestCase
         $this->postJson($documentos, $carga + ['archivo' => UploadedFile::fake()->create('ajeno.pdf'),
             'cod_documento_anterior' => $ajeno->getKey()])
             ->assertUnprocessable()->assertJsonValidationErrors('cod_documento_anterior');
-        $this->assertDatabaseCount('documentos', 2);
+        $this->assertSame(2, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
         $nuevo = $this->postJson($documentos, $carga + ['archivo' => UploadedFile::fake()->create('propio.pdf'),
             'cod_documento_anterior' => $propio->getKey()])

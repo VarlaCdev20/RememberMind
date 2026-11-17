@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Alerta;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -209,6 +210,6 @@ class AlertasFlujosPorRolTest extends TestCase
         $this->assertSame($rolesOriginales, $superadmin->fresh()->getRoleNames()->all());
         $this->assertDatabaseCount('eventos_alerta', 0);
         $this->assertSame(0, \App\Models\ValoracionNutricional::count());
-        $this->assertDatabaseCount('notas_clinicas', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('notas_clinicas')->count());
     }
 }

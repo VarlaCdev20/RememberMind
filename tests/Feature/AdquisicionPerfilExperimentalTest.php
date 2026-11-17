@@ -45,8 +45,8 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
             'insomnio' => false, 'somnolencia_diurna' => null, 'estado' => 'VIGENTE']);
         DB::table('actividades')->insert(['cod_actividad' => 'SIM-ACT', 'cod_area' => 'SIM-AREA', 'cod_personal' => 'SIM-PER',
             'tipo' => 'PRUEBA_TECNICA', 'nombre' => 'Actividad ficticia', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE']);
-        DB::table('seguimientos_pedagogicos')->insert(['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',
-            'cod_personal' => 'SIM-PER', 'cod_actividad' => 'SIM-ACT', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE', 'atencion' => '0']);
+        RegistrosConsumo::insertar('seguimientos_pedagogicos', [['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',
+            'cod_personal' => 'SIM-PER', 'cod_actividad' => 'SIM-ACT', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE', 'atencion' => '0']]);
         DB::table('controles_funcionales_iadl')->insert($comun + ['cod_control_iadl' => 'SIM-IADL',
             'cod_usuario_registro' => $autor->getKey(), 'actividad' => 'TELEFONO', 'oportunidad' => 'NO_OBSERVADA',
             'desempeno' => 'NO_DETERMINADO', 'tipo_ayuda' => 'NO_DETERMINADA', 'causa_ayuda' => 'NO_DETERMINADA',

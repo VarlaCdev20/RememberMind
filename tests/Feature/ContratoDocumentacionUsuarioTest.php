@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Documento;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\DocumentacionUsuarioService;
@@ -112,7 +113,7 @@ class ContratoDocumentacionUsuarioTest extends TestCase
             $this->assertSame(403, $error->getStatusCode());
         }
         $this->assertSame([], Storage::disk('public')->allFiles());
-        $this->assertDatabaseCount('documentos', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('documentos')->count());
     }
 
     public function test_reemplazo_preserva_archivo_anterior_y_sucesion(): void
@@ -154,7 +155,7 @@ class ContratoDocumentacionUsuarioTest extends TestCase
         } finally {
             Activity::setEventDispatcher($dispatcher);
         }
-        $this->assertDatabaseCount('documentos', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('documentos')->count());
         $this->assertSame('CARGADO', $anterior->fresh()->estado);
         $this->assertSame($auditoriaAntes, Activity::count());
         $this->assertSame([$anterior->ruta_archivo], Storage::disk('public')->allFiles());

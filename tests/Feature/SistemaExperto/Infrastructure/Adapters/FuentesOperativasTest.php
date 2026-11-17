@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Adapters;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum;
 use DomainException;
 use Illuminate\Database\QueryException;
@@ -74,8 +75,8 @@ final class FuentesOperativasTest extends AdaptadoresTestCase
         $this->cambiarFuente('seguimientos_pedagogicos', 'cod_seguimiento_pedagogico', 'SIM-PEDAGOGIA', 'SIM-SEG', 'atencion');
         DB::table('actividades')->insert(['cod_actividad' => 'SIM-ACT', 'cod_area' => 'SIM-AREA', 'cod_personal' => 'SIM-PER',
             'tipo' => 'PRUEBA_TECNICA', 'nombre' => 'Actividad ficticia', 'fecha_hora' => '2026-10-17 12:00:00', 'estado' => 'VIGENTE']);
-        DB::table('seguimientos_pedagogicos')->insert(['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',
-            'cod_personal' => 'SIM-PER', 'cod_actividad' => 'SIM-ACT', 'fecha_hora' => '2026-10-17 12:00:00', 'atencion' => '0', 'estado' => 'VIGENTE']);
+        RegistrosConsumo::insertar('seguimientos_pedagogicos', [['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',
+            'cod_personal' => 'SIM-PER', 'cod_actividad' => 'SIM-ACT', 'fecha_hora' => '2026-10-17 12:00:00', 'atencion' => '0', 'estado' => 'VIGENTE']]);
         $memoria = $this->repositorioAdaptado()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', self::corte());
 
         self::assertSame('0', $memoria->hechos['SIM-EVID']->valor);

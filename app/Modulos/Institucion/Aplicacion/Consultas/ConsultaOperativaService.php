@@ -211,7 +211,7 @@ class ConsultaOperativaService
                 );
             case 'documentacion':
                 return $this->armar(
-                    DB::table('documentos as d')
+                    RegistrosConsumo::consulta('documentos', 'd')
                         ->leftJoin('residentes as r', 'r.cod_residente', '=', 'd.cod_residente')
                         ->leftJoin('preadmisiones as p', 'p.cod_preadmision', '=', 'd.cod_preadmision')
                         ->leftJoin('contactos as c', 'c.cod_contacto', '=', 'd.cod_contacto')
