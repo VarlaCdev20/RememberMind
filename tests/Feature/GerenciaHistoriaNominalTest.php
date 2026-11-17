@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\Jornada;
@@ -30,6 +32,7 @@ class GerenciaHistoriaNominalTest extends TestCase
     {
         parent::setUp();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 
@@ -78,7 +81,7 @@ class GerenciaHistoriaNominalTest extends TestCase
         app(GestionarHorariosPersonal::class)->confirmarFinalizar(['usuarioId' => $persona->getKey(), 'codAsignacionFinalizar' => $segunda->getKey(), 'f_fecha_fin_finalizar' => '2026-10-27']);
         $this->assertSame('ACTIVO', $filas->first()->fresh()->estado);
         $this->assertSame('INACTIVO', $segunda->fresh()->estado);
-        $eventos = DB::table('eventos_asignacion_personal')->where('cod_asignacion_personal', $segunda->getKey())->orderBy('numero_evento')->get();
+        $eventos = HistoriaLaboral::consulta('eventos_asignacion_personal')->where('cod_asignacion_personal', $segunda->getKey())->orderBy('numero_evento')->get();
         $this->assertCount(2, $eventos);
         $this->assertSame('ALTA', $eventos[0]->tipo_evento);
         $this->assertSame('FINALIZACION', $eventos[1]->tipo_evento);
@@ -93,9 +96,12 @@ class GerenciaHistoriaNominalTest extends TestCase
     public function test_inventario_y_reversion_sin_datos_deja_modelo_original(): void
     {
         $antes = Schema::getTableListing();
-        $this->assertCount(118, $antes);
+        $this->assertCount(101, $antes);
+        (require base_path('database/propuestas/gerencia/2026_11_16_000004_consolidacion_historia_laboral.php'))->down();
+        (require base_path('database/propuestas/gerencia/2026_10_27_000003_campos_aviso_evento_asignacion.php'))->down();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->down();
-        $this->assertCount(116, Schema::getTableListing());
+        (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->down();
+        $this->assertCount(96, Schema::getTableListing());
     }
 
     public function test_historia_guardada_no_se_sobrescribe_ni_se_retiра_con_rollback(): void
@@ -176,18 +182,21 @@ class GerenciaHistoriaNominalTest extends TestCase
         $eventos->conservar($asignacion, $actor, 'FINALIZACION', 'ACTIVO', now(), 'Cierre de ensayo');
         foreach ([['versiones_vinculo_contacto', 'cod_version_vinculo', 'cod_version_anterior', 'numero_version'],
             ['eventos_asignacion_personal', 'cod_evento_asignacion', 'cod_evento_anterior', 'numero_evento']] as [$tabla, $pk, $previo, $numero]) {
-            $base = (array) DB::table($tabla)->where($numero, 1)->first();
+            $consulta = fn () => $tabla === 'eventos_asignacion_personal'
+                ? HistoriaLaboral::consulta($tabla) : DB::table($tabla);
+            $base = (array) $consulta()->where($numero, 1)->first();
             foreach (['autoenlace', 'salto', 'rama'] as $modo) {
                 $clave = 'QA_'.strtoupper($modo);
                 $fila = [...$base, $pk => $clave, $numero => $modo === 'salto' ? 4 : 3,
                     $previo => $modo === 'autoenlace' ? $clave : $base[$pk]];
                 try {
-                    DB::transaction(fn () => DB::table($tabla)->insert($fila));
+                    DB::transaction(fn () => $tabla === 'eventos_asignacion_personal'
+                        ? HistoriaLaboral::insertar($tabla, [$fila]) : DB::table($tabla)->insert($fila));
                     $this->fail('Debe rechazarse '.$modo.' en '.$tabla);
                 } catch (QueryException $error) {
                     $this->assertStringContainsString('secuencia', $error->getMessage());
                 }
-                $this->assertDatabaseCount($tabla, 2);
+                $this->assertSame(2, $consulta()->count());
             }
         }
     }

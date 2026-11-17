@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -174,6 +176,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
     public function test_edicion_de_grupo_legacy_conserva_guardia_anterior_en_control_de_solapamiento(): void
     {
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $noche = $this->turno('Noche', '20:00', '08:00');
         $manana = $this->turno('Mañana', '07:00', '15:00');
         $domingo = Jornada::create(['cod_turno' => $noche->getKey(), 'fecha_jornada' => '2026-10-25', 'estado' => 'ABIERTA']);
@@ -190,7 +193,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->assertSame('ACTIVO', $previa->fresh()->estado);
         $this->assertSame('ACTIVO', $editar->fresh()->estado);
         $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
-        $this->assertDatabaseCount('eventos_asignacion_personal', 0);
+        $this->assertSame(0, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
     }
 
     public function test_plaza_tampoco_duplica_una_jornada_cerrada_por_formato_de_fecha(): void
@@ -215,6 +218,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
     public function test_finalizar_grupo_no_sobrescribe_ocurrencias_anuladas_y_rechaza_origen_inactivo(): void
     {
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $turno = $this->turno('Mañana', '08:00', '16:00');
         $meta = json_encode(['grupo' => 'GRUPO_HISTORICO', 'observaciones' => 'Texto original']);
         $filas = collect(['ACTIVO', 'ANULADA'])->map(function ($estado, $indice) use ($turno, $meta) {
@@ -228,15 +232,15 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->assertSame('INACTIVO', $filas[0]->fresh()->estado);
         $this->assertSame('ANULADA', $filas[1]->fresh()->estado);
         $this->assertSame($meta, $filas[1]->fresh()->observacion);
-        $this->assertDatabaseCount('eventos_asignacion_personal', 1);
-        $this->assertDatabaseMissing('eventos_asignacion_personal', ['cod_asignacion_personal' => $filas[1]->getKey()]);
+        $this->assertSame(1, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
+        $this->assertDatabaseMissing('historial_laboral_personal', ['clase_acto' => 'ASIGNACION', 'cod_asignacion_personal' => $filas[1]->getKey()]);
         try {
             app(GestionarHorariosPersonal::class)->confirmarFinalizar([...$entrada, 'codAsignacionFinalizar' => $filas[1]->getKey()]);
             $this->fail('Una ocurrencia anulada no puede servir de origen para finalizar.');
         } catch (ValidationException $error) {
             $this->assertArrayHasKey('f_fecha_fin_finalizar', $error->errors());
         }
-        $this->assertDatabaseCount('eventos_asignacion_personal', 1);
+        $this->assertSame(1, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
     }
 
     public function test_turno_referenciado_conserva_horas_historicas_pero_permite_corregir_nombre(): void
@@ -265,6 +269,7 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
     public function test_fallo_en_segunda_ocurrencia_revierte_primera_jornada_evento_y_auditoria(): void
     {
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $turno = $this->turno('Mañana', '08:00:00', '16:00:00');
         $entrada = [...$this->entrada($turno), 'f_dias_semana' => ['LUNES', 'MARTES']];
         $antes = Activity::count();
@@ -288,12 +293,12 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         }
         $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 0);
-        $this->assertDatabaseCount('eventos_asignacion_personal', 0);
+        $this->assertSame(0, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
         $this->assertSame($antes, Activity::count());
         app(GestionarHorariosPersonal::class)->guardar($entrada);
         $this->assertSame(2, RegistrosConsumo::consulta('asignaciones_personal')->count());
         $this->assertDatabaseCount('jornadas', 2);
-        $this->assertDatabaseCount('eventos_asignacion_personal', 2);
+        $this->assertSame(2, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
     }
     public function test_tarjeta_selecciona_detalle_sin_escribir_y_filtros_retiro_no_dejan_datos_residuales(): void
     {

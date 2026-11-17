@@ -13,6 +13,8 @@ runtime_verified: false
 
 # Estado actual de RememberMind
 
+**Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](base-de-datos/DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
+
 **Actualización de persistencia del 16/11/2026:** cuatro [uniones autorizadas e instaladas](base-de-datos/DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md) dejan **64 operativas + 22 expertas + 16 técnicas = 102 tablas físicas**. Se conservaron los 859 registros afectados, las referencias y los permisos, con respaldo y ensayo de reversión. El informe distingue las pruebas ejecutadas de los escenarios pendientes. Las evidencias anteriores mantienen su fecha.
 
 **Revisión: 04/11/2026, America/La_Paz.** Referencia de código: `57285c7e`, más los cambios locales existentes de Gerencia, avisos y Reportes. Esta revisión documental contrasta archivos, decisiones y rutas registradas. No ejecuta una aceptación integral del producto, no consulta historias clínicas ni vuelve a contar la BDD operativa.

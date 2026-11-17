@@ -28,6 +28,7 @@ class GerenciaContactosTest extends TestCase
     {
         parent::setUp();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->gerente = User::factory()->create();
         $this->gerente->assignRole('GERENTE');

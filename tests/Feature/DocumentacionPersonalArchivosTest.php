@@ -219,6 +219,7 @@ class DocumentacionPersonalArchivosTest extends TestCase
     private function instalarSeguimiento(): void
     {
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->titular->forceFill(['fecha_hora_alta' => now()])->save();
     }
 

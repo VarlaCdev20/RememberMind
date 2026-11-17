@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
+
 **Actualización autorizada e instalada del 16/11/2026:** [documentos, valoraciones y textos clínicos consolidados](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). Inventario vigente: **64 operativas + 22 expertas + 16 técnicas**. Este diccionario conserva la descripción histórica del núcleo; las cuatro relaciones modificadas y sus identidades se definen en la decisión posterior.
 
 **Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.

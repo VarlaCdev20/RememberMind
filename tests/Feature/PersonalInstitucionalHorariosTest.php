@@ -22,6 +22,7 @@ class PersonalInstitucionalHorariosTest extends TestCase
     {
         parent::setUp();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         \Spatie\Permission\Models\Permission::findOrCreate('turnos.asignar', 'web');
         $actor = User::factory()->create(['estado' => 'ACTIVO']);
         $actor->givePermissionTo('turnos.asignar');

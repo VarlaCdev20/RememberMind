@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\Jornada;
@@ -37,6 +39,7 @@ class GerenciaConcurrenciaPlanificacionPostgresTest extends TestCase
         }
         $this->artisan('migrate:fresh', ['--force' => true])->assertSuccessful();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->seed(RolesAndPermissionsSeeder::class);
         $actor = User::factory()->create();
         $actor->assignRole('GERENTE');
@@ -83,7 +86,7 @@ class GerenciaConcurrenciaPlanificacionPostgresTest extends TestCase
             $this->assertTrue($proceso->isSuccessful(), $proceso->getErrorOutput());
             $this->assertSame('RECHAZADO', json_decode($proceso->getOutput(), true, flags: JSON_THROW_ON_ERROR)['estado']);
             $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
-            $this->assertDatabaseCount('eventos_asignacion_personal', 0);
+            $this->assertSame(0, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
             $this->assertSame($estado, DB::table($tabla)->where($pk, $codigo)->value('estado'));
         } finally {
             if (DB::transactionLevel() > 0) {

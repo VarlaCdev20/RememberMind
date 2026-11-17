@@ -17,6 +17,8 @@ Entrada vigente de navegación documental, revisada el **04/11/2026**. El produc
 
 ## Empezar aquí
 
+**Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](base-de-datos/DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
+
 Persistencia actualizada el **16/11/2026**: [cuatro uniones instaladas y evidencia](base-de-datos/DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md), **86 tablas de negocio + 16 técnicas**. Los inventarios anteriores describen su corte.
 
 - [Estado actual](ESTADO_ACTUAL.md): capacidades presentes, límites y evidencia por alcance.

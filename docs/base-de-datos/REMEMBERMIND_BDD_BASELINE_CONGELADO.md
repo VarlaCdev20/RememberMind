@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
+
 **Decisión posterior autorizada e instalada del 16/11/2026:** [unión de documentos, valoraciones y textos clínicos](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). El inventario instalado vigente es **64 operativas + 22 expertas = 86 de negocio**, más **16 técnicas**. El núcleo y los inventarios históricos siguientes mantienen sus fechas y contratos fuera de ese alcance.
 
 > Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.

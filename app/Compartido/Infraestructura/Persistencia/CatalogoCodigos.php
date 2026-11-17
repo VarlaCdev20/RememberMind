@@ -9,12 +9,11 @@ final class CatalogoCodigos
 {
     /** Diseño 35 aprobado para bases desechables; no forma parte del inventario instalado. */
     public const EXTENSIONES_GERENCIA = [
+        'historial_laboral_personal' => ['cod_historial_laboral', 'HLP'],
         'solicitudes_documentales_personal' => ['cod_solicitud_documental', 'SDP'],
         'destinatarios_solicitud_documental' => ['cod_destinatario_documental', 'DSD'],
         'entregas_solicitud_documental' => ['cod_entrega_documental', 'ESD'],
-        'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
         'versiones_vinculo_contacto' => ['cod_version_vinculo', 'VVC'],
-        'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
     ];
     public const ENTIDADES = [
         'registros_textuales_clinicos' => ['cod_registro_textual', 'RTC'],
@@ -101,6 +100,8 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
+        'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
         'documentos_clinicos' => ['cod_documento_clinico', 'DCL'],
         'indicaciones_clinicas' => ['cod_indicacion', 'IND'],
         'notas_clinicas' => ['cod_nota', 'NOT'],

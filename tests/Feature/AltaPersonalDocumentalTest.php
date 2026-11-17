@@ -33,6 +33,7 @@ class AltaPersonalDocumentalTest extends TestCase
         parent::setUp();
         $this->travelTo(\Carbon\Carbon::parse('2026-11-05 10:30:00'));
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         (require base_path('database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php'))->up();
         $this->seed(RolesAndPermissionsSeeder::class);
         Storage::fake('public'); Storage::fake('local'); Mail::fake();

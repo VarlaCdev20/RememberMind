@@ -4,11 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MovimientoLaboralPersonal extends ModeloOperativo
+class MovimientoLaboralPersonal extends RegistroHistoriaLaboral
 {
-    protected $table = 'movimientos_laborales_personal';
+    protected const CLASE_ACTO = 'LABORAL';
+
+    protected $appends = ['cod_movimiento_laboral'];
+
+    protected $hidden = ['cod_historial_laboral', 'clase_acto', 'cod_evento_asignacion', 'cod_asignacion_personal',
+        'numero_evento', 'cod_evento_anterior', 'tipo_evento', 'cod_usuario_afectado_aviso', 'estado_aviso_planificacion',
+        'numero_intentos_aviso', 'fecha_hora_ultimo_intento_aviso', 'fecha_hora_disponible_aviso', 'categoria_fallo_aviso'];
 
     protected $primaryKey = 'cod_movimiento_laboral';
+
+    public function getCodMovimientoLaboralAttribute($valor): ?string
+    {
+        return $this->attributes['cod_historial_laboral'] ?? $valor;
+    }
+
+    public function setCodMovimientoLaboralAttribute(string $codigo): void
+    {
+        $this->attributes['cod_historial_laboral'] = $codigo;
+    }
 
     protected function casts(): array
     {
@@ -27,6 +43,7 @@ class MovimientoLaboralPersonal extends ModeloOperativo
 
     protected static function booted(): void
     {
+        parent::booted();
         static::updating(fn () => throw new \LogicException('Un movimiento laboral conserva la transición original.'));
     }
 }

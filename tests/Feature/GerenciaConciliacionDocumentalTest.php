@@ -201,6 +201,7 @@ class GerenciaConciliacionDocumentalTest extends TestCase
     public function test_correccion_con_capacidad_nominal_conserva_fecha_cargador_y_emision_por_separado(): void
     {
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->travelTo(Carbon::parse('2026-10-26 10:00:00'));
         $anterior = $this->documento('FOTO_DOC', 'OBSERVADO');
         $nuevo = app(DocumentacionUsuarioService::class)->subirDocumento($this->titular, 'FOTO_DOC',

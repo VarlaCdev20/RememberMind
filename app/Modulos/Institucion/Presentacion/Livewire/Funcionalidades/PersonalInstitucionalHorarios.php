@@ -2,6 +2,8 @@
 
 namespace App\Modulos\Institucion\Presentacion\Livewire\Funcionalidades;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
@@ -409,7 +411,7 @@ class PersonalInstitucionalHorarios extends Component
         ];
         $this->detalleAsignacion['historia'] = [];
         if (app(ConservarEventoAsignacion::class)->disponible()) {
-            $this->detalleAsignacion['historia'] = DB::table('eventos_asignacion_personal as e')
+            $this->detalleAsignacion['historia'] = HistoriaLaboral::consulta('eventos_asignacion_personal', 'e')
                 ->joinSub(RegistrosConsumo::consulta('asignaciones_personal'), 'a', 'a.cod_asignacion_personal', '=', 'e.cod_asignacion_personal')
                 ->join('personal as titular', 'titular.cod_personal', '=', 'a.cod_personal')
                 ->leftJoin('personal as autor', 'autor.cod_usuario', '=', 'e.cod_usuario_registro')

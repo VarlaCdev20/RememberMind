@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Area;
 use App\Models\Personal;
@@ -42,6 +44,7 @@ class GerenciaDocumentacionConcurrenciaPostgresTest extends TestCase
         $this->artisan('migrate:fresh', ['--force' => true])->assertSuccessful();
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
         (require base_path('database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         $this->seed(RolesAndPermissionsSeeder::class);
         $actor = User::factory()->create();
         $actor->assignRole('GERENTE');
@@ -102,7 +105,7 @@ class GerenciaDocumentacionConcurrenciaPostgresTest extends TestCase
             } else {
                 $this->assertEqualsCanonicalizing(['CONFIRMADO', 'RECHAZADO'], array_column($salidas, 'estado'));
                 if ($modo === 'laboral') {
-                    $this->assertDatabaseCount('movimientos_laborales_personal', 1);
+                    $this->assertSame(1, HistoriaLaboral::consulta('movimientos_laborales_personal')->count());
                     $this->assertSame('INACTIVO', $personal->fresh()->estado);
                     $this->assertSame('ACTIVO', $trabajador->fresh()->estado);
                 } elseif ($modo === 'vinculo') {
@@ -111,7 +114,7 @@ class GerenciaDocumentacionConcurrenciaPostgresTest extends TestCase
                 } elseif ($modo === 'horario') {
                     $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
                     $this->assertDatabaseCount('jornadas', 1);
-                    $this->assertDatabaseCount('eventos_asignacion_personal', 1);
+                    $this->assertSame(1, HistoriaLaboral::consulta('eventos_asignacion_personal')->count());
                 } else {
                     $this->assertSame(1, DB::table('destinatarios_solicitud_documental')->whereNotNull('fecha_limite_prorrogada')->count());
                 }

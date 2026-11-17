@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
+
 **Consolidación instalada el 16/11/2026:** [documentos, valoraciones y textos clínicos](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). Inventario local comprobado: **64 operativas + 22 expertas = 86 de negocio**, más **16 técnicas: 102 físicas**. Las cifras siguientes conservan sus fechas históricas.
 
 **Consolidaciones instaladas el 14/11/2026:** [valoración inicial dentro de preadmisiones](DECISION_CONSOLIDACION_VALORACION_PREADMISION_2026_11_14.md), [ingesta e hidratación en registros de consumo](DECISION_CONSOLIDACION_CONSUMO_2026_11_14.md), [cuidados y criterios](DECISION_CONSOLIDACION_CUIDADOS_Y_CRITERIOS_2026_11_14.md) y [sueño, mediciones y valoraciones profesionales](DECISION_CONSOLIDACION_CLINICA_2026_11_14.md) y [estudios clínicos y vínculos de evidencia](DECISION_CONSOLIDACION_ESTUDIOS_EVIDENCIA_2026_11_14.md). La [consolidación de registros clínicos, asignaciones y componentes de reglas](DECISION_CONSOLIDACION_CLINICA_ASIGNACIONES_REGLAS_2026_11_14.md) deja **68 operativas + 22 expertas = 90 de negocio**, más **16 técnicas**.

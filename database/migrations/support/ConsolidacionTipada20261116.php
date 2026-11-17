@@ -7,6 +7,17 @@ use Illuminate\Support\Facades\Schema;
 /** Transición acotada a las cuatro uniones autorizadas el 16/11/2026. */
 abstract class ConsolidacionTipada20261116 extends Migration
 {
+    protected const DISCRIMINADOR = 'tipo_evento';
+
+    protected function protegerFusion(): void {}
+
+    protected function protegerOriginales(): void {}
+
+    protected function declaracionesOriginales(string $tabla, array $declaraciones): array
+    {
+        return $declaraciones;
+    }
+
     private const DOCUMENTACION_GERENCIA = [
         'cod_usuario_carga', 'fecha_hora_carga', 'fecha_emision',
         'cod_usuario_anulacion', 'fecha_hora_anulacion', 'motivo_anulacion',
@@ -41,6 +52,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
                 $this->retirarCopia($tabla.'_antes16');
             }
             $this->indexarFusion($fuentes);
+            $this->protegerFusion();
             $this->finalizarSQLite();
         });
     }
@@ -68,6 +80,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
             foreach ($fuentes as $tabla => $definicion) {
                 $this->indexarOriginal($tabla, $definicion);
             }
+            $this->protegerOriginales();
             $this->finalizarSQLite();
         });
     }
@@ -116,10 +129,10 @@ abstract class ConsolidacionTipada20261116 extends Migration
 
     private function columnasFusion(array $fuentes): array
     {
-        $columnas = [static::CODIGO => ['varchar(20)', false, null], 'tipo_evento' => ['varchar(20)', false, null]];
+        $columnas = [static::CODIGO => ['varchar(20)', false, null], static::DISCRIMINADOR => ['varchar(20)', false, null]];
         foreach ($fuentes as $definicion) {
             foreach ($definicion['columns'] as $columna => [$tipo, , $generada]) {
-                if ($columna === $definicion['key'] || $columna === 'tipo_evento') {
+                if ($columna === $definicion['key'] || $columna === static::DISCRIMINADOR) {
                     continue;
                 }
                 if (isset($columnas[$columna]) && $columnas[$columna][0] !== $tipo) {
@@ -132,7 +145,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
             if ($definicion['type'] !== null) {
                 $tipo = $definicion['type'];
                 $columnas[$this->codigoAlternativo($tabla, $fuentes)] = ['varchar(20)', true,
-                    "CASE WHEN tipo_evento = '$tipo' THEN ".static::CODIGO.' END'];
+                    'CASE WHEN '.static::DISCRIMINADOR." = '$tipo' THEN ".static::CODIGO.' END'];
             }
         }
 
@@ -149,7 +162,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
             $campos = [];
             $tipo = $definicion['type'];
             if ($tipo !== null) {
-                $campos[] = "tipo_evento = '$tipo'";
+                $campos[] = static::DISCRIMINADOR." = '$tipo'";
             }
             foreach ($definicion['columns'] as $campo => [$tipoSQL, $nullable, $generada]) {
                 if ($campo === $definicion['key'] || $generada !== null) {
@@ -166,7 +179,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
                 $campos[] = substr($check, strlen('CHECK '));
             }
             foreach ($columnas as $campo => [, , $generada]) {
-                if ($generada === null && $campo !== static::CODIGO && $campo !== 'tipo_evento'
+                if ($generada === null && $campo !== static::CODIGO && $campo !== static::DISCRIMINADOR
                     && ! isset($definicion['columns'][$campo])) {
                     $campos[] = "$campo IS NULL";
                 }
@@ -192,7 +205,17 @@ abstract class ConsolidacionTipada20261116 extends Migration
             }
         }
         $sql = array_unique([...$sql, ...$foraneas, 'CHECK (('.implode(' OR ', $ramas).') IS TRUE)']);
+        $unicasSQLite = [];
+        if (DB::getDriverName() === 'sqlite') {
+            // Laravel necesita nombres explícitos al reconstruir tablas con columnas nuevas.
+            $unicasSQLite = array_filter($sql, fn ($declaracion) => str_starts_with($declaracion, 'UNIQUE ('));
+            $sql = array_diff($sql, $unicasSQLite);
+        }
         DB::statement('CREATE TABLE '.static::DESTINO.' ('.implode(', ', $sql).')');
+        foreach ($unicasSQLite as $unica) {
+            $nombre = 'u16_key_'.substr(hash('sha256', static::DESTINO.$unica), 0, 20);
+            DB::statement('CREATE UNIQUE INDEX '.$nombre.' ON '.static::DESTINO.substr($unica, strlen('UNIQUE')));
+        }
     }
 
     private function declaracionesColumnas(array $columnas, array $pk): array
@@ -226,7 +249,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
                 $sql[] = 'CONSTRAINT '.$nombre.' UNIQUE ('.implode(', ', $columnas).')';
             }
         }
-        DB::statement('CREATE TABLE '.$tabla.' ('.implode(', ', $sql).')');
+        DB::statement('CREATE TABLE '.$tabla.' ('.implode(', ', $this->declaracionesOriginales($tabla, $sql)).')');
         // Una FK puede apuntar a una clave candidata generada de este original.
         if (DB::getDriverName() === 'sqlite') {
             foreach ($definicion['indexes'] as [$nombre, $columnas, $unico]) {
@@ -242,14 +265,14 @@ abstract class ConsolidacionTipada20261116 extends Migration
         $columnas = array_keys(array_filter($definicion['columns'], fn ($c) => $c[2] === null));
         $destinos = array_map(fn ($c) => $c === $definicion['key'] ? static::CODIGO : $c, $columnas);
         $tablaFusion = static::DESTINO.($subir ? '' : '_antes16');
-        $filtro = $definicion['type'] !== null ? " WHERE tipo_evento = '".$definicion['type']."'"
-            : ' WHERE tipo_evento IN ('.($this->tipoDeFamilia()).')';
+        $filtro = $definicion['type'] !== null ? ' WHERE '.static::DISCRIMINADOR." = '".$definicion['type']."'"
+            : ' WHERE '.static::DISCRIMINADOR.' IN ('.($this->tipoDeFamilia()).')';
         $original = 'SELECT '.implode(', ', $columnas).' FROM '.$origen;
         $fusion = 'SELECT '.implode(', ', $destinos).' FROM '.$tablaFusion.$filtro;
         if ($subir) {
             $tipo = $definicion['type'];
             $seleccion = 'SELECT '.implode(', ', $columnas).($tipo !== null ? ", '$tipo'" : '').' FROM '.$origen;
-            DB::statement('INSERT INTO '.$tablaFusion.' ('.implode(', ', $destinos).($tipo !== null ? ', tipo_evento' : '').') '.$seleccion);
+            DB::statement('INSERT INTO '.$tablaFusion.' ('.implode(', ', $destinos).($tipo !== null ? ', '.static::DISCRIMINADOR : '').') '.$seleccion);
         } else {
             DB::statement('INSERT INTO '.$origen.' ('.implode(', ', $columnas).') '.$fusion);
         }
@@ -287,6 +310,27 @@ abstract class ConsolidacionTipada20261116 extends Migration
 
     private function referencias(array $tablas): array
     {
+        if (DB::getDriverName() === 'pgsql') {
+            $parametros = implode(', ', array_fill(0, count($tablas), '?'));
+            $filas = DB::select("SELECT t.relname AS tabla, r.conname AS nombre, d.relname AS origen,
+                json_agg(a.attname ORDER BY p.orden)::text AS columnas,
+                json_agg(b.attname ORDER BY p.orden)::text AS destinos
+                FROM pg_constraint r
+                JOIN pg_class t ON t.oid=r.conrelid
+                JOIN pg_namespace nt ON nt.oid=t.relnamespace
+                JOIN pg_class d ON d.oid=r.confrelid
+                JOIN pg_namespace nd ON nd.oid=d.relnamespace
+                CROSS JOIN LATERAL unnest(r.conkey,r.confkey) WITH ORDINALITY AS p(columna,referencia,orden)
+                JOIN pg_attribute a ON a.attrelid=r.conrelid AND a.attnum=p.columna
+                JOIN pg_attribute b ON b.attrelid=r.confrelid AND b.attnum=p.referencia
+                WHERE r.contype='f' AND nt.nspname=current_schema() AND nd.nspname=current_schema()
+                    AND d.relname IN ($parametros) AND t.relname NOT IN ($parametros)
+                GROUP BY t.relname,r.conname,d.relname ORDER BY t.relname,r.conname", [...$tablas, ...$tablas]);
+
+            return array_map(fn ($r) => ['tabla' => $r->tabla, 'nombre' => $r->nombre, 'origen' => $r->origen,
+                'columnas' => json_decode($r->columnas, true, flags: JSON_THROW_ON_ERROR),
+                'destinos' => json_decode($r->destinos, true, flags: JSON_THROW_ON_ERROR)], $filas);
+        }
         $referencias = [];
         foreach (Schema::getTables() as $tabla) {
             if (in_array($tabla['name'], $tablas, true)) {
@@ -350,7 +394,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         }
         foreach (['cod_residente', 'cod_personal', 'cod_usuario'] as $contexto) {
             if (isset($this->columnasFusion($fuentes)[$contexto])) {
-                $indices['u16_'.substr(hash('sha256', static::DESTINO.$contexto.'_tipo'), 0, 20)] = [$contexto, 'tipo_evento'];
+                $indices['u16_'.substr(hash('sha256', static::DESTINO.$contexto.'_tipo'), 0, 20)] = [$contexto, static::DISCRIMINADOR];
             }
         }
 

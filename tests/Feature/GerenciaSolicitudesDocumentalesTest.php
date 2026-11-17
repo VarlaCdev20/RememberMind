@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Institucion\Infraestructura\Persistencia\HistoriaLaboral;
+
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\DestinatarioSolicitudDocumental;
 use App\Models\Documento;
@@ -46,6 +48,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-26 10:00:00'));
         (require base_path('database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php'))->up();
+        \Tests\Support\PrepararHistoriaLaboral::instalar();
         (require base_path('database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php'))->up();
         $this->seed(RolesAndPermissionsSeeder::class);
         Storage::fake('local');
@@ -384,7 +387,7 @@ class GerenciaSolicitudesDocumentalesTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('estado_esperado', $e->errors());
         }
-        $this->assertDatabaseCount('movimientos_laborales_personal', 1);
+        $this->assertSame(1, HistoriaLaboral::consulta('movimientos_laborales_personal')->count());
     }
 
     public function test_interfaz_worker_no_consulta_solicitudes_ajenas_y_manager_emite_desde_formulario(): void

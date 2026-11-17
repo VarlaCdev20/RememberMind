@@ -65,6 +65,7 @@ if ($preparar) {
     if (getenv('RM_GERENCIA_QA_PERSONAL')==='1') (require $raiz.'/database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php')->up();
     if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php')->up();
     if (getenv('RM_GERENCIA_QA_HISTORIA')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php')->up();
+    if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1' || getenv('RM_GERENCIA_QA_HISTORIA')==='1') \Tests\Support\PrepararHistoriaLaboral::instalar();
     Artisan::call('db:seed', ['--class'=>Database\Seeders\RolesAndPermissionsSeeder::class,'--force'=>true]);
     $actor = User::factory()->create(['cod_usuario'=>'QA_GERENCIA','correo'=>'direccion@example.test','password'=>'TemporalGerencia#123']);
     Personal::create(['cod_usuario'=>$actor->getKey(),'nombres'=>'Dirección','apellido_paterno'=>'Sintética','numero_documento'=>'9100000','profesion'=>'GERENCIA','estado'=>'ACTIVO']);
