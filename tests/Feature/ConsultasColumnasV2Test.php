@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\Alerta;
 use App\Models\PaseTurno;
 use App\Models\Residente;
@@ -27,7 +29,7 @@ class ConsultasColumnasV2Test extends TestCase
             ['cod_jornada' => 'JOR_SALIENTE', 'cod_turno' => 'TUR_SALIENTE', 'cod_usuario_apertura' => 'USU_SALIENTE', 'fecha_jornada' => today(), 'estado' => 'CERRADA'],
             ['cod_jornada' => 'JOR_ENTRANTE', 'cod_turno' => 'TUR_ENTRANTE', 'cod_usuario_apertura' => 'USU_ENTRANTE', 'fecha_jornada' => today(), 'estado' => 'ABIERTA'],
         ]);
-        DB::table('pases_turno')->insert([
+        RegistrosConsumo::insertar('pases_turno', [[
             'cod_pase' => 'PAS_REGRESION',
             'cod_residente' => 'RES_PASE',
             'cod_jornada_saliente' => 'JOR_SALIENTE',
@@ -37,7 +39,7 @@ class ConsultasColumnasV2Test extends TestCase
             'fecha_hora' => now(),
             'resumen' => 'Entrega de turno',
             'estado' => 'GENERADO',
-        ]);
+        ]]);
 
         $porSaliente = PaseTurno::query()->where('cod_personal_saliente', 'PER_SALIENTE')->first();
         $porEntrante = PaseTurno::query()->where('cod_personal_entrante', 'PER_ENTRANTE')->first();

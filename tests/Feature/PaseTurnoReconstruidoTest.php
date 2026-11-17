@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -75,7 +77,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->assertDontSee('Conducta anulada invisible')
             ->assertDontSee('Sin registro%')->assertDontSee('Sin registro ml');
         $this->assertDatabaseCount('controles_cognitivos', 3);
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     protected function setUp(): void
@@ -554,7 +556,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         $this->assertEquals(PaseTurno::ESTADO_ANULADO, $paseAnulado->estado);
 
         // Registro aún existe en la base de datos
-        $this->assertDatabaseHas('pases_turno', [
+        $this->assertDatabaseHas('registros_textuales_clinicos', ['tipo_evento' => 'PASE',
             'cod_pase' => $pase->cod_pase,
             'estado' => PaseTurno::ESTADO_ANULADO,
         ]);
@@ -574,7 +576,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_asignacion_de_otra_jornada_no_autoriza_pase_saliente(): void
@@ -592,7 +594,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_recepcion_revalida_cuenta_activa_sin_modificar_el_pase(): void
@@ -647,7 +649,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_turno_no_vigente_no_admite_entrega(): void
@@ -661,7 +663,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_continuidad_lee_resultado_y_deriva_agenda_sin_copiar_fuentes(): void
@@ -701,7 +703,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         $this->assertDatabaseCount('administraciones_medicacion', 2);
         $this->assertDatabaseCount('prescripciones', 1);
         $this->assertDatabaseCount('horarios_prescripcion', 5);
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_continuidad_incluye_ejecutada_y_alertas_reconocida_asignada_con_pendientes_previos(): void
@@ -741,7 +743,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('cod_personal_entrante', $e->errors());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_otro_enfermero_no_puede_entregar_el_borrador_del_autor_original(): void
@@ -791,7 +793,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (ValidationException $exception) {
             $this->assertArrayHasKey('cod_residente', $exception->errors());
         }
-        $this->assertDatabaseCount('pases_turno', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('pases_turno')->count());
         $this->assertSame(1, \Spatie\Activitylog\Models\Activity::where('subject_type', PaseTurno::class)->count());
     }
 
@@ -803,7 +805,7 @@ class PaseTurnoReconstruidoTest extends TestCase
             ->call('guardarBorrador')->assertHasErrors('pendientesTurno')->assertSee('handoff-pendientesTurno-error')
             ->call('cerrarModalPreparar')->call('cambiarTab', 'historial')->call('limpiarHistorial')
             ->assertSet('filtroFechaHistorial', '')->assertHasNoErrors();
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_guardia_nocturna_iniciada_ayer_y_relevo_cronologico(): void
@@ -825,7 +827,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         Livewire::test(\App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel::class)
             ->assertSee('La siguiente jornada debe estar planificada')->assertSee('Mario Gutiérrez')
             ->assertSee('La entrega estará disponible cuando exista un relevo planificado.');
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_relevo_inmediato_sin_receptor_no_se_salta_por_una_asignacion_posterior(): void
@@ -861,7 +863,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         $this->assertSame($this->personalEntrante1->getKey(), $pase->cod_personal_entrante);
         $this->assertTrue($recepcion->equalTo($pase->fecha_hora_recepcion));
         $this->assertSame('Corrección documentada del pase sintético', \Spatie\Activitylog\Models\Activity::where('subject_id', $pase->getKey())->latest('id')->firstOrFail()->properties['motivo']);
-        $this->assertDatabaseCount('pases_turno', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_fallo_de_auditoria_revierte_la_entrega_completa(): void
@@ -876,7 +878,7 @@ class PaseTurnoReconstruidoTest extends TestCase
         } catch (\RuntimeException $exception) {
             $this->assertSame('Fallo sintético de auditoría', $exception->getMessage());
         }
-        $this->assertDatabaseCount('pases_turno', 0);
+        $this->assertSame(0, RegistrosConsumo::consulta('pases_turno')->count());
         $this->assertDatabaseCount('activity_log', $auditoriasPrevias);
     }
 

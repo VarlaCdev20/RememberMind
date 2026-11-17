@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — BDD Operativa V2.1: 70 tablas
 
+**Corte vigente del 17/11/2026 — pases de turno y textos clínicos:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_PASES_TEXTOS_2026_11_17.md) conserva los 136 registros originales y deja **62 operativas + 22 expertas = 84 de negocio**, más **16 técnicas: 100 tablas físicas**. Las pruebas específicas pasan en SQLite y PostgreSQL; el informe separa cuatro fallos de la ejecución ampliada. Los cortes siguientes son históricos.
+
 **Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
 
 **Actualización autorizada e instalada del 16/11/2026:** [documentos, valoraciones y textos clínicos consolidados](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). Inventario vigente: **64 operativas + 22 expertas + 16 técnicas**. Este diccionario conserva la descripción histórica del núcleo; las cuatro relaciones modificadas y sus identidades se definen en la decisión posterior.

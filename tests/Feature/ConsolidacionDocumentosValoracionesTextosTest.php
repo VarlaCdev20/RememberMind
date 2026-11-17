@@ -110,6 +110,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->rechazar(fn () => DB::table('soportes_valoracion_petersen')->where('cod_soporte_petersen', 'SVP-DOC-16')
             ->update(['cod_documento_clinico' => $admin->getKey()]));
 
+        $pases = require database_path('migrations/2026_11_17_000001_consolidate_pases_textos.php');
+        $pases->down();
         $migraciones = array_map(static fn ($ruta) => require $ruta, glob(database_path('migrations/2026_11_16_*.php')));
         foreach (array_reverse($migraciones) as $migracion) {
             $migracion->down();
@@ -125,6 +127,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
                 $migracion->up();
             }
         }
+        $pases->up();
         $this->assertSame($dolor->getKey(), $reevaluacion->fresh()->origen->getKey());
         $this->assertSame($reevaluacion->getKey(), $dolor->fresh()->reevaluaciones->sole()->getKey());
         $this->assertSame($nota->getKey(), $correccion->fresh()->anterior->getKey());

@@ -69,6 +69,8 @@ class ConsolidacionClinicaTest extends TestCase
             $this->assertContains($e->getCode(), ['23000', '23503']);
         }
 
+        $pases = require database_path('migrations/2026_11_17_000001_consolidate_pases_textos.php');
+        $pases->down();
         $posteriores = array_map(static fn ($ruta) => require $ruta, glob(database_path('migrations/2026_11_16_*.php')));
         foreach (array_reverse($posteriores) as $posterior) {
             $posterior->down();
@@ -89,6 +91,7 @@ class ConsolidacionClinicaTest extends TestCase
         foreach ($posteriores as $posterior) {
             $posterior->up();
         }
+        $pases->up();
         $this->assertSame('2026-09-30', $sueno->fresh()->fecha->toDateString());
         $this->assertFalse($sueno->fresh()->insomnio);
         $this->assertSame('BUENA', $movilidad->fresh()->tolerancia_movilidad);

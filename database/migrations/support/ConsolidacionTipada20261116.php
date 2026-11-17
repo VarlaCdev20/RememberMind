@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/** Transición acotada a las cuatro uniones autorizadas el 16/11/2026. */
+/** Soporte de las uniones tipadas autorizadas; cada migración congela su propio alcance. */
 abstract class ConsolidacionTipada20261116 extends Migration
 {
     protected const DISCRIMINADOR = 'tipo_evento';
@@ -63,6 +63,13 @@ abstract class ConsolidacionTipada20261116 extends Migration
             $fuentes = $this->fuentes();
             $referencias = $this->referencias([static::DESTINO]);
             $this->bloquear([static::DESTINO, ...array_column($referencias, 'tabla')]);
+            $actuales = Schema::getColumnListing(static::DESTINO);
+            $esperadas = array_keys($this->columnasFusion($fuentes));
+            sort($actuales);
+            sort($esperadas);
+            if ($actuales !== $esperadas) {
+                throw new LogicException('Revierta primero las consolidaciones posteriores: el esquema actual contiene otros campos.');
+            }
             Schema::rename(static::DESTINO, static::DESTINO.'_antes16');
             // Los índices explícitos tienen nombres globales en ambos motores.
             foreach ($this->indicesFusion($fuentes) as $nombre => $_) {
@@ -71,6 +78,10 @@ abstract class ConsolidacionTipada20261116 extends Migration
             foreach ($fuentes as $tabla => $definicion) {
                 $this->crearOriginal($tabla, $definicion);
                 $this->copiar($tabla, $definicion, false);
+            }
+            $copiadas = array_sum(array_map(fn ($tabla) => DB::table($tabla)->count(), array_keys($fuentes)));
+            if ($copiadas !== DB::table(static::DESTINO.'_antes16')->count()) {
+                throw new LogicException('La reversión no conserva todos los tipos del registro; revierta primero las consolidaciones posteriores.');
             }
             foreach ($referencias as $referencia) {
                 [$tabla, $columnas] = $this->origenReferencia($referencia['destinos'], $fuentes);
@@ -213,7 +224,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         }
         DB::statement('CREATE TABLE '.static::DESTINO.' ('.implode(', ', $sql).')');
         foreach ($unicasSQLite as $unica) {
-            $nombre = 'u16_key_'.substr(hash('sha256', static::DESTINO.$unica), 0, 20);
+            $nombre = 'u16_key_'.substr(hash('sha256', static::DESTINO.implode(':', array_keys($fuentes)).$unica), 0, 20);
             DB::statement('CREATE UNIQUE INDEX '.$nombre.' ON '.static::DESTINO.substr($unica, strlen('UNIQUE')));
         }
     }
@@ -286,6 +297,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         return match (static::DESTINO) {
             'valoraciones_profesionales' => "'PSICOLOGICA', 'NUTRICIONAL', 'FUNCIONAL'",
             'mediciones_clinicas' => "'SIGNOS', 'ANTROPOMETRIA'",
+            'registros_textuales_clinicos' => "'NOTA', 'INDICACION'",
             default => throw new RuntimeException('Familia consolidada desconocida.'),
         };
     }

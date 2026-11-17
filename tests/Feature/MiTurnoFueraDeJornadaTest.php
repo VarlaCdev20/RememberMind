@@ -315,7 +315,7 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Livewire::test(PaseTurnoPanel::class)
             ->assertViewHas('historialPases', fn ($pases) => $pases->total() === 0)
             ->call('abrirVer', $pase->cod_pase)->assertForbidden();
-        $this->assertDatabaseCount('pases_turno', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('pases_turno')->count());
     }
 
     public function test_registros_de_cuidados_fuera_de_turno_permiten_consulta_propia_sin_formulario_de_escritura(): void

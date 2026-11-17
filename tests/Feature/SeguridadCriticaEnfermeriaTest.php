@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Modulos\Alertas\Presentacion\Livewire\Paginas\AlertasPanel;
 use App\Modulos\Medicacion\Presentacion\Livewire\Funcionalidades\MedicacionAdultoModal;
 use App\Modulos\Cuidados\Presentacion\Livewire\Paginas\PaseTurnoPanel;
@@ -231,7 +233,7 @@ class SeguridadCriticaEnfermeriaTest extends TestCase
         $this->recibir($receptor, $entrante);
         $componente->set('enfermeroEntranteId', $receptor->cod_usuario)
             ->call('generarPase')->assertHasNoErrors();
-        $this->assertDatabaseHas('pases_turno', [
+        $this->assertDatabaseHas('registros_textuales_clinicos', ['tipo_evento' => 'PASE',
             'cod_residente' => $this->residente->cod_residente,
             'cod_personal_entrante' => $receptor->personal?->cod_personal,
         ]);

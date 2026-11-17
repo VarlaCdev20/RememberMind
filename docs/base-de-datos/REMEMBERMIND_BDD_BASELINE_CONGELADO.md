@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Corte vigente del 17/11/2026 — pases de turno y textos clínicos:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_PASES_TEXTOS_2026_11_17.md) conserva los 136 registros originales y deja **62 operativas + 22 expertas = 84 de negocio**, más **16 técnicas: 100 tablas físicas**. Las pruebas específicas pasan en SQLite y PostgreSQL; el informe separa cuatro fallos de la ejecución ampliada. Los cortes siguientes son históricos.
+
 **Corte posterior del 16/11/2026 — historial laboral:** la [unión autorizada e instalada](DECISION_CONSOLIDACION_HISTORIA_LABORAL_2026_11_16.md) conserva 208 actos y deja **63 operativas + 22 expertas = 85 tablas de negocio**, más **16 técnicas: 101 físicas**. Los inventarios siguientes corresponden a sus cortes anteriores.
 
 **Decisión posterior autorizada e instalada del 16/11/2026:** [unión de documentos, valoraciones y textos clínicos](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). El inventario instalado vigente es **64 operativas + 22 expertas = 86 de negocio**, más **16 técnicas**. El núcleo y los inventarios históricos siguientes mantienen sus fechas y contratos fuera de ese alcance.

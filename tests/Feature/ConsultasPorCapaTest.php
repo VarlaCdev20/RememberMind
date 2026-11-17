@@ -60,7 +60,7 @@ class ConsultasPorCapaTest extends TestCase
         $datos = app(ConsultarCuidadosFicha::class)->consultar($residente, 'signos', $actor);
         $this->assertSame([], $datos);
         $sql = implode(' ', array_column(DB::getQueryLog(), 'query'));
-        foreach (['ejecuciones_cuidado', 'intervenciones_cuidado', 'planes_cuidado', 'pases_turno'] as $tabla) {
+        foreach (['ejecuciones_cuidado', 'intervenciones_cuidado', 'planes_cuidado', 'registros_textuales_clinicos'] as $tabla) {
             $this->assertStringNotContainsString($tabla, $sql);
         }
         DB::disableQueryLog();

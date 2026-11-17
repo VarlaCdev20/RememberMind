@@ -42,16 +42,16 @@ class CodigosCorrelativosTest extends TestCase
         $this->assertSame(CatalogoCodigos::formatear('usuarios', $u + 2), $g->siguiente('usuarios'));
     }
 
-    public function test_catalogo_cubre_80_entidades_fisicas_con_prefijos_unicos_y_claves_reales(): void
+    public function test_catalogo_cubre_79_entidades_fisicas_con_prefijos_unicos_y_claves_reales(): void
     {
-        $this->assertCount(80, CatalogoCodigos::ENTIDADES);
+        $this->assertCount(79, CatalogoCodigos::ENTIDADES);
         $prefijos = [];
         foreach (CatalogoCodigos::ENTIDADES as $tabla => [$pk, $prefijo]) {
             $this->assertTrue(DB::getSchemaBuilder()->hasColumn($tabla, $pk), $tabla);
             $this->assertLessThanOrEqual(20, strlen(CatalogoCodigos::formatear($tabla, 1000000)));
             $prefijos[] = $prefijo;
         }
-        $this->assertCount(80, array_unique($prefijos));
+        $this->assertCount(79, array_unique($prefijos));
         foreach (\App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::DEFINICIONES as $entidad => $bloque) {
             $this->assertFalse(DB::getSchemaBuilder()->hasTable($entidad));
             $this->assertTrue(DB::getSchemaBuilder()->hasColumn($bloque['tabla'], CatalogoCodigos::clave($entidad)));

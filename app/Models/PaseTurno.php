@@ -4,13 +4,34 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PaseTurno extends ModeloOperativo
+class PaseTurno extends RegistroConsumo
 {
-    protected $table = 'pases_turno';
-    protected $primaryKey = 'cod_pase';
+    protected const TIPO = 'PASE';
+    protected const ENTIDAD = 'pases_turno';
+    protected $table = 'registros_textuales_clinicos';
+    protected $primaryKey = 'cod_registro_textual';
+    protected $appends = ['cod_pase'];
+    protected $hidden = ['cod_registro_textual', 'tipo_evento', 'cod_atencion', 'cod_personal', 'cod_nota_anterior',
+        'tipo_nota', 'contenido', 'motivo_correccion', 'tipo_indicacion', 'descripcion', 'prioridad', 'observacion',
+        'cod_nota', 'cod_indicacion'];
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+
+    public function getKey()
+    {
+        return parent::getKey() ?? ($this->attributes['cod_pase'] ?? null);
+    }
+
+    public function getCodPaseAttribute(): ?string
+    {
+        return $this->getKey();
+    }
+
+    public function setCodPaseAttribute(?string $codigo): void
+    {
+        $this->attributes[$this->getKeyName()] = $codigo;
+    }
 
     public const ESTADO_BORRADOR = 'BORRADOR';
     public const ESTADO_ENTREGADO = 'ENTREGADO';

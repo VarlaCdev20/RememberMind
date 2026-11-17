@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+
 use App\Models\Area;
 use App\Models\AsignacionPersonal;
 use App\Models\AsignacionResidenteJornada;
@@ -72,7 +74,7 @@ class PaseTurnoConcurrenciaPostgresTest extends TestCase
     public function test_dos_entradas_distintas_no_crean_dos_primeros_pases(): void
     {
         $this->competir('entregar', $this->saliente);
-        $this->assertDatabaseCount('pases_turno', 1);
+        $this->assertSame(1, RegistrosConsumo::consulta('pases_turno')->count());
         $pase = PaseTurno::sole();
         $this->assertSame($this->saliente->personal->getKey(), $pase->cod_personal_saliente);
         $this->assertSame(1, Activity::where('subject_type', PaseTurno::class)->count());

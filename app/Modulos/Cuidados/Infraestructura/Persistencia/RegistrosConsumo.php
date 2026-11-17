@@ -12,6 +12,7 @@ final class RegistrosConsumo
     public const CODIGO = 'cod_registro_consumo';
 
     public const ORIGENES = [
+        'pases_turno' => ['registros_textuales_clinicos', 'cod_registro_textual', 'PASE', 'cod_pase'],
         'seguimientos_pedagogicos' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
         'documentos' => ['documentos', 'cod_documento', 'ADMINISTRATIVO', 'cod_documento'],
         'documentos_clinicos' => ['documentos', 'cod_documento', 'CLINICO', 'cod_documento_clinico'],

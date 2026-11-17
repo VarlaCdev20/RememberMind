@@ -68,7 +68,6 @@ final class CatalogoCodigos
         'ocupaciones_cama' => ['cod_ocupacion', 'OCU'],
         'opciones_pregunta' => ['cod_opcion', 'OPC'],
         'participantes_actividad' => ['cod_participante', 'PAC'],
-        'pases_turno' => ['cod_pase', 'PAS'],
         'personal' => ['cod_personal', 'PER'],
         'planes_cuidado' => ['cod_plan', 'PLC'],
         'preadmisiones' => ['cod_preadmision', 'PRE'],
@@ -100,6 +99,7 @@ final class CatalogoCodigos
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
+        'pases_turno' => ['cod_pase', 'PAS'],
         'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
         'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
         'documentos_clinicos' => ['cod_documento_clinico', 'DCL'],

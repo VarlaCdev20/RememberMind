@@ -10,7 +10,7 @@ class IndicacionClinica extends RegistroConsumo
 
     protected $appends = ['cod_indicacion'];
 
-    protected $hidden = ['cod_registro_textual', 'tipo_evento'];
+    protected $hidden = ['cod_registro_textual', 'tipo_evento', 'cod_pase', 'cod_jornada_saliente', 'cod_jornada_entrante', 'cod_personal_saliente', 'cod_personal_entrante', 'estado_general', 'resumen', 'pendientes', 'vigilancia', 'recomendacion', 'fecha_hora_recepcion', 'observacion_recepcion'];
 
     public function getKey()
     {
