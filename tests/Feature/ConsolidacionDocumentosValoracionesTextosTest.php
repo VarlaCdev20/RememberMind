@@ -30,6 +30,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
 
     public function test_un_cambio_de_esquema_intermedio_revierte_la_transicion_completa(): void
     {
+        $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
+        $reparto->down();
         $migracion = require database_path('migrations/2026_11_16_000001_consolidate_pedagogia.php');
         $migracion->down();
         DB::statement('ALTER TABLE seguimientos_pedagogicos ADD COLUMN campo_no_aprobado varchar(10)');
@@ -45,6 +47,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->assertTrue(Schema::hasColumn('seguimientos_pedagogicos', 'campo_no_aprobado'));
         DB::statement('ALTER TABLE seguimientos_pedagogicos DROP COLUMN campo_no_aprobado');
         $migracion->up();
+        $reparto->up();
     }
 
     public function test_conserva_tipos_historia_referencias_y_reversion_poblada(): void
@@ -93,7 +96,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
             ->update(['cod_valoracion_origen' => $signo->getKey()]));
         $this->rechazar(fn () => DB::table('mediciones_clinicas')->where('cod_registro_medicion', $reevaluacion->getKey())
             ->update(['cod_residente' => $otro->getKey()]));
-        $this->rechazar(fn () => DB::table('valoraciones_profesionales')->where('cod_valoracion_profesional', $psicologia->getKey())
+        $this->rechazar(fn () => DB::table('valoraciones_psicopedagogicas')->where('cod_valoracion_profesional', $psicologia->getKey())
             ->update(['cod_atencion' => null]));
         $this->rechazar(fn () => DB::table('registros_textuales_clinicos')->where('cod_registro_textual', $correccion->getKey())
             ->update(['cod_nota_anterior' => $indicacion->getKey()]));
@@ -110,6 +113,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->rechazar(fn () => DB::table('soportes_valoracion_petersen')->where('cod_soporte_petersen', 'SVP-DOC-16')
             ->update(['cod_documento_clinico' => $admin->getKey()]));
 
+        $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
+        $reparto->down();
         $pases = require database_path('migrations/2026_11_17_000001_consolidate_pases_textos.php');
         $pases->down();
         $migraciones = array_map(static fn ($ruta) => require $ruta, glob(database_path('migrations/2026_11_16_*.php')));
@@ -128,6 +133,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
             }
         }
         $pases->up();
+        $reparto->up();
         $this->assertSame($dolor->getKey(), $reevaluacion->fresh()->origen->getKey());
         $this->assertSame($reevaluacion->getKey(), $dolor->fresh()->reevaluaciones->sole()->getKey());
         $this->assertSame($nota->getKey(), $correccion->fresh()->anterior->getKey());

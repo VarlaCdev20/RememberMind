@@ -75,7 +75,8 @@ final class InventarioExperto
         foreach (ContratoFuentesPetersen::FUENTES as $fk => [$modelo]) {
             $entidad = new $modelo;
             $relacionesSoporte[] = [$fk, $entidad->getTable(), match ($fk) {
-                'cod_valoracion_psicologica', 'cod_antecedente', 'cod_diagnostico' => $fk.'_ref',
+                'cod_antecedente', 'cod_diagnostico' => $fk.'_ref',
+                'cod_valoracion_psicologica' => $fk,
                 'cod_documento_clinico', 'cod_control_cognitivo', 'cod_control_iadl' => $fk,
                 default => $entidad->getKeyName(),
             }];

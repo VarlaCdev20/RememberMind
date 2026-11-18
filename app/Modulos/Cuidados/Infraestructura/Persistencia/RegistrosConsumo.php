@@ -13,7 +13,7 @@ final class RegistrosConsumo
 
     public const ORIGENES = [
         'pases_turno' => ['registros_textuales_clinicos', 'cod_registro_textual', 'PASE', 'cod_pase'],
-        'seguimientos_pedagogicos' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
+        'seguimientos_pedagogicos' => ['valoraciones_psicopedagogicas', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
         'documentos' => ['documentos', 'cod_documento', 'ADMINISTRATIVO', 'cod_documento'],
         'documentos_clinicos' => ['documentos', 'cod_documento', 'CLINICO', 'cod_documento_clinico'],
         'valoraciones_dolor' => ['mediciones_clinicas', 'cod_registro_medicion', 'DOLOR', 'cod_valoracion_dolor'],
@@ -33,7 +33,7 @@ final class RegistrosConsumo
         'registros_sueno' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'SUENO', 'cod_registro_sueno'],
         'signos_vitales' => ['mediciones_clinicas', 'cod_registro_medicion', 'SIGNOS', 'cod_signo'],
         'mediciones_antropometricas' => ['mediciones_clinicas', 'cod_registro_medicion', 'ANTROPOMETRIA', 'cod_medicion'],
-        'valoraciones_psicologicas' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PSICOLOGICA', 'cod_valoracion_psicologica'],
+        'valoraciones_psicologicas' => ['valoraciones_psicopedagogicas', 'cod_valoracion_profesional', 'PSICOLOGICA', 'cod_valoracion_psicologica'],
         'valoraciones_nutricionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'NUTRICIONAL', 'cod_valoracion_nutricional'],
         'valoraciones_funcionales' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'FUNCIONAL', 'cod_valoracion_funcional'],
         'resultados_estudio' => ['registros_estudio', 'cod_registro_estudio', 'RESULTADO', 'cod_resultado_estudio'],

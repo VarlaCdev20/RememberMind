@@ -69,6 +69,8 @@ class ConsolidacionClinicaTest extends TestCase
             $this->assertContains($e->getCode(), ['23000', '23503']);
         }
 
+        $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
+        $reparto->down();
         $separacion = require database_path('migrations/2026_11_18_000001_separate_clinical_assessments.php');
         $separacion->down();
         $controles = require database_path('migrations/2026_11_17_000002_consolidate_controles_observaciones.php');
@@ -98,6 +100,7 @@ class ConsolidacionClinicaTest extends TestCase
         $pases->up();
         $controles->up();
         $separacion->up();
+        $reparto->up();
         $this->assertSame('2026-09-30', $sueno->fresh()->fecha->toDateString());
         $this->assertFalse($sueno->fresh()->insomnio);
         $this->assertSame('BUENA', $movilidad->fresh()->tolerancia_movilidad);

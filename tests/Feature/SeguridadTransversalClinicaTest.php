@@ -36,7 +36,7 @@ class SeguridadTransversalClinicaTest extends TestCase
             'conclusion' => 'Evolución favorable con acompañamiento profesional.',
         ])->assertCreated();
 
-        $this->assertDatabaseHas('valoraciones_profesionales', ['tipo_evento' => 'PSICOLOGICA',
+        $this->assertDatabaseHas('valoraciones_psicopedagogicas', ['tipo_evento' => 'PSICOLOGICA',
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $psicologa->personal()->sole()->cod_personal,
             'estado_animo' => 'ESTABLE',

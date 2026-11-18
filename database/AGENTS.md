@@ -14,6 +14,8 @@ The current code is not authority over the frozen baseline.
 
 ## Frozen schema
 
+Owner approval 2026-11-18 additionally authorizes the professional-assessment partition in `docs/base-de-datos/DECISION_REPARTO_VALORACIONES_2026_11_18.md`: preserve Functional/Nutrition in `valoraciones_profesionales` and move Psychology/Pedagogy to `valoraciones_psicopedagogicas`, 30 columns each. The final local inventory is **64 operational + 20 expert + 16 technical = 100 physical tables**. This scope-specific approval supersedes the preceding 99-table cut; it does not authorize further tables or unrelated structural changes.
+
 Owner authorization 2026-11-18 installs the three clinical separations and five derived-column removals in `DECISION_SEPARACION_CLINICA_2026_11_18.md`. Current local inventory is **63 operational + 20 expert + 16 technical = 99 physical tables**. The redesign ceiling is **100 physical tables including expert and technical tables**. These three separations are expressly authorized. The other frozen boundaries remain applicable.
 
 Owner-authorized Gerencia designs35/37 were installed locally on2026-10-27: **81 operational +25 expert =106 business tables**, plus16 technical tables. Eight nullable columns and six relations are specified in `docs/base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md`. The100-table inventory below describes the preceding2026-10-22 cut. Explicit extension paths remain outside automatic migration discovery; a fresh test core without those paths still has100 business tables. Do not infer approval of unrelated changes from this installation.

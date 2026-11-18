@@ -94,9 +94,9 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     public function test_conserva_valores_rectificaciones_referencias_y_reversion_poblada(): void
     {
-        $this->assertCount(92, Schema::getTableListing()); // Núcleo histórico y referencia del ensayo.
+        $this->assertCount(93, Schema::getTableListing()); // Núcleo histórico y referencia del ensayo.
         $this->migracion->up();
-        $this->assertCount(95, Schema::getTableListing());
+        $this->assertCount(96, Schema::getTableListing());
         $this->assertCount(44, Schema::getColumnListing('registros_observaciones_cuidado'));
         $this->assertSame(1, ControlCognitivo::count());
         $this->assertSame(2, ControlFuncionalIadl::count());

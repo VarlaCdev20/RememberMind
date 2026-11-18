@@ -17,6 +17,8 @@ related_modules: []
 
 # RememberMind — Baseline Rector de la BDD Operativa
 
+**Corte posterior del 18/11/2026 — reparto de valoraciones.** La [división adicional expresamente autorizada](DECISION_REPARTO_VALORACIONES_2026_11_18.md) distribuye las 51 columnas de valoraciones en dos relaciones de 30: Funcional/Nutrición y Psicología/Pedagogía. El inventario final es **64 operativas + 20 expertas + 16 técnicas = 100 tablas físicas**. El corte de 99 que sigue es anterior a este reparto.
+
 **Corte del 18/11/2026.** La [separación clínica y retirada de cinco columnas derivadas](DECISION_SEPARACION_CLINICA_2026_11_18.md) deja **63 operativas + 20 expertas + 16 técnicas = 99 tablas físicas**, dentro del máximo de 100 físicas aprobado por la propietaria.
 
 **Corte vigente del 17/11/2026 — 20 expertas.** La [unión instalada de evaluaciones e instantáneas de reglas](DECISION_20_EXPERTAS_REGLAS_2026_11_17.md) conserva 206 registros y deja **60 operativas, 20 expertas y 16 técnicas**, para un total de **96 tablas físicas**.

@@ -197,7 +197,7 @@ final class FichaPsicologicaResidenteTest extends TestCase
             ->assertHasNoErrors()
             ->assertSee('Valoración afectiva registrada correctamente');
 
-        $this->assertDatabaseHas('valoraciones_profesionales', ['tipo_evento' => 'PSICOLOGICA',
+        $this->assertDatabaseHas('valoraciones_psicopedagogicas', ['tipo_evento' => 'PSICOLOGICA',
             'cod_residente' => $this->residente->getKey(),
             'estado_animo' => 'EUTIMICO',
             'ansiedad' => 'AUSENTE',

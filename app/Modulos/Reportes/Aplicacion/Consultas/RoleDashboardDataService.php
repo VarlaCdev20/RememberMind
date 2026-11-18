@@ -263,9 +263,9 @@ final class RoleDashboardDataService
         $todayActivities = (clone $activities)->whereDate('fecha_hora', today())
             ->whereIn('estado', ['PROGRAMADA', 'ACTIVA', 'EN_CURSO']);
         $participants = (clone $activities)->join('participantes_actividad as pa', 'pa.cod_actividad', '=', 'actividades.cod_actividad');
-        $recent = (clone $followups)->join('residentes as r', 'r.cod_residente', '=', 'valoraciones_profesionales.cod_residente')
-            ->orderByDesc('valoraciones_profesionales.fecha_hora')->limit(6)
-            ->get(['r.nombres', 'r.apellido_paterno', 'valoraciones_profesionales.fecha_hora'])
+        $recent = (clone $followups)->join('residentes as r', 'r.cod_residente', '=', 'valoraciones_psicopedagogicas.cod_residente')
+            ->orderByDesc('valoraciones_psicopedagogicas.fecha_hora')->limit(6)
+            ->get(['r.nombres', 'r.apellido_paterno', 'valoraciones_psicopedagogicas.fecha_hora'])
             ->map(fn ($row) => ['label' => trim($row->nombres.' '.$row->apellido_paterno), 'detail' => date('d/m/Y H:i', strtotime($row->fecha_hora))])->all();
         $participation = (clone $participants)->select('actividades.nombre as label')
             ->selectRaw('COUNT(pa.cod_participante) as total')

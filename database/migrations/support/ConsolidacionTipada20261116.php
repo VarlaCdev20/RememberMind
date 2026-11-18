@@ -9,6 +9,8 @@ abstract class ConsolidacionTipada20261116 extends Migration
 {
     protected const DISCRIMINADOR = 'tipo_evento';
 
+    protected const IDENTIDADES_TIPADAS = true;
+
     protected function protegerFusion(): void {}
 
     protected function protegerOriginales(): void {}
@@ -99,7 +101,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         });
     }
 
-    private function fuentes(): array
+    protected function fuentes(): array
     {
         $fuentes = static::FUENTES;
         if (isset($fuentes['documentos']) && ! Schema::hasColumn('documentos', 'cod_usuario_carga')) {
@@ -156,7 +158,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
             }
         }
         foreach ($fuentes as $tabla => $definicion) {
-            if ($definicion['type'] !== null) {
+            if ($definicion['type'] !== null && static::IDENTIDADES_TIPADAS) {
                 $tipo = $definicion['type'];
                 $columnas[$this->codigoAlternativo($tabla, $fuentes)] = ['varchar(20)', true,
                     'CASE WHEN '.static::DISCRIMINADOR." = '$tipo' THEN ".static::CODIGO.' END'];

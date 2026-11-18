@@ -47,7 +47,7 @@ final class RenumerarCodigos
                 }
                 // Los registros consolidados conservan los correlativos de su entidad lógica.
                 if (in_array($tabla, ['registros_consumo', 'registros_observaciones_cuidado', 'mediciones_clinicas',
-                    'valoraciones_profesionales', 'registros_estudio', 'vinculos_evidencia_experta',
+                    'valoraciones_profesionales', 'valoraciones_psicopedagogicas', 'registros_estudio', 'vinculos_evidencia_experta',
                     'registros_clinicos', 'asignaciones_jornada', 'componentes_regla_experta', 'evaluaciones_reglas', 'reglas_aplicadas_dcl_instantanea', 'documentos', 'registros_textuales_clinicos'], true)) {
                     continue;
                 }

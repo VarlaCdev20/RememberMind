@@ -33,7 +33,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         $control = F::evidencia(['memoria_reciente' => null, 'repite_preguntas' => false]);
         $comun = ['cod_residente' => 'SINTETICO-RES', 'cod_personal' => 'SIM-PER', 'cod_atencion' => 'SIM-AT',
             'fecha_hora' => '2026-10-16 12:00:00'];
-        DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
+        DB::table('valoraciones_psicopedagogicas')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
             'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']);
         DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'FUNCIONAL', 'cod_valoracion_profesional' => 'SIM-FUNC', 'estado' => 'ACTIVA']);
         RegistrosConsumo::insertar('diagnosticos', [$comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']]);

@@ -84,6 +84,7 @@ final class CatalogoCodigos
         'turnos' => ['cod_turno', 'TUR'],
         'usuarios' => ['cod_usuario', 'USU'],
         'valoraciones_profesionales' => ['cod_valoracion_profesional', 'VPR'],
+        'valoraciones_psicopedagogicas' => ['cod_valoracion_profesional', 'VPP'],
         'valores_semanticos' => ['cod_valor_semantico', 'VSE'],
         'versiones_modelo_experto' => ['cod_version_modelo', 'VME'],
         'visitas' => ['cod_visita', 'VIS'],

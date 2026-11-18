@@ -121,6 +121,7 @@ class HistoriaResidencialSeeder extends Seeder
             'usuarios',
             'valoraciones_dolor',
             'valoraciones_profesionales',
+            'valoraciones_psicopedagogicas',
             'visitas',
         ];
     }
