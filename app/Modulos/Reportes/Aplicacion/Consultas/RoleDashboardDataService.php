@@ -36,7 +36,7 @@ final class RoleDashboardDataService
 
         $code = $personal->cod_personal;
         $care = DB::table('atenciones')->where('cod_personal', $code);
-        $studies = DB::table('estudios_clinicos')->where('cod_personal', $code);
+        $studies = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'estudios_clinicos')->where('cod_personal', $code);
         $alerts = app(BandejaAlertas::class)->pendientes($user)
             ->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS);
         $pendingStudies = (clone $studies)->whereNull('fecha_realizacion')

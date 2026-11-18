@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // sistema experto 4.16.6; restricciones físicas D-137.
 class MapeoVariableFuente extends ModeloExperto
 {
+    use \App\Compartido\Infraestructura\Persistencia\LeeColumnasRelacionadas;
+
+    public function getCodVersionModeloAttribute(?string $value): ?string
+    {
+        return $this->valorRelacionado($value);
+    }
+
+
     protected $table = 'mapeos_variables_fuente';
 
     protected $primaryKey = 'cod_mapeo_variable_fuente';

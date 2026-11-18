@@ -12,8 +12,6 @@ final class RegistrosConsumo
     public const CODIGO = 'cod_registro_consumo';
 
     public const ORIGENES = [
-        'controles_cognitivos' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'COGNITIVO', 'cod_control_cognitivo'],
-        'controles_funcionales_iadl' => ['registros_observaciones_cuidado', 'cod_observacion_cuidado', 'IADL', 'cod_control_iadl'],
         'pases_turno' => ['registros_textuales_clinicos', 'cod_registro_textual', 'PASE', 'cod_pase'],
         'seguimientos_pedagogicos' => ['valoraciones_profesionales', 'cod_valoracion_profesional', 'PEDAGOGICA', 'cod_seguimiento_pedagogico'],
         'documentos' => ['documentos', 'cod_documento', 'ADMINISTRATIVO', 'cod_documento'],
@@ -51,7 +49,9 @@ final class RegistrosConsumo
     {
         return isset(self::ORIGENES[$entidad])
             ? DB::table(self::ORIGENES[$entidad][0], $alias)->where(($alias ? $alias.'.' : '').'tipo_evento', self::ORIGENES[$entidad][2])
-            : DB::table($entidad, $alias);
+            : (isset(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::CONTRATOS[$entidad])
+                ? \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), $entidad, $alias)
+                : DB::table($entidad, $alias));
     }
 
     public static function insertar(string $entidad, array $filas): void
@@ -59,14 +59,8 @@ final class RegistrosConsumo
         if (isset(self::ORIGENES[$entidad])) {
             [$tabla, $codigo, $tipo, $campo] = self::ORIGENES[$entidad];
             foreach ($filas as &$fila) {
-                if ($entidad === 'controles_funcionales_iadl' && ! array_key_exists('estado', $fila)) {
-                    $fila['estado'] = 'REGISTRADO';
-                }
                 $fila[$codigo] = $fila[$campo];
                 $fila['tipo_evento'] = $tipo;
-                if (in_array($entidad, ['controles_cognitivos', 'controles_funcionales_iadl'], true)) {
-                    unset($fila['cod_control_cognitivo'], $fila['cod_control_iadl']);
-                }
                 if ($campo !== $codigo) {
                     unset($fila[$campo]);
                 }
@@ -77,6 +71,6 @@ final class RegistrosConsumo
             return;
         }
 
-        DB::table($entidad)->insert($filas);
+        DB::table($entidad)->insert(array_map(fn ($fila) => \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));
     }
 }

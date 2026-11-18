@@ -198,24 +198,25 @@ class CasosPreadmisionTest extends TestCase
         ]);
 
         // 2. Valoración de enfermería NO cambia el estado de la preadmisión
-        $caso->forceFill([
+        \Illuminate\Support\Facades\DB::table('valoraciones_enfermeria_preadmision')->insert([
+            'cod_preadmision' => $caso->getKey(),
             'cod_valoracion_enfermeria' => 'VEN_TEST_EST_01',
-            'valoracion_cod_usuario_registro' => $usuario->getKey(),
-            'valoracion_cod_personal_valorador' => $usuario->personal->getKey(),
-            'valoracion_hay_dolor' => false,
-            'valoracion_hay_heridas' => false,
-            'valoracion_confirmacion_documentacion' => true,
-            'valoracion_estado_general' => 'BUENO',
-            'valoracion_nivel_conciencia' => 'ALERTA',
-            'valoracion_orientacion_persona' => 'ORIENTADO',
-            'valoracion_orientacion_tiempo' => 'ORIENTADO',
-            'valoracion_orientacion_espacio' => 'ORIENTADO',
-            'valoracion_comunicacion' => 'NORMAL',
-            'valoracion_movilidad' => 'INDEPENDIENTE',
-            'valoracion_riesgo_caida' => 'BAJO',
-            'valoracion_talla' => 160.0,
-            'valoracion_peso' => 65.0,
-        ])->save();
+            'cod_usuario_registro' => $usuario->getKey(),
+            'cod_personal_valorador' => $usuario->personal->getKey(),
+            'hay_dolor' => false,
+            'hay_heridas' => false,
+            'confirmacion_documentacion' => true,
+            'estado_general' => 'BUENO',
+            'nivel_conciencia' => 'ALERTA',
+            'orientacion_persona' => 'ORIENTADO',
+            'orientacion_tiempo' => 'ORIENTADO',
+            'orientacion_espacio' => 'ORIENTADO',
+            'comunicacion' => 'NORMAL',
+            'movilidad' => 'INDEPENDIENTE',
+            'riesgo_caida' => 'BAJO',
+            'talla' => 160.0,
+            'peso' => 65.0,
+        ]);
 
         $casoFresco = $caso->fresh();
         $this->assertSame('PENDIENTE', $casoFresco->estado);

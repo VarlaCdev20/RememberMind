@@ -9,6 +9,14 @@ use Illuminate\Validation\ValidationException;
 
 class AdministracionMedicacion extends ModeloOperativo
 {
+    use \App\Compartido\Infraestructura\Persistencia\LeeColumnasRelacionadas;
+
+    public function getCodResidenteAttribute(?string $value): ?string
+    {
+        return $this->valorRelacionado($value);
+    }
+
+
     protected $table = 'administraciones_medicacion';
 
     protected $primaryKey = 'cod_administracion';
@@ -71,12 +79,6 @@ class AdministracionMedicacion extends ModeloOperativo
                 $registro->cod_prescripcion = $rawMed;
             }
 
-            if (empty($registro->cod_residente) && ! empty($registro->cod_prescripcion)) {
-                $p = Prescripcion::find($registro->cod_prescripcion);
-                if ($p) {
-                    $registro->cod_residente = $p->cod_residente;
-                }
-            }
             if (empty($registro->cod_personal)) {
                 throw new \LogicException('La administración requiere el personal responsable.');
             }
@@ -113,24 +115,6 @@ class AdministracionMedicacion extends ModeloOperativo
         });
 
         static::saving(function (self $registro): void {
-
-            if (! empty($registro->cod_prescripcion)) {
-                $presc = Prescripcion::query()->whereKey($registro->cod_prescripcion)->first();
-                if ($presc) {
-                    $registro->cod_prescripcion = $presc->cod_prescripcion;
-                    if (empty($registro->cod_residente)) {
-                        $registro->cod_residente = $presc->cod_residente;
-                    }
-                }
-            }
-
-            if (! empty($registro->cod_prescripcion) && ! empty($registro->cod_residente)
-                && ! Prescripcion::query()->whereKey($registro->cod_prescripcion)
-                    ->where('cod_residente', $registro->cod_residente)->exists()) {
-                throw ValidationException::withMessages([
-                    'cod_prescripcion' => 'La prescripción no corresponde al residente.',
-                ]);
-            }
 
             if (! empty($registro->cod_horario_prescripcion) && ! empty($registro->cod_prescripcion)
                 && ! HorarioPrescripcion::query()->whereKey($registro->cod_horario_prescripcion)

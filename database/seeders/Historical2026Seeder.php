@@ -380,7 +380,7 @@ class Historical2026Seeder extends Seeder
             'permanencia' => 'PERMANENTE', 'prioridad' => 'MEDIA', 'descripcion_caso' => $reason,
             'fecha_solicitud' => $request, 'estado' => 'PENDIENTE']);
         $preadNurse = $this->nurse(substr($review, 0, 10), 0, ($i - 1) % 4);
-        DB::table('preadmisiones')->where('cod_preadmision', $pre)->update(\App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial::atributos([
+        DB::table('valoraciones_enfermeria_preadmision')->updateOrInsert(['cod_preadmision' => $pre], [
             'cod_valoracion_enfermeria' => $this->codigoImportacion('H26_VEP_'.$serial),
             'cod_usuario_registro' => \App\Models\Personal::findOrFail($preadNurse)->cod_usuario,
             'cod_personal_valorador' => $preadNurse, 'fecha_hora' => $review,
@@ -400,7 +400,7 @@ class Historical2026Seeder extends Seeder
             'riesgo_nutricional' => $profile === 'nutricion' ? 'ALTO' : 'BAJO', 'riesgo_cognitivo' => $profile === 'cognicion' ? 'ALTO' : 'BAJO',
             'necesidad_apoyo_inmediato' => false, 'prioridad_sugerida' => 'MEDIA', 'confirmacion_documentacion' => true,
             'recomendacion_enfermeria' => $reason,
-        ]));
+        ]);
         DB::table('preadmisiones')->where('cod_preadmision', $pre)->update([
             'estado' => 'APROBADA', 'cod_usuario_revision' => $this->codigoImportacion('H26_USU_ADMIN'), 'fecha_revision' => $review,
         ]);
@@ -966,10 +966,6 @@ class Historical2026Seeder extends Seeder
         if (DB::table('residentes')->whereIn('cod_residente', $ids)->distinct()->count('fecha_nacimiento') !== 30
             || RegistrosConsumo::consulta('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('usuarios as u', 'u.cod_usuario', '=', 'j.cod_usuario_apertura')->where('j.fecha_jornada', self::REFERENCE_DATE)->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->where('u.correo', 'admisiones'.self::DOMINIO_CORREO)->sole(['j.cod_jornada'])->cod_jornada)->where('estado', 'ACTIVA')->count() !== 30) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
-        }
-        if (DB::table('administraciones_medicacion as a')->join('prescripciones as p', 'p.cod_prescripcion', '=', 'a.cod_prescripcion')
-            ->whereIn('a.cod_residente', $admissions->pluck('cod_residente'))->whereColumn('a.cod_residente', '<>', 'p.cod_residente')->exists()) {
-            throw new RuntimeException('Administración cruzada entre residentes.');
         }
         if (DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
             ->join('preguntas_instrumento as p', 'p.cod_pregunta', '=', 'r.cod_pregunta')->join('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')

@@ -38,13 +38,12 @@ final class RegistrarValoracionInicial
             $preadmision = Preadmision::query()->lockForUpdate()->findOrFail($datos['preadmision']->getKey());
             abort_unless($preadmision->estado === 'PENDIENTE', 422, 'La preadmisión debe estar pendiente.');
 
-            $codigo = $preadmision->getAttribute(Bloque::CODIGO);
+            $registroOriginal = $preadmision->valoracionEnfermeriaRegistro();
+            $codigo = $registroOriginal?->getKey();
             $esEdicion = $codigo !== null;
             $permiso = $esEdicion ? 'valoracion_enfermeria.editar' : 'valoracion_enfermeria.registrar';
             abort_unless($user->can($permiso), 403, 'No posee el permiso requerido para la valoración.');
             abort_unless($codigo === ($datos['valoracionId'] ?? null), 409, 'La valoración cambió. Abra el formulario de nuevo.');
-
-            $registroOriginal = $preadmision->valoracionEnfermeriaRegistro();
 
             $orientacionCombinada = "Persona: {$datos['orientacion_persona']}, Tiempo: {$datos['orientacion_tiempo']}, Espacio: {$datos['orientacion_espacio']}";
             $valoracion = [
@@ -92,7 +91,13 @@ final class RegistrarValoracionInicial
             ];
 
             $valoracion[Bloque::CODIGO] = $codigo ?? app(CodigosEntidad::class)->siguiente(Bloque::ORIGEN);
-            $preadmision->forceFill(['prioridad' => $datos['prioridad_sugerida']] + Bloque::atributos($valoracion))->save();
+            $valoracion['cod_preadmision'] = $preadmision->getKey();
+            if ($esEdicion) {
+                DB::table(Bloque::ORIGEN)->where(Bloque::CODIGO, $codigo)->update($valoracion);
+            } else {
+                DB::table(Bloque::ORIGEN)->insert($valoracion);
+            }
+            $preadmision->forceFill(['prioridad' => $datos['prioridad_sugerida']])->save();
 
             activity('Enfermeria')
                 ->causedBy($user)

@@ -134,16 +134,17 @@ class TallaCanonicaTest extends TestCase
 
         // Intento con talla = 1.65 m (debe fallar por la restricción CHECK de motor / trigger)
         $this->expectException(QueryException::class);
-        DB::table('preadmisiones')->where('cod_preadmision', $preadmision->getKey())->update([
+        DB::table('valoraciones_enfermeria_preadmision')->insert([
+            'cod_preadmision' => $preadmision->getKey(),
             'cod_valoracion_enfermeria' => 'VAL_TEST_'.Str::random(5),
-            'valoracion_cod_personal_valorador' => $personal->cod_personal,
-            'valoracion_cod_usuario_registro' => $enfermero->cod_usuario,
-            'valoracion_fecha_hora' => now(),
-            'valoracion_talla' => 1.65,
+            'cod_personal_valorador' => $personal->cod_personal,
+            'cod_usuario_registro' => $enfermero->cod_usuario,
+            'fecha_hora' => now(),
+            'talla' => 1.65,
 
-            'valoracion_hay_dolor' => false,
-            'valoracion_hay_heridas' => false,
-            'valoracion_confirmacion_documentacion' => false,
+            'hay_dolor' => false,
+            'hay_heridas' => false,
+            'confirmacion_documentacion' => false,
         ]);
     }
 

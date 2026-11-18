@@ -17,6 +17,8 @@ Entrada vigente de navegación documental, revisada el **04/11/2026**. El produc
 
 ## Empezar aquí
 
+**Corte del 18/11/2026 — controles clínicos separados.** La [separación instalada de controles cognitivos, IADL y valoración inicial](base-de-datos/DECISION_SEPARACION_CLINICA_2026_11_18.md) deja **63 operativas, 20 expertas y 16 técnicas: 99 tablas físicas**.
+
 **Corte vigente del 17/11/2026 — 20 expertas.** La [unión instalada de evaluaciones e instantáneas de reglas](base-de-datos/DECISION_20_EXPERTAS_REGLAS_2026_11_17.md) conserva 206 registros y deja **60 operativas, 20 expertas y 16 técnicas**, para un total de **96 tablas físicas**.
 
 **Corte anterior del 17/11/2026 — 60 operativas:** la [unión autorizada e instalada de controles cognitivos e IADL](base-de-datos/DECISION_60_OPERATIVAS_CONTROLES_2026_11_17.md) conserva los 327 registros afectados y deja **60 operativas + 22 expertas = 82 de negocio**, más **16 técnicas: 98 físicas**. Los cortes siguientes conservan su fecha histórica.

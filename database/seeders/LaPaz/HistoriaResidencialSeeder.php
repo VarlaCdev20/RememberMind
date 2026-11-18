@@ -532,7 +532,7 @@ class HistoriaResidencialSeeder extends Seeder
             'permanencia' => 'PERMANENTE', 'prioridad' => 'MEDIA', 'descripcion_caso' => $reason,
             'fecha_solicitud' => $request, 'estado' => 'PENDIENTE']);
         $preadNurse = $this->nurse(substr($review, 0, 10), 0, ($i - 1) % 4);
-        DB::table('preadmisiones')->where('cod_preadmision', $pre)->update(\App\Modulos\Valoraciones\Infraestructura\Persistencia\BloqueValoracionInicial::atributos([
+        DB::table('valoraciones_enfermeria_preadmision')->updateOrInsert(['cod_preadmision' => $pre], [
             'cod_valoracion_enfermeria' => 'LP_VEP_'.$serial,
             'cod_usuario_registro' => str_replace('PER', 'USU', $preadNurse),
             'cod_personal_valorador' => $preadNurse, 'fecha_hora' => $review,
@@ -552,7 +552,7 @@ class HistoriaResidencialSeeder extends Seeder
             'riesgo_nutricional' => $profile === 'nutricion' ? 'ALTO' : 'BAJO', 'riesgo_cognitivo' => $profile === 'cognicion' ? 'ALTO' : 'BAJO',
             'necesidad_apoyo_inmediato' => false, 'prioridad_sugerida' => 'MEDIA', 'confirmacion_documentacion' => true,
             'recomendacion_enfermeria' => $reason,
-        ]));
+        ]);
         DB::table('preadmisiones')->where('cod_preadmision', $pre)->update([
             'estado' => 'APROBADA', 'cod_usuario_revision' => 'LP_USU_ADMIN', 'fecha_revision' => $review,
         ]);
@@ -1080,17 +1080,14 @@ class HistoriaResidencialSeeder extends Seeder
             || RegistrosConsumo::consulta('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', $this->jornada(self::REFERENCE_DATE, 1))->where('estado', 'ACTIVA')->count() !== 48) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
         }
-        if (DB::table('administraciones_medicacion as a')->join('prescripciones as p', 'p.cod_prescripcion', '=', 'a.cod_prescripcion')
-            ->whereIn('a.cod_residente', $ids)->whereColumn('a.cod_residente', '<>', 'p.cod_residente')->exists()) {
-            throw new RuntimeException('Administración cruzada entre residentes.');
-        }
-        if (DB::table('administraciones_medicacion as a')->join('horarios_prescripcion as h', 'h.cod_horario_prescripcion', '=', 'a.cod_horario_prescripcion')
+        if (\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'administraciones_medicacion', 'a')->join('horarios_prescripcion as h', 'h.cod_horario_prescripcion', '=', 'a.cod_horario_prescripcion')
             ->whereIn('a.cod_residente', $ids)->whereColumn('a.cod_prescripcion', '<>', 'h.cod_prescripcion')->exists()) {
             throw new RuntimeException('Horario de otra prescripción.');
         }
         if (DB::table('registros_estudio as r')->where('r.tipo_evento', 'RESULTADO')->join('estudios_clinicos as e', 'e.cod_estudio', '=', 'r.cod_estudio')
             ->join('componentes_estudio as c', 'c.cod_componente', '=', 'r.cod_componente')
-            ->whereIn('e.cod_residente', $ids)->whereColumn('e.cod_tipo_estudio', '<>', 'c.cod_tipo_estudio')->exists()) {
+            ->join('atenciones as atencion_estudio', 'atencion_estudio.cod_atencion', '=', 'e.cod_atencion')
+            ->whereIn('atencion_estudio.cod_residente', $ids)->whereColumn('e.cod_tipo_estudio', '<>', 'c.cod_tipo_estudio')->exists()) {
             throw new RuntimeException('Resultado de un componente ajeno al estudio.');
         }
         if (DB::table('ocupaciones_cama')->whereIn('cod_residente', $ids)->where('estado', 'ACTIVA')

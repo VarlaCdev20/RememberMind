@@ -228,7 +228,8 @@ class ReporteDataService
     public function medicacionLista(int $limite = 50): Collection
     {
         return DB::table('prescripciones as p')
-            ->join('residentes as r', 'p.cod_residente', '=', 'r.cod_residente')
+            ->join('atenciones as a', 'p.cod_atencion', '=', 'a.cod_atencion')
+            ->join('residentes as r', 'a.cod_residente', '=', 'r.cod_residente')
             ->leftJoin('medicamentos as m', 'p.cod_medicamento', '=', 'm.cod_medicamento')
             ->select(
                 'r.cod_residente',

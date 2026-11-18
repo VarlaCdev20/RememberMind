@@ -7,14 +7,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Prescripcion extends ModeloOperativo
 {
+    use \App\Compartido\Infraestructura\Persistencia\LeeColumnasRelacionadas;
+
+    public function getCodResidenteAttribute(?string $value): ?string
+    {
+        return $this->valorRelacionado($value);
+    }
+
+
     public ?string $hora_programada_temp = null;
     protected $table = 'prescripciones';
     protected $primaryKey = 'cod_prescripcion';
 
     /**
-     * Columnas reales de PostgreSQL V2. Una prescripción exige residente,
-     * atención, medicamento y personal médico ya existentes; el modelo no crea
-     * registros auxiliares ni traduce atributos legacy de manera silenciosa.
+     * La atención determina el residente. Un residente explícito se comprueba
+     * antes de guardar; la columna calculada se incorpora solamente a la lectura.
      */
     protected $fillable = [
         'cod_prescripcion', 'cod_residente', 'cod_atencion', 'cod_medicamento',

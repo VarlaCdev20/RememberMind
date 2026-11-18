@@ -47,7 +47,7 @@ final class VinculosProfesionalesAlertas
             $tabla = $modelo->getTable();
             $origen = $this->consultaFuente($fuente)
                 ->whereColumn($tabla.'.'.$modelo->getKeyName(), 'alertas.cod_registro')
-                ->whereColumn($tabla.'.cod_residente', 'alertas.cod_residente')
+                ->whereColumn($modelo->qualifyColumn('cod_residente'), 'alertas.cod_residente')
                 ->where(function (Builder $origen) use ($fuente, $roles) {
                     foreach ($fuente['autores'] as $relacion => $motivo) {
                         $origen->orWhereHas($relacion, fn ($r) => $r->whereIn('name', $roles));

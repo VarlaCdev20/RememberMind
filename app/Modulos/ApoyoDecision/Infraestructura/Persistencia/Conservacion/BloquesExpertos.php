@@ -97,7 +97,9 @@ final class BloquesExpertos
             return $db->query()->fromSub($origen, $alias ?? $entidad);
         }
         if (($d = self::definicion($entidad)) === null) {
-            return $db->table($entidad, $alias);
+            return isset(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::CONTRATOS[$entidad])
+                ? \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta($db, $entidad, $alias)
+                : $db->table($entidad, $alias);
         }
         $columnas = array_map(static fn ($col, $nombre) => $col.' as '.$nombre, $d['campos'], array_keys($d['campos']));
         $origen = $db->table($d['tabla'])->select($columnas)->whereNotNull($d['id']);
@@ -129,7 +131,7 @@ final class BloquesExpertos
             return;
         }
         if (($d = self::definicion($entidad)) === null) {
-            $db->table($entidad)->insert($filas);
+            $db->table($entidad)->insert(array_map(fn ($fila) => \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::preparar($db, $entidad, $fila), $filas));
 
             return;
         }

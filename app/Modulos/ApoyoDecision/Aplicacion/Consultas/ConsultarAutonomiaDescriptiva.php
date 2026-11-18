@@ -33,8 +33,8 @@ final class ConsultarAutonomiaDescriptiva
         $filas = FuentesValoracionOperativa::limitar(ControlFuncionalIadl::query())
             ->where('cod_residente', $residente->getKey())->where('fecha_hora', '<=', $corte)->where('registrado_en', '<=', $corte)
             ->whereIn('estado', ['REGISTRADO', 'RECTIFICACION'])
-            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('registros_observaciones_cuidado as sucesora')->where('sucesora.tipo_evento', 'IADL')
-                ->whereColumn('sucesora.cod_control_anterior', 'registros_observaciones_cuidado.cod_control_iadl')
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('controles_funcionales_iadl as sucesora')
+                ->whereColumn('sucesora.cod_control_anterior', 'controles_funcionales_iadl.cod_control_iadl')
                 ->where('sucesora.fecha_hora', '<=', $corte)->where('sucesora.registrado_en', '<=', $corte))
             ->orderByDesc('fecha_hora')->orderByDesc('registrado_en')->orderByDesc('cod_control_iadl')->get();
         $autores = Personal::whereIn('cod_personal', $filas->pluck('cod_personal')->unique())

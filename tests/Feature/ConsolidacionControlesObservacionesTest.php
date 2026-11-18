@@ -44,8 +44,7 @@ class ConsolidacionControlesObservacionesTest extends TestCase
     {
         parent::setUp();
         $this->travelTo('2026-11-17 15:00:00');
-        $this->migracion = require database_path('migrations/2026_11_17_000002_consolidate_controles_observaciones.php');
-        $this->migracion->down();
+        $this->migracion = require database_path('migrations/2026_11_18_000001_separate_clinical_assessments.php');
         $usuario = User::factory()->create();
         $personal = Personal::create(['cod_usuario' => $usuario->getKey(), 'nombres' => 'Profesional',
             'apellido_paterno' => 'Sintético', 'numero_documento' => 'CONTROL-SINTETICO', 'profesion' => 'PSICOLOGIA', 'estado' => 'ACTIVO']);
@@ -79,7 +78,7 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         DB::table('qa_referencias_control')->insert(['cod_control_cognitivo' => 'COG-ORIGINAL-60', 'cod_control_iadl' => 'IAD-ORIGINAL-60']);
         $this->triggersOriginales = DB::getDriverName() === 'sqlite' ? DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson() : null;
         $this->originales = $this->capturar();
-        $this->migracion->up();
+        $this->migracion->down();
     }
 
     private function capturar(): array
@@ -95,10 +94,10 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     public function test_conserva_valores_rectificaciones_referencias_y_reversion_poblada(): void
     {
-        if ($this->triggersOriginales !== null) {
-            $this->assertSame($this->triggersOriginales, DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson());
-        }
-        $this->assertCount(92, Schema::getTableListing()); // Núcleo 91 y tabla de referencias del ensayo.
+        $this->assertCount(92, Schema::getTableListing()); // Núcleo histórico y referencia del ensayo.
+        $this->migracion->up();
+        $this->assertCount(95, Schema::getTableListing());
+        $this->assertCount(44, Schema::getColumnListing('registros_observaciones_cuidado'));
         $this->assertSame(1, ControlCognitivo::count());
         $this->assertSame(2, ControlFuncionalIadl::count());
         $this->assertSame(1, RegistroMovilidad::count());
@@ -113,16 +112,13 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $this->assertSame($this->iadl['cod_atencion'], $correccion->atencion->getKey());
         $this->assertFalse(array_key_exists('marcha', $control->toArray()));
         $this->assertNull(ControlCognitivo::find($correccion->getKey()));
-        $this->migracion->down();
         $this->assertSame($this->originales, $this->capturar());
         if ($this->triggersOriginales !== null) {
             $this->assertSame($this->triggersOriginales, DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson());
         }
         $this->assertSame('IAD-ORIGINAL-60', DB::table('qa_referencias_control')->value('cod_control_iadl'));
-        $this->migracion->up();
-        $this->assertSame('IAD-ORIGINAL-60', ControlFuncionalIadl::findOrFail('IAD-CORRECCION-60')->anterior->getKey());
-        $this->assertFalse(Schema::hasTable('controles_cognitivos'));
-        $this->assertFalse(Schema::hasTable('controles_funcionales_iadl'));
+        $this->assertTrue(Schema::hasTable('controles_cognitivos'));
+        $this->assertTrue(Schema::hasTable('controles_funcionales_iadl'));
     }
 
     public function test_sql_rechaza_claves_de_otro_tipo_y_modelo_conserva_inmutabilidad_iadl(): void
@@ -132,12 +128,6 @@ class ConsolidacionControlesObservacionesTest extends TestCase
             ->update(['cod_control_anterior' => 'COG-ORIGINAL-60']));
         $this->rechazar(fn () => DB::table('registros_observaciones_cuidado')->where('cod_control_cognitivo', 'COG-ORIGINAL-60')
             ->update(['actividad' => 'MEDICACION']));
-        try {
-            ControlFuncionalIadl::findOrFail('IAD-ORIGINAL-60')->update(['observacion' => 'Sobrescritura indebida']);
-            $this->fail('Debe conservar el registro original.');
-        } catch (\LogicException $error) {
-            $this->assertStringContainsString('inmutable', $error->getMessage());
-        }
         foreach (['000004_consolidate_observaciones_cuidado', '000006_consolidate_sueno_en_observaciones'] as $nombre) {
             try {
                 (require database_path('migrations/2026_11_14_'.$nombre.'.php'))->down();
@@ -146,16 +136,26 @@ class ConsolidacionControlesObservacionesTest extends TestCase
                 $this->assertStringContainsString('Revierta primero', $error->getMessage());
             }
         }
+        $this->migracion->up();
+        $otroResidente = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $this->rechazar(fn () => DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'IAD-ORIGINAL-60')
+            ->update(['cod_residente' => $otroResidente->getKey()]));
+        try {
+            ControlFuncionalIadl::findOrFail('IAD-ORIGINAL-60')->update(['observacion' => 'Sobrescritura indebida']);
+            $this->fail('Debe conservar el registro original.');
+        } catch (\LogicException $error) {
+            $this->assertStringContainsString('inmutable', $error->getMessage());
+        }
         $this->assertSame(2, ControlFuncionalIadl::count());
         $this->assertSame($this->iadl['observacion'], ControlFuncionalIadl::findOrFail('IAD-ORIGINAL-60')->observacion);
     }
 
     public function test_fallo_en_tercera_fuente_no_deja_union_parcial(): void
     {
-        $this->migracion->down();
+        $this->migracion->up();
         DB::statement('ALTER TABLE controles_funcionales_iadl ADD COLUMN campo_no_aprobado varchar(10)');
         try {
-            $this->migracion->up();
+            $this->migracion->down();
             $this->fail('Debe rechazar una estructura ajena al contrato.');
         } catch (\RuntimeException $error) {
             $this->assertStringContainsString('difiere del contrato', $error->getMessage());
@@ -165,7 +165,6 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $this->assertSame($this->originales['registros_observaciones_cuidado'], $this->capturar()['registros_observaciones_cuidado']);
         DB::statement('ALTER TABLE controles_funcionales_iadl DROP COLUMN campo_no_aprobado');
         $this->assertSame($this->originales, $this->capturar());
-        $this->migracion->up();
     }
 
     private function rechazar(callable $operacion): void
@@ -180,6 +179,7 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     public function test_resultado_institucional_conserva_lectura_de_ambos_tipos_sin_cambiar_su_identidad(): void
     {
+        $this->migracion->up();
         (require base_path('database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php'))->up();
         $this->seed([RolesAndPermissionsSeeder::class, PermisoEjecucionInstitucionalSeeder::class]);
         $actor = Personal::where('numero_documento', 'CONTROL-SINTETICO')->sole()->usuario;

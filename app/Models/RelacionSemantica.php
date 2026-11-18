@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // sistema experto 4.16.3; restricciones físicas D-137.
 class RelacionSemantica extends ModeloExperto
 {
+    use \App\Compartido\Infraestructura\Persistencia\LeeColumnasRelacionadas;
+
+    public function getCodVersionModeloAttribute(?string $value): ?string
+    {
+        return $this->valorRelacionado($value);
+    }
+
+
     protected $table = 'relaciones_semanticas';
 
     protected $primaryKey = 'cod_relacion_semantica';

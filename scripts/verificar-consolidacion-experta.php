@@ -44,11 +44,21 @@ try {
         ['evidencias_soporte_condicion', ['cod_evaluacion_condicion'], 'evaluaciones_condiciones_regla', ['cod_evaluacion_condicion']],
         ['condiciones_regla_instantanea', ['cod_regla_propietaria'], 'reglas_aplicadas_dcl_instantanea', ['cod_regla_aplicada_dcl']],
         ['condiciones_regla_instantanea', ['cod_condicion_padre'], 'condiciones_regla_instantanea', ['cod_condicion_instantanea']]];
+    $fkVerificadas = 0;
     foreach ($referencias as [$tabla, $cols, $entidad, $destinos]) {
+        if ($tabla === 'mapeos_variables_fuente' && $cols === ['cod_variable_experta', 'cod_version_modelo']
+            && ! Schema::hasColumn($tabla, 'cod_version_modelo')) {
+            if (DB::scalar("SELECT count(*) FROM pg_trigger WHERE tgname='norm18_mapeo' AND NOT tgisinternal") !== 1) {
+                throw new RuntimeException('Falta la protección SQL del mapeo entre versiones.');
+            }
+
+            continue;
+        }
         $fks = array_values(array_filter(Schema::getForeignKeys(BloquesExpertos::tablaFisica($tabla)), static fn ($f) => $f['columns'] === $cols));
         if (count($fks) !== 1 || $fks[0]['foreign_table'] !== BloquesExpertos::tablaFisica($entidad) || $fks[0]['foreign_columns'] !== $destinos) {
             throw new RuntimeException('Una FK trasladada no coincide con el contrato.');
         }
+        $fkVerificadas++;
     }
     $modelos = [VariableExperta::class => ['nodo', 'dominio', 'version', 'usuarioCreacion'],
         ResultadoCriterio::class => ['evaluacionCriterio', 'valor'], TrazaInferencia::class => ['evaluacionCriterio'],
@@ -84,7 +94,7 @@ try {
         'columnas_propietarios' => array_map(static fn ($t) => count(Schema::getColumnListing($t)),
             array_combine(['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'], ['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'])),
         'filas_recuperadas_eloquent' => $filas, 'versiones_conocimiento_leidas' => $versiones,
-        'fk_entrantes_verificadas' => count($referencias),
+        'fk_entrantes_verificadas' => $fkVerificadas,
         'clasificaciones_sinteticas_recuperadas' => $simulacionesRecuperadas,
         'solo_lectura' => true], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL;
 } finally {

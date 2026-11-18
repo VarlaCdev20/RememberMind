@@ -8,7 +8,7 @@ use LogicException;
 
 class ValoracionEnfermeriaPreadmision extends Model
 {
-    protected $table = 'preadmisiones';
+    protected $table = 'valoraciones_enfermeria_preadmision';
 
     public $incrementing = false;
 
@@ -20,7 +20,7 @@ class ValoracionEnfermeriaPreadmision extends Model
 
     public function save(array $options = [])
     {
-        throw new LogicException('La valoración inicial se escribe mediante su preadmisión.');
+        throw new LogicException('La valoración inicial se escribe mediante su operación institucional.');
     }
 
     public function delete()

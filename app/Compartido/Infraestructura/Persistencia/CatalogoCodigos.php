@@ -91,14 +91,15 @@ final class CatalogoCodigos
         'registros_clinicos' => ['cod_registro_clinico', 'RCL'],
         'asignaciones_jornada' => ['cod_asignacion_jornada', 'ASJ'],
         'componentes_regla_experta' => ['cod_componente_regla', 'CEX'],
+        'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
+        'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
+        'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],
     ];
 
     /** Identidades alternativas de bloques consolidados; no son tablas físicas. */
     public const ALIASES = [
         'condiciones_regla_instantanea' => ['cod_condicion_instantanea', 'COX'],
         'evaluaciones_condiciones_regla' => ['cod_evaluacion_condicion', 'ECO'],
-        'controles_cognitivos' => ['cod_control_cognitivo', 'CCO'],
-        'controles_funcionales_iadl' => ['cod_control_iadl', 'IAD'],
         'pases_turno' => ['cod_pase', 'PAS'],
         'movimientos_laborales_personal' => ['cod_movimiento_laboral', 'MLP'],
         'eventos_asignacion_personal' => ['cod_evento_asignacion', 'EAP'],
@@ -131,7 +132,6 @@ final class CatalogoCodigos
         'registros_movilidad' => ['cod_movilidad', 'RMO'],
         'registros_hidratacion' => ['cod_hidratacion', 'RHI'],
         'registros_ingesta' => ['cod_ingesta', 'RIN'],
-        'valoraciones_enfermeria_preadmision' => ['cod_valoracion_enfermeria', 'VEN'],
         'clasificaciones_dcl_instantanea' => ['cod_clasificacion_dcl_instantanea', 'CIX'],
         'resultados_criterio' => ['cod_resultado_criterio', 'RCR'],
         'trazas_inferencia' => ['cod_traza_inferencia', 'TRI'],

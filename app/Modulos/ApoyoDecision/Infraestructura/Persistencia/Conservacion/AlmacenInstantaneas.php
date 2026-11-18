@@ -230,7 +230,7 @@ final readonly class AlmacenInstantaneas
             ->join('mapeos_variables_fuente as mv', 'mv.cod_mapeo_variable_fuente', '=', 'ev.cod_mapeo_variable_fuente')
             ->join('fuentes_datos_expertas as f', 'f.cod_fuente_dato_experta', '=', 'mv.cod_fuente_dato_experta')
             ->where('ev.cod_evaluacion_experta', $e)->select(['ev.cod_evidencia_evaluacion', 'ev.cod_registro_fuente',
-                'mv.cod_version_modelo', 'f.cod_version_modelo as version_fuente', 'f.codigo_fuente', 'f.tabla_raiz'])
+                'f.cod_version_modelo', 'f.cod_version_modelo as version_fuente', 'f.codigo_fuente', 'f.tabla_raiz'])
             ->get()->keyBy('cod_evidencia_evaluacion')->all();
     }
 

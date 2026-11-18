@@ -30,8 +30,7 @@ class ConsolidacionValoracionInicialTest extends TestCase
         ]);
         $solicitud = $this->solicitud($usuario, 'PRE_VEN_MIG');
         $sinValoracion = $this->solicitud($usuario, 'PRE_VEN_VAC');
-        $transicion = require database_path('migrations/2026_11_14_000001_consolidate_valoraciones_enfermeria_preadmision.php');
-        $transicion->down();
+        $transicion = require database_path('migrations/2026_11_18_000001_separate_clinical_assessments.php');
         $this->assertTrue(Schema::hasTable(Bloque::ORIGEN));
 
         DB::table(Bloque::ORIGEN)->insert([
@@ -47,8 +46,10 @@ class ConsolidacionValoracionInicialTest extends TestCase
         $antes = (array) DB::table(Bloque::ORIGEN)->first();
         ksort($antes);
 
-        $transicion->up();
+        $transicion->down();
         $this->assertFalse(Schema::hasTable(Bloque::ORIGEN));
+        $this->assertSame('VEN_MIG_01', DB::table('preadmisiones')->where('cod_preadmision', $solicitud->getKey())->value(Bloque::CODIGO));
+        $transicion->up();
         $this->assertNull($sinValoracion->fresh()->valoracionEnfermeriaRegistro());
         $solicitud = $solicitud->fresh();
         $this->assertSame('VEN_MIG_01', $solicitud->valoracionEnfermeriaRegistro()->getKey());
@@ -58,17 +59,17 @@ class ConsolidacionValoracionInicialTest extends TestCase
         $this->assertFalse($solicitud->isDirty('valoracion_talla'));
 
         $this->rechazar(fn () => DB::table('preadmisiones')->where('cod_preadmision', $solicitud->getKey())->delete());
-        $this->rechazar(fn () => DB::table('preadmisiones')->where('cod_preadmision', $solicitud->getKey())
+        $this->rechazar(fn () => DB::table(Bloque::ORIGEN)->where('cod_preadmision', $solicitud->getKey())
             ->update(['cod_valoracion_enfermeria' => 'VEN_MIG_02']));
+        $this->rechazar(fn () => DB::table(Bloque::ORIGEN)->where('cod_preadmision', $solicitud->getKey())->delete());
         $this->rechazar(fn () => DB::table('preadmisiones')->where('cod_preadmision', $sinValoracion->getKey())
             ->update(['valoracion_talla' => 152.5]));
 
-        $transicion->down();
         $despues = (array) DB::table(Bloque::ORIGEN)->first();
         ksort($despues);
         $this->assertSame($antes, $despues);
         $this->assertFalse(Schema::hasColumn('preadmisiones', 'valoracion_talla'));
-        $transicion->up();
+        $this->assertCount(24, Schema::getColumnListing('preadmisiones'));
     }
 
     private function solicitud(User $usuario, string $codigo): Preadmision

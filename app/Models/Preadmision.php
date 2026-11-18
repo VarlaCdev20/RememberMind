@@ -14,6 +14,8 @@ class Preadmision extends ModeloOperativo
 
     protected $primaryKey = 'cod_preadmision';
 
+    protected $hidden = ['valoracionInicial'];
+
     protected function casts(): array
     {
         return [
@@ -38,28 +40,19 @@ class Preadmision extends ModeloOperativo
         return $this->hasMany(Documento::class, 'cod_preadmision', 'cod_preadmision');
     }
 
-    public function getHidden()
-    {
-        return [...parent::getHidden(), ...Bloque::columnas()];
-    }
-
     public function getGuarded()
     {
         return [...parent::getGuarded(), ...Bloque::columnas()];
     }
 
+    public function valoracionInicial(): HasOne
+    {
+        return $this->hasOne(ValoracionEnfermeriaPreadmision::class, 'cod_preadmision', 'cod_preadmision');
+    }
+
     public function valoracionEnfermeriaRegistro(): ?ValoracionEnfermeriaPreadmision
     {
-        if ($this->getAttribute(Bloque::CODIGO) === null) {
-            return null;
-        }
-
-        $valores = ['cod_preadmision' => $this->getKey()];
-        foreach (array_keys(Bloque::TIPOS) as $campo) {
-            $valores[$campo] = $this->getAttribute(Bloque::columna($campo));
-        }
-
-        return (new ValoracionEnfermeriaPreadmision)->setRawAttributes($valores, true);
+        return $this->valoracionInicial;
     }
 
     public function getValoracionEnfermeriaAttribute(): ?array
