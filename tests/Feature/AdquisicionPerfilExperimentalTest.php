@@ -35,7 +35,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
             'fecha_hora' => '2026-10-16 12:00:00'];
         DB::table('valoraciones_psicopedagogicas')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
             'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']);
-        DB::table('valoraciones_profesionales')->insert($comun + ['tipo_evento' => 'FUNCIONAL', 'cod_valoracion_profesional' => 'SIM-FUNC', 'estado' => 'ACTIVA']);
+        RegistrosConsumo::insertar('valoraciones_funcionales', [$comun + ['cod_valoracion_funcional' => 'SIM-FUNC', 'estado' => 'ACTIVA']]);
         RegistrosConsumo::insertar('diagnosticos', [$comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']]);
         RegistrosConsumo::insertar('antecedentes_clinicos', [['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'tipo_antecedente' => 'PRUEBA_TECNICA', 'descripcion' => 'Antecedente ficticio.',

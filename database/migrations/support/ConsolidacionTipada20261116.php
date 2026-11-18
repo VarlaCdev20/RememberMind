@@ -143,7 +143,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         }
     }
 
-    private function columnasFusion(array $fuentes): array
+    protected function columnasFusion(array $fuentes): array
     {
         $columnas = [static::CODIGO => ['varchar(20)', false, null], static::DISCRIMINADOR => ['varchar(20)', false, null]];
         foreach ($fuentes as $definicion) {
@@ -168,7 +168,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         return $columnas;
     }
 
-    private function crearFusion(array $fuentes): void
+    protected function crearFusion(array $fuentes): void
     {
         $columnas = $this->columnasFusion($fuentes);
         $sql = $this->declaracionesColumnas($columnas, [static::CODIGO]);
@@ -330,7 +330,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         throw new RuntimeException('No se puede reconstruir una referencia entrante.');
     }
 
-    private function referencias(array $tablas): array
+    protected function referencias(array $tablas): array
     {
         if (DB::getDriverName() === 'pgsql') {
             $parametros = implode(', ', array_fill(0, count($tablas), '?'));
@@ -432,7 +432,7 @@ abstract class ConsolidacionTipada20261116 extends Migration
         return $indices;
     }
 
-    private function indexarFusion(array $fuentes): void
+    protected function indexarFusion(array $fuentes): void
     {
         foreach ($this->indicesFusion($fuentes) as $nombre => $columnas) {
             DB::statement('CREATE INDEX '.$nombre.' ON '.static::DESTINO.' ('.implode(', ', $columnas).')');

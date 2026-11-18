@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Infraestructura\Persistencia;
 
+use App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -47,11 +48,16 @@ final class RegistrosConsumo
 
     public static function consulta(string $entidad, ?string $alias = null): Builder
     {
-        return isset(self::ORIGENES[$entidad])
-            ? DB::table(self::ORIGENES[$entidad][0], $alias)->where(($alias ? $alias.'.' : '').'tipo_evento', self::ORIGENES[$entidad][2])
-            : (isset(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::CONTRATOS[$entidad])
-                ? \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), $entidad, $alias)
-                : DB::table($entidad, $alias));
+        $tabla = self::ORIGENES[$entidad][0] ?? $entidad;
+        $consulta = isset(ColumnasRelacionadas::CONTRATOS[$tabla])
+            ? ColumnasRelacionadas::consulta(DB::connection(), $tabla, $alias)
+            : DB::table($tabla, $alias);
+
+        if (isset(self::ORIGENES[$entidad])) {
+            $consulta->where(($alias ? $alias.'.' : '').'tipo_evento', self::ORIGENES[$entidad][2]);
+        }
+
+        return $consulta;
     }
 
     public static function insertar(string $entidad, array $filas): void
@@ -66,11 +72,19 @@ final class RegistrosConsumo
                 }
             }
             unset($fila);
-            DB::table($tabla)->insert($filas);
+            if ($tabla === 'valoraciones_profesionales') {
+                DB::transaction(function () use ($tabla, $filas): void {
+                    DB::table('atenciones')->whereIn('cod_atencion', array_column($filas, 'cod_atencion'))
+                        ->orderBy('cod_atencion')->sharedLock()->get(['cod_atencion']);
+                    DB::table($tabla)->insert(array_map(fn ($fila) => ColumnasRelacionadas::preparar(DB::connection(), $tabla, $fila), $filas));
+                });
+            } else {
+                DB::table($tabla)->insert($filas);
+            }
 
             return;
         }
 
-        DB::table($entidad)->insert(array_map(fn ($fila) => \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));
+        DB::table($entidad)->insert(array_map(fn ($fila) => ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));
     }
 }

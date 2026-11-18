@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-class ValoracionNutricional extends RegistroConsumo
+class ValoracionNutricional extends ValoracionProfesional
 {
     protected const TIPO = 'NUTRICIONAL';
 
     protected const ENTIDAD = 'valoraciones_nutricionales';
-
-    protected $table = 'valoraciones_profesionales';
-
-    protected $primaryKey = 'cod_valoracion_profesional';
 
     protected $appends = ['cod_valoracion_nutricional'];
 

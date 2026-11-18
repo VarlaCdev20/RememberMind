@@ -30,6 +30,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
 
     public function test_un_cambio_de_esquema_intermedio_revierte_la_transicion_completa(): void
     {
+        $contexto = require database_path('migrations/2026_11_18_000004_derive_professional_assessment_resident.php');
+        $contexto->down();
         $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
         $reparto->down();
         $migracion = require database_path('migrations/2026_11_16_000001_consolidate_pedagogia.php');
@@ -48,6 +50,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         DB::statement('ALTER TABLE seguimientos_pedagogicos DROP COLUMN campo_no_aprobado');
         $migracion->up();
         $reparto->up();
+        $contexto->up();
     }
 
     public function test_conserva_tipos_historia_referencias_y_reversion_poblada(): void
@@ -113,6 +116,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->rechazar(fn () => DB::table('soportes_valoracion_petersen')->where('cod_soporte_petersen', 'SVP-DOC-16')
             ->update(['cod_documento_clinico' => $admin->getKey()]));
 
+        $contexto = require database_path('migrations/2026_11_18_000004_derive_professional_assessment_resident.php');
+        $contexto->down();
         $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
         $reparto->down();
         $pases = require database_path('migrations/2026_11_17_000001_consolidate_pases_textos.php');
@@ -134,6 +139,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         }
         $pases->up();
         $reparto->up();
+        $contexto->up();
         $this->assertSame($dolor->getKey(), $reevaluacion->fresh()->origen->getKey());
         $this->assertSame($reevaluacion->getKey(), $dolor->fresh()->reevaluaciones->sole()->getKey());
         $this->assertSame($nota->getKey(), $correccion->fresh()->anterior->getKey());

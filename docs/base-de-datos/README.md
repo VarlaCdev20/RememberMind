@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Residente derivado en valoraciones funcionales y nutricionales, 18/11/2026.** La [decisión autorizada](DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md) reduce `valoraciones_profesionales` a 29 atributos. Se conserva el inventario de 100 tablas físicas. El reparto de 30 atributos por tabla corresponde al corte anterior.
+
 **Corte posterior del 18/11/2026 — reparto de valoraciones.** La [división adicional expresamente autorizada](DECISION_REPARTO_VALORACIONES_2026_11_18.md) distribuye las 51 columnas de valoraciones en dos relaciones de 30: Funcional/Nutrición y Psicología/Pedagogía. El inventario final es **64 operativas + 20 expertas + 16 técnicas = 100 tablas físicas**. El corte de 99 que sigue es anterior a este reparto.
 
 **Corte del 18/11/2026.** La [separación clínica y retirada de cinco columnas derivadas](DECISION_SEPARACION_CLINICA_2026_11_18.md) deja **63 operativas + 20 expertas + 16 técnicas = 99 tablas físicas**, dentro del máximo de 100 físicas aprobado por la propietaria.

@@ -202,8 +202,8 @@ final class RoleDashboardDataService
         $table = 'valoraciones_profesionales';
         $title = $discipline === 'nutricion' ? 'Valoraciones nutricionales' : 'Valoraciones funcionales';
         $icon = $discipline === 'nutricion' ? 'ph-bowl-food' : 'ph-person-simple-walk';
-        $valuations = DB::table($table)->where('cod_personal', $code)
-            ->where('tipo_evento', $discipline === 'nutricion' ? 'NUTRICIONAL' : 'FUNCIONAL');
+        $valuations = RegistrosConsumo::consulta($discipline === 'nutricion' ? 'valoraciones_nutricionales' : 'valoraciones_funcionales')
+            ->where($table.'.cod_personal', $code);
         $care = DB::table('atenciones')->where('cod_personal', $code)
             ->where('fecha_hora', '>=', now()->subDays(90));
         $plans = DB::table('planes_cuidado')->where('cod_personal', $code)

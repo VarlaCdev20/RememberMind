@@ -97,10 +97,10 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
         self::assertSame(0, DB::table('reglas_expertas')->count());
         self::assertSame([], config('sistema_experto.lectura_clinica'));
         self::assertFalse(RegistrosConsumo::consulta('controles_cognitivos')->where('fecha_hora', '>', now())->exists());
-        self::assertFalse(DB::table('notas_clinicas as n')->join('atenciones as a', 'n.cod_atencion', '=', 'a.cod_atencion')
+        self::assertFalse(RegistrosConsumo::consulta('notas_clinicas', 'n')->join('atenciones as a', 'n.cod_atencion', '=', 'a.cod_atencion')
             ->whereColumn('n.cod_residente', '!=', 'a.cod_residente')->exists());
-        self::assertFalse(DB::table('valoraciones_profesionales as v')->where('v.tipo_evento', 'FUNCIONAL')->join('atenciones as a', 'v.cod_atencion', '=', 'a.cod_atencion')
-            ->where(fn ($q) => $q->whereColumn('v.cod_residente', '!=', 'a.cod_residente')->orWhereColumn('v.cod_personal', '!=', 'a.cod_personal'))->exists());
+        self::assertFalse(RegistrosConsumo::consulta('valoraciones_funcionales', 'v')->join('atenciones as a', 'v.cod_atencion', '=', 'a.cod_atencion')
+            ->whereColumn('v.cod_personal', '!=', 'a.cod_personal')->exists());
         foreach (DB::table('registros_consumo as i')->where('i.tipo_evento', 'INGESTA')->join('jornadas as j', 'i.cod_jornada', '=', 'j.cod_jornada')
             ->get(['i.fecha_hora', 'j.fecha_jornada']) as $registro) {
             self::assertSame(substr($registro->fecha_hora, 0, 10), substr($registro->fecha_jornada, 0, 10));

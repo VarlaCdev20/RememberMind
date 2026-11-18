@@ -5,15 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ValoracionFuncional extends RegistroConsumo
+class ValoracionFuncional extends ValoracionProfesional
 {
     protected const TIPO = 'FUNCIONAL';
 
     protected const ENTIDAD = 'valoraciones_funcionales';
-
-    protected $table = 'valoraciones_profesionales';
-
-    protected $primaryKey = 'cod_valoracion_profesional';
 
     protected $appends = ['cod_valoracion_funcional'];
 

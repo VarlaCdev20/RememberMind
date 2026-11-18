@@ -34,6 +34,8 @@ Never silently blend contradictory sources. Follow the higher-authority source a
 
 ## Frozen DB governance
 
+Owner approval 2026-11-18 removes only `valoraciones_profesionales.cod_residente` and derives the resident from the mandatory attention, retaining its historical identity. The table has 29 columns after migration and the inventory remains 100 physical tables. See `docs/base-de-datos/DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md`. Other structural decisions remain scoped to their recorded authorizations.
+
 Owner approval 2026-11-18 additionally authorizes the professional-assessment partition in `docs/base-de-datos/DECISION_REPARTO_VALORACIONES_2026_11_18.md`: preserve Functional/Nutrition in `valoraciones_profesionales` and move Psychology/Pedagogy to `valoraciones_psicopedagogicas`, 30 columns each. The final local inventory is **64 operational + 20 expert + 16 technical = 100 physical tables**. This scope-specific approval supersedes the preceding 99-table cut; it does not authorize further tables or unrelated structural changes.
 
 Owner authorization 2026-11-18 installs three specific clinical separations and removes five derived context columns, documented in `docs/base-de-datos/DECISION_SEPARACION_CLINICA_2026_11_18.md`. Current local inventory is **63 operational + 20 expert + 16 technical = 99 physical tables**. The owner sets a maximum of **100 physical tables including expert and technical tables** for this redesign. This scope supersedes the earlier no-new-table restriction only for these three separations. The remaining structural boundaries apply.
