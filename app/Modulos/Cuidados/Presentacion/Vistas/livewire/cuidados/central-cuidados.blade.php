@@ -1,8 +1,9 @@
-<div class="rm-page-layout rm-care-center space-y-5">
-    <x-ui.collection-header title="Cuidados" subtitle="Consulta los cuidados guardados y continúa la atención de tus residentes." icon="ph-heartbeat" eyebrow="Enfermería">
+<div class="rm-page-layout rm-care-center">
+    <x-ui.collection-header title="Cuidados" :subtitle="$opcionesRegistro === [] ? 'Consulta los cuidados por residente' : 'Consulta y registra cuidados por residente'" icon="ph-heartbeat" eyebrow="Enfermería">
         <x-slot:actions>
+            <x-ui.nursing-report-link :area="$tipo" :residente="$residente" :desde="$desde" :hasta="$hasta" />
             @if($opcionesRegistro !== [])
-                <button type="button" class="rm-btn-primary" wire:click="abrirRegistro" wire:loading.attr="disabled" wire:target="abrirRegistro"><i class="ph-bold ph-plus" aria-hidden="true"></i> Registrar</button>
+                <x-ui.action-button icono="ph-plus" aria-label="Registrar cuidado" wire:click="abrirRegistro" loading="abrirRegistro">Registrar</x-ui.action-button>
             @endif
         </x-slot:actions>
     </x-ui.collection-header>
@@ -13,14 +14,44 @@
         @endforeach
     </nav>
 
-    <x-ui.filter-bar>
-        <div class="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div><label for="central-tipo" class="rm-label">Tipo de cuidado</label><select id="central-tipo" class="rm-select w-full" wire:model.live="tipo"><option value="">Todos los cuidados autorizados</option>@foreach($tipos as $clave => $label)<option value="{{ $clave }}">{{ $label }}</option>@endforeach</select></div>
-            <div><label for="central-residente" class="rm-label">Residente</label><select id="central-residente" class="rm-select w-full" wire:model.live="residente"><option value="">Todos los residentes autorizados</option>@foreach($residentes as $persona)<option value="{{ $persona->cod_residente }}">{{ $persona->nombres }} {{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}</option>@endforeach</select></div>
-            <div><label for="central-desde" class="rm-label">Desde</label><input id="central-desde" type="date" class="rm-input w-full" wire:model.live="desde" max="{{ today()->toDateString() }}" aria-invalid="{{ $errors->has('desde') ? 'true' : 'false' }}" @error('desde') aria-describedby="central-desde-error" @enderror>@error('desde')<p id="central-desde-error" role="alert" class="text-sm text-[var(--rm-danger)]">{{ $message }}</p>@enderror</div>
-            <div><label for="central-hasta" class="rm-label">Hasta</label><input id="central-hasta" type="date" class="rm-input w-full" wire:model.live="hasta" max="{{ today()->toDateString() }}" aria-invalid="{{ $errors->has('hasta') ? 'true' : 'false' }}" @error('hasta') aria-describedby="central-hasta-error" @enderror>@error('hasta')<p id="central-hasta-error" role="alert" class="text-sm text-[var(--rm-danger)]">{{ $message }}</p>@enderror</div>
+    @php
+        $periodoCuidado = $desde !== today()->subDays(6)->toDateString() || $hasta !== today()->toDateString();
+        $errorPeriodo = $errors->has('desde') || $errors->has('hasta');
+    @endphp
+    <x-ui.filter-bar class="rm-nursing-filters" aria-label="Filtros de cuidados" :x-data="'{ masFiltros: '.($errorPeriodo ? 'true' : 'false').' }'">
+        <div class="rm-nursing-filters__row">
+            <x-ui.field label="Tipo de cuidado" for="central-tipo">
+                <select id="central-tipo" class="rm-select" wire:model.live="tipo">
+                    <option value="">Todos los cuidados</option>
+                    @foreach($tipos as $clave => $label)<option value="{{ $clave }}">{{ $label }}</option>@endforeach
+                </select>
+            </x-ui.field>
+            <x-ui.field label="Residente" for="central-residente">
+                <select id="central-residente" class="rm-select" wire:model.live="residente">
+                    <option value="">Todos</option>
+                    @foreach($residentes as $persona)<option value="{{ $persona->cod_residente }}">{{ $persona->nombre_completo }}</option>@endforeach
+                </select>
+            </x-ui.field>
+            <div class="rm-nursing-filters__actions">
+                <x-ui.action-button variant="secondary" icono="ph-calendar-blank" @click="masFiltros = !masFiltros"
+                    aria-controls="central-periodo" x-bind:aria-expanded="masFiltros">
+                    {{ $periodoCuidado ? 'Período personalizado' : 'Últimos 7 días' }}
+                </x-ui.action-button>
+                @if($tipo || $residente || $periodoCuidado)
+                    <x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" wire:click="limpiarFiltros" loading="limpiarFiltros"
+                        data-rm-action-icon aria-label="Limpiar filtros" />
+                @endif
+            </div>
         </div>
-        <button type="button" class="rm-btn-secondary" wire:click="limpiarFiltros">Restablecer filtros</button>
+        <div id="central-periodo" class="rm-nursing-filters__extra" x-show="masFiltros" x-cloak>
+            @foreach(['desde' => 'Desde', 'hasta' => 'Hasta'] as $campo => $label)
+                <x-ui.field :label="$label" :for="'central-'.$campo" :error="$campo">
+                    <input id="central-{{ $campo }}" class="rm-input" type="date" wire:model.live="{{ $campo }}" max="{{ today()->toDateString() }}"
+                        aria-invalid="{{ $errors->has($campo) ? 'true' : 'false' }}" @error($campo) aria-describedby="central-{{ $campo }}-error" @enderror>
+                </x-ui.field>
+            @endforeach
+        </div>
+        @if($errorPeriodo)<p class="rm-field-error" x-show="!masFiltros" role="alert">Revisa las fechas del período.</p>@endif
     </x-ui.filter-bar>
     <p wire:loading role="status" class="text-sm text-[var(--rm-text-secondary)]">Actualizando cuidados…</p>
 
@@ -29,26 +60,40 @@
     @elseif($residentes->isEmpty())
         <x-ui.empty-state icon="ph-users" title="Sin residentes disponibles para consulta" description="No tienes residentes dentro de tu alcance actual. Revisa la asignación de la jornada con Administración." />
     @elseif($vista === 'resumen')
-        <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
-            <x-ui.metric-card :value="$datos['total']" label="Registros guardados" icon="ph-clipboard-text" />
-            <x-ui.metric-card :value="$datos['residentes_con_registros']" label="Residentes con registros" icon="ph-users" />
-            <x-ui.metric-card :value="count($datos['resumen'])" label="Tipos con registros" icon="ph-squares-four" />
-        </div>
-        <section aria-labelledby="central-por-cuidado" class="space-y-3">
+        <x-ui.card class="rm-care-center__summary">
+            <dl class="rm-care-center__totals">
+                <div><dt>Registros guardados</dt><dd>{{ $datos['total'] }}</dd></div>
+                <div><dt>Residentes con registros</dt><dd>{{ $datos['residentes_con_registros'] }}</dd></div>
+                <div><dt>Tipos con registros</dt><dd>{{ count($datos['resumen']) }}</dd></div>
+            </dl>
+        </x-ui.card>
+        <section aria-labelledby="central-por-cuidado" class="space-y-2">
             <h2 id="central-por-cuidado" class="rm-section-title">Resumen por cuidado</h2>
-            <p class="text-sm text-[var(--rm-text-secondary)]">Conteos del período seleccionado. Incluyen la historia guardada; cada registro conserva su estado. Heridas identificadas y curaciones se muestran como registros distintos.</p>
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                @foreach($tipos as $clave => $label)
-                    @if($tipo === '' || $tipo === $clave)
-                        <article class="rm-card p-4 space-y-3" wire:key="resumen-{{ $clave }}">
-                            <div class="flex items-start justify-between gap-3"><h3 class="font-semibold text-[var(--rm-text-primary)]">{{ $label }}</h3><strong class="text-xl tabular-nums">{{ $datos['resumen'][$clave]['total'] ?? 0 }}</strong></div>
-                            <p class="text-sm text-[var(--rm-text-secondary)]">{{ isset($datos['resumen'][$clave]) ? 'Último registro: '.$datos['resumen'][$clave]['ultima_fecha'] : 'Sin registros en este período' }}</p>
-                            @if(($datos['resumen'][$clave]['anulados'] ?? 0) > 0)<p class="text-sm">{{ $datos['resumen'][$clave]['anulados'] }} anulados incluidos en la historia</p>@endif
-                            <button type="button" class="rm-btn-secondary" wire:click="verRegistros('{{ $clave }}')" aria-label="Ver registros de {{ $label }}">Ver registros <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></button>
-                        </article>
-                    @endif
-                @endforeach
-            </div>
+            <x-ui.table-surface>
+                <ul class="rm-care-center__overview">
+                    @foreach($tipos as $clave => $label)
+                        @if($tipo === '' || $tipo === $clave)
+                            <li wire:key="resumen-{{ $clave }}">
+                                <div>
+                                    <strong>{{ $label }}</strong>
+                                    @if(isset($datos['resumen'][$clave]))
+                                        <p class="rm-help">Último registro · {{ $datos['resumen'][$clave]['ultima_fecha'] }}</p>
+                                    @else
+                                        <p class="rm-help">Sin registros en este período</p>
+                                    @endif
+                                </div>
+                                <p class="rm-care-center__count"><strong>{{ $datos['resumen'][$clave]['total'] ?? 0 }}</strong> {{ ($datos['resumen'][$clave]['total'] ?? 0) === 1 ? 'registro' : 'registros' }}
+                                    @if(($datos['resumen'][$clave]['anulados'] ?? 0) > 0)
+                                        <small class="block">{{ $datos['resumen'][$clave]['anulados'] }} anulados incluidos</small>
+                                    @endif
+                                </p>
+                                <x-ui.action-button variant="secondary" icono="ph-list-bullets" wire:click="verRegistros('{{ $clave }}')"
+                                    loading="verRegistros" data-rm-action-icon aria-label="Ver registros de {{ $label }}" />
+                            </li>
+                        @endif
+                    @endforeach
+                </ul>
+            </x-ui.table-surface>
         </section>
     @else
         <section aria-labelledby="central-registros" class="space-y-3" wire:loading.class="opacity-60">
@@ -66,7 +111,7 @@
             @empty
                 <x-ui.empty-state icon="ph-clipboard-text" title="Sin registros para estos filtros" description="Prueba otro período, residente o tipo de cuidado." />
             @endforelse
-            <x-ui.paginacion :paginator="$datos['registros']" mode="livewire" :showPerPage="false" label="registros de cuidado" />
+            <x-ui.paginacion class="rm-pagination--compact" :paginator="$datos['registros']" mode="livewire" :showPerPage="false" label="registros de cuidado" />
         </section>
     @endif
 

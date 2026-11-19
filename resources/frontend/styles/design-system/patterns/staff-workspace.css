@@ -771,6 +771,57 @@ html .rm-shell[class] [data-rm-main] .rm-staff-directory .rm-staff-directory__fi
     .rm-staff-action__actions > .rm-btn, :is(.rm-staff-action-dialog, .rm-record-form-dialog) .rm-modal-footer > .rm-btn { flex: 1 1 auto; }
 }
 
+.rm-staff-schedule { container: staff-schedule / inline-size; min-width: 0; }
+.rm-staff-schedule input[type="checkbox"]:not(.sr-only) { width: 18px; height: 18px; min-height: 18px; flex-shrink: 0; accent-color: var(--rm-primary-ink); color: var(--rm-primary-ink); }
+.rm-staff-schedule .rm-staff-action__actions { padding-bottom: var(--rm-space-2); background: var(--rm-surface-soft); }
+.rm-schedule-editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .6fr); gap: var(--rm-space-4); align-items: start; }
+.rm-schedule-editor__fields { display: grid; gap: var(--rm-space-3); min-width: 0; }
+.rm-schedule-shifts { min-width: 0; }
+.rm-schedule-shifts__options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--rm-space-2); margin-top: var(--rm-space-2); }
+.rm-schedule-shifts__options label { position: relative; display: grid; justify-items: center; gap: var(--rm-space-1); min-width: 0; padding: var(--rm-space-3) var(--rm-space-2); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-xl); background: var(--rm-surface-soft); cursor: pointer; text-align: center; }
+.rm-schedule-shifts__options label:has(:checked) { background: var(--rm-sage-soft); border-color: var(--rm-primary-ink); color: var(--rm-primary-ink); }
+.rm-schedule-shifts__options label:has(:focus-visible) { outline: 2px solid var(--rm-focus); outline-offset: 2px; }
+.rm-schedule-shifts__options label > i { font-size: var(--rm-icon-lg); }
+.rm-schedule-shifts__options strong { font-size: var(--rm-font-size-label); }
+.rm-schedule-shifts__options span { font-size: var(--rm-font-size-meta); white-space: nowrap; }
+.rm-schedule-day-shortcuts { display: flex; flex-wrap: wrap; gap: var(--rm-space-1); }
+.rm-schedule-preview { position: sticky; top: 0; display: grid; gap: var(--rm-space-3); min-width: 0; padding: var(--rm-space-4); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-xl); background: var(--rm-surface-soft); }
+.rm-schedule-preview__heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--rm-space-2); }
+.rm-schedule-preview__heading h3 { font-size: var(--rm-font-size-card); font-weight: 800; }
+.rm-schedule-preview__dates { display: grid; gap: var(--rm-space-2); margin: 0; padding: 0; list-style: none; }
+.rm-schedule-preview__dates li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: var(--rm-space-2); padding-block: var(--rm-space-2); border-bottom: 1px solid var(--rm-border-soft); }
+.rm-schedule-preview__dates time { font-size: var(--rm-font-size-label); color: var(--rm-text-secondary); }
+.rm-schedule-preview__dates strong, .rm-schedule-preview__dates span { display: block; overflow-wrap: anywhere; }
+.rm-schedule-preview__dates strong { font-size: var(--rm-font-size-card); }
+.rm-schedule-preview__dates span { font-size: var(--rm-font-size-meta); color: var(--rm-text-secondary); }
+.rm-schedule-preview__dates .is-rest strong { color: var(--rm-primary-ink); }
+.rm-schedule-preview__navigation { display: flex; justify-content: space-between; align-items: center; gap: var(--rm-space-2); font-size: var(--rm-font-size-label); }
+.rm-schedule-preview__empty { display: grid; justify-items: center; gap: var(--rm-space-3); padding-block: var(--rm-space-5); text-align: center; font-size: var(--rm-font-size-body); color: var(--rm-text-secondary); }
+.rm-schedule-preview__empty > i { font-size: var(--rm-icon-xl); color: var(--rm-primary-ink); }
+.rm-schedule-table { table-layout: auto; font-family: var(--rm-font-body); }
+.rm-schedule-table :is(th, td) { padding: var(--rm-space-3); vertical-align: middle; font-size: var(--rm-font-size-table); }
+.rm-schedule-table :is(td, th) > strong, .rm-schedule-table .rm-help { display: block; overflow-wrap: anywhere; white-space: normal; }
+.rm-schedule-table .rm-help { margin-top: var(--rm-space-1); font-weight: 400; font-size: var(--rm-font-size-label); }
+.rm-schedule-table__hours { display: inline-flex; align-items: center; gap: var(--rm-space-1); white-space: nowrap; }
+.rm-schedule-table__actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--rm-space-1); }
+.rm-schedule-table-wrap { container: schedule-table / inline-size; min-width: 0; }
+@container staff-schedule (max-width: 800px) {
+    .rm-schedule-editor { grid-template-columns: minmax(0, 1fr); }
+    .rm-schedule-preview { position: static; }
+}
+@container schedule-table (max-width: 760px) {
+    .rm-schedule-table, .rm-schedule-table tbody { display: block; width: 100%; }
+    .rm-schedule-table thead { display: none; }
+    .rm-schedule-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rm-space-2); height: auto; padding: var(--rm-space-3); border-bottom: 1px solid var(--rm-border); }
+    .rm-schedule-table tbody :is(td, th) { display: block; padding: 0; border: 0; min-width: 0; white-space: normal; }
+    .rm-schedule-table tbody [data-label]::before { content: attr(data-label); display: block; margin-bottom: var(--rm-space-1); color: var(--rm-text-secondary); font-size: var(--rm-font-size-meta); font-weight: 400; }
+    .rm-schedule-table tbody tr > :first-child { grid-column: 1 / -1; }
+    .rm-schedule-table tbody tr > :last-child { align-self: end; }
+    .rm-schedule-table tbody tr > :last-child::before { display: none; }
+    .rm-schedule-table__actions { justify-content: flex-start; }
+}
+@container staff-schedule (max-width: 360px) { .rm-schedule-shifts__options { grid-template-columns: minmax(0, 1fr); } }
+
 .rm-record-form__state { display: flex; align-items: center; gap: var(--rm-space-2); min-height: 48px; padding: var(--rm-space-2) var(--rm-space-3); border: 1px solid var(--rm-border-soft); border-radius: var(--rm-radius-xl); background: color-mix(in srgb, var(--rm-palette-mint) 15%, var(--rm-surface)); color: var(--rm-text-primary); font-size: calc(var(--rm-font-size-body) + 2px); }
 .rm-record-form__state > i { color: var(--rm-primary-ink); font-size: var(--rm-icon-lg); }
 .rm-record-form-dialog .rm-input::placeholder { text-align: center; color: var(--rm-text-secondary); opacity: .65; }

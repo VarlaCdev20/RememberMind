@@ -59,6 +59,9 @@ class AlertasPanel extends Component
     #[Url]
     public string $filtroEspecialidad = '';
 
+    #[Locked]
+    public bool $consultandoPrioritariasAutorizadas = false;
+
     public bool $confirmarDescarte = false;
 
     public bool $modalCrear = false;
@@ -142,14 +145,11 @@ class AlertasPanel extends Component
     {
         $this->comprobarPermiso('ver');
         $rol = app(ExperienciaAlertas::class)->paraUsuario(auth()->user())['rol'];
-        if (! request()->has('filtroEspecialidad') && isset(VinculosProfesionalesAlertas::ESPECIALIDADES[$rol])) {
-            $this->filtroEspecialidad = $rol;
-        }
         // Si solo hay registros anteriores, la entrada debe mostrarlos sin reclasificarlos.
         if (! request()->has('filtroEstado') && $this->filtroEstado === 'ACTIVAS') {
             $base = app(BandejaAlertas::class)->consulta(auth()->user())
                 ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto));
-            app(VinculosProfesionalesAlertas::class)->aplicar($base, auth()->user(), $this->filtroEspecialidad);
+            app(VinculosProfesionalesAlertas::class)->aplicar($base, auth()->user(), $this->especialidadDeBandeja($rol));
             if (! (clone $base)->abiertas()->exists() && (clone $base)->exists()) {
                 $this->filtroEstado = '';
             }
@@ -158,6 +158,20 @@ class AlertasPanel extends Component
         if (is_string($alerta) && $alerta !== '') {
             $this->verDetalle($alerta);
         }
+    }
+
+    private function especialidadDeBandeja(?string $rol): string
+    {
+        if (isset(VinculosProfesionalesAlertas::ESPECIALIDADES[$rol])) {
+            return $rol;
+        }
+
+        return $this->puedeFiltrarEspecialidades($rol) ? $this->filtroEspecialidad : '';
+    }
+
+    private function puedeFiltrarEspecialidades(?string $rol): bool
+    {
+        return in_array($rol, ['ADMINISTRADOR', 'SUPERADMINISTRADOR'], true);
     }
 
     private function comprobarPermiso(string $accion): void
@@ -178,6 +192,9 @@ class AlertasPanel extends Component
 
     public function updated($campo): void
     {
+        if (in_array($campo, ['filtroNivel', 'filtroEspecialidad'], true)) {
+            $this->consultandoPrioritariasAutorizadas = false;
+        }
         if ($campo === 'buscarResidente') {
             $this->paginaResidentes = 1;
         }
@@ -201,6 +218,8 @@ class AlertasPanel extends Component
         $this->filtroNivel = '';
         $this->filtroOrigen = '';
         $this->filtroAdulto = '';
+        $this->filtroEspecialidad = '';
+        $this->consultandoPrioritariasAutorizadas = false;
         $this->filtroResponsabilidad = $this->fechaDesde = $this->fechaHasta = '';
         $this->resetValidation(['fechaDesde', 'fechaHasta']);
         $this->resetPage();
@@ -213,16 +232,15 @@ class AlertasPanel extends Component
             $this->resetPage();
         } elseif (in_array($campo, ['search', 'filtroNivel', 'filtroOrigen', 'filtroAdulto'])) {
             $this->$campo = '';
-            $this->resetPage();
+            $this->updated($campo);
         }
     }
 
     public function setFiltroRapido(string $campo, string $valor): void
     {
-        if (in_array($campo, ['filtroEstado', 'filtroNivel', 'filtroOrigen', 'filtroResponsabilidad', 'filtroEspecialidad'], true)) {
+        if (in_array($campo, ['filtroEstado', 'filtroNivel', 'filtroOrigen', 'filtroResponsabilidad'], true)) {
             $this->{$campo} = $valor;
-            $this->trazaId = null;
-            $this->resetPage();
+            $this->updated($campo);
         }
     }
 
@@ -230,8 +248,10 @@ class AlertasPanel extends Component
     {
         abort_unless(in_array($resumen, ['urgentes', 'criticas', 'altas', 'medias', 'por_atender', 'en_atencion', 'cerradas', 'anteriores', 'todas', 'sin_responsable', 'fuera_plazo'], true), 422);
         $residente = $this->filtroAdulto;
+        $especialidad = $this->filtroEspecialidad;
         $this->limpiarFiltros();
         $this->filtroAdulto = $residente;
+        $this->filtroEspecialidad = $especialidad;
         $this->filtroEstado = match ($resumen) {
             'criticas', 'altas', 'medias' => 'ACTIVAS',
             'por_atender' => 'POR_ATENDER', 'en_atencion' => 'EN_ATENCION', 'cerradas' => 'CERRADA', 'anteriores' => 'ANTERIORES', 'sin_responsable' => 'ACTIVAS', 'fuera_plazo' => 'CON_LIMITE_SUPERADO', default => '',
@@ -274,6 +294,8 @@ class AlertasPanel extends Component
 
     public function verPrioritarias(): void
     {
+        $this->comprobarPermiso('ver');
+        $this->consultandoPrioritariasAutorizadas = true;
         $this->filtroEspecialidad = '';
         $this->search = $this->filtroOrigen = $this->filtroResponsabilidad = $this->fechaDesde = $this->fechaHasta = '';
         $this->resetValidation(['fechaDesde', 'fechaHasta']);
@@ -661,8 +683,11 @@ class AlertasPanel extends Component
         $ambito = $bandeja->consulta($usuario)
             ->when($this->filtroAdulto, fn ($q) => $q->where('cod_residente', $this->filtroAdulto));
         $vinculador = app(VinculosProfesionalesAlertas::class);
-        $base = $vinculador->aplicar(clone $ambito, $usuario, $this->filtroEspecialidad);
-        $especialidadesDisponibles = VinculosProfesionalesAlertas::ESPECIALIDADES;
+        $consultaPrioridades = $this->consultandoPrioritariasAutorizadas && $this->filtroNivel === 'PRIORITARIAS';
+        $base = $consultaPrioridades
+            ? (clone $ambito)->abiertas()->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS)
+            : $vinculador->aplicar(clone $ambito, $usuario, $this->especialidadDeBandeja($perfil['rol']));
+        $especialidadesDisponibles = $this->puedeFiltrarEspecialidades($perfil['rol']) ? VinculosProfesionalesAlertas::ESPECIALIDADES : [];
         $statsEstado = (clone $base)->select('estado')->selectRaw('COUNT(*) as total')->groupBy('estado')->pluck('total', 'estado')->map(fn ($n) => (int) $n)->all();
         $estadosHistoricos = array_diff_key($statsEstado, array_flip([...Alerta::ESTADOS_ACTIVOS, 'ATENDIDA', ...Alerta::ESTADOS_TERMINALES]));
         $statsNivel = (clone $base)->abiertas()->select('prioridad')->selectRaw('COUNT(*) as total')->groupBy('prioridad')->pluck('total', 'prioridad')->all();
@@ -699,7 +724,7 @@ class AlertasPanel extends Component
             ->when($this->filtroEstado === 'ACTIVAS', fn ($q) => $q->abiertas())
             ->when($this->filtroEstado === 'CON_LIMITE_SUPERADO', fn ($q) => $q->abiertas()->whereNotNull('fecha_hora_limite')->where('fecha_hora_limite', '<', now()))
             ->when(! in_array($this->filtroEstado, ['', 'ACTIVAS', 'POR_ATENDER', 'ANTERIORES', 'CON_LIMITE_SUPERADO'], true), fn ($q) => $q->where('estado', $this->filtroEstado))
-            ->when($this->filtroNivel === 'PRIORITARIAS', fn ($q) => $q->abiertas()->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS))
+            ->when(! $consultaPrioridades && $this->filtroNivel === 'PRIORITARIAS', fn ($q) => $q->abiertas()->whereIn('prioridad', Alerta::PRIORIDADES_ALTAS))
             ->when($this->filtroNivel !== '' && $this->filtroNivel !== 'PRIORITARIAS', fn ($q) => $q->whereIn('prioridad', match ($this->filtroNivel) {
                 'CRITICO' => ['CRITICO', 'CRITICA'], 'ALTO' => ['ALTO', 'ALTA'], 'MEDIO' => ['MEDIO', 'MEDIA'], 'BAJO' => ['BAJO', 'BAJA'], default => [$this->filtroNivel],
             }))
@@ -795,7 +820,7 @@ class AlertasPanel extends Component
         $resumenEquipo = app(ConsultarResumenEquipoAlertas::class)->consultar($usuario, $this->filtroAdulto);
 
         return view('livewire.alertas.alertas-panel', compact('alertas', 'prioritarias', 'conteos', 'chartData', 'detalle', 'signoOrigen', 'evolucionSignos',
-            'vinculosAlertas', 'especialidadesDisponibles',
+            'vinculosAlertas', 'especialidadesDisponibles', 'consultaPrioridades',
             'definicionEspecialidad', 'areaEspecialidad', 'errorContextoEspecialidad', 'atencionesEspecialidad', 'puedeGuardarEspecialidad', 'contextoEspecialidad', 'resumenEquipo', 'origenDetalle',
             'traza', 'totalResidentes', 'residenteSeleccionado', 'puedeRegistrarNuevaMedicion', 'puedeIntervenir', 'puedeCoordinar', 'puedeCerrar', 'puedeReconocer', 'puedeAsignar', 'origenesDisponibles', 'sinResponsableConsulta', 'perfil', 'adultos', 'usuarios', 'preview', 'estadosHistoricos'))
             ->layout($perfil['foco'] === 'turno' ? 'layouts.enfermeria' : 'layouts.sistema');

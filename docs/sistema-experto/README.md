@@ -13,11 +13,15 @@ runtime_verified: false
 
 # Consulta cognitiva y sistema experto
 
+**Estado de incorporación comprobado el04/11:** [integración real, vínculos y conservación pendientes](ESTADO_INTEGRACION_TOTAL_2026_11_04.md). Contrasta código, rutas y catálogo configurado en solo lectura. Los tres perfiles iniciales ya están en los formularios normales; el resultado conjunto instrumental/Petersen sigue transitorio. Un ensayo o un script aislado no cuentan como incorporación total.
+
 **Revisión documental del 04/11:** el [estado actual](../ESTADO_ACTUAL.md) y el [mapa del código](../../motor-experto/README.md) recogen el árbol posterior a la limpieza de nombres. La denominación de investigación, su importador y su fallback están retirados del producto; las huellas históricas conservan sus identificadores originales. Las entregas siguientes mantienen su fecha y alcance.
 
 **Orden vigente del 30/10/2026:** [estado funcional y desarrollo técnico primero](ESTADO_FUNCIONAL_Y_ORDEN_DESARROLLO_2026_10_30.md). Durante todo el desarrollo no se solicitan estudios con residentes, firmas o avales externos para continuar. Primero se completa y prueba el funcionamiento integral; la evaluación posterior en uso real se realiza después. Los controles de datos, permisos y coherencia de inferencia se conservan.
 
 ## Entrada única: dónde encontrar cada parte
+
+**Cierre incorporado del04/11:** [resultado institucional guardado, historial y revisiones independientes](CIERRE_RECORRIDO_INSTITUCIONAL_2026_11_04.md). La ampliación autorizada ya está instalada sin nuevas tablas; conserva el resultado, hechos, reglas y explicación. El DTO completo para replay conserva su alcance pendiente y no se confunde con este contrato.
 
 Objetivo de trabajo: detección temprana de DCL en personas mayores de 60 años, con evidencias explicables y revisión profesional. La propietaria aprobó el 28/10 una selección escalonada: entrevista e informante + MoCA o RUDAS + FAQ como prioridad inicial; apoyos y evaluación ampliada según el caso. El04/11 se activaron tres ediciones exactas para captura y puntuación, tras su declaración de materiales/permisos y autorización de digitalización. Los totales no sustituyen interpretación de dominios ni requisitos Petersen; véase la entrega de activación.
 

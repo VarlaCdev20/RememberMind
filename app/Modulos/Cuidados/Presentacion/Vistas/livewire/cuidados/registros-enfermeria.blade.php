@@ -1,4 +1,4 @@
-<div class="rm-pilot-enfermeria rm-page-layout font-sans space-y-5 {{ in_array($cuidado, ['hidratacion', 'sueno', 'heridas'], true) || $seccion === 'HERIDAS' ? 'rm-clinical-workspace' : '' }}" x-data="rmClinicalFormFeedback()" @clinical-capture-changed="clinicalFormDirty = $event.detail.dirty" @swal="if (confirmWorkspaceFeedback($event.detail)) $event.stopPropagation()">
+<div class="rm-pilot-enfermeria rm-page-layout font-sans {{ in_array($cuidado, ['hidratacion', 'sueno', 'heridas'], true) || $seccion === 'HERIDAS' ? 'rm-clinical-workspace' : '' }}" x-data="rmClinicalFormFeedback()" @clinical-capture-changed="clinicalFormDirty = $event.detail.dirty" @swal="if (confirmWorkspaceFeedback($event.detail)) $event.stopPropagation()">
     @if($emergente)
         @include('livewire.cuidados.partials.heridas-curaciones')
     @else
@@ -8,8 +8,10 @@
     :overline="$esSuperAdmin ? 'Supervisión asistencial' : 'Registro asistencial'"
     icon="ph-activity"
     :date="now()">
-    <a href="{{ route('admin.enfermeria.agenda') }}" class="rm-btn rm-btn-secondary">Agenda</a>
-    <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn rm-btn-secondary">{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis residentes' }}</a>
+    @if($cuidado !== 'heridas' && $seccion !== 'HERIDAS')
+        <x-ui.nursing-report-link :area="$cuidado ?: strtolower($seccion)" :residente="$codResidente" />
+    @endif
+    <a href="{{ route('admin.enfermeria.pacientes') }}" class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis residentes' }}"><i class="ph-bold ph-users" aria-hidden="true"></i><span>{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis residentes' }}</span></a>
 </x-ui.page-header>
 
     <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-4 shadow-sm">
@@ -39,16 +41,6 @@
         @endif
     @else
     @if($adulto)
-        @if(in_array($cuidado, ['sueno', 'hidratacion'], true))
-            <section class="rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-5">
-                <h2 class="text-lg font-bold text-[var(--rm-text-title)]">Últimos registros guardados</h2>
-                @forelse($registrosCuidado as $registro)
-                    <p class="mt-2 text-sm">{{ ($cuidado === 'sueno' ? $registro->fecha : $registro->fecha_hora)->format('d/m/Y H:i') }} · {{ $cuidado === 'sueno' ? ($registro->calidad ?? 'Sin calidad registrada') : $registro->cantidad_ml.' ml' }} · {{ $registro->estado }} · {{ $registro->observacion }}</p>
-                @empty
-                    <p class="mt-2 text-sm text-[var(--rm-text-muted)]">Sin registros guardados para este residente.</p>
-                @endforelse
-            </section>
-        @endif
         @if($errors->any())
             <div class="rounded-xl border border-[var(--rm-danger-border)] bg-[var(--rm-danger-soft)] p-4 text-sm text-[var(--rm-danger)]">
                 <ul class="list-disc space-y-1 pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
@@ -72,20 +64,19 @@
             @endif
         </section>
 
-        <nav class="flex flex-wrap gap-2 rounded-2xl border border-[var(--rm-border)] bg-[var(--rm-surface)] p-3 shadow-sm" aria-label="Tipos de registro">
-            @foreach(['CUIDADOS' => 'Cuidados diarios', 'DOLOR' => 'Dolor', 'DISPOSITIVOS' => 'Dispositivos', 'INCIDENTES' => 'Incidentes y lesiones', 'HERIDAS' => 'Heridas y curaciones', 'HISTORIAL' => 'Historial'] as $clave => $etiqueta)
-                <button wire:click="$set('seccion', '{{ $clave }}')" class="rounded-xl px-4 py-2 text-xs font-bold transition {{ $seccion === $clave ? 'bg-[var(--rm-primary)] text-inverso' : 'bg-[var(--rm-surface-soft)] text-[var(--rm-text-body)] hover:text-[var(--rm-text-title)]' }}">{{ $etiqueta }}</button>
-            @endforeach
-        </nav>
+        <x-ui.filter-bar class="rm-nursing-filters">
+            <x-ui.field label="Tipo de registro" for="registro-seccion">
+                <select id="registro-seccion" class="rm-select" wire:model.live="seccion" x-bind:disabled="clinicalFormOpen">
+                    @foreach(['CUIDADOS' => 'Cuidados diarios', 'DOLOR' => 'Dolor', 'DISPOSITIVOS' => 'Dispositivos', 'INCIDENTES' => 'Incidentes y lesiones', 'HERIDAS' => 'Heridas y curaciones', 'HISTORIAL' => 'Historial'] as $clave => $etiqueta)
+                        <option value="{{ $clave }}">{{ $etiqueta }}</option>
+                    @endforeach
+                </select>
+            </x-ui.field>
+        </x-ui.filter-bar>
 
         @if($seccion === 'HERIDAS')
             @include('livewire.cuidados.partials.heridas-curaciones')
         @elseif($seccion === 'CUIDADOS')
-            @if($cuidado === 'sueno' && ! $this->puedeMutarRegistro('registros_sueno.crear'))
-                <p class="text-sm text-[var(--rm-text-muted)]">Consulta de sueño. Tu cuenta no tiene permiso para registrar sueño desde esta pantalla.</p>
-            @elseif($cuidado === 'hidratacion' && ! $this->puedeMutarRegistro('registros_hidratacion.crear'))
-                <p class="text-sm text-[var(--rm-text-muted)]">Consulta de hidratación. El registro requiere permiso y una jornada vigente.</p>
-            @else
             @if(!$modoConsulta)
 <form x-data="rmClinicalCapture()" wire:submit="guardarCuidado" class="rm-clinical-form rm-clinical-form--generic"><x-ui.card class="rm-clinical-form__section">
                 <x-ui.section-header :level="2" title="Nuevo cuidado" icon="ph-clipboard-text" />
@@ -176,7 +167,6 @@
                 <div class="mt-4 flex justify-end"><button class="rm-btn-secondary px-5 py-2.5 text-xs font-bold">Registrar rectificación</button></div>
             <x-ui.clinical-clear-action /></x-ui.card></form>
 @endif
-            @endif
         @elseif($seccion === 'DOLOR')
             @if(!$modoConsulta)
 <form x-data="rmClinicalCapture()" wire:submit="guardarDolor" class="rm-clinical-form rm-clinical-form--generic"><x-ui.card class="rm-clinical-form__section">

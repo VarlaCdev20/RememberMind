@@ -77,12 +77,20 @@ class AlertasRolesConsistenciaTest extends TestCase
         $ajeno = Residente::factory()->create();
         $this->asignarTurno($actor, $propio);
         foreach (['ABIERTA', 'RECONOCIDA', 'ASIGNADA', 'EN_ATENCION', 'ATENDIDA', 'CERRADA', 'ANULADA'] as $estado) {
-            $this->alerta($propio, $estado);
+            $this->alerta($propio, $estado)->update(['cod_personal_responsable' => $actor->personal->getKey()]);
         }
         $externa = $this->alerta($ajeno);
-        $esperados = app(BandejaAlertas::class)->pendientes($actor)->pluck('cod_alerta')->sort()->values()->all();
+        $medico = User::factory()->create(['nombres' => 'Médico de prueba']);
+        $medico->assignRole('MEDICO GENERAL/GERIATRA');
+        $otraEspecialidad = $this->alerta($propio, 'ABIERTA', 'SOLICITUD_MEDICA');
+        $otraEspecialidad->update(['prioridad' => 'MEDIO', 'cod_personal_responsable' => $medico->personal->getKey()]);
+        $esperados = app(BandejaAlertas::class)->pendientes($actor)->where('cod_personal_responsable', $actor->personal->getKey())
+            ->pluck('cod_alerta')->sort()->values()->all();
         $this->assertCount(4, $esperados);
-        Livewire::test(AlertasPanel::class)->set('filtroEspecialidad', '')->assertViewHas('alertas', fn ($a) => $a->pluck('cod_alerta')->sort()->values()->all() === $esperados)
+        $panel = Livewire::test(AlertasPanel::class)->assertDontSee('Especialidad vinculada')
+            ->assertViewHas('alertas', fn ($a) => $a->pluck('cod_alerta')->sort()->values()->all() === $esperados);
+        $panel->set('filtroEspecialidad', 'MEDICO GENERAL/GERIATRA')
+            ->assertViewHas('alertas', fn ($a) => ! $a->contains('cod_alerta', $otraEspecialidad->getKey()))
             ->call('verDetalle', $externa->getKey())->assertForbidden();
         Livewire::test(CampanaNotificaciones::class)->assertSet('conteoAlertas', 4)->assertSet('conteoRecordatorios', 0)
             ->call('togglePanel')->assertSet('conteoAlertas', 4);
@@ -676,7 +684,7 @@ class AlertasRolesConsistenciaTest extends TestCase
         $r = Residente::factory()->create(['nombres' => 'Residente Sintético', 'apellido_paterno' => 'Interacción']);
         $this->asignarTurno($actor, $r);
         $panel = Livewire::test(AlertasPanel::class)->call('abrirCrear')
-            ->assertDontSee('<select', false)->assertDontSee('role="combobox"', false)
+            ->assertSee('type="radio" name="origen"', false)->assertSee('type="radio" name="nivel"', false)
             ->call('guardarAlerta')->assertHasErrors(['codResidente', 'tipoAlerta', 'motivo'])
             ->set('codResidente', $r->getKey())->set('tipoAlerta', 'Aviso sintético')
             ->set('nivel', 'CRITICO')->set('motivo', 'Hecho sintético de prueba para el seguimiento autorizado.')

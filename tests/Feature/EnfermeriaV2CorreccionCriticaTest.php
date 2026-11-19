@@ -119,7 +119,7 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         ]);
         $vista->call('$refresh')->assertSee('0 h')->assertSee('No registrado')->assertSee('Solo consulta')
             ->assertSee('Observación sintética de descanso.')->assertDontSee('Registrar sueño');
-        $this->assertStringNotContainsString('<form', $vista->html());
+        $this->assertStringNotContainsString('wire:submit=', $vista->html());
         $this->assertSame(1, \App\Models\RegistroSueno::count());
         AsignacionResidenteJornada::where('cod_residente', $residente->cod_residente)->update(['estado' => 'FINALIZADA']);
         $vista->call('$refresh')->assertStatus(403);
@@ -610,10 +610,12 @@ class EnfermeriaV2CorreccionCriticaTest extends TestCase
         });
 
         $component = Livewire::test(ReporteEnfermeria::class);
-        $indicadores = $component->viewData('indicadores');
+        $filas = $component->viewData('reporte')['filas']->where('categoria', 'MEDICACION');
 
-        $this->assertSame(2, $indicadores['dosis'], 'Debe contar exactamente 2 dosis administradas.');
-        $this->assertSame(1, $indicadores['omisiones'], 'Debe contar exactamente 1 omision real.');
+        $this->assertSame(2, $filas->whereIn('estado', ['Administrada', 'Administrado'])->count(), 'Debe contar exactamente 2 dosis administradas.');
+        $this->assertSame(1, $filas->where('estado', 'Omitida')->count(), 'Debe contar exactamente 1 omisión real.');
+        $this->assertSame(1, $filas->where('estado', 'Rechazada')->count(), 'El rechazo se conserva separado de la omisión.');
+        $this->assertSame(1, $filas->where('estado', 'Pendiente')->count(), 'El registro programado conserva su estado.');
 
         // Verificar que no se consulto la columna prohibida administrado
         foreach ($queries as $sql) {

@@ -10,7 +10,7 @@ $fuentes = @(
     @('08-SOLICITUD-DOCUMENTAL-POR-ROL.md','S',8,'GerenciaSolicitudesDocumentalesTest;GerenciaDocumentacionConcurrenciaPostgresTest'),
     @('11-ACEPTACION-FAMILIARES-CONTACTOS.md','FA',24,'GerenciaContactosTest;GerenciaAccesoFamiliarTest;GerenciaHistoriaNominalTest'),
     @('13-ACEPTACION-AREAS-EQUIPO.md','AE',20,'GerenciaAreasEquipoTest;AreasInstitucionalesV2Test'),
-    @('16-ACEPTACION-PLANIFICACION-COBERTURA.md','PC',28,'GerenciaPlanificacionSeguridadTest;GerenciaConcurrenciaPlanificacionPostgresTest'),
+    @('16-ACEPTACION-PLANIFICACION-COBERTURA.md','PC',28,'GerenciaPlanificacionSeguridadTest;GerenciaConcurrenciaPlanificacionPostgresTest;GerenciaAvisoCompartidoTest;GerenciaCamposAvisoEstructuraTest'),
     @('20-ACEPTACION-RESIDENTES-OCUPACION.md','RO',24,'GerenciaConsultaResidentesTest;GerenciaOcupacionAccesoTest;MapaHabitacionesTest'),
     @('23-ACEPTACION-ALERTAS-GERENCIA.md','AG',24,'AlertasFlujosPorRolTest;AlertasRolesConsistenciaTest;AlertasHistorialFeatureTest'),
     @('27-ACEPTACION-REPORTES-GERENCIA.md','RG-T',24,'ReportesGerenciaRenovacionTest'),
@@ -26,8 +26,8 @@ $brechas = @{
     'AE08'='Revocación posterior elimina equipo abierto; faltan las demás combinaciones del caso.'
     'PC12'='Regresión de dos altas concurrentes del mismo intervalo; no equivale a carrera de estado.'
     'PC13'='Regresión de fallo en segunda ocurrencia y rollback de jornada/eventos/auditoría.'
-    'PC14'='Falta aceptación específica de avisos de cambios de planificación.'
-    'PC15'='Falta aceptación específica de reintentos de avisos de planificación.'
+    'PC14'='Cerrado en alcance compartido adoptado del informe44: publicación postcommit, cuenta afectada original y Administración; no seguimiento de lectura individual.'
+    'PC15'='Cerrado en alcance informe44: fallos de cola/publicación, retry idempotente, permisos revalidados y dos publicadores PostgreSQL sin repetir asignación.'
     'PC17'='Regresión de horas de turno referenciado y corrección de nombre sin alterar la jornada.'
     'RO18'='Falta aceptación del origen por cada acto, permisos históricos y límite visible superior a doce.'
     'AG10'='Falta fixture de más de ocho grupos y comprobación del alcance truncado.'
@@ -45,6 +45,8 @@ $regresiones = @{
     'AE08'=@('GerenciaAreasEquipoTest','test_revocar_lectura_de_equipo_abierto_no_mantiene_datos_residuales','gerencia-verificacion-aislada.xml')
     'PC12'=@('GerenciaDocumentacionConcurrenciaPostgresTest','test_confirmaciones_solapadas_no_duplican_solicitud_prorroga_o_historia with data set #4','gerencia-adicional-postgres-final.xml')
     'PC13'=@('GerenciaPlanificacionSeguridadTest','test_fallo_en_segunda_ocurrencia_revierte_primera_jornada_evento_y_auditoria','gerencia-verificacion-aislada.xml')
+    'PC14'=@('GerenciaAvisoCompartidoTest','test_aviso_unico_se_publica_despues_del_commit_y_conserva_el_afectado','gerencia-aviso-compartido-cierre-postgres.xml')
+    'PC15'=@('GerenciaAvisoCompartidoTest','test_fallo_postcommit_y_reintento_conservan_asignacion_original_y_un_solo_aviso','gerencia-aviso-compartido-cierre-postgres.xml')
     'PC17'=@('GerenciaPlanificacionSeguridadTest','test_turno_referenciado_conserva_horas_historicas_pero_permite_corregir_nombre','gerencia-verificacion-aislada.xml')
     'GL-T16'=@('GaleriaInstitucionalTest','test_dos_editores_del_mismo_instante_no_sobrescriben_cambios_y_conservan_entrada_obsoleta','gerencia-cierre-vacios-sqlite.xml')
 }
@@ -79,7 +81,7 @@ foreach ($fuente in $fuentes) {
             $filas += [pscustomobject]@{
                 Caso=$caso; Fuente="docs/especificacion-funcional/vistas/gerencia/$archivo"; Linea=$indice+1
                 Contrato=($celdas[2..($celdas.Count-2)] | ForEach-Object { $_.Trim() }) -join ' | '
-                Estado=$(if($caso -in @('P03','P17')){'VERIFICADO_EN_ALCANCE_INFORME_41'}else{'ACEPTACION_COMPLETA_NO_DECLARADA'})
+                Estado=$(if($caso -in @('P03','P17')){'VERIFICADO_EN_ALCANCE_INFORME_41'}elseif($caso -in @('PC14','PC15')){'VERIFICADO_EN_ALCANCE_INFORME_44'}else{'ACEPTACION_COMPLETA_NO_DECLARADA'})
                 Pruebas_base_localizadas=$pruebas
                 Regresion_especifica_verificada=$metodo
                 Evidencia_regresion=$evidencia

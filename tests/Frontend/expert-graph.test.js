@@ -58,6 +58,7 @@ test('la evolución conserva intervalos, ceros reales y ciclo RMCharts sin relle
     globalThis.window = { RMCharts: {
         color: () => 'token-cognitive',
         presets: { line: (labels, datasets) => ({ data: { labels, datasets }, options: { scales: { y: {} }, plugins: { tooltip: {} } } }) },
+        getCss: name => { assert.equal(name, '--rm-chart-surface-bg'); return 'token-surface'; },
         init: (key, canvas, definition, callback) => { config = definition; repaint = callback; assert.equal(key, 'timeline'); },
         destroy: key => { destroyed = key; },
     } };
@@ -77,6 +78,15 @@ test('la evolución conserva intervalos, ceros reales y ciclo RMCharts sin relle
         single.$refs = { canvas: {} };
         single.dibujar();
         assert.equal(config.data.datasets[0].showLine, false);
+        const destacado = cognitiveTimeline(puntos, 'timeline', 'Puntuación z', true);
+        destacado.$refs = { canvas: {} };
+        destacado.dibujar();
+        assert.equal(config.data.datasets[0].pointBackgroundColor, 'token-surface');
+        assert.equal(config.data.datasets[0].borderWidth, 3);
+        config.options.onClick({}, [{ index: 1 }]);
+        assert.equal(destacado.puntoActivo.valor, -1.25);
+        destacado.seleccionar(99);
+        assert.equal(destacado.activo, 1);
     } finally { globalThis.window = original; }
 });
 

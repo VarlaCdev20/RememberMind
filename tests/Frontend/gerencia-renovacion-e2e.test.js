@@ -50,13 +50,13 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.setRequestInterception(true);
     page.on('request',r=>r.url().startsWith('blob:') ? r.continue() : r.url().startsWith(base+'/') ? r.continue({headers:{...r.headers(),'X-RM-GERENCIA-QA':token}}) : r.abort());
     await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
-    const out=join(root,'output/auditoria-integral-20261025/gerencia-renovada',process.env.RM_GERENCIA_QA_CORRECCION ? 'correccion-concurrente' : (process.env.RM_GERENCIA_QA_ACCESIBILIDAD ? 'aceptacion-accesibilidad' : (process.env.RM_GERENCIA_QA_RAPIDO ? 'depuracion-rapida' : ''))); mkdirSync(out,{recursive:true});
+    const out=join(root,'output/auditoria-integral-20261025/gerencia-renovada',process.env.RM_GERENCIA_QA_AVISOS ? 'avisos-compartidos' : (process.env.RM_GERENCIA_QA_CORRECCION ? 'correccion-concurrente' : (process.env.RM_GERENCIA_QA_ACCESIBILIDAD ? 'aceptacion-accesibilidad' : (process.env.RM_GERENCIA_QA_RAPIDO ? 'depuracion-rapida' : '')))); mkdirSync(out,{recursive:true});
     t.after(async()=>{
         writeFileSync(join(out,'diagnostico.json'),JSON.stringify({errors,solicitudesFallidas},null,2));
         if(!page.isClosed())await page.screenshot({path:join(out,'ultimo-estado.png'),fullPage:true});
     });
     const go=async path=>{
-        const r=await page.goto(base+path,{waitUntil:'networkidle0'}); assert.equal(r.status(),200,path);
+        const r=await page.goto(base+path,{waitUntil:'networkidle0'}); assert.equal(r.status(),200,`${path}: ${r.status() === 200 ? '' : await page.$eval('body', e => e.innerText)}`);
         await page.waitForFunction(()=>window.Alpine && window.Livewire);
         await page.evaluate(()=>document.fonts.ready);
     };
@@ -401,6 +401,45 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
         writeFileSync(join(personalOut,'resultado.json'),JSON.stringify({evidencia,filtros:true,oscuro390:true,errors,solicitudesFallidas},null,2));
         return;
     }
+    if (process.env.RM_GERENCIA_QA_AVISOS) {
+        await go('/admin/avisos-planificacion');
+        assert.match(await page.$eval('main', e => e.innerText), /aviso pendiente de preparación/);
+        await page.click('button[wire\\:click^="reintentar("]');
+        await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('El aviso está disponible'));
+        assert.equal(await page.$('button[wire\\:click^="reintentar("]'), null);
+        await page.screenshot({path:join(out,'confirmacion-reintento.png'),fullPage:true});
+        // Gerencia deja de listar el disponible: la bandeja confirmada pertenece a Administración y al afectado.
+        await page.click('button[aria-label="Consultar avisos y alertas pendientes"]');
+        await page.waitForFunction(() => [...document.querySelectorAll('.rm-notification-list')].some(e => e.getClientRects().length));
+        await page.keyboard.press('Escape');
+        assert.equal(await page.$eval('button[aria-label="Consultar avisos y alertas pendientes"]', e => e === document.activeElement), true);
+        // Cada actor inicia otra sesión; no se reutiliza el hash de contraseña de Gerencia.
+        await page.deleteCookie(...await page.cookies());
+        await page.setExtraHTTPHeaders({'X-RM-GERENCIA-QA-ROL':'ADMINISTRADOR'});
+        await go('/admin/avisos-planificacion');
+        assert.match(await page.$eval('main',e=>e.innerText),/Disponible en la bandeja/);
+        for (const width of [1440,1280,1024,768,390]) {
+            await page.setViewport({width,height:960});
+            await page.reload({waitUntil:'networkidle0'});
+            const texto = await page.$eval('main', e => e.innerText);
+            assert.match(texto, /Disponible en la bandeja/);
+            assert.doesNotMatch(texto,/\b(?:undefined|NaN|Infinity|null)\b|\[object Object\]|COD_(?:RES|PER|USU|EAP)_/);
+            assert.equal(await page.evaluate(() => document.documentElement.scrollWidth>innerWidth+1),false);
+            await page.screenshot({path:join(out,`avisos-${width}.png`),fullPage:true});
+        }
+        await page.evaluate(()=>{document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');});
+        await page.screenshot({path:join(out,'avisos-oscuro-390.png'),fullPage:true});
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth>innerWidth+1),false);
+        await page.deleteCookie(...await page.cookies());
+        await page.setExtraHTTPHeaders({'X-RM-GERENCIA-QA-ROL':'AFECTADO'});
+        await go('/admin/avisos-planificacion');
+        assert.match(await page.$eval('main',e=>e.innerText),/Disponible en la bandeja/);
+        assert.equal(await page.$('button[wire\\:click^="reintentar("]'),null);
+        await page.screenshot({path:join(out,'aviso-propio-390.png'),fullPage:true});
+        writeFileSync(join(out,'resultado.json'),JSON.stringify({reintento:'confirmado',sinRepeticion:true,anchos:[1440,1280,1024,768,390],oscuro390:true,focoCampanaRestaurado:true,errors,solicitudesFallidas},null,2));
+        assert.deepEqual(errors,[]); assert.deepEqual(solicitudesFallidas,[]);
+        return;
+    }
     if (process.env.RM_GERENCIA_QA_CORRECCION) {
         const etapa = nombre => writeFileSync(join(out, 'etapa.json'), JSON.stringify({ etapa: nombre }));
         etapa('preparar dos pestañas');
@@ -516,6 +555,8 @@ test('Gerencia: vistas reales, cinco anchos, filtros y modales en SQL desechable
     await page.waitForSelector('.rm-planning .rm-table-scroll table', {visible:true});
     await page.click('button[wire\\:click="abrirNuevaAsignacion"]');
     await page.waitForSelector('#planificar-persona',{visible:true});
+    await page.type('#planificar-persona','equipo1@example.test');
+    await page.waitForFunction(() => [...document.querySelectorAll('[role="dialog"] button')].some(button => button.textContent.includes('equipo1@example.test')));
     await page.click('[role="dialog"] button[wire\\:click^="seleccionarUsuario("]');
     await page.waitForSelector('.rm-staff-schedule',{visible:true});
     await page.screenshot({path:join(out,'planificacion-asignar-390.png'),fullPage:true});

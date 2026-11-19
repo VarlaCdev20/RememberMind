@@ -37,6 +37,16 @@ class EvaluacionExperta extends ModeloExperto
         return $this->belongsTo(Personal::class, 'cod_personal_solicitante', 'cod_personal');
     }
 
+    public function versionPetersen(): BelongsTo
+    {
+        return $this->belongsTo(VersionModeloExperto::class, 'cod_version_petersen', 'cod_version_modelo');
+    }
+
+    public function usuarioEjecucion(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cod_usuario_ejecucion', 'cod_usuario');
+    }
+
     /** Dictámenes de Psicología y Medicina; no alteran el resultado automático. */
     public function revisionesProfesionales(): HasMany
     {
@@ -56,7 +66,8 @@ class EvaluacionExperta extends ModeloExperto
     /** Mantiene visible el historial D-137 al anexar una instantánea, sin publicar evaluaciones exclusivamente V2. */
     public function scopeParaLecturaD137(Builder $query): Builder
     {
-        return $query->where(fn (Builder $q) => $q->whereNull('version_conservacion')
+        return $query->where(fn (Builder $q) => $q->whereNull('version_conservacion')->orWhere('version_conservacion', '<>', 'RESULTADO-INSTITUCIONAL-1'))
+            ->where(fn (Builder $q) => $q->whereNull('version_conservacion')
             ->orWhereHas('evaluacionCriterios', fn (Builder $c) => $c->where('tipo_registro', 'D137')));
     }
 

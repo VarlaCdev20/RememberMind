@@ -137,6 +137,7 @@ final class CapturaPetersenPanel extends Component
     {
         [$usuario, $residente] = $this->autorizar();
         abort_unless($this->solicitud !== null, 409);
+        $this->mensaje = null;
         $entrada = $this->form;
         // datetime-local admite milisegundos. La representación sin editar conserva el instante original completo.
         if ($this->fechaOriginal !== null && ($this->tipoRegistro === 'ANULACION'
@@ -167,7 +168,7 @@ final class CapturaPetersenPanel extends Component
             $original = app(RegistrarValoracionPetersenOriginal::class)->ejecutar($usuario, $residente, array_replace($entrada, [
                 'solicitud_uuid' => $this->solicitud, 'tipo_registro' => $this->tipoRegistro, 'cod_valoracion_anterior' => $this->anterior]));
             $this->limpiar();
-            $this->mensaje = 'Valoración original registrada: '.$original->getKey().'. Sus fuentes permanecen vinculadas; la revisión del resultado se registra por separado.';
+            $this->mensaje = 'Valoración original registrada: '.self::ELEMENTOS[$original->elemento].'. Sus fuentes permanecen vinculadas.';
             $this->dispatch('petersen-captura-cerrada');
             $this->resetPage();
         } catch (DomainException $e) {
@@ -190,13 +191,13 @@ final class CapturaPetersenPanel extends Component
             ->where(fn ($q) => $q->where('registrado_en', '>', $registro->getRawOriginal('registrado_en'))
                 ->orWhere(fn ($q) => $q->where('registrado_en', $registro->getRawOriginal('registrado_en'))->where('cod_valoracion_petersen', '>', $id)))->count();
         $this->setPage(intdiv($anteriores, 15) + 1);
-        $this->mensaje = 'Registro consultado: '.$id.'.';
+        $this->mensaje = 'Registro consultado: '.self::ELEMENTOS[$registro->elemento].', del '.$registro->fecha_hora->format('d/m/Y H:i').'.';
         $this->dispatch('petersen-registro-mostrado', registro: $id);
     }
 
     private function limpiar(): void
     {
-        $this->reset('form', 'solicitud', 'anterior', 'tipoRegistro', 'fechaOriginal', 'tipoSoporte', 'campoFuente', 'registroFuente', 'busquedaFuente');
+        $this->reset('form', 'solicitud', 'anterior', 'tipoRegistro', 'fechaOriginal', 'tipoSoporte', 'campoFuente', 'registroFuente', 'busquedaFuente', 'mensaje');
         $this->resetErrorBag();
     }
 
@@ -244,6 +245,9 @@ final class CapturaPetersenPanel extends Component
             $usuario->hasRole('MEDICO GENERAL/GERIATRA') => 'Volver a la ficha clínica',
             default => 'Volver al sistema experto',
         };
+        $urlResultados = Gate::forUser($usuario)->allows('consultarResultados', [EvaluacionExperta::class, $residente])
+            ? route($usuario->hasRole('PSICOLOGO/A') ? 'admin.psicologia.residente.resultados-experto' : 'admin.medico.residente.resultados-experto', $residente)
+            : null;
         $labelsFuentes = ['cod_aplicacion' => 'Aplicación de instrumento', 'cod_control_cognitivo' => 'Control cognitivo',
             'cod_control_iadl' => 'Control de actividad instrumental (IADL)', 'cod_valoracion_psicologica' => 'Valoración psicológica',
             'cod_antecedente' => 'Antecedente clínico', 'cod_diagnostico' => 'Diagnóstico', 'cod_documento_clinico' => 'Documento clínico original',
@@ -256,7 +260,7 @@ final class CapturaPetersenPanel extends Component
             'suficiencia_conjunto' => 'Suficiencia del conjunto de valoraciones', 'condiciones_revisadas' => 'Condiciones de aplicación revisadas',
             'exclusiones_revisadas' => 'Exclusiones revisadas'];
 
-        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional', 'urlRetorno', 'textoRetorno', 'labelsFuentes', 'labelsComprobaciones', 'cobertura', 'registrados'))
+        return view('apoyodecision::livewire.petersen.captura-original', compact('residente', 'registros', 'tipos', 'fuentes', 'opciones', 'comprobaciones', 'puedeCrear', 'profesional', 'urlRetorno', 'textoRetorno', 'urlResultados', 'labelsFuentes', 'labelsComprobaciones', 'cobertura', 'registrados'))
             ->layout('layouts.sistema');
     }
 }

@@ -62,7 +62,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
             'controles_funcionales_iadl.ver', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar',
             'reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
-            'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia', 'evaluaciones_expertas.ejecutar_observaciones',
+            'evaluaciones_expertas.revisar_medicina', 'evaluaciones_expertas.revisar_psicologia', 'evaluaciones_expertas.ejecutar_observaciones', 'evaluaciones_expertas.ejecutar_institucional',
             'auditoria.ver', 'usuarios.gestionar', 'personal.gestionar', 'areas.gestionar', 'turnos.gestionar',
             'fotografias_institucionales.ver', 'fotografias_institucionales.gestionar',
             'jornadas.gestionar', 'asignaciones_personal.gestionar',
@@ -100,7 +100,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Durante la construcción del sistema recibe todos los permisos web,
         // incluidos los que se hayan creado fuera de este seeder.
         $roles['SUPERADMINISTRADOR']->syncPermissions(
-            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'])->get()
+            Permission::query()->where('guard_name', 'web')->whereNotIn('name', ['fotografias_institucionales.gestionar', 'evaluaciones_expertas.ejecutar_observaciones', 'evaluaciones_expertas.ejecutar_institucional', 'reglas_expertas.gestionar', 'reglas_expertas.revisar', 'aplicaciones_instrumento.transcribir', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar', 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'])->get()
         );
 
         // Dirección institucional: personal, organización, planificación maestra
@@ -167,6 +167,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles['PSICOLOGO/A']->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar', 'reglas_expertas.revisar']);
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
         $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.ejecutar_observaciones');
+        $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('evaluaciones_expertas.ejecutar_institucional');
+        $roles['PSICOLOGO/A']->givePermissionTo('evaluaciones_expertas.ejecutar_institucional');
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo('aplicaciones_instrumento.transcribir');
         $roles['PSICOLOGO/A']->givePermissionTo('aplicaciones_instrumento.transcribir');
         $roles['MEDICO GENERAL/GERIATRA']->givePermissionTo(['valoraciones_petersen.ver', 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar']);

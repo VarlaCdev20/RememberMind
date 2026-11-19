@@ -5,7 +5,7 @@
  {{-- ==================================================
  2. TABLA KARDEX DIRECTA (SIN CONTENEDORES ANIDADOS)
  ================================================== --}}
- <div class="rm-medication-workspace__table-panel rounded-xl border border-[var(--rm-border-soft)] shadow-sm overflow-hidden">
+ <x-ui.table-surface>
  {{-- Header Compacto de la Tabla --}}
  <div class="rm-medication-workspace__table-heading">
  <div class="flex items-center gap-2">
@@ -29,8 +29,7 @@
  </div>
 
  {{-- Tabla de Dosis del Turno --}}
- <div class="w-full overflow-x-auto">
- <table class="rm-medication-workspace__dose-table rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse min-w-[700px]">
+ <table class="rm-medication-workspace__dose-table rm-data-table rm-data-table--actions w-full table-auto text-left">
  <thead>
   <tr class="bg-[var(--rm-surface-soft)] text-[10.5px] font-[700] text-[var(--rm-text-muted)] uppercase tracking-wider border-b border-[var(--rm-border-soft)]">
   <th class="px-2.5 py-2 w-[65px] text-center">Hora</th>
@@ -120,13 +119,8 @@
 
   {{-- Acción --}}
   <td data-label="Acción" class="rm-dose-action px-2.5 py-2 text-right whitespace-nowrap">
-  <button type="button"
-   aria-label="Ver dosis de {{ $dosis['medicamento'] }} para {{ $dosis['nombre_residente'] }} a las {{ $dosis['hora'] }}"
-   wire:click.stop="abrirDrawerDosis('{{ $dosis['cod_prescripcion'] }}', '{{ $dosis['hora'] }}', '{{ $dosis['cod_residente'] }}')"
-   class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold rounded-md bg-[var(--rm-surface-soft)] hover:bg-[var(--rm-surface)] border border-[var(--rm-border-soft)] text-[var(--rm-text-primary)] transition cursor-pointer">
-   <span class="rm-dose-action-short">Ver</span><span class="rm-dose-action-long">Ver detalle</span>
-   <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
-  </button>
+  <x-ui.action-button variant="secondary" icono="ph-eye" data-rm-action-icon aria-label="Ver detalle de la dosis"
+   wire:click.stop="abrirDrawerDosis('{{ $dosis['cod_prescripcion'] }}', '{{ $dosis['hora'] }}', '{{ $dosis['cod_residente'] }}')" />
   </td>
   </tr>
   @empty
@@ -139,8 +133,7 @@
   @endforelse
  </tbody>
  </table>
- </div>
- </div>
+ </x-ui.table-surface>
  </div>
  <aside class="rm-medication-workspace__sidebar" aria-label="Gráficas de la agenda de medicación">
  @include('livewire.medicacion.partials.kardex-graficas')

@@ -2,9 +2,10 @@
     <x-ui.collection-header title="MEDICACIÓN" subtitle="Administración y seguimiento del turno, con sus horarios y registros." icon="ph-pill" :date="now()">
         <x-slot:context>
             <i class="ph-bold {{ $esModoConsulta ? 'ph-eye' : 'ph-clock' }}" aria-hidden="true"></i>
-            {{ $esModoConsulta ? 'Solo consulta' : 'Jornada activa' }}
+            {{ $esModoConsulta ? 'Solo lectura' : 'Jornada activa' }}
+            @unless($esModoConsulta)<span>· {{ $turnoNombre }}</span>@endunless
         </x-slot:context>
-        <x-slot:actions><span class="rm-medication-workspace__shift">{{ $turnoNombre }}</span></x-slot:actions>
+        <x-slot:actions><x-ui.nursing-report-link area="medicacion" /></x-slot:actions>
     </x-ui.collection-header>
 
     @if(session()->has('mensaje_exito') || session()->has('mensaje'))

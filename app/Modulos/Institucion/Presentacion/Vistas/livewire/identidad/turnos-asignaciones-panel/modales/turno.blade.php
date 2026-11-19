@@ -43,15 +43,12 @@
     </div>
     </div>
    @else
-    <div class="relative">
-    <i class="ph-bold ph-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-apoyo"></i>
-    <input type="search" wire:model.live.debounce.300ms="busquedaModal"
-     class="h-10 w-full rounded-xl border border-borde-suave bg-fondo-card/40 pl-9 pr-3 text-xs font-bold text-titulo outline-none transition focus:border-borde-focus"
-     placeholder="Buscar personal para asignar...">
-    </div>
+    <x-ui.field label="¿A quién asignar el horario?" for="planificar-persona">
+     <x-ui.filter-search model="busquedaModal" input-id="planificar-persona" label="" placeholder="Busca por nombre, apellido, correo o rol" :show-clear="false" />
+    </x-ui.field>
 
     <div class="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
-    @forelse ($personalModal as $usuario)
+    @forelse ($personalModal->take(8) as $usuario)
      <button type="button" wire:click="seleccionarUsuario('{{ $usuario->cod_usuario }}')"
      class="w-full rounded-2xl border border-borde-suave bg-fondo-card/35 p-3 text-left transition hover:border-borde-focus hover:bg-fondo-card">
      <p class="text-sm font-black text-titulo">{{ $usuario->nombres }} {{ $usuario->ap_paterno }}</p>
@@ -63,9 +60,10 @@
      </div>
      </button>
     @empty
-     <p class="rounded-2xl border border-dashed border-borde-suave p-8 text-center text-sm font-bold text-apoyo">No se encontraron usuarios disponibles.</p>
+     <p class="rm-help" role="status">{{ mb_strlen(trim($busquedaModal)) < 2 ? 'Escribe al menos 2 caracteres para buscar un trabajador.' : 'No encontramos coincidencias. Prueba con otro nombre, correo o rol.' }}</p>
     @endforelse
     </div>
+    @if($personalModal->count() > 8)<p class="rm-help" role="status">Mostrando 8 coincidencias. Añade un apellido o correo para precisar la búsqueda.</p>@endif
    @endif
    </div>
   </div>

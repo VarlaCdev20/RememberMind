@@ -154,7 +154,7 @@ html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-
     max-width: 100%;
     gap: var(--rm-space-1);
 }
-html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]) {
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, [data-rm-action-icon]) {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -170,7 +170,7 @@ html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-cho
     border-radius: var(--rm-radius-pill);
     box-shadow: none;
 }
-html .rm-shell [data-rm-main] header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon] > span:not(.rm-btn__spinner) {
+html .rm-shell [data-rm-main] [data-rm-action-icon] > span:not(.rm-btn__spinner) {
     display: none;
 }
 html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice) > i {
@@ -188,7 +188,7 @@ html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-cho
     border-color: var(--rm-role-primary, var(--rm-primary));
 }
 /* La etiqueta flota bajo el icono para no desplazar los controles vecinos. */
-html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon])::after {
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, [data-rm-action-icon])::after {
     content: attr(aria-label);
     position: absolute;
     z-index: 5;
@@ -205,11 +205,132 @@ html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-cho
     visibility: hidden;
     pointer-events: none;
 }
-html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]):focus-visible::after {
+html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, [data-rm-action-icon]):focus-visible::after {
     visibility: visible;
 }
 @media (hover: hover) {
-    html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, header.rm-collection-header:has(.rm-report-export-button) .rm-collection-header__actions [data-rm-action-icon]):hover::after {
+    html .rm-shell [data-rm-main] :is(.rm-report-export-button, .rm-report-chart-choice, [data-rm-action-icon]):hover::after {
         visibility: visible;
+    }
+}
+
+/* En Enfermería, los datos del turno quedan junto a la identidad de la vista. */
+html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header {
+    --rm-nursing-heading-icon: var(--rm-control-lg);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: var(--rm-space-2) var(--rm-space-4);
+    background: var(--rm-operational-surface) !important;
+    box-shadow: var(--rm-shadow-xs) !important;
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header:has(.rm-collection-header__actions) {
+    grid-template-columns: minmax(0, 1fr) fit-content(45%);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__identity {
+    justify-content: flex-start;
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    gap: var(--rm-space-3);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__copy {
+    text-align: start;
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header .rm-collection-header__icon {
+    width: var(--rm-nursing-heading-icon);
+    height: var(--rm-nursing-heading-icon);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header .rm-collection-header__aside {
+    display: contents;
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__meta {
+    display: flex;
+    grid-column: 1;
+    grid-row: 2;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rm-space-1) var(--rm-space-3);
+    min-width: 0;
+    padding-inline-start: calc(var(--rm-nursing-heading-icon) + var(--rm-space-3));
+    color: var(--rm-text-secondary);
+    font: 600 var(--rm-font-size-label)/1.4 var(--rm-font-body);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header .rm-collection-header__context {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--rm-space-1);
+    padding: var(--rm-space-1) var(--rm-space-2);
+    border: 0;
+    border-radius: var(--rm-radius-md);
+    background: var(--rm-surface-soft);
+    color: var(--rm-text-primary);
+    font-weight: 700;
+    text-align: start;
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__context > i {
+    color: var(--rm-action-primary-ink);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__meta > time {
+    font-size: inherit;
+    overflow-wrap: anywhere;
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header .rm-collection-header__actions {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    gap: var(--rm-space-1);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__actions :is(.rm-report-export-button, [data-rm-action-icon]).rm-btn-secondary {
+    background: var(--rm-surface-soft);
+    border-color: var(--rm-border-soft);
+    color: var(--rm-text-primary);
+}
+html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__actions :is(.rm-report-export-button, [data-rm-action-icon]).rm-btn-secondary:is(:hover, :focus-visible) {
+    background: var(--rm-role-primary-soft);
+    border-color: var(--rm-selected-border);
+}
+.rm-nursing-shell .rm-resident-directory__filter-search { max-width: 26rem; }
+
+.rm-nursing-dashboard .rm-nursing-dashboard__welcome:not(.rm-dashboard-header--compact) .rm-dashboard-header__content {
+    align-items: flex-start;
+    text-align: start;
+    gap: var(--rm-space-2);
+}
+.rm-nursing-dashboard .rm-nursing-dashboard__welcome:not(.rm-dashboard-header--compact) :is(.rm-dashboard-header__heading, .rm-dashboard-header__metadata) {
+    align-self: start;
+    justify-content: flex-start;
+}
+.rm-nursing-dashboard .rm-nursing-dashboard__welcome .rm-dashboard-header__ornaments { display: none; }
+.rm-nursing-dashboard .rm-nursing-dashboard__welcome:not(.rm-dashboard-header--compact) .rm-dashboard-header__metadata > :is(.rm-dashboard-header__date, .rm-dashboard-header__clock) {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--rm-header-secondary);
+}
+@media (max-width: 600px) {
+    html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header {
+        --rm-nursing-heading-icon: var(--rm-control-md);
+        column-gap: var(--rm-space-2);
+    }
+    html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__identity { grid-column: 1 / -1; }
+    html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__meta { padding-inline-start: 0; }
+    html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header .rm-collection-header__actions {
+        grid-row: 2;
+        align-self: start;
+    }
+    html .rm-shell.rm-nursing-shell [data-rm-main] header.rm-collection-header:not(:has(.rm-collection-header__meta)) .rm-collection-header__actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+    html .rm-shell.rm-nursing-shell [data-rm-main] .rm-collection-header__actions > :is(a, button) {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 }

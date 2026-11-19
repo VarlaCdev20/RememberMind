@@ -1,26 +1,10 @@
-@php($petersenEnfermeria = $perfilInstrumental['petersen_institucional'] ?? null)
-<nav class="rm-expert-reading-nav" aria-label="Consulta del residente asignado"><a href="#expert-nursing-today" class="rm-btn rm-btn-secondary"><i class="ph ph-sun" aria-hidden="true"></i>Resultado</a><a href="#expert-nursing-records" class="rm-btn rm-btn-secondary"><i class="ph ph-notepad" aria-hidden="true"></i>Registros</a><a href="#expert-nursing-care" class="rm-btn rm-btn-secondary"><i class="ph ph-heart" aria-hidden="true"></i>Cuidados</a></nav>
-@if($petersenEnfermeria)
-    @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-perfil-petersen', ['petersen' => $petersenEnfermeria])
-@endif
+@include('apoyodecision::livewire.medico.resultados-experto.enfermeria-informe')
+<details class="rm-card rm-expert-report__foundation"><summary><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i><span>Evaluaciones guardadas<small>Historial de resultados conservados</small></span><i class="ph ph-caret-down" aria-hidden="true"></i></summary>
+    @include('apoyodecision::livewire.medico.resultados-experto.historia-institucional')
+</details>
+<details class="rm-card rm-expert-report__foundation" id="nursing-followup">
+    <summary><i class="ph ph-hand-heart" aria-hidden="true"></i><span>Seguimiento y cuidados<small>Controles originales y continuidad del turno</small></span><i class="ph ph-caret-down" aria-hidden="true"></i></summary>
 <div class="rm-expert-nursing-grid">
-    @unless($petersenEnfermeria)
-    <section class="rm-card rm-decision-panel rm-expert-nursing-result" id="expert-nursing-today" aria-labelledby="expert-nursing-today-title">
-        <div class="rm-decision-section-heading">
-            <p class="rm-expert-eyebrow">Resultado de la evaluación clínica</p>
-            @if($consultaEnfermeria)<span class="rm-decision-state">{{ $consultaEnfermeria['estado_principal'] }}</span>@endif
-        </div>
-        <h2 id="expert-nursing-today-title">{{ $consultaEnfermeria['titulo'] ?? 'Sin evaluación experta disponible' }}</h2>
-        <p class="rm-expert-prose">{{ $consultaEnfermeria['resumen'] ?? 'No hay un resultado experto verificable para esta consulta. Puede volver al expediente autorizado o reintentar la lectura.' }}</p>
-        <p class="rm-decision-note">Aquí solo aparece una conclusión cognitiva cuando existe una evaluación clínica conservada y publicable. Los controles de seguimiento se muestran por separado; ninguno genera indicaciones de cuidado por sí solo.</p>
-        @if($consultaEnfermeria)
-            <div class="rm-decision-toolbar">
-                <button type="button" class="rm-btn rm-btn-primary" wire:click="abrirSignificado" wire:loading.attr="disabled" wire:target="abrirSignificado">¿Qué significa este resultado?</button>
-                <button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta('registro')" wire:loading.attr="disabled" wire:target="abrirConsulta">Consultar fuentes y fundamento</button>
-            </div>
-        @endif
-    </section>
-    @endunless
     <section class="rm-card rm-decision-panel rm-expert-nursing-observations" aria-labelledby="expert-nursing-observations-title">
         <div class="rm-decision-section-heading"><h2 id="expert-nursing-observations-title" class="rm-expert-section-title">Hallazgos del seguimiento cognitivo</h2><i class="ph ph-clipboard-text" aria-hidden="true"></i></div>
         @if($errorObservacional)
@@ -62,3 +46,5 @@
         </div>
     </section>
 </div>
+
+</details>

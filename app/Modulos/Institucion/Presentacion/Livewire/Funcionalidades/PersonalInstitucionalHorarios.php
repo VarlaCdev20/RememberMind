@@ -94,7 +94,17 @@ class PersonalInstitucionalHorarios extends Component
 
     public string $f_tipo_asignacion = 'FIJO';
 
+    public bool $f_rotacion_automatica = false;
+
+    public string $f_turno_inicial = 'MANANA';
+
     public string $f_observaciones = '';
+
+    #[Locked]
+    public array $vistaPreviaHorario = [];
+
+    #[Locked]
+    public int $paginaVistaPrevia = 1;
 
     public bool $modalFinalizarAbierto = false;
 
@@ -169,6 +179,7 @@ class PersonalInstitucionalHorarios extends Component
         $this->f_cod_area = $this->codAreaUsuario($this->usuario());
         $this->formAbierto = true;
         $this->modoEdicion = false;
+        $this->f_rotacion_automatica = $this->esEnfermeria;
     }
 
     public function editarAsignacion(string $cod): void
@@ -212,6 +223,7 @@ class PersonalInstitucionalHorarios extends Component
         $this->f_fecha_inicio = $this->fechaParaInput($asignacion['fecha_inicio_raw'] ?? null, now());
         $this->f_fecha_fin = $this->fechaParaInput($asignacion['fecha_fin_raw'] ?? null);
         $this->f_tipo_asignacion = $asignacion['tipo_asignacion'] ?? ($this->esEnfermeria ? 'ROTATIVO' : 'FIJO');
+        $this->f_rotacion_automatica = false;
         $this->f_observaciones = $asignacion['observaciones'] ?? '';
         $this->modoEdicion = true;
         $this->formAbierto = true;
@@ -233,31 +245,14 @@ class PersonalInstitucionalHorarios extends Component
             return;
         }
 
-        $this->validate([
-            'f_cod_area' => 'required|string|exists:areas,cod_area',
-            'f_cod_turno' => 'required|string|exists:turnos,cod_turno',
-            'f_dias_semana' => 'required|array|min:1',
-            'f_dias_semana.*' => 'required|in:LUNES,MARTES,MIERCOLES,JUEVES,VIERNES,SABADO,DOMINGO',
-            'f_fecha_inicio' => 'required|date',
-            'f_fecha_fin' => 'nullable|date|after_or_equal:f_fecha_inicio',
-            'f_tipo_asignacion' => 'required|in:FIJO,ROTATIVO,TEMPORAL,EVENTUAL',
-            'f_observaciones' => 'nullable|string|max:1000',
-        ], [
-            'f_cod_area.required' => 'Debe seleccionar un área.',
-            'f_cod_area.exists' => 'Seleccione un área institucional válida.',
-            'f_cod_turno.required' => 'Debe seleccionar un turno.',
-            'f_dias_semana.required' => 'Seleccione al menos un día laboral.',
-            'f_dias_semana.min' => 'Seleccione al menos un día laboral.',
-            'f_fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
-            'f_tipo_asignacion.required' => 'El tipo de asignación es obligatorio.',
-        ]);
+        $this->validarFormulario();
 
         $turno = Turno::query()
             ->where('cod_turno', $this->f_cod_turno)
             ->where('estado', 'ACTIVO')
             ->first();
 
-        if (! $turno) {
+        if (! $this->esRotacionAutomatica() && ! $turno) {
             $this->addError('f_cod_turno', 'El turno seleccionado no está disponible.');
 
             return;
@@ -275,11 +270,24 @@ class PersonalInstitucionalHorarios extends Component
             return;
         }
 
-        $fechaInicio = Carbon::parse($this->f_fecha_inicio)->startOfDay();
         $isEdit = $this->modoEdicion;
 
         try {
-            app(GestionarHorariosPersonal::class)->guardar(['usuarioId' => $this->usuarioId, 'f_cod_turno' => $this->f_cod_turno, 'f_fecha_inicio' => $this->f_fecha_inicio, 'modoEdicion' => $this->modoEdicion, 'codAsignacionEditar' => $this->codAsignacionEditar, 'f_dias_semana' => $this->f_dias_semana, 'f_cod_area' => $this->f_cod_area, 'f_tipo_asignacion' => $this->f_tipo_asignacion, 'f_observaciones' => $this->f_observaciones, 'asignaciones' => $this->asignaciones]);
+            app(GestionarHorariosPersonal::class)->guardar([
+                'usuarioId' => $this->usuarioId,
+                'f_cod_turno' => $this->f_cod_turno,
+                'f_fecha_inicio' => $this->f_fecha_inicio,
+                'f_fecha_fin' => ($this->permiteRepetir() || $this->esRotacionAutomatica()) && $this->f_fecha_fin !== '' ? $this->f_fecha_fin : null,
+                'f_rotacion_automatica' => $this->esRotacionAutomatica(),
+                'f_turno_inicial' => $this->f_turno_inicial,
+                'modoEdicion' => $this->modoEdicion,
+                'codAsignacionEditar' => $this->codAsignacionEditar,
+                'f_dias_semana' => $this->f_dias_semana,
+                'f_cod_area' => $this->f_cod_area,
+                'f_tipo_asignacion' => $this->f_tipo_asignacion,
+                'f_observaciones' => $this->f_observaciones,
+                'asignaciones' => $this->asignaciones,
+            ]);
         } catch (ValidationException $e) {
             foreach ($e->errors() as $field => $messages) {
                 $this->addError($field, $messages[0]);
@@ -287,9 +295,7 @@ class PersonalInstitucionalHorarios extends Component
 
             return;
         } catch (\Throwable $e) {
-
             report($e);
-
             $this->dispatch('mostrarAlerta', [
                 'type' => 'error',
                 'title' => 'Error al guardar',
@@ -308,9 +314,31 @@ class PersonalInstitucionalHorarios extends Component
             'title' => $isEdit ? 'Asignación actualizada' : 'Asignación creada',
             'message' => $isEdit
                 ? 'El horario anterior se finalizó y la nueva asignación quedó registrada.'
-                : 'Asignación de turno registrada correctamente.',
+                : 'El horario ya está asignado para las fechas seleccionadas.',
         ]);
         $this->dispatch('asignacionActualizada');
+    }
+
+    private function validarFormulario(): void
+    {
+        $this->validate([
+            'f_cod_area' => 'required|string|exists:areas,cod_area',
+            'f_cod_turno' => $this->esRotacionAutomatica() ? 'exclude' : 'required|string|exists:turnos,cod_turno',
+            'f_dias_semana' => $this->esRotacionAutomatica() ? 'exclude' : 'required|array|min:1',
+            'f_dias_semana.*' => $this->esRotacionAutomatica() ? 'exclude' : 'required|in:LUNES,MARTES,MIERCOLES,JUEVES,VIERNES,SABADO,DOMINGO',
+            'f_fecha_inicio' => 'required|date',
+            'f_tipo_asignacion' => 'required|in:FIJO,ROTATIVO,TEMPORAL,EVENTUAL',
+            'f_observaciones' => 'nullable|string|max:1000',
+        ], [
+            'f_cod_area.required' => 'Debe seleccionar un área.',
+            'f_cod_area.exists' => 'Seleccione un área institucional válida.',
+            'f_cod_turno.required' => 'Debe seleccionar un turno.',
+            'f_dias_semana.required' => 'Seleccione al menos un día laboral.',
+            'f_dias_semana.min' => 'Seleccione al menos un día laboral.',
+            'f_fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
+            'f_tipo_asignacion.required' => 'El tipo de asignación es obligatorio.',
+        ]);
+
     }
 
     public function prepararFinalizar(string $cod): void
@@ -439,15 +467,112 @@ class PersonalInstitucionalHorarios extends Component
         $this->formAbierto = false;
     }
 
-    public function solicitarGuardar(): void
+    public function updated(string $propiedad): void
+    {
+        if (str_starts_with($propiedad, 'f_')) {
+            $this->reset('vistaPreviaHorario', 'paginaVistaPrevia');
+        }
+    }
+
+    public function seleccionarDias(string $grupo): void
     {
         app(GestionarHorariosPersonal::class)->autorizar();
-        $this->dispatch('confirmarGuardadoAsignacion', [
+        abort_unless(in_array($grupo, ['laborables', 'todos', 'ninguno'], true), 422);
+        $this->f_dias_semana = match ($grupo) {
+            'laborables' => array_slice(self::DIAS, 0, 5),
+            'todos' => self::DIAS,
+            default => [],
+        };
+        $this->reset('vistaPreviaHorario', 'paginaVistaPrevia');
+    }
+
+    public function previsualizarHorario(): void
+    {
+        $horarios = app(GestionarHorariosPersonal::class);
+        $horarios->autorizar();
+        $this->reset('vistaPreviaHorario', 'paginaVistaPrevia');
+        $this->validarFormulario();
+        $entrada = [
+            'f_fecha_inicio' => $this->f_fecha_inicio,
+            'f_fecha_fin' => $this->permiteRepetir() || $this->esRotacionAutomatica() ? $this->f_fecha_fin : null,
+            'f_dias_semana' => $this->f_dias_semana,
+            'f_turno_inicial' => $this->f_turno_inicial,
+        ];
+        $turno = collect($this->cargarTurnos())->firstWhere('cod_turno', $this->f_cod_turno);
+        if (! $this->esRotacionAutomatica() && ! $turno) {
+            $this->addError('f_cod_turno', 'Selecciona un turno activo para revisar el calendario.');
+
+            return;
+        }
+
+        $calendario = $this->esRotacionAutomatica()
+            ? $horarios->previsualizarRotacion($entrada)
+            : array_fill_keys($horarios->fechasParaAsignar($entrada), 'FIJO');
+        foreach ($calendario as $fecha => $fase) {
+            $esDescanso = $fase === null;
+            $definicion = $this->esRotacionAutomatica() && ! $esDescanso ? GestionarHorariosPersonal::TURNOS_ROTACION[$fase] : null;
+            $horaInicio = $esDescanso ? '07:00' : ($definicion['inicio'] ?? $turno['hora_inicio']);
+            $horaFin = $esDescanso ? '07:00' : ($definicion['fin'] ?? $turno['hora_fin']);
+            $inicio = Carbon::parse($fecha)->setTimeFromTimeString($horaInicio);
+            $fin = Carbon::parse($fecha)->setTimeFromTimeString($horaFin);
+            if ($fin->lte($inicio)) {
+                $fin->addDay();
+            }
+            $this->vistaPreviaHorario[] = [
+                'fecha' => $fecha,
+                'dia' => $inicio->locale('es')->translatedFormat('D d M'),
+                'nombre' => $esDescanso ? 'Descanso' : ($definicion['nombre'] ?? $turno['nombre']),
+                'horario' => $inicio->format('H:i').'–'.$fin->format('H:i'),
+                'cruza_dia' => $fin->toDateString() !== $inicio->toDateString(),
+                'descanso' => $esDescanso,
+            ];
+        }
+        $this->resetValidation();
+    }
+
+    public function moverVistaPrevia(int $direccion): void
+    {
+        app(GestionarHorariosPersonal::class)->autorizar(false);
+        $paginas = max(1, (int) ceil(count($this->vistaPreviaHorario) / 7));
+        $this->paginaVistaPrevia = max(1, min($paginas, $this->paginaVistaPrevia + ($direccion < 0 ? -1 : 1)));
+    }
+
+    public function solicitarGuardar(): void
+    {
+        $horarios = app(GestionarHorariosPersonal::class);
+        $horarios->autorizar();
+        $this->validarFormulario();
+        $confirmacion = [
             'title' => $this->modoEdicion ? 'Guardar nueva versión del horario' : 'Crear asignación',
             'message' => $this->modoEdicion
                 ? 'La asignación activa actual se finalizará y se registrará una nueva versión.'
-                : 'Se registrará el horario seleccionado para este usuario.',
-        ]);
+                : 'El horario quedará asignado al trabajador para las fechas seleccionadas.',
+        ];
+        if ($this->esRotacionAutomatica()) {
+            $calendario = $horarios->previsualizarRotacion([
+                'f_fecha_inicio' => $this->f_fecha_inicio,
+                'f_fecha_fin' => $this->f_fecha_fin,
+                'f_turno_inicial' => $this->f_turno_inicial,
+            ]);
+            $this->resetValidation();
+            $confirmacion['fechas'] = [];
+            foreach ($calendario as $fecha => $fase) {
+                $nombre = $fase === null ? 'DESCANSO · 07:00–07:00 (+1 día)' : mb_strtoupper(GestionarHorariosPersonal::TURNOS_ROTACION[$fase]['nombre']);
+                $confirmacion['fechas'][] = Carbon::parse($fecha)->format('d/m/Y').' · '.$nombre;
+            }
+            $confirmacion['message'] = 'Revisa la rotación y las fechas de descanso antes de confirmar.';
+        }
+        if ($this->permiteRepetir() && $this->f_fecha_fin !== '') {
+            $fechas = $horarios->fechasParaAsignar([
+                'f_fecha_inicio' => $this->f_fecha_inicio,
+                'f_fecha_fin' => $this->f_fecha_fin,
+                'f_dias_semana' => $this->f_dias_semana,
+            ]);
+            $this->resetValidation(['f_fecha_inicio', 'f_fecha_fin', 'f_dias_semana', 'f_dias_semana.*']);
+            $confirmacion['fechas'] = array_map(fn (string $fecha) => Carbon::parse($fecha)->format('d/m/Y'), $fechas);
+            $confirmacion['message'] = 'Se registrará una asignación por cada fecha indicada.';
+        }
+        $this->dispatch('confirmarGuardadoAsignacion', $confirmacion);
     }
 
     public function solicitarFinalizar(): void
@@ -456,11 +581,45 @@ class PersonalInstitucionalHorarios extends Component
         $this->dispatch('confirmarFinalizacionAsignacion');
     }
 
+    public function solicitarPrepararTurnos(): void
+    {
+        $actor = app(GestionarHorariosPersonal::class)->autorizar();
+        abort_unless($actor->can('turnos.gestionar'), 403);
+        $this->dispatch('confirmarPreparacionTurnosRotacion');
+    }
+
+    public function prepararTurnosRotacion(): void
+    {
+        app(GestionarHorariosPersonal::class)->prepararTurnosRotacion();
+        $this->cargarDatos();
+        $this->resetValidation('f_rotacion_automatica');
+        $this->dispatch('mostrarAlerta', [
+            'type' => 'success',
+            'title' => 'Turnos preparados',
+            'message' => 'Mañana, tarde y noche están disponibles para la rotación de ocho horas.',
+        ]);
+    }
+
     public function render(): View
     {
         app(GestionarHorariosPersonal::class)->autorizar(false);
 
-        return view('livewire.identidad.personal-institucional-horarios');
+        return view('livewire.identidad.personal-institucional-horarios', [
+            'permiteRepetir' => $this->permiteRepetir(),
+            'esRotacionAutomatica' => $this->esRotacionAutomatica(),
+            'turnosRotacion' => GestionarHorariosPersonal::TURNOS_ROTACION,
+        ]);
+    }
+
+    private function permiteRepetir(): bool
+    {
+        return in_array('ENFERMEROS', $this->rolesUsuario, true) && ! $this->modoEdicion && $this->f_tipo_asignacion === 'FIJO';
+    }
+
+    private function esRotacionAutomatica(): bool
+    {
+        return in_array('ENFERMEROS', $this->rolesUsuario, true) && ! $this->modoEdicion
+            && $this->f_tipo_asignacion === 'ROTATIVO' && $this->f_rotacion_automatica;
     }
 
     private function usuario(): ?User
@@ -510,6 +669,18 @@ class PersonalInstitucionalHorarios extends Component
             ->where('estado', 'ACTIVO')
             ->orderBy('hora_inicio')
             ->get(['cod_turno', 'nombre', 'hora_inicio', 'hora_cierre', 'orden', 'estado'])
+            ->filter(function (Turno $turno): bool {
+                if ($this->esEnfermeria) {
+                    return true;
+                }
+                $inicio = Carbon::parse('2000-01-01 '.$turno->hora_inicio);
+                $fin = Carbon::parse('2000-01-01 '.$turno->hora_cierre);
+                if ($fin->lte($inicio)) {
+                    $fin->addDay();
+                }
+
+                return (int) $inicio->diffInMinutes($fin) === 480;
+            })
             ->map(fn (Turno $turno) => [
                 'cod_turno' => $turno->cod_turno,
                 'nombre' => $turno->nombre,
@@ -517,7 +688,7 @@ class PersonalInstitucionalHorarios extends Component
                 'hora_fin' => $turno->hora_fin,
                 'color' => '#2F3E5C',
             ])
-            ->toArray();
+            ->values()->toArray();
     }
 
     private function cargarAsignacionesAgrupadas(User $usuario): Collection
@@ -656,6 +827,7 @@ class PersonalInstitucionalHorarios extends Component
 
     private function resetFormulario(): void
     {
+        $this->reset('vistaPreviaHorario', 'paginaVistaPrevia');
         $codAreaUsuario = $this->codAreaUsuario($this->usuario());
         $areasValidas = array_column($this->areas, 'cod_area');
         $this->f_cod_area = in_array($codAreaUsuario, $areasValidas, true) ? $codAreaUsuario : '';
@@ -663,6 +835,8 @@ class PersonalInstitucionalHorarios extends Component
         $this->f_dias_semana = [];
         $this->f_fecha_inicio = now()->format('Y-m-d');
         $this->f_fecha_fin = '';
+        $this->f_rotacion_automatica = false;
+        $this->f_turno_inicial = 'MANANA';
         $this->f_tipo_asignacion = $this->esEnfermeria ? 'ROTATIVO' : 'FIJO';
         $this->f_observaciones = '';
         $this->modoEdicion = false;

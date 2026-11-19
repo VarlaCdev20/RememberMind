@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\Gate;
 
 class EvaluacionExpertaPolicy
 {
+    /** Ejecución explícita del resultado institucional; no se concede por lectura o Superadministración. */
+    public function ejecutarInstitucional(User $user, Residente $residente): Response
+    {
+        $competente = ($user->hasRole('MEDICO GENERAL/GERIATRA') && $user->personal()->where('estado', 'ACTIVO')->where('profesion', 'MEDICINA')->exists())
+            || ($user->hasRole('PSICOLOGO/A') && $user->personal()->where('estado', 'ACTIVO')->where('profesion', 'PSICOLOGIA')->exists());
+        return $competente && $residente->estado === 'ADMITIDO' && $this->consultarResultados($user, $residente)->allowed()
+            && $user->checkPermissionTo('evaluaciones_expertas.ejecutar_institucional', 'web')
+            ? Response::allow() : Response::denyAsNotFound();
+    }
+
     /** Guardado observacional autorizado solo a Medicina/Psicología, nunca por auditoría o rol de lectura. */
     public function ejecutarObservaciones(User $user, Residente $residente): Response
     {

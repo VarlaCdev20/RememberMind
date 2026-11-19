@@ -1,5 +1,5 @@
 <div class="rm-report-visuals" :aria-busy="cargandoGraficas">
-    @unless($visorInicioGerencia ?? false)
+    @unless(($visorInicioGerencia ?? false) || ($ocultarToolbarGraficas ?? false))
         <div class="rm-report-visuals__toolbar">
             @include('reportes::paginas.gerencia.partials.selector-graficas')
             <p class="rm-help">El diseño se adapta a las categorías y unidades disponibles.</p>

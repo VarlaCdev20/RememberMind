@@ -9,12 +9,11 @@
 >
     @if($modoConsulta || $turno)
         <x-slot:context>
-            <span class="rm-resident-directory__shift-status">
-                <i class="ph-bold {{ $modoConsulta ? 'ph-eye' : 'ph-clock' }}" aria-hidden="true"></i>
-                {{ $modoConsulta ? 'MODO CONSULTA / SOLO LECTURA' : 'Jornada activa' }}
-            </span>
+            <i class="ph-bold {{ $modoConsulta ? 'ph-eye' : 'ph-clock' }}" aria-hidden="true"></i>
+            {{ $modoConsulta ? 'Solo lectura' : 'Jornada activa' }}
+
             @if($turno && ! $modoConsulta)
-                <span class="rm-resident-directory__shift-name">{{ $turno->nombre ?: 'Turno en curso' }}</span>
+                <span>· {{ $turno->nombre ?: 'Turno en curso' }}</span>
             @endif
         </x-slot:context>
     @endif

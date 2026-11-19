@@ -39,6 +39,9 @@
                 <p class="rm-body" aria-live="polite" x-text="selected.toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })"></p>
                 <button type="button" class="rm-calendar__today" @click="today()">Hoy</button>
             </footer>
+            @if(auth()->user() && app(\App\Modulos\Institucion\Aplicacion\Consultas\ConsultarAvisosPlanificacion::class)->propio(auth()->user()) && \Illuminate\Support\Facades\Route::has('admin.avisos-planificacion.index'))
+                <a class="rm-btn-secondary" href="{{ route('admin.avisos-planificacion.index') }}#mis-horarios">Mis horarios</a>
+            @endif
         </div>
     </dialog>
 </div>

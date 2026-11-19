@@ -1,4 +1,4 @@
-@php($claveRevision = ($esRevisionObservacional ?? false) ? 'observacional' : 'cognitiva')
+@php($claveRevision = ($esRevisionInstitucional ?? false) ? 'institucional' : (($esRevisionObservacional ?? false) ? 'observacional' : 'cognitiva'))
 <section class="rm-card rm-expert-clinical-block" @if(! ($esRevisionObservacional ?? false)) id="decision-revision-profesional" @endif aria-labelledby="revision-{{ $claveRevision }}-titulo">
     <h2 id="revision-{{ $claveRevision }}-titulo" class="rm-expert-section-title">{{ ($esRevisionObservacional ?? false) ? 'Hallazgos observacionales · Confirmación profesional' : 'Valoración del sistema experto · Confirmación profesional' }}</h2>
     @if($esRevisionObservacional ?? false)<p class="text-sm mt-2">Esta revisión confirma o rechaza los hallazgos descriptivos de la evaluación observacional conservada.</p>@endif
@@ -10,7 +10,7 @@
                 <h3 class="font-semibold">{{ $revision['nombre'] }}</h3>
                 <p class="text-sm mt-2">{{ ['PENDIENTE' => 'Pendiente de revisión profesional', 'CONFIRMADA' => 'Valoración confirmada', 'RECHAZADA' => 'Valoración rechazada'][$revision['estado']] }}</p>
                 @if($revision['puede_firmar'] && !$disciplinaRevision)
-                    <button type="button" wire:click="{{ ($esRevisionObservacional ?? false) ? 'prepararRevisionObservacional' : 'prepararRevision' }}(@js($disciplina))" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">{{ $revision['cabeza'] ? 'Registrar rectificación' : 'Revisar valoración' }}</button>
+                    <button type="button" wire:click="{{ ($esRevisionInstitucional ?? false) ? 'prepararRevisionInstitucional' : (($esRevisionObservacional ?? false) ? 'prepararRevisionObservacional' : 'prepararRevision') }}(@js($disciplina))" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary mt-3">{{ $revision['cabeza'] ? 'Registrar rectificación' : 'Revisar valoración' }}</button>
                 @endif
                 @if($revision['historial'])
                     <details class="rm-expert-supplement mt-3"><summary>Consultar decisiones conservadas</summary>

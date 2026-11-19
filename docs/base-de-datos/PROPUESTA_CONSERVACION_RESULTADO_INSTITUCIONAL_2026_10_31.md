@@ -1,16 +1,18 @@
 ---
 title: "Conservación del resultado institucional sin nuevas tablas"
-status: REJECTED
-last_reviewed: 2026-10-31
+status: APPROVED_BY_SUCCESSOR
+last_reviewed: 2026-11-04
 owner: ApoyoDecision
 source_of_truth: false
 ---
 
 # Decisión de la propietaria
 
-El 31/10/2026, ante la propuesta de cinco FK/checks y del permiso de ejecución institucional, la propietaria respondió **«Mantener relaciones y permisos actuales»**. No se implementa ni instala esta transición; se conserva este documento para registrar el alcance rechazado y evitar volver a solicitarlo durante el mismo cierre. Las correcciones compatibles de código y pruebas continúan, sin modificar reglas, relaciones ni permisos.
+**Sucesión del04/11/2026:** la propietaria autorizó expresamente el guardado descrito y sus revisiones, incluidas las19 columnas, cinco FK/índices/CHECK y el permiso para Medicina/Psicología. Véase [la decisión vigente](DECISION_RESULTADO_INSTITUCIONAL_2026_11_04.md). El rechazo del31/10 que sigue se conserva como historia; ya no bloquea este alcance concreto. La autorización no incluye guardar íntegro el DTO para replay completo.
 
-## Propuesta no autorizada
+El 31/10/2026, ante la propuesta de cinco FK/checks y del permiso de ejecución institucional, la propietaria respondió **«Mantener relaciones y permisos actuales»**. En ese corte no se implementó ni instaló esta transición; las correcciones compatibles continuaron sin cambiar esas relaciones o permisos. El registro se conserva como historia y queda sucedido por la autorización específica del04/11 indicada arriba.
+
+## Diccionario de la propuesta, adoptado por decisión posterior
 
 Cerrar la conservación y recuperación del resultado institucional con el modelo existente. No modificar reglas, criterios clínicos ni puntuaciones. No crear tablas. La autorización solicitada se limita a los campos, relaciones, checks y permiso descritos a continuación; no autoriza otro rediseño ni borrado.
 
@@ -69,4 +71,4 @@ Pruebas requeridas: positivo, abstención, doble envío, falta de permiso, compe
 
 Migración por extensión explícita, sin ejecutarla contra la BDD operativa antes de autorización. La reversión debe rechazar retirar columnas si contienen resultados conservados. Respaldar antes de una instalación local autorizada y verificar inventario, FK e historia previa. Inventario esperado sin cambios: 106 tablas de negocio +16 técnicas.
 
-Esta propuesta es revisable, pero todavía no constituye autorización de DDL ni del permiso. No se solicita estudio con residentes, firma ni aval externo.
+La autorización específica posterior está registrada en la decisión del04/11 vinculada al principio. No se solicita estudio con residentes, firma ni aval externo para desarrollar, integrar y comprobar técnicamente este alcance.

@@ -1,30 +1,69 @@
 <div class="rm-page-layout rm-nursing-report text-rm-primary">
-    <x-ui.collection-header title="Reportes de Enfermería" subtitle="Consulta los registros por período y residente." icon="ph-chart-bar">
-        <x-slot:actions><a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn rm-btn-secondary"><i class="ph ph-arrow-left" aria-hidden="true"></i> Volver</a></x-slot:actions>
+    <x-ui.collection-header title="Reportes de Enfermería" subtitle="Elige una sección, revisa los registros y prepara tu reporte." icon="ph-files" eyebrow="Consulta y exportación">
+        <x-slot:actions><a href="{{ route('admin.enfermeria.dashboard') }}" class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="Volver a Mi turno"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Volver</span></a></x-slot:actions>
     </x-ui.collection-header>
-    <form wire:submit="aplicar" class="rm-card p-4 space-y-3" aria-label="Filtros del reporte">
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div><label for="reporte-desde" class="rm-label">Desde</label><input id="reporte-desde" wire:model="desde" type="date" class="rm-input w-full" aria-describedby="reporte-desde-error">@error('desde')<p id="reporte-desde-error" class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
-            <div><label for="reporte-hasta" class="rm-label">Hasta</label><input id="reporte-hasta" wire:model="hasta" type="date" max="{{ today()->toDateString() }}" class="rm-input w-full" aria-describedby="reporte-hasta-error">@error('hasta')<p id="reporte-hasta-error" class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
-            <div><label for="reporte-residente" class="rm-label">Residente</label><select id="reporte-residente" wire:model="codResidente" class="rm-select w-full"><option value="">Todos los autorizados</option>@foreach($reporte['residentes'] as $residente)<option value="{{ $residente->cod_residente }}">{{ $residente->nombres }} {{ $residente->apellido_paterno }} {{ $residente->apellido_materno }}</option>@endforeach</select>@error('codResidente')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
-            <div><label for="reporte-tipo" class="rm-label">Registros</label><select id="reporte-tipo" wire:model="tipo" class="rm-select w-full">@foreach(\App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria::TIPOS as $valor => $nombre)<option value="{{ $valor }}">{{ $nombre }}</option>@endforeach</select>@error('tipo')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
-        </div>
-        <div class="flex flex-wrap gap-3 items-center"><button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled"><span wire:loading.remove wire:target="aplicar">Aplicar filtros</span><span wire:loading wire:target="aplicar">Consultando…</span></button><p class="text-sm text-rm-secondary">Aplica los cambios para actualizar el resumen y el PDF.</p></div>
-    </form>
-    <section class="rm-card p-4 space-y-4" aria-labelledby="resumen-reporte-titulo" wire:loading.class="opacity-60">
-        <div class="flex flex-wrap gap-4 items-start justify-between">
-            <div><h2 id="resumen-reporte-titulo" class="text-lg font-bold">{{ $reporte['alcance'] }}</h2><p class="text-sm text-rm-secondary">{{ \Carbon\Carbon::parse($reporte['filtros']['desde'])->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($reporte['filtros']['hasta'])->format('d/m/Y') }} · {{ $reporte['filas']->count() }} registros</p></div>
-            <div class="flex flex-wrap gap-2"><a href="{{ route('admin.enfermeria.reportes.preview', $reporte['filtros']) }}" target="_blank" rel="noopener" class="rm-btn rm-btn-secondary">Vista previa <span class="sr-only">(abre otra pestaña)</span></a>@can('enfermeria.ver_ficha_paciente')<a href="{{ route('admin.enfermeria.reportes.pdf', $reporte['filtros']) }}" class="rm-btn rm-btn-primary"><i class="ph ph-download-simple" aria-hidden="true"></i> Descargar PDF</a>@endcan</div>
-        </div>
-        <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">@foreach($reporte['totales'] as $total)<div class="rounded-xl border border-rm-border-soft p-3"><p class="rm-nursing-report__count">{{ $total['cantidad'] }}</p><p class="text-sm text-rm-secondary">{{ $total['nombre'] }}</p></div>@endforeach</div>
-        <p class="text-sm text-rm-secondary">Datos disponibles al consultar. Se excluyen registros anulados; una actividad pendiente no se considera realizada.</p>
-    </section>
-    @if($reporte['residentes']->isEmpty())<div class="rm-card p-5" role="status">No tienes residentes disponibles para consulta. Revisa tus asignaciones con la persona responsable.</div>@endif
-    <section class="rm-card p-4 space-y-3" aria-labelledby="actividad-diaria-titulo">
-        <h2 id="actividad-diaria-titulo" class="text-lg font-bold">Registros por día</h2><p class="text-sm text-rm-secondary">Cantidad de registros, no gravedad ni evolución clínica. Solo se muestran días con registros.</p>
-        @if($reporte['dias']->isEmpty())<p class="py-3 text-rm-secondary">No hay registros en este período para los filtros aplicados.</p>@else
-        <details><summary class="min-h-11 flex items-center cursor-pointer font-semibold">Ver distribución por día</summary><div class="max-h-72 overflow-y-auto space-y-2 py-3" role="list" aria-label="Cantidad de registros por fecha">@foreach($reporte['dias'] as $dia)<div class="flex gap-3 items-center text-sm" role="listitem"><time class="shrink-0 w-24" datetime="{{ $dia['fecha'] }}">{{ \Carbon\Carbon::parse($dia['fecha'])->format('d/m/Y') }}</time><div class="flex-1 h-3 rounded bg-rm-surface-soft" aria-hidden="true"><div class="h-3 rounded bg-rm-primary-action" style="width: {{ 100 * $dia['cantidad'] / $reporte['dias']->max('cantidad') }}%"></div></div><span class="shrink-0">{{ $dia['cantidad'] }} registros</span></div>@endforeach</div></details>
-        @endif
-    </section>
-    <section class="rm-card p-4 space-y-3" aria-labelledby="detalle-reporte-titulo"><h2 id="detalle-reporte-titulo" class="text-lg font-bold">Registros del período</h2><p class="text-sm text-rm-secondary">Cuidados y medicación: fecha efectiva o, si falta, programada. Incidentes y alertas son registros distintos.</p><div class="rm-table-container overflow-x-auto" tabindex="0" role="region" aria-label="Tabla de registros, desplazable horizontalmente">@include('reportes::reportes.enfermeria-registros', ['filas' => $registros])</div>{{ $registros->links() }}</section>
+    <div class="rm-nursing-report__content">
+        <x-ui.filter-bar as="form" wire:submit="aplicar" class="rm-card rm-nursing-report__filters rm-nursing-filters" aria-label="Filtros del reporte">
+            <div class="rm-nursing-filters__row">
+                <div class="rm-field"><label for="reporte-desde" class="rm-label">Desde</label><input id="reporte-desde" wire:model="desde" type="date" class="rm-input" aria-invalid="{{ $errors->has('desde') ? 'true' : 'false' }}">@error('desde')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+                <div class="rm-field"><label for="reporte-hasta" class="rm-label">Hasta</label><input id="reporte-hasta" wire:model="hasta" type="date" max="{{ today()->toDateString() }}" class="rm-input" aria-invalid="{{ $errors->has('hasta') ? 'true' : 'false' }}">@error('hasta')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+                <div class="rm-field"><label for="reporte-residente" class="rm-label">Residente</label><select id="reporte-residente" wire:model="codResidente" class="rm-select"><option value="">Todos</option>@foreach($reporte['residentes'] as $persona)<option value="{{ $persona->getKey() }}">{{ $persona->nombre_completo }}</option>@endforeach</select></div>
+                <div class="rm-field"><label for="reporte-tipo" class="rm-label">Sección</label><select id="reporte-tipo" wire:model="tipo" class="rm-select">@foreach(\App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria::TIPOS as $clave => $nombre)@if($clave === 'TODOS' || auth()->user()->can(\App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria::PERMISOS[$clave]))<option value="{{ $clave }}">{{ $clave === 'TODOS' ? 'General' : $nombre }}</option>@endif @endforeach</select>@error('tipo')<p class="rm-error" role="alert">{{ $message }}</p>@enderror</div>
+                <button type="submit" class="rm-btn rm-btn-primary" wire:loading.attr="disabled"><i class="ph ph-funnel" aria-hidden="true"></i><span wire:loading.remove wire:target="aplicar">Aplicar filtros</span><span wire:loading wire:target="aplicar">Consultando…</span></button>
+            </div>
+        </x-ui.filter-bar>
+        <section class="rm-card rm-nursing-report__summary" aria-labelledby="resumen-reporte-titulo" wire:loading.class="opacity-60">
+            <div><h2 id="resumen-reporte-titulo">{{ $aplicados['tipo'] === 'TODOS' ? 'Reporte general' : \App\Modulos\Reportes\Aplicacion\Consultas\ConsultarReporteEnfermeria::TIPOS[$aplicados['tipo']] }}</h2><p>{{ $reporte['alcance'] }} · {{ \Carbon\Carbon::parse($aplicados['desde'])->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($aplicados['hasta'])->format('d/m/Y') }}</p></div>
+            <div class="rm-nursing-report__metrics">
+                <div><strong class="rm-nursing-report__count">{{ $reporte['filas']->count() }}</strong><span>Registros encontrados</span></div>
+                <div><strong class="rm-nursing-report__count">{{ $reporte['totales']->filter(fn($t) => $t['cantidad'] > 0)->count() }}</strong><span>Secciones con registros</span></div>
+                <div><strong class="rm-nursing-report__count">{{ $reporte['dias']->count() }}</strong><span>Días con registros</span></div>
+            </div>
+            <div class="rm-nursing-report__export" aria-label="Opciones del reporte">
+                <a href="{{ route('admin.enfermeria.reportes.preview', $aplicados) }}" target="_blank" rel="noopener" class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="Vista previa (otra pestaña)"><i class="ph ph-eye" aria-hidden="true"></i></a>
+                @can('enfermeria.ver_ficha_paciente')
+                <x-ui.nursing-report-link :area="$aplicados['tipo']" :residente="$aplicados['codResidente']" :desde="$aplicados['desde']" :hasta="$aplicados['hasta']"
+                    :alcance="$reporte['alcance']" identificador="reporte" />
+                <a href="{{ route('admin.enfermeria.reportes.preview', array_merge($aplicados, ['imprimir' => 1])) }}" target="_blank" rel="noopener" class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="Imprimir (otra pestaña)"><i class="ph ph-printer" aria-hidden="true"></i></a>
+                @endcan
+            </div>
+            <p class="text-sm text-rm-secondary">Se excluyen registros anulados. Los pendientes mantienen su estado. La cantidad de registros no indica gravedad.</p>
+        </section>
+        @if($reporte['residentes']->isEmpty())<div class="rm-card p-4" role="status">No tienes residentes disponibles para consulta. Revisa tus asignaciones con la persona responsable.</div>@endif
+        @php
+            $serie = $reporte['totales']->filter(fn ($total) => $total['cantidad'] > 0)
+                ->map(fn ($total) => ['etiqueta' => $total['nombre'], 'valor' => $total['cantidad']])->values();
+            $tipos = ['barras', 'dona', 'torta'];
+            if ($serie->count() >= 3) $tipos[] = 'radar';
+            $grafica = [
+                'id' => 'registros-por-seccion', 'titulo' => 'Registros por sección', 'unidad' => 'registros',
+                'serie' => $serie, 'total' => $serie->sum('valor'), 'maximo' => $serie->max('valor') ?? 0,
+                'composicion' => true, 'tipos' => $tipos, 'recomendado' => $serie->count() > 1 ? 'dona' : 'barras',
+                'nota' => 'Conteos del período aplicado. Cada registro se cuenta en su sección.',
+            ];
+        @endphp
+        <section class="rm-card rm-nursing-report__breakdown" aria-labelledby="report-distribution">
+            <div class="grid gap-3" wire:key="grafica-enfermeria-{{ md5(json_encode([$aplicados, $grafica])) }}"
+                x-data="rmReportStatistics()" data-graficas-iniciales="{{ json_encode([$grafica]) }}">
+                <div class="flex items-center justify-between gap-2">
+                    <h2 id="report-distribution">Resumen por secciones</h2>
+                    @include('reportes::paginas.gerencia.partials.selector-graficas', ['selectorGraficaCompacto' => true, 'idSelectorGrafica' => 'enfermeria-tipos-grafica'])
+                </div>
+                @include('reportes::paginas.gerencia.partials.visor-graficas', ['ocultarToolbarGraficas' => true])
+            </div>
+            <details><summary>Ver cantidad de registros por día</summary>@forelse($reporte['dias'] as $dia)<div class="rm-nursing-report__day"><time datetime="{{ $dia['fecha'] }}">{{ \Carbon\Carbon::parse($dia['fecha'])->format('d/m/Y') }}</time><meter min="0" max="{{ $reporte['dias']->max('cantidad') }}" value="{{ $dia['cantidad'] }}" aria-label="{{ $dia['cantidad'] }} registros el {{ $dia['fecha'] }}"></meter><span>{{ $dia['cantidad'] }}</span></div>@empty<p>No hay registros en este período.</p>@endforelse</details>
+        </section>
+        <section class="rm-nursing-report__records grid gap-2" aria-labelledby="detalle-reporte-titulo">
+            <h2 id="detalle-reporte-titulo">Detalle de los registros</h2>
+            <p class="text-sm text-rm-secondary">El PDF y el CSV incluyen todas las páginas del período elegido.</p>
+            <x-ui.table-surface>
+                @include('reportes::reportes.enfermeria-registros', ['filas' => $registros, 'interactivo' => true])
+                @if($registros->isNotEmpty())
+                    <x-slot:footer>
+                        <x-ui.paginacion class="rm-pagination--compact" :paginator="$registros" mode="livewire" :show-per-page="false" label="registros" />
+                    </x-slot:footer>
+                @endif
+            </x-ui.table-surface>
+        </section>
+    </div>
 </div>

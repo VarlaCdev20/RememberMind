@@ -12,6 +12,7 @@ use App\Models\Turno;
 use App\Models\User;
 use App\Modulos\Identidad\Aplicacion\Acciones\RolePreviewService;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -41,17 +42,28 @@ final class GestionarHorariosPersonal
         'DOMINGO',
     ];
 
+    public const TURNOS_ROTACION = [
+        'MANANA' => ['nombre' => 'Mañana', 'catalogo' => ['TURNO MAÑANA', 'MANANA'], 'inicio' => '07:00', 'fin' => '15:00'],
+        'TARDE' => ['nombre' => 'Tarde', 'catalogo' => ['TURNO TARDE', 'TARDE'], 'inicio' => '15:00', 'fin' => '23:00'],
+        'NOCHE' => ['nombre' => 'Noche', 'catalogo' => ['TURNO NOCHE', 'NOCHE'], 'inicio' => '23:00', 'fin' => '07:00'],
+    ];
+
     public function guardar(array $entrada): void
     {
         $actor = $this->autorizar();
+        Validator::make($entrada, ['f_rotacion_automatica' => ['sometimes', 'boolean']])->validate();
+        $esRotacion = (bool) ($entrada['f_rotacion_automatica'] ?? false);
         if ($entrada['modoEdicion'] ?? false) {
             app(ConservarEventoAsignacion::class)->exigir();
         }
         Validator::make($entrada, ['usuarioId' => ['required', 'string', 'exists:usuarios,cod_usuario'],
-            'f_cod_area' => ['required', 'string', 'exists:areas,cod_area'], 'f_cod_turno' => ['required', 'string', 'exists:turnos,cod_turno'],
-            'f_dias_semana' => ['required', 'array', 'min:1', 'max:7'], 'f_dias_semana.*' => ['required', 'in:'.implode(',', self::DIAS), 'distinct'],
-            'f_fecha_inicio' => ['required', 'date_format:Y-m-d'], 'f_observaciones' => ['nullable', 'string', 'max:1000'],
+            'f_cod_area' => ['required', 'string', 'exists:areas,cod_area'],
+            'f_cod_turno' => $esRotacion ? ['exclude'] : ['required', 'string', 'exists:turnos,cod_turno'],
+            'f_observaciones' => ['nullable', 'string', 'max:1000'],
             'f_tipo_asignacion' => ['required', 'string', 'max:30'], 'modoEdicion' => ['required', 'boolean']])->validate();
+        $calendario = $esRotacion
+            ? $this->calendarioRotacion($entrada)
+            : array_fill_keys($this->fechasParaAsignar($entrada), $entrada['f_cod_turno']);
         $usuario = User::with(['roles', 'personal'])->whereKey($entrada['usuarioId'])->firstOrFail();
         if ($usuario->personal?->estado !== 'ACTIVO' || ! Area::whereKey($entrada['f_cod_area'])->whereIn('estado', ['ACTIVO', 'ACTIVA'])->exists()) {
             throw ValidationException::withMessages(['f_cod_area' => 'El trabajador y el área deben estar activos.']);
@@ -62,10 +74,6 @@ final class GestionarHorariosPersonal
         if (in_array(strtoupper((string) $usuario->estado), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true)) {
             throw ValidationException::withMessages(['f_cod_area' => 'No se puede asignar horario a personal INACTIVO, SUSPENDIDO o RETIRADO.']);
         }
-        $turno = Turno::query()->whereKey($entrada['f_cod_turno'])->where('estado', 'ACTIVO')->first();
-        if (! $turno) {
-            throw ValidationException::withMessages(['f_cod_turno' => 'El turno seleccionado no está disponible.']);
-        }
         $fechaInicio = Carbon::parse($entrada['f_fecha_inicio'])->startOfDay();
         $isEdit = $entrada['modoEdicion'];
         DB::beginTransaction();
@@ -73,21 +81,24 @@ final class GestionarHorariosPersonal
         try {
             $this->autorizar();
             $usuario = User::whereKey($usuario->getKey())->lockForUpdate()->firstOrFail();
+            if ($esRotacion && ($isEdit || $entrada['f_tipo_asignacion'] !== 'ROTATIVO' || ! $usuario->hasRole('ENFERMEROS'))) {
+                throw ValidationException::withMessages(['f_rotacion_automatica' => 'La rotación automática se aplica al crear un horario rotativo de Enfermería.']);
+            }
+            if (! $esRotacion && ! empty($entrada['f_fecha_fin']) && ($isEdit || $entrada['f_tipo_asignacion'] !== 'FIJO' || ! $usuario->hasRole('ENFERMEROS'))) {
+                throw ValidationException::withMessages(['f_fecha_fin' => 'La repetición semanal se aplica al crear un horario fijo de Enfermería.']);
+            }
             $areaVigente = Area::whereKey($entrada['f_cod_area'])->lockForUpdate()->firstOrFail();
             if (! in_array($areaVigente->estado, ['ACTIVO', 'ACTIVA'], true)) {
                 throw ValidationException::withMessages(['f_cod_area' => 'El área ya no está activa.']);
             }
             $personal = Personal::whereKey($usuario->personal->getKey())->lockForUpdate()->firstOrFail();
-            $turno = Turno::whereKey($entrada['f_cod_turno'])->lockForUpdate()->firstOrFail();
-            if ($personal->estado !== 'ACTIVO' || $turno->estado !== 'ACTIVO' || $usuario->fresh()->estado !== 'ACTIVO') {
-                throw ValidationException::withMessages(['f_cod_area' => 'La cuenta, el trabajador o el turno cambiaron de estado. Actualiza antes de asignar.']);
+            if ($personal->estado !== 'ACTIVO' || $usuario->estado !== 'ACTIVO') {
+                throw ValidationException::withMessages(['f_cod_area' => 'La cuenta o el trabajador cambiaron de estado. Actualiza antes de asignar.']);
             }
-            if (! $personal) {
-                throw ValidationException::withMessages(['f_cod_area' => 'El usuario no tiene un registro de personal V2 asociado.']);
-            }
-            $solapamiento = $this->verificarSolapamiento($entrada, $turno);
+            $turnos = $esRotacion ? $this->turnosRotacion(bloquear: true) : $this->turnoIndividual($entrada['f_cod_turno']);
+            $solapamiento = $this->verificarSolapamiento($entrada, $turnos, $calendario);
             if ($solapamiento) {
-                throw ValidationException::withMessages(['f_dias_semana' => $solapamiento]);
+                throw ValidationException::withMessages([($esRotacion ? 'f_rotacion_automatica' : 'f_dias_semana') => $solapamiento]);
             }
 
             if ($isEdit && $entrada['codAsignacionEditar']) {
@@ -98,8 +109,12 @@ final class GestionarHorariosPersonal
                 );
             }
 
-            foreach ($entrada['f_dias_semana'] as $dia) {
-                $fechaJornada = $this->fechaParaDia($entrada, $fechaInicio, $dia);
+            foreach ($calendario as $fecha => $turnoProgramado) {
+                if ($turnoProgramado === null) {
+                    continue;
+                }
+                $turno = $turnos[$turnoProgramado];
+                $fechaJornada = Carbon::parse($fecha);
                 // El cast date se almacena con hora en SQLite y como DATE en PostgreSQL.
                 // Buscar por fecha evita crear otra jornada y eludir el estado de la original.
                 $jornada = Jornada::query()->where('cod_turno', $turno->cod_turno)
@@ -109,12 +124,14 @@ final class GestionarHorariosPersonal
                         'cod_jornada' => app(CodigosEntidad::class)->siguiente('jornadas'),
                         'cod_turno' => $turno->cod_turno, 'fecha_jornada' => $fechaJornada->toDateString(),
                         'estado' => 'ABIERTA',
+                        'cod_usuario_apertura' => $actor->getKey(),
                     ]);
                 }
                 $jornada = Jornada::whereKey($jornada->getKey())->lockForUpdate()->firstOrFail();
                 if (! in_array($jornada->estado, ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'], true)) {
-                    throw ValidationException::withMessages(['f_fecha_inicio' => 'La jornada está cerrada o no admite asignaciones.']);
+                    throw ValidationException::withMessages(['f_fecha_inicio' => 'La jornada del '.$fechaJornada->format('d/m/Y').' está cerrada o no admite asignaciones.']);
                 }
+                $jornada->abrirAlConfirmarHorario($actor);
                 $asignacion = AsignacionPersonal::query()->create([
                     'cod_asignacion_personal' => app(CodigosEntidad::class)->siguiente('asignaciones_personal'),
                     'cod_jornada' => $jornada->cod_jornada,
@@ -213,21 +230,150 @@ final class GestionarHorariosPersonal
         return 'cod_asignacion_personal';
     }
 
-    private function fechaParaDia(array $entrada, Carbon $base, string $dia): Carbon
+    /** @return list<string> */
+    public function fechasParaAsignar(array $entrada): array
     {
-        $indice = array_search($this->normalizarDiaSemana($entrada, $dia), self::DIAS, true);
-        $objetivoIso = ($indice === false ? 0 : $indice) + 1;
-        $diferencia = ($objetivoIso - $base->dayOfWeekIso + 7) % 7;
+        Validator::make($entrada, [
+            'f_fecha_inicio' => ['required', 'date_format:Y-m-d'],
+            'f_fecha_fin' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:f_fecha_inicio'],
+            'f_dias_semana' => ['required', 'array', 'min:1', 'max:7'],
+            'f_dias_semana.*' => ['required', 'in:'.implode(',', self::DIAS), 'distinct'],
+        ], [
+            'f_fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
+            'f_fecha_fin.after_or_equal' => 'La fecha final debe ser igual o posterior a la fecha de inicio.',
+            'f_dias_semana.required' => 'Selecciona al menos un día laboral.',
+        ])->validate();
 
-        return $base->copy()->addDays($diferencia);
+        $inicio = Carbon::parse($entrada['f_fecha_inicio']);
+        $fin = empty($entrada['f_fecha_fin']) ? $inicio->copy()->addDays(6) : Carbon::parse($entrada['f_fecha_fin']);
+        $this->validarHorizonte($inicio, $fin);
+
+        $fechas = [];
+        for ($fecha = $inicio; $fecha->lte($fin); $fecha->addDay()) {
+            if (in_array(self::DIAS[$fecha->dayOfWeekIso - 1], $entrada['f_dias_semana'], true)) {
+                $fechas[] = $fecha->toDateString();
+            }
+        }
+        if ($fechas === []) {
+            throw ValidationException::withMessages(['f_dias_semana' => 'Ninguno de los días seleccionados cae dentro de esas fechas.']);
+        }
+
+        return $fechas;
     }
 
-    private function normalizarDiaSemana(array $entrada, string $dia): string
+    /** @return array<string, string|null> */
+    public function previsualizarRotacion(array $entrada): array
     {
-        $dia = mb_strtoupper(trim($dia));
-        $dia = str_replace(['Á', 'É', 'Í', 'Ó', 'Ú'], ['A', 'E', 'I', 'O', 'U'], $dia);
+        $this->autorizar();
+        $calendario = $this->calendarioRotacion($entrada);
+        $this->turnosRotacion();
 
-        return in_array($dia, self::DIAS, true) ? $dia : 'LUNES';
+        return $calendario;
+    }
+
+    public function prepararTurnosRotacion(): void
+    {
+        $actor = $this->autorizar();
+        abort_unless($actor->can('turnos.gestionar'), 403);
+
+        DB::transaction(function () use ($actor) {
+            $catalogo = Turno::query()->orderBy('cod_turno')->lockForUpdate()->get();
+            foreach (self::TURNOS_ROTACION as $definicion) {
+                $existentes = $catalogo->whereIn('nombre', $definicion['catalogo']);
+                if ($existentes->isNotEmpty()) {
+                    continue;
+                }
+
+                $orden = collect(range(1, 10))->diff($catalogo->pluck('orden'))->first();
+                if ($orden === null) {
+                    throw ValidationException::withMessages(['f_rotacion_automatica' => 'El catálogo de turnos no tiene un orden disponible. Revisa los turnos configurados.']);
+                }
+                app(GestionarTurnosInstitucionales::class)->guardar($actor, [
+                    'editandoId' => null,
+                    'nombre' => $definicion['catalogo'][0],
+                    'horaInicio' => $definicion['inicio'],
+                    'horaFin' => $definicion['fin'],
+                    'orden' => $orden,
+                    'estado' => 'ACTIVO',
+                    'observacion' => 'Turno de ocho horas para rotación de Enfermería.',
+                ]);
+                $catalogo = Turno::query()->get();
+            }
+            $this->turnosRotacion();
+        });
+    }
+
+    /** @return array<string, string|null> */
+    private function calendarioRotacion(array $entrada): array
+    {
+        Validator::make($entrada, [
+            'f_fecha_inicio' => ['required', 'date_format:Y-m-d'],
+            'f_fecha_fin' => ['required', 'date_format:Y-m-d', 'after_or_equal:f_fecha_inicio'],
+            'f_turno_inicial' => ['required', 'in:'.implode(',', array_keys(self::TURNOS_ROTACION))],
+        ], [
+            'f_fecha_inicio.required' => 'Indica cuándo comienza la rotación.',
+            'f_fecha_fin.required' => 'Indica hasta qué fecha se programará la rotación.',
+            'f_fecha_fin.after_or_equal' => 'La fecha final debe ser igual o posterior a la fecha de inicio.',
+            'f_turno_inicial.in' => 'Selecciona un turno inicial válido.',
+        ])->validate();
+
+        $inicio = Carbon::parse($entrada['f_fecha_inicio']);
+        $fin = Carbon::parse($entrada['f_fecha_fin']);
+        $this->validarHorizonte($inicio, $fin);
+        $ciclo = ['MANANA', 'TARDE', 'NOCHE', null];
+        $indiceInicial = array_search($entrada['f_turno_inicial'], $ciclo, true);
+
+        $calendario = [];
+        for ($fecha = $inicio, $dia = 0; $fecha->lte($fin); $fecha->addDay(), $dia++) {
+            $calendario[$fecha->toDateString()] = $ciclo[($dia + $indiceInicial) % count($ciclo)];
+        }
+
+        return $calendario;
+    }
+
+    private function validarHorizonte(Carbon $inicio, Carbon $fin): void
+    {
+        if ($fin->gt($inicio->copy()->addYearNoOverflow())) {
+            throw ValidationException::withMessages(['f_fecha_fin' => 'Puedes planificar hasta un año por asignación.']);
+        }
+    }
+
+    /** @return Collection<string, Turno> */
+    private function turnoIndividual(string $codigo): Collection
+    {
+        $turno = Turno::whereKey($codigo)->where('estado', 'ACTIVO')->lockForUpdate()->first();
+        if (! $turno) {
+            throw ValidationException::withMessages(['f_cod_turno' => 'El turno seleccionado no está disponible.']);
+        }
+
+        return collect([$codigo => $turno]);
+    }
+
+    /** @return Collection<string, Turno> */
+    private function turnosRotacion(bool $bloquear = false): Collection
+    {
+        $nombres = array_merge(...array_column(self::TURNOS_ROTACION, 'catalogo'));
+        $catalogo = Turno::query()->whereIn('nombre', $nombres)->where('estado', 'ACTIVO')->orderBy('cod_turno')
+            ->when($bloquear, fn ($query) => $query->lockForUpdate())->get();
+
+        $turnos = collect();
+        $faltantes = [];
+        foreach (self::TURNOS_ROTACION as $fase => $definicion) {
+            $coincidencias = $catalogo->filter(fn (Turno $turno) => in_array($turno->nombre, $definicion['catalogo'], true)
+                && in_array($turno->hora_inicio, [$definicion['inicio'], $definicion['inicio'].':00'], true)
+                && in_array($turno->hora_cierre, [$definicion['fin'], $definicion['fin'].':00'], true));
+            if ($coincidencias->count() !== 1) {
+                $faltantes[] = $definicion['nombre'].' '.$definicion['inicio'].'–'.$definicion['fin'];
+
+                continue;
+            }
+            $turnos[$fase] = $coincidencias->sole();
+        }
+        if ($faltantes !== []) {
+            throw ValidationException::withMessages(['f_rotacion_automatica' => 'El catálogo debe tener un turno activo por cada horario. Revisa: '.implode(', ', $faltantes).'.']);
+        }
+
+        return $turnos;
     }
 
     public function actualizarGrupo(array $entrada, string $codAsignacion, string $estado, Carbon $fecha): void
@@ -238,7 +384,7 @@ final class GestionarHorariosPersonal
         DB::transaction(fn () => $this->actualizarEstadoAsignacionGrupo($entrada, $codAsignacion, $estado, $fecha));
     }
 
-    private function verificarSolapamiento(array $entrada, Turno $turno): ?string
+    private function verificarSolapamiento(array $entrada, Collection $turnos, array $calendario): ?string
     {
         $idsExcluir = $entrada['modoEdicion'] && ($entrada['codAsignacionEditar'] ?? null)
             ? $this->idsGrupo($entrada, $entrada['codAsignacionEditar'])
@@ -249,14 +395,12 @@ final class GestionarHorariosPersonal
                 ->filter(fn ($a) => Carbon::parse($a->jornada->fecha_jornada)->setTimeFromTimeString($a->jornada->turno->hora_inicio)->gte($corte))->modelKeys();
         }
 
-        $fechaBase = Carbon::parse($entrada['f_fecha_inicio'])->startOfDay();
-        $fechas = collect($entrada['f_dias_semana'])
-            ->map(fn (string $dia) => $this->fechaParaDia($entrada, $fechaBase, $dia)->toDateString())
-            ->all();
+        $desde = Carbon::parse(array_key_first($calendario))->subDays(2)->toDateString();
+        $hasta = Carbon::parse(array_key_last($calendario))->addDays(2)->toDateString();
         $existentes = $this->queryHorarios($entrada)
             ->with('jornada.turno')
             ->whereIn('estado', ['ACTIVO', 'ACTIVA'])
-            ->whereHas('jornada', fn ($query) => $query->whereBetween('fecha_jornada', [Carbon::parse(min($fechas))->subDay()->toDateString(), Carbon::parse(max($fechas))->addDay()->toDateString()]))
+            ->whereHas('jornada', fn ($query) => $query->whereDate('fecha_jornada', '>=', $desde)->whereDate('fecha_jornada', '<=', $hasta))
             ->when($idsExcluir !== [], function ($query) use ($idsExcluir, $entrada) {
                 $query->whereNotIn($this->primaryKeyHorario($entrada), $idsExcluir);
             })
@@ -268,17 +412,39 @@ final class GestionarHorariosPersonal
                 throw ValidationException::withMessages(['f_cod_turno' => 'Una asignación existente no tiene un turno verificable. Revise la planificación.']);
             }
             [$inicioExistente, $finExistente] = $this->intervalo($existente->jornada->fecha_jornada, $turnoExistente);
-            foreach ($fechas as $fecha) {
+            $finDescansoExistente = $this->finConDescansoRotativo($turnoExistente, (string) $existente->tipo_asignacion, $finExistente);
+            $fechaExistente = Carbon::parse($existente->jornada->fecha_jornada);
+            $diaExistente = $fechaExistente->toDateString();
+            if (array_key_exists($diaExistente, $calendario) && $calendario[$diaExistente] === null) {
+                return 'El descanso del '.$fechaExistente->format('d/m/Y').' tiene un turno activo ('.$turnoExistente->nombre.').';
+            }
+            // La noche rotativa conserva además las 24 horas de descanso posteriores.
+            for ($desplazamiento = -2; $desplazamiento <= 2; $desplazamiento++) {
+                $fecha = $fechaExistente->copy()->addDays($desplazamiento)->toDateString();
+                if (! isset($calendario[$fecha])) {
+                    continue;
+                }
+                $turno = $turnos[$calendario[$fecha]];
                 [$inicio, $fin] = $this->intervalo($fecha, $turno);
                 if ($inicio->lt($finExistente) && $inicioExistente->lt($fin)) {
-                    $dia = $this->diaDesdeFecha($entrada, $existente->jornada->fecha_jornada);
-
-                    return "Ya existe un horario activo que se cruza el día {$dia} con el turno {$turnoExistente?->nombre}.";
+                    return 'El horario del '.$inicio->format('d/m/Y').' se cruza con el turno '.$turnoExistente->nombre.' del '.$fechaExistente->format('d/m/Y').'.';
+                }
+                $finDescanso = $this->finConDescansoRotativo($turno, $entrada['f_tipo_asignacion'], $fin);
+                if ($inicio->lt($finDescansoExistente) && $inicioExistente->lt($finDescanso)) {
+                    return 'El horario del '.$inicio->format('d/m/Y').' invade las 24 horas de descanso posteriores a una noche rotativa.';
                 }
             }
         }
 
         return null;
+    }
+
+    public function finConDescansoRotativo(Turno $turno, string $tipo, Carbon $fin): Carbon
+    {
+        $esNocheRotativa = $tipo === 'ROTATIVO' && in_array($turno->hora_inicio, ['23:00', '23:00:00'], true)
+            && in_array($turno->hora_cierre, ['07:00', '07:00:00'], true);
+
+        return $esNocheRotativa ? $fin->copy()->addDay() : $fin;
     }
 
     private function intervalo(mixed $fecha, Turno $turno): array
@@ -320,10 +486,5 @@ final class GestionarHorariosPersonal
         }
 
         return [$inicioMinutos, $finMinutos];
-    }
-
-    private function diaDesdeFecha(array $entrada, mixed $fecha): string
-    {
-        return self::DIAS[Carbon::parse($fecha)->dayOfWeekIso - 1];
     }
 }

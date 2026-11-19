@@ -157,7 +157,7 @@ SISTEMA EXPERTO
 - reglas;
 - pesos;
 - normalización;
-- agregación multicriterio;
+- agregación;
 - motor de inferencia;
 - clasificación de riesgo cognitivo;
 - alertas preventivas;
@@ -1290,7 +1290,7 @@ PESOS
 ↓
 REGLAS
 ↓
-AGREGACIÓN MULTICRITERIO
+AGREGACIÓN
 ↓
 INFERENCIA
 ↓
@@ -1422,7 +1422,7 @@ REGLAS
 - conflictos;
 - prioridades.
 
-MULTICRITERIO
+VARIABLES Y AGREGACIÓN
 - variables;
 - normalización;
 - pesos;

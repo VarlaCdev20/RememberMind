@@ -58,6 +58,21 @@ final class HechoInstantaneaExperta extends ModeloExperto
         return $this->belongsTo(Personal::class, 'cod_personal_autor', 'cod_personal');
     }
 
+    public function respuestaOriginal(): BelongsTo
+    {
+        return $this->belongsTo(RespuestaInstrumento::class, 'cod_respuesta', 'cod_respuesta');
+    }
+
+    public function aplicacionOriginal(): BelongsTo
+    {
+        return $this->belongsTo(AplicacionInstrumento::class, 'cod_aplicacion', 'cod_aplicacion');
+    }
+
+    public function valoracionPetersenOriginal(): BelongsTo
+    {
+        return $this->belongsTo(ValoracionPetersenOriginal::class, 'cod_valoracion_petersen', 'cod_valoracion_petersen');
+    }
+
     /** Devuelve las columnas del bloque cognitivo presente en esta fila, sin consulta adicional. */
     public function caracterizacionCognitiva(): ?array
     {

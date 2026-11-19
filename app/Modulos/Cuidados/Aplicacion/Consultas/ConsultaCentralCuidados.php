@@ -158,6 +158,20 @@ final class ConsultaCentralCuidados
     {
         [, $tipo, , $fecha, $label] = self::FUENTES[$origen];
         $residente = $origen === 'curaciones' ? $modelo->herida->residente : $modelo->residente;
+        $campos = $this->camposPresentacion($origen, $modelo);
+
+        return [
+            'origen' => $origen, 'tipo' => $tipo, 'codigo' => (string) $modelo->getKey(), 'label' => $label,
+            'fecha' => $modelo->{$fecha}->format($origen === 'sueno' ? 'd/m/Y' : 'd/m/Y H:i'),
+            'residente_codigo' => $residente->getKey(), 'residente' => trim($residente->nombres.' '.$residente->apellido_paterno.' '.$residente->apellido_materno),
+            'profesional' => $modelo->personal ? trim($modelo->personal->nombres.' '.$modelo->personal->apellido_paterno.' '.$modelo->personal->apellido_materno) : 'Autor no informado en el registro',
+            'estado' => $modelo->getAttribute('estado'), 'campos' => $campos,
+        ];
+    }
+
+    /** Solo formato de un modelo ya autorizado; no consulta ni concede acceso. */
+    public function camposPresentacion(string $origen, Model $modelo): array
+    {
         $campos = [];
         if (in_array($origen, ['eliminacion', 'movilidad'], true)) {
             $resumen = $modelo->resumenOperacional();
@@ -178,6 +192,9 @@ final class ConsultaCentralCuidados
                     continue;
                 }
                 $texto = is_bool($valor) ? ($valor ? 'Sí' : 'No') : ($valor instanceof \DateTimeInterface ? $valor->format('d/m/Y H:i') : (string) $valor);
+                if (preg_match('/^[A-Z][A-Z_]+$/D', $texto)) {
+                    $texto = mb_convert_case(str_replace('_', ' ', $texto), MB_CASE_TITLE, 'UTF-8');
+                }
                 $campos[] = ['nombre' => $nombre, 'valor' => $texto];
             }
         }
@@ -186,12 +203,6 @@ final class ConsultaCentralCuidados
                 ['nombre' => 'Herida', 'valor' => $modelo->herida->tipo_herida.' · '.$modelo->herida->ubicacion]);
         }
 
-        return [
-            'origen' => $origen, 'tipo' => $tipo, 'codigo' => (string) $modelo->getKey(), 'label' => $label,
-            'fecha' => $modelo->{$fecha}->format($origen === 'sueno' ? 'd/m/Y' : 'd/m/Y H:i'),
-            'residente_codigo' => $residente->getKey(), 'residente' => trim($residente->nombres.' '.$residente->apellido_paterno.' '.$residente->apellido_materno),
-            'profesional' => $modelo->personal ? trim($modelo->personal->nombres.' '.$modelo->personal->apellido_paterno.' '.$modelo->personal->apellido_materno) : 'Autor no informado en el registro',
-            'estado' => $modelo->getAttribute('estado'), 'campos' => $campos,
-        ];
+        return $campos;
     }
 }

@@ -50,6 +50,28 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         app('request')->setMethod('POST');
     }
 
+    public function test_busqueda_para_asignar_filtra_por_nombre_completo_correo_y_rol(): void
+    {
+        $contacto = User::factory()->create(['correo' => 'persona.contacto@example.test', 'estado' => 'ACTIVO']);
+        $contacto->assignRole('FAMILIAR');
+        $panel = Livewire::test(TurnosAsignacionesPanel::class)
+            ->call('abrirNuevaAsignacion')
+            ->assertViewHas('personalModal', fn ($filas) => $filas->isEmpty())
+            ->set('busquedaModal', 'P')
+            ->assertViewHas('personalModal', fn ($filas) => $filas->isEmpty())
+            ->set('busquedaModal', 'Persona Sintetica')
+            ->assertViewHas('personalModal', fn ($filas) => $filas->modelKeys() === [$this->trabajador->getKey()])
+            ->set('busquedaModal', 'ENFERMEROS')
+            ->assertViewHas('personalModal', fn ($filas) => $filas->modelKeys() === [$this->trabajador->getKey()])
+            ->set('busquedaModal', $this->trabajador->correo)
+            ->assertViewHas('personalModal', fn ($filas) => $filas->modelKeys() === [$this->trabajador->getKey()])
+            ->set('busquedaModal', 'persona.contacto@example.test')
+            ->assertViewHas('personalModal', fn ($filas) => $filas->isEmpty())
+            ->set('busquedaModal', 'sin-coincidencia')
+            ->assertSee('No encontramos coincidencias.');
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
+    }
+
     public function test_noche_del_dia_anterior_impide_asignacion_superpuesta_y_preserva_sql(): void
     {
         $noche = $this->turno('Noche', '20:00', '08:00');
@@ -66,6 +88,40 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $this->assertDatabaseCount('jornadas', 1);
     }
 
+    public function test_preparar_turnos_de_ocho_horas_es_idempotente_y_exige_permiso_de_catalogo(): void
+    {
+        $accion = app(GestionarHorariosPersonal::class);
+        $accion->prepararTurnosRotacion();
+        $accion->prepararTurnosRotacion();
+        $this->assertDatabaseCount('turnos', 3);
+        $this->assertDatabaseHas('turnos', ['nombre' => 'TURNO NOCHE', 'hora_inicio' => '23:00:00', 'hora_cierre' => '07:00:00']);
+
+        $this->actor->syncRoles([]);
+        $this->actor->syncPermissions(['turnos.asignar']);
+        try {
+            $accion->prepararTurnosRotacion();
+            $this->fail('El permiso de asignar no permite modificar el catálogo.');
+        } catch (HttpException $error) {
+            $this->assertSame(403, $error->getStatusCode());
+        }
+        $this->assertDatabaseCount('turnos', 3);
+    }
+
+    public function test_preparar_turnos_conserva_un_turno_referenciado_con_horas_distintas(): void
+    {
+        $turno = $this->turno('TURNO NOCHE', '20:00:00', '08:00:00');
+        $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => '2026-11-16', 'estado' => 'CERRADA']);
+        try {
+            app(GestionarHorariosPersonal::class)->prepararTurnosRotacion();
+            $this->fail('El catálogo existente requiere revisión.');
+        } catch (ValidationException $error) {
+            $this->assertArrayHasKey('f_rotacion_automatica', $error->errors());
+        }
+        $this->assertDatabaseCount('turnos', 1);
+        $this->assertSame('20:00:00', $turno->fresh()->hora_inicio);
+        $this->assertSame($turno->getKey(), $jornada->fresh()->cod_turno);
+    }
+
     public function test_fin_de_guardia_contiguo_no_es_solapamiento(): void
     {
         $noche = $this->turno('Noche', '20:00', '08:00');
@@ -78,13 +134,37 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
             ->assertOk()->assertSeeText('26/10 08:00')->assertSeeText('Persona Sintetica');
     }
 
+    public function test_conflicto_nocturno_en_una_semana_posterior_rechaza_todo_el_horario_fijo(): void
+    {
+        $noche = $this->turno('Noche', '20:00', '08:00');
+        $manana = $this->turno('Mañana', '07:00', '15:00');
+        $jornada = Jornada::create(['cod_turno' => $noche->getKey(), 'fecha_jornada' => '2026-11-08', 'estado' => 'ABIERTA']);
+        AsignacionPersonal::create(['cod_jornada' => $jornada->getKey(), 'cod_personal' => $this->trabajador->personal->getKey(), 'cod_area' => $this->area->getKey(), 'estado' => 'ACTIVO']);
+
+        try {
+            app(GestionarHorariosPersonal::class)->guardar(array_replace($this->entrada($manana), [
+                'f_tipo_asignacion' => 'FIJO',
+                'f_fecha_fin' => '2026-11-09',
+            ]));
+            $this->fail('Debió rechazar el cruce nocturno de la última semana.');
+        } catch (ValidationException $error) {
+            $this->assertStringContainsString('09/11/2026', $error->errors()['f_dias_semana'][0]);
+        }
+
+        $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
+        $this->assertDatabaseCount('jornadas', 1);
+    }
+
     public function test_calendario_gerencial_inicia_en_semana_y_muestra_estados_activo_y_activa(): void
     {
         $this->travelTo(Carbon::parse('2026-10-26 10:00:00'));
         $turno = $this->turno('Turno nocturno', '20:00', '08:00');
+        $this->turno('Turno sin asignaciones', '08:00', '16:00');
         $jornada = Jornada::create(['cod_turno' => $turno->getKey(), 'fecha_jornada' => '2026-10-26', 'estado' => 'ABIERTA']);
         AsignacionPersonal::create(['cod_personal' => $this->trabajador->personal->getKey(), 'cod_area' => $this->area->getKey(), 'cod_jornada' => $jornada->getKey(), 'estado' => 'ACTIVO']);
         $calendario = Livewire::test(TurnosAsignacionesPanel::class)->assertSet('tipoPlanilla', 'general')->assertSet('vistaCalendario', 'semana')
+            ->assertViewHas('filasAgenda', fn ($filas) => $filas->count() === 1 && $filas->first()['codigo'] === $turno->getKey())
+            ->assertDontSee('Detalle de la asignación')
             ->assertSee('Planificación del equipo')->assertSee('Persona Sintetica')->assertSee('27/10 08:00')->assertDontSee('Turnos por cubrir');
         $calendario->call('cambiarVista', 'mes')->assertSee('personas con asignación')->call('seleccionarFecha', '2026-10-26')->assertSet('vistaCalendario', 'dia')->assertSee('Turno nocturno');
         $this->assertSame(1, RegistrosConsumo::consulta('asignaciones_personal')->count());
@@ -144,6 +224,38 @@ class GerenciaPlanificacionSeguridadTest extends TestCase
         $cookie = $respuesta->getCookie(config('session.cookie'), decrypt: false);
         $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())->get(route($ruta, $fecha))->assertOk()->assertSeeText('Elige un área disponible.')
             ->assertSeeText('Elige un turno disponible.')->assertDontSeeText('Sin asignaciones en esta consulta');
+    }
+
+    public function test_filtros_ofrecen_ocho_horas_y_solo_especiales_vinculados_a_enfermeria(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-11 10:00:00'));
+        $this->trabajador->assignRole('ADMINISTRADOR');
+        $ordinario = $this->turno('Jornada ordinaria', '08:00:00', '16:00:00');
+        $especial = $this->turno('Cobertura nocturna especial', '20:00:00', '08:00:00');
+        $administrativoLargo = $this->turno('Horario antiguo administrativo', '06:00:00', '18:00:00');
+        $this->turno('Catálogo sin asignaciones', '07:00:00', '15:00:00');
+        $admin = User::factory()->create(['nombres' => 'Administración', 'apellido_paterno' => 'Sintética']);
+        $admin->assignRole('ADMINISTRADOR');
+        foreach ([[$this->trabajador, $ordinario], [$this->trabajador, $especial], [$admin, $ordinario], [$admin, $administrativoLargo]] as [$trabajador, $turno]) {
+            $jornada = Jornada::firstOrCreate(['cod_turno' => $turno->getKey(), 'fecha_jornada' => today()], ['estado' => 'ABIERTA']);
+            AsignacionPersonal::create(['cod_jornada' => $jornada->getKey(), 'cod_personal' => $trabajador->personal->getKey(), 'cod_area' => $this->area->getKey(), 'estado' => 'ACTIVO']);
+        }
+
+        $panel = Livewire::test(TurnosAsignacionesPanel::class)
+            ->assertViewHas('turnosFiltro', fn ($grupos) => $grupos->get('Jornadas de 8 horas')->pluck('valor')->all() === ['Jornada ordinaria']
+                && $grupos->get('Especiales de Enfermería')->pluck('valor')->all() === ['Cobertura nocturna especial'])
+            ->set('filtroTurno', 'Cobertura nocturna especial')
+            ->assertViewHas('turnosFiltro', fn ($grupos) => $grupos->count() === 2)
+            ->call('cambiarTipoPlanilla', 'administrativo')
+            ->assertSet('filtroTurno', '')
+            ->assertViewHas('turnosFiltro', fn ($grupos) => $grupos->keys()->all() === ['Jornadas de 8 horas'])
+            ->call('cambiarTipoPlanilla', 'enfermeria')
+            ->call('limpiarFiltros')
+            ->assertSet('filtroRol', 'ENFERMEROS')
+            ->assertSet('tipoPlanilla', 'enfermeria')
+            ->assertViewHas('turnosFiltro', fn ($grupos) => $grupos->count() === 2);
+        $panel->call('moverPeriodo', 1)->assertViewHas('turnosFiltro', fn ($grupos) => $grupos->isEmpty());
+        $this->assertSame(4, RegistrosConsumo::consulta('asignaciones_personal')->count());
     }
 
     private function turno(string $nombre, string $inicio, string $fin): Turno

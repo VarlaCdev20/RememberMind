@@ -91,6 +91,9 @@ class TurnosAsignacionesPanel extends Component
 
     public ?string $usuarioSeleccionado = null;
 
+    #[Locked]
+    public bool $crearHorarioSeleccionado = true;
+
     /*
     |--------------------------------------------------------------------------
     | Planilla institucional por tipo de personal
@@ -186,7 +189,8 @@ class TurnosAsignacionesPanel extends Component
                 $filtros = $contexto->validated();
                 if (isset($filtros['fecha'])) {
                     $this->fechaSeleccionada = $filtros['fecha'];
-                    $this->vistaCalendario = 'dia';
+                    $periodo = request()->query('periodo');
+                    $this->vistaCalendario = in_array($periodo, ['dia', 'semana', 'mes'], true) ? $periodo : 'dia';
                 }
                 $this->filtroArea = $filtros['area'] ?? '';
                 $this->filtroTurno = isset($filtros['turno']) ? (Turno::find($filtros['turno'])?->nombre ?? '') : '';
@@ -235,10 +239,11 @@ class TurnosAsignacionesPanel extends Component
         $this->dispatch('planificacion-detalle-cerrado', codigo: $codigo);
     }
 
-    public function seleccionarUsuario(string $codUsuario): void
+    public function seleccionarUsuario(string $codUsuario, bool $crearHorario = true): void
     {
         $this->autorizarAsignacion();
         $this->usuarioSeleccionado = $codUsuario;
+        $this->crearHorarioSeleccionado = $crearHorario;
         $this->modalAbierto = true;
     }
 
@@ -295,6 +300,7 @@ class TurnosAsignacionesPanel extends Component
             'filtroTurno',
             'filtroEstado',
         ]);
+        $this->cambiarTipoPlanilla($this->tipoPlanilla);
     }
 
     /*
@@ -310,6 +316,7 @@ class TurnosAsignacionesPanel extends Component
         }
 
         $this->tipoPlanilla = $tipo;
+        $this->filtroTurno = '';
 
         if ($tipo==='general') {
             $this->filtroTipo=''; $this->filtroRol='';
@@ -498,7 +505,11 @@ class TurnosAsignacionesPanel extends Component
         $turnos = Turno::activos()->orderBy('hora_inicio')->get();
         $roles = Role::orderBy('name')->pluck('name');
         $personal = $this->personalFiltrado()->get();
-        $asignaciones = $this->asignacionesFiltradas();
+        $asignacionesContexto = $this->asignacionesFiltradas(aplicarTurno: false);
+        $turnosFiltro = $this->turnosParaFiltro($asignacionesContexto, $fecha);
+        $asignaciones = $asignacionesContexto
+            ->when($this->filtroTurno !== '', fn ($filas) => $filas->filter(fn ($asignacion) => $asignacion->turno?->nombre === $this->filtroTurno))
+            ->values();
         $asignacionesActivas = $asignaciones->whereIn('estado', ['ACTIVO', 'ACTIVA'])->values();
         $conflictos = $this->detectarConflictos($asignacionesActivas);
 
@@ -515,11 +526,9 @@ class TurnosAsignacionesPanel extends Component
             $eventosAgenda = collect($datosCalendario['dias'])->flatMap(fn ($dia) => $dia['eventos']);
             $detalleAgenda = $eventosAgenda->first(fn ($evento) => $evento['asignacion']->cod_asignacion === $this->asignacionSeleccionada);
             if (! $detalleAgenda) $this->asignacionSeleccionada = null;
-            $filasAgenda = $turnos->map(fn ($turno) => ['codigo'=>$turno->getKey(), 'nombre'=>$turno->nombre,
-                'inicio'=>substr($turno->hora_inicio, 0, 5), 'fin'=>substr($turno->hora_cierre, 0, 5)]);
-            $filasAgenda = $filasAgenda->concat($eventosAgenda->map(fn ($evento) => [
+            $filasAgenda = $eventosAgenda->map(fn ($evento) => [
                 'codigo'=>$evento['asignacion']->cod_turno, 'nombre'=>$evento['asignacion']->turno?->nombre ?: 'Sin turno registrado',
-                'inicio'=>$evento['inicio_hora'], 'fin'=>$evento['fin_hora']]))->unique('codigo')
+                'inicio'=>$evento['inicio_hora'], 'fin'=>$evento['fin_hora']])->unique('codigo')
                 ->when($this->filtroTurno !== '', fn ($filas) => $filas->where('nombre', $this->filtroTurno))->sortBy('inicio')->values();
         } else {
             $this->asignacionSeleccionada = null;
@@ -534,6 +543,7 @@ class TurnosAsignacionesPanel extends Component
         return view($vista, [
             'areas' => $areas,
             'turnos' => $turnos,
+            'turnosFiltro' => $turnosFiltro,
             'roles' => $roles,
             'stats' => $this->metricas($personal, $asignacionesActivas, $turnos),
             'datosCalendario' => $datosCalendario,
@@ -665,7 +675,7 @@ class TurnosAsignacionesPanel extends Component
             });
     }
 
-    private function asignacionesFiltradas(): Collection
+    private function asignacionesFiltradas(bool $aplicarTurno = true): Collection
     {
         $all = $this->obtenerVirtualAsignaciones();
 
@@ -697,7 +707,7 @@ class TurnosAsignacionesPanel extends Component
             $all = $all->filter(fn ($asig) => $asig->cod_area === $area);
         }
 
-        if ($this->filtroTurno !== '') {
+        if ($aplicarTurno && $this->filtroTurno !== '') {
             $turno = $this->filtroTurno;
             $all = $all->filter(fn ($asig) => ($asig->turno?->nombre ?? '') === $turno);
         }
@@ -711,30 +721,74 @@ class TurnosAsignacionesPanel extends Component
         return $all->values();
     }
 
+    private function turnosParaFiltro(Collection $asignaciones, Carbon $fecha): Collection
+    {
+        $inicioPeriodo = match ($this->vistaCalendario) {
+            'dia' => $fecha->copy()->startOfDay(),
+            'mes' => $fecha->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY),
+            'anio' => $fecha->copy()->startOfYear(),
+            default => $fecha->copy()->startOfWeek(Carbon::MONDAY),
+        };
+        $finPeriodo = match ($this->vistaCalendario) {
+            'dia' => $fecha->copy()->endOfDay(),
+            'mes' => $fecha->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY),
+            'anio' => $fecha->copy()->endOfYear(),
+            default => $fecha->copy()->endOfWeek(Carbon::SUNDAY),
+        };
+
+        return $asignaciones->filter(fn ($asignacion) => $asignacion->turno !== null
+            && $asignacion->fecha_inicio?->gte($inicioPeriodo) && $asignacion->fecha_inicio->lte($finPeriodo))
+            ->groupBy('cod_turno')->map(function (Collection $filas): ?array {
+                $turno = $filas->first()->turno;
+                $inicio = Carbon::parse('2000-01-01 '.$turno->hora_inicio);
+                $fin = Carbon::parse('2000-01-01 '.$turno->hora_fin);
+                if ($fin->lte($inicio)) {
+                    $fin->addDay();
+                }
+                $minutos = (int) $inicio->diffInMinutes($fin);
+                $esEnfermeria = $this->tipoPlanilla !== 'administrativo'
+                    && $filas->contains(fn ($fila) => $this->usuarioTieneRol($fila->usuario, ['ENFERMEROS']));
+                if ($minutos !== 480 && ! $esEnfermeria) {
+                    return null;
+                }
+
+                return [
+                    'valor' => $turno->nombre,
+                    'nombre' => $turno->nombre,
+                    'horario' => $inicio->format('H:i').'–'.$fin->format('H:i').($fin->day !== $inicio->day ? ' (+1 día)' : ''),
+                    'grupo' => $minutos === 480 ? 'Jornadas de 8 horas' : 'Especiales de Enfermería',
+                ];
+            })->filter()->sortBy('horario')->values()->groupBy('grupo');
+    }
+
     private function personalModal(): Collection
     {
-        if (! $this->modalAbierto || $this->usuarioSeleccionado) {
+        $busqueda = trim($this->busquedaModal);
+        if (! $this->modalAbierto || $this->usuarioSeleccionado || mb_strlen($busqueda) < 2) {
             return collect();
         }
 
-        return User::with(['roles'])
+        $terminos = array_slice(preg_split('/\s+/u', $busqueda), 0, 8);
+
+        return User::with(['roles', 'personal'])
             ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', [
                 ...self::ROLES_ADMINISTRATIVOS,
                 ...self::ROLES_SALUD,
             ]))
-            ->when($this->busquedaModal !== '', function (Builder $query) {
-                $busqueda = trim($this->busquedaModal);
-
-                $query->where(fn (Builder $query) => $query
-                    ->whereLike('correo', "%{$busqueda}%")
-                    ->orWhereLike('cod_usuario', "%{$busqueda}%")
-                    ->orWhereHas('personal', fn (Builder $personal) => $personal
-                        ->whereLike('nombres', "%{$busqueda}%")
-                        ->orWhereLike('apellido_paterno', "%{$busqueda}%")
-                        ->orWhereLike('apellido_materno', "%{$busqueda}%")));
+            ->where(function (Builder $query) use ($terminos) {
+                foreach ($terminos as $termino) {
+                    $query->where(fn (Builder $query) => $query
+                        ->whereLike('correo', "%{$termino}%")
+                        ->orWhereLike('cod_usuario', "%{$termino}%")
+                        ->orWhereHas('roles', fn (Builder $roles) => $roles->whereLike('name', "%{$termino}%"))
+                        ->orWhereHas('personal', fn (Builder $personal) => $personal
+                            ->whereLike('nombres', "%{$termino}%")
+                            ->orWhereLike('apellido_paterno', "%{$termino}%")
+                            ->orWhereLike('apellido_materno', "%{$termino}%")));
+                }
             })
             ->orderBy('correo')
-            ->limit(20)
+            ->limit(9)
             ->get();
     }
 

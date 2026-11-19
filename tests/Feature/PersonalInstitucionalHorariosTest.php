@@ -44,6 +44,14 @@ class PersonalInstitucionalHorariosTest extends TestCase
             ->set('f_fecha_inicio', '2026-06-08')
             ->set('f_tipo_asignacion', 'ROTATIVO')
             ->set('f_observaciones', 'Cobertura base')
+            ->call('previsualizarHorario')
+            ->assertHasNoErrors()
+            ->assertSet('vistaPreviaHorario.0.horario', '08:00–16:00')
+            ->assertSet('vistaPreviaHorario.0.descanso', false)
+            ->call('seleccionarDias', 'laborables')
+            ->assertSet('f_dias_semana', ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES'])
+            ->assertSet('vistaPreviaHorario', [])
+            ->set('f_dias_semana', ['LUNES', 'MARTES'])
             ->call('guardar')
             ->assertHasNoErrors();
 
@@ -54,6 +62,46 @@ class PersonalInstitucionalHorariosTest extends TestCase
             'cod_area' => $area->cod_area,
             'estado' => 'ACTIVO',
         ]);
+    }
+
+    public function test_horario_fijo_de_enfermeria_previsualiza_y_guarda_los_dias_hasta_la_fecha_inclusive(): void
+    {
+        $user = $this->crearUsuarioConRol('ENFERMEROS');
+        $area = $this->crearArea('ARE_0004', 'AREA DE ATENCION MEDICA', 'Salud');
+        $turno = $this->crearTurno('COD_TUR_000001', 'MANANA', '08:00:00', '16:00:00');
+
+        $formulario = Livewire::test(PersonalInstitucionalHorarios::class, [
+            'usuarioId' => $user->getKey(),
+        ])
+            ->call('abrirFormNuevo')
+            ->assertSet('formAbierto', true)
+            ->assertSee('Fecha de inicio')
+            ->assertDontSee('Repetir hasta')
+            ->set('f_cod_area', $area->getKey())
+            ->set('f_cod_turno', $turno->getKey())
+            ->set('f_tipo_asignacion', 'FIJO')
+            ->assertSet('f_tipo_asignacion', 'FIJO')
+            ->assertSee('Repetir hasta')
+            ->set('f_fecha_inicio', '2026-11-16')
+            ->set('f_dias_semana', ['LUNES', 'MIERCOLES'])
+            ->set('f_fecha_fin', '2026-11-15')
+            ->call('solicitarGuardar')
+            ->assertHasErrors(['f_fecha_fin'])
+            ->assertNotDispatched('confirmarGuardadoAsignacion')
+            ->set('f_fecha_fin', '2026-11-25')
+            ->call('solicitarGuardar')
+            ->assertHasNoErrors()
+            ->assertDispatched('confirmarGuardadoAsignacion', fn ($evento, $datos) => $datos[0]['fechas'] === [
+                '16/11/2026', '18/11/2026', '23/11/2026', '25/11/2026',
+            ]);
+
+        $this->assertSame(0, RegistrosConsumo::consulta('asignaciones_personal')->count());
+        $formulario->call('guardar')->assertHasNoErrors();
+
+        $asignaciones = AsignacionPersonal::where('cod_personal', $user->personal->getKey())->with('jornada')->get();
+        $this->assertSame(['2026-11-16', '2026-11-18', '2026-11-23', '2026-11-25'], $asignaciones
+            ->map(fn (AsignacionPersonal $asignacion) => $asignacion->jornada->fecha_jornada->toDateString())->sort()->values()->all());
+        $this->assertSame(['ABIERTA'], $asignaciones->pluck('jornada.estado')->unique()->values()->all());
     }
 
     public function test_edicion_posterior_conserva_ocurrencias_anteriores_y_registra_nuevas_fechas(): void
@@ -127,6 +175,17 @@ class PersonalInstitucionalHorariosTest extends TestCase
 
             $this->assertSame($guardado, $asignacion->fresh()->estado);
         }
+    }
+
+    public function test_el_formulario_administrativo_ofrece_jornadas_de_ocho_horas(): void
+    {
+        $usuario = $this->crearUsuarioConRol('ADMINISTRADOR');
+        $ordinario = $this->crearTurno('TUR_0001', 'JORNADA DIARIA', '08:00:00', '16:00:00');
+        $this->crearTurno('TUR_0002', 'GUARDIA ESPECIAL', '20:00:00', '08:00:00');
+
+        Livewire::test(PersonalInstitucionalHorarios::class, ['usuarioId' => $usuario->getKey()])
+            ->assertSet('turnos', fn ($turnos) => count($turnos) === 1 && $turnos[0]['cod_turno'] === $ordinario->getKey());
+        $this->assertDatabaseCount('turnos', 2);
     }
 
     private function crearUsuarioConRol(string $rol): User

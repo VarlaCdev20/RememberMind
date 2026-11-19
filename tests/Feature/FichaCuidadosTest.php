@@ -6,10 +6,12 @@ use App\Modulos\Clinica\Presentacion\Livewire\Paginas\FichaPaciente;
 use App\Models\Residente;
 use App\Models\Area;
 use App\Models\AsignacionResidenteJornada;
+use App\Models\Atencion;
 use App\Models\Cama;
 use App\Models\Habitacion;
 use App\Models\IntervencionCuidado;
 use App\Models\Jornada;
+use App\Models\PaseTurno;
 use App\Models\PlanCuidado;
 use App\Models\Turno;
 use App\Models\User;
@@ -136,6 +138,47 @@ class FichaCuidadosTest extends TestCase
             ->assertSee('Registrar')
             ->assertSee('Histórico de cuidados')
             ->assertSee('No existen cuidados ejecutados');
+    }
+
+    public function test_historial_muestra_el_seguimiento_registrado_desde_el_turno(): void
+    {
+        Atencion::create([
+            'cod_residente' => $this->adulto->getKey(),
+            'cod_personal' => $this->enfermero->personal->getKey(),
+            'cod_area' => $this->plan->cod_area,
+            'tipo_atencion' => 'SEGUIMIENTO_ENFERMERIA',
+            'fecha_hora' => now(),
+            'estado' => 'FINALIZADA',
+            'observacion' => 'Se registró tolerancia al traslado.',
+        ]);
+
+        Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->getKey()])
+            ->call('cambiarTab', 'historial')
+            ->assertSee('Evolución de Enfermería')
+            ->assertSee('Se registró tolerancia al traslado.');
+    }
+
+    public function test_historial_excluye_el_pase_que_sigue_en_borrador(): void
+    {
+        $siguiente = Jornada::create([
+            'cod_turno' => $this->jornada->cod_turno,
+            'fecha_jornada' => today()->addDay(),
+            'estado' => 'ABIERTA',
+        ]);
+        PaseTurno::create([
+            'cod_residente' => $this->adulto->getKey(),
+            'cod_jornada_saliente' => $this->jornada->getKey(),
+            'cod_jornada_entrante' => $siguiente->getKey(),
+            'cod_personal_saliente' => $this->enfermero->personal->getKey(),
+            'fecha_hora' => now(),
+            'estado' => PaseTurno::ESTADO_BORRADOR,
+            'resumen' => 'Pendiente de confirmación.',
+        ]);
+
+        $ficha = Livewire::test(FichaPaciente::class, ['adulto' => $this->adulto->getKey()])
+            ->call('cambiarTab', 'historial');
+
+        $this->assertNotContains('PASE_TURNO', collect($ficha->instance()->historialCronologico)->pluck('tipo'));
     }
 
     public function test_drawer_de_detalle_de_cuidado_y_registro_directo(): void

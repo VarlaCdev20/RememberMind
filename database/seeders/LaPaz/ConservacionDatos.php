@@ -2,8 +2,8 @@
 
 namespace Database\Seeders\LaPaz;
 
-use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+use App\Compartido\Infraestructura\Persistencia\CatalogoCodigos;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -16,6 +16,8 @@ final class ConservacionDatos
     private array $originales = [];
 
     private array $secuencias = [];
+
+    public function __construct(private readonly array $generadas = self::GENERADAS) {}
 
     public function capturar(): array
     {
@@ -94,7 +96,7 @@ final class ConservacionDatos
             if ($despues === $antes && array_key_exists($entidad, $this->secuencias)) {
                 continue;
             }
-            if (! in_array($entidad, self::GENERADAS, true) || $despues <= $antes) {
+            if (! in_array($entidad, $this->generadas, true) || $despues <= $antes) {
                 throw new RuntimeException('Cambio no permitido en una secuencia de códigos.');
             }
             $tabla = RegistrosConsumo::ORIGENES[$entidad][0] ?? $entidad;

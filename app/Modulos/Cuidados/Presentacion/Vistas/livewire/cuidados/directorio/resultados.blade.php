@@ -1,5 +1,5 @@
 <section class="rm-resident-directory__results animate-fade-in-up" aria-labelledby="residents-results-title" wire:loading.class="is-loading" wire:target="search,filtroEstado,filtroRapido,filtroAlertas,filtroMedicacion,filtroCuidados,filtroHabitacion,orden,vistaModo,aplicarFiltro,removerFiltro,limpiarFiltrosActivos,limpiarFiltros">
-    <div class="rm-resident-directory__results-header">
+    <div @class(['rm-resident-directory__results-header' => $stats['total'] > 0, 'sr-only' => $stats['total'] === 0])>
         <div>
             <h2 id="residents-results-title">{{ $stats['total'] }} {{ $stats['total'] === 1 ? 'residente' : 'residentes' }} {{ ($esSuperAdmin || $esModoConsulta) ? ($stats['total'] === 1 ? 'disponible' : 'disponibles') : ($stats['total'] === 1 ? 'asignado' : 'asignados') }}</h2>
         </div>
@@ -59,5 +59,5 @@
 </section>
 
 @if($pacientes->hasPages())
-    <nav class="rm-resident-directory__pagination" aria-label="Páginas de residentes">{{ $pacientes->links() }}</nav>
+    <x-ui.paginacion class="rm-pagination--compact rm-resident-directory__pagination" :paginator="$pacientes" mode="livewire" :show-per-page="false" label="residentes" />
 @endif

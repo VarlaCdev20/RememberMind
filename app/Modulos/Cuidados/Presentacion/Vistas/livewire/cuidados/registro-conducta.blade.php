@@ -29,6 +29,7 @@
                 <details class="rm-conducta__context-more"><summary>Detalles del registro <i class="ph-bold ph-caret-down" aria-hidden="true"></i></summary><dl><div><dt>Profesional que registra</dt><dd>{{ auth()->user()->name }}</dd></div><div><dt>Turno</dt><dd>{{ $jornada?->turno?->nombre ?: 'Sin jornada activa' }}</dd></div><div><dt>Fecha y hora del servidor</dt><dd>{{ now()->format('d/m/Y · H:i') }} · Se guardan al confirmar</dd></div></dl></details>
             </div>
             <x-ui.clinical-consultation-bar label="Consultar conducta registrada">
+                <x-ui.nursing-report-link area="conducta" :residente="$residente->getKey()" />
                 <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" x-ref="historyTrigger" @click="openHistory($event.currentTarget)" x-bind:aria-expanded="historyOpen" aria-controls="conducta-historial" aria-haspopup="dialog">Ver historial</x-ui.action-button>
                 <x-ui.action-button variant="secondary" icono="ph-chart-line" class="rm-conducta__evolution-trigger" @click="openTrend($event.currentTarget)" x-bind:aria-expanded="trendOpen" aria-controls="conducta-grafica-popup" aria-haspopup="dialog">Ver evolución</x-ui.action-button>
             </x-ui.clinical-consultation-bar>

@@ -1,223 +1,70 @@
-<div class="space-y-5 font-sans bg-[var(--rm-bg-app)] p-3 sm:p-5 rounded-2xl">
+<div class="space-y-4 min-w-0">
+    @php
+        $viasHistorial = ['ORAL' => 'Oral', 'SUBLINGUAL' => 'Sublingual', 'INTRAVENOSA' => 'Intravenosa', 'INTRAMUSCULAR' => 'Intramuscular', 'SUBCUTANEA' => 'Subcutánea', 'TOPICA' => 'Tópica', 'INHALATORIA' => 'Inhalatoria'];
+        $resultadosHistorial = ['ADMINISTRADA' => 'Administrada', 'OMITIDA' => 'Omitida', 'RECHAZADA' => 'Rechazada'];
+        $residenteHistorial = $residentes->firstWhere('cod_residente', $filtroHistorialResidente)?->nombre_completo;
+        $filtrosHistorial = array_filter([
+            'filtroHistorialBusqueda' => $filtroHistorialBusqueda ? 'Búsqueda: '.Str::limit($filtroHistorialBusqueda, 24) : null,
+            'filtroHistorialResultado' => isset($resultadosHistorial[$filtroHistorialResultado]) ? 'Resultado: '.$resultadosHistorial[$filtroHistorialResultado] : null,
+            'filtroHistorialResidente' => $residenteHistorial ? 'Residente: '.$residenteHistorial : null,
+            'filtroHistorialVia' => isset($viasHistorial[$filtroHistorialVia]) ? 'Vía: '.$viasHistorial[$filtroHistorialVia] : null,
+            'filtroHistorialMedicamento' => $filtroHistorialMedicamento ? 'Medicamento: '.Str::limit($filtroHistorialMedicamento, 24) : null,
+            'filtroHistorialFechaDesde' => $filtroHistorialFechaDesde ? 'Desde: '.$filtroHistorialFechaDesde : null,
+            'filtroHistorialFechaHasta' => $filtroHistorialFechaHasta ? 'Hasta: '.$filtroHistorialFechaHasta : null,
+        ]);
+    @endphp
+    <x-ui.filter-bar class="rm-nursing-filters" aria-label="Filtros del historial" x-data="{ masFiltros: false }">
+        <div class="rm-nursing-filters__row">
+            <x-ui.field label="Buscar" for="historial-med-buscar">
+                <input id="historial-med-buscar" type="search" class="rm-input" wire:model.live.debounce.300ms="filtroHistorialBusqueda" placeholder="Buscar residente o medicamento...">
+            </x-ui.field>
+            <x-ui.field label="Resultado" for="historial-med-resultado">
+                <select id="historial-med-resultado" class="rm-select" wire:model.live="filtroHistorialResultado">
+                    <option value="">Todos los resultados</option>
+                    @foreach($resultadosHistorial as $codigo => $etiqueta)<option value="{{ $codigo }}">{{ $etiqueta }}</option>@endforeach
+                </select>
+            </x-ui.field>
+            <div class="rm-nursing-filters__actions">
+                <x-ui.action-button variant="secondary" icono="ph-faders" @click="masFiltros = !masFiltros" aria-controls="historial-med-filtros-extra" x-bind:aria-expanded="masFiltros">Más filtros</x-ui.action-button>
+                @if($filtrosHistorial)<x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" data-rm-action-icon aria-label="Limpiar filtros" wire:click="resetFilters" />@endif
+            </div>
+        </div>
+        <div id="historial-med-filtros-extra" class="rm-nursing-filters__extra" x-show="masFiltros" x-cloak>
+            <x-ui.field label="Residente" for="historial-med-residente">
+                <select id="historial-med-residente" class="rm-select" wire:model.live="filtroHistorialResidente">
+                    <option value="">Todos los residentes</option>
+                    @foreach($residentes as $residente)<option value="{{ $residente->cod_residente }}">{{ $residente->nombre_completo }}</option>@endforeach
+                </select>
+            </x-ui.field>
+            <x-ui.field label="Medicamento" for="historial-med-medicamento">
+                <input id="historial-med-medicamento" type="search" class="rm-input" wire:model.live.debounce.300ms="filtroHistorialMedicamento" placeholder="Filtrar por medicamento...">
+            </x-ui.field>
+            <x-ui.field label="Vía de administración" for="historial-med-via">
+                <select id="historial-med-via" class="rm-select" wire:model.live="filtroHistorialVia">
+                    <option value="">Todas las vías</option>
+                    @foreach($viasHistorial as $codigo => $etiqueta)<option value="{{ $codigo }}">{{ $etiqueta }}</option>@endforeach
+                </select>
+            </x-ui.field>
+            @foreach(['Desde', 'Hasta'] as $extremo)
+                <x-ui.field :label="$extremo" :for="'historial-med-'.strtolower($extremo)">
+                    <input id="historial-med-{{ strtolower($extremo) }}" class="rm-input" type="date" wire:model.live="filtroHistorialFecha{{ $extremo }}">
+                </x-ui.field>
+            @endforeach
+        </div>
+        @if($filtrosHistorial)
+            <div class="rm-active-filters-row" aria-label="Filtros aplicados">
+                <span class="rm-active-filters-row__label">Filtros activos:</span>
+                <div class="rm-active-filters-row__chips">
+                    @foreach($filtrosHistorial as $campo => $texto)
+                        <x-ui.active-filter-chip :type="$campo" :label="$texto" :on-remove="'limpiarFiltro(\''.$campo.'\')'" />
+                    @endforeach
+                    <span class="rm-medication-workspace__count">{{ count($historial) }} coincidentes</span>
+                </div>
+            </div>
+        @endif
+    </x-ui.filter-bar>
 
- {{-- ==================================================
- 1. BARRA DE FILTROS ESPECÍFICA DE HISTORIAL
- ================================================== --}}
- <x-ui.filter-bar class="mb-4">
-
- {{-- Fila Principal: Búsqueda y Selectores Primarios --}}
- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
-
- {{-- 1. Búsqueda textual: residente o medicamento --}}
- <div class="lg:col-span-4 relative flex items-center">
- <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
-  <i class="ph ph-magnifying-glass text-base"></i>
- </span>
- <span class="sr-only">Buscar residente...</span>
- <input type="text"
-  wire:model.live.debounce.300ms="filtroHistorialBusqueda"
-  placeholder="Buscar residente o medicamento..."
-  title="Buscar residente..."
-  aria-label="Buscar residente..."
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-input-placeholder)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]" />
- @if(!empty($filtroHistorialBusqueda))
-  <button type="button"
-  wire:click="limpiarFiltro('filtroHistorialBusqueda')"
-  class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-muted)] hover:text-[var(--rm-action-primary)] transition cursor-pointer"
-  title="Limpiar búsqueda">
-  <i class="ph ph-x-circle text-base"></i>
-  </button>
- @endif
- </div>
-
- {{-- 2. Resultado (Administrada / Omitida / Rechazada) --}}
- <div class="lg:col-span-3">
- <select wire:model.live="filtroHistorialResultado" aria-label="Resultado de administración"
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
-  <option value="">Todos los resultados</option>
-  <option value="ADMINISTRADA">Administradas</option>
-  <option value="OMITIDA">OMITIDA / Omisiones</option>
-  <option value="RECHAZADA">Rechazadas</option>
- </select>
- </div>
-
- {{-- 3. Residente --}}
- <div class="lg:col-span-3">
- <select wire:model.live="filtroHistorialResidente" aria-label="Residente del historial"
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
-  <option value="">Todos los residentes</option>
-  @foreach($residentes as $res)
-  <option value="{{ $res->cod_residente }}">
-  {{ $res->apellido_paterno ?? $res->ap_paterno }} {{ $res->nombres }}
-  </option>
-  @endforeach
- </select>
- </div>
-
- {{-- 4. Vía de Administración --}}
- <div class="lg:col-span-2">
- <select wire:model.live="filtroHistorialVia" aria-label="Vía de administración"
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]">
-  <option value="">Vía (Todas)</option>
-  <option value="ORAL">Oral</option>
-  <option value="SUBLINGUAL">Sublingual</option>
-  <option value="INTRAVENOSA">Intravenosa</option>
-  <option value="INTRAMUSCULAR">Intramuscular</option>
-  <option value="SUBCUTANEA">Subcutánea</option>
-  <option value="TOPICA">Tópica</option>
-  <option value="INHALATORIA">Inhalatoria</option>
- </select>
- </div>
- </div>
-
- {{-- Fila Secundaria: Filtro Fármaco y Rango de Fechas --}}
- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-2 border-t border-[var(--rm-border-soft)]/60 /60 items-center">
-
- {{-- Filtro Medicamento Específico --}}
- <div class="lg:col-span-6 relative flex items-center">
- <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-muted)]">
-  <i class="ph ph-pill text-base"></i>
- </span>
- <span class="sr-only">Buscar residente...</span>
- <input type="text"
-  wire:model.live.debounce.300ms="filtroHistorialMedicamento" aria-label="Filtrar por medicamento"
-  placeholder="Filtrar por medicamento..."
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]" />
- @if(!empty($filtroHistorialMedicamento))
-  <button type="button"
-  wire:click="limpiarFiltro('filtroHistorialMedicamento')"
-  class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-muted)] hover:text-[var(--rm-action-primary)] transition cursor-pointer"
-  title="Limpiar medicamento">
-  <i class="ph ph-x-circle text-base"></i>
-  </button>
- @endif
- </div>
-
- {{-- Fecha Desde --}}
- <div class="lg:col-span-3 flex items-center gap-2">
- <label for="fDesde" class="text-[11px] font-bold text-[var(--rm-text-muted)] shrink-0">Desde:</label>
- <input type="date"
-  id="fDesde"
-  wire:model.live="filtroHistorialFechaDesde"
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
-  title="Fecha desde" />
- </div>
-
- {{-- Fecha Hasta --}}
- <div class="lg:col-span-3 flex items-center gap-2">
- <label for="fHasta" class="text-[11px] font-bold text-[var(--rm-text-muted)] shrink-0">Hasta:</label>
- <input type="date"
-  id="fHasta"
-  wire:model.live="filtroHistorialFechaHasta"
-  class="w-full rounded-xl border border-[var(--rm-border-soft)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-focus)] focus:outline-none h-[38px]"
-  title="Fecha hasta" />
- </div>
- </div>
-
- {{-- Fila de chips de filtros activos --}}
- @php
- $historialChipsActivos = !empty($filtroHistorialBusqueda)
- || !empty($filtroHistorialResultado)
- || !empty($filtroHistorialResidente)
- || !empty($filtroHistorialMedicamento)
- || !empty($filtroHistorialVia)
- || !empty($filtroHistorialFechaDesde)
- || !empty($filtroHistorialFechaHasta);
- @endphp
-
- @if($historialChipsActivos)
- <div class="rm-filter-bar__active">
- <div class="flex flex-wrap items-center gap-1.5">
-  <span class="rm-filter-bar__active-label">
-  Filtros activos:
-  </span>
-
-  @if(!empty($filtroHistorialBusqueda))
-  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)] text-[11px] font-semibold shadow-2xs">
-  <i class="ph ph-magnifying-glass text-xs text-[var(--rm-action-primary)]"></i>
-  <span>Búsqueda: "{{ Str::limit($filtroHistorialBusqueda, 18) }}"</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialBusqueda')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5">
-  <i class="ph ph-x"></i>
-  </button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialResultado))
-  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg {{ strtoupper($filtroHistorialResultado) === 'ADMINISTRADA' ? 'bg-[var(--rm-action-primary-soft)] dark:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary-active)] border border-[var(--rm-action-primary)]/40' : 'bg-[var(--rm-danger-soft)] dark:bg-[var(--rm-action-primary)]/20 text-[var(--rm-action-primary)] border border-[var(--rm-danger)]/40' }} text-[11px] font-bold shadow-2xs">
-  <span>Resultado: {{ ucfirst(strtolower($filtroHistorialResultado)) }}</span>
-  <span class="sr-only">({{ strtoupper($filtroHistorialResultado) }})</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialResultado')" class="hover:text-[var(--rm-action-primary-active)] transition cursor-pointer ml-0.5">
-  <i class="ph ph-x"></i>
-  </button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialResidente))
-  @php $resHistFiltrado = $residentes->firstWhere('cod_residente', $filtroHistorialResidente); @endphp
-  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)] text-[11px] font-semibold shadow-2xs">
-  <i class="ph ph-user text-xs text-[var(--rm-action-primary)]"></i>
-  <span>Residente: {{ $resHistFiltrado ? ($resHistFiltrado->apellido_paterno ?? $resHistFiltrado->nombres) : 'Filtrado' }}</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialResidente')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5">
-  <i class="ph ph-x"></i>
-  </button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialMedicamento))
-  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)] text-[11px] font-semibold shadow-2xs">
-  <i class="ph ph-pill text-xs text-[var(--rm-action-primary)]"></i>
-  <span>Medicamento: "{{ Str::limit($filtroHistorialMedicamento, 16) }}"</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialMedicamento')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5">
-  <i class="ph ph-x"></i>
-  </button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialVia))
-  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-primary)] border border-[var(--rm-border-soft)] text-[11px] font-semibold shadow-2xs">
-  <span>Vía: {{ ucfirst(strtolower($filtroHistorialVia)) }}</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialVia')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5">
-  <i class="ph ph-x"></i>
-  </button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialFechaDesde))
-  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)] text-[11px] font-medium shadow-2xs">
-  <span>Desde: {{ \Carbon\Carbon::parse($filtroHistorialFechaDesde)->format('d/m/Y') }}</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialFechaDesde')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5"><i class="ph ph-x"></i></button>
-  </span>
-  @endif
-
-  @if(!empty($filtroHistorialFechaHasta))
-  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--rm-surface-soft)] text-[var(--rm-text-muted)] border border-[var(--rm-border-soft)] text-[11px] font-medium shadow-2xs">
-  <span>Hasta: {{ \Carbon\Carbon::parse($filtroHistorialFechaHasta)->format('d/m/Y') }}</span>
-  <button type="button" wire:click="limpiarFiltro('filtroHistorialFechaHasta')" class="hover:text-[var(--rm-action-primary)] transition cursor-pointer ml-0.5"><i class="ph ph-x"></i></button>
-  </span>
-  @endif
- </div>
-
- {{-- Conteo y Botón Restablecer --}}
- <div class="flex items-center gap-2.5">
-  <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-[var(--rm-text-primary)]/10 text-[var(--rm-text-primary)]">
-  {{ count($historial) }} coincidentes
-  </span>
-
-  <button type="button"
-  wire:click="resetFilters"
-  class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-action-primary-soft)] hover:bg-[var(--rm-action-primary-soft)] text-[var(--rm-action-primary)] py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-  <i class="ph-bold ph-arrow-counter-clockwise"></i>
-  <span>Limpiar filtros</span>
-  </button>
- </div>
- </div>
- @endif
- </x-ui.filter-bar>
-
- {{-- ==================================================
- 2. CONTENEDOR PRINCIPAL: BITÁCORA CLÍNICA
- ================================================== --}}
- <main class="bg-[var(--rm-surface)] rounded-2xl border border-[var(--rm-border-soft)] shadow-sm overflow-hidden transition-colors">
+ <section aria-labelledby="historial-med-titulo" class="bg-[var(--rm-surface)] rounded-2xl border border-[var(--rm-border-soft)] shadow-sm overflow-hidden transition-colors">
 
  {{-- Header Clínico de Bitácora con Contadores Sincronizados --}}
  <header class="px-5 py-4 border-b border-[var(--rm-border-soft)] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[var(--rm-surface)] ">
@@ -227,16 +74,11 @@
  </span>
  <div>
   <div class="flex items-center gap-2.5 flex-wrap">
-  <h3 class="text-[17px] font-[800] text-[var(--rm-text-primary)] tracking-tight">
+  <h3 id="historial-med-titulo" class="text-[17px] font-[800] text-[var(--rm-text-primary)] tracking-tight">
   Historial de Administración
   </h3>
-  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--rm-surface-soft)] text-[var(--rm-action-primary)] border border-[var(--rm-border-soft)]">
-  <i class="ph-bold ph-shield-check text-xs"></i> Bitácora clínica
-  </span>
   </div>
-  <p class="text-[12px] text-[var(--rm-text-muted)] mt-0.5">
-  Trazabilidad clínica completa: registro asistencial directo de dosis, horarios, omisiones e incidencias
-  </p>
+  <p class="rm-help">Trazabilidad clínica de las dosis registradas.</p>
  </div>
  </div>
 
@@ -684,6 +526,6 @@
  </div>
  @endforelse
  </div>
- </main>
+ </section>
 
 </div>

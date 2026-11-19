@@ -1,14 +1,15 @@
-<div class="rm-pilot-alertas rm-emergency-workspace rm-page-layout" data-alert-workspace="{{ $perfil['foco'] }}" x-data="rmAlertasInteraccion()" @alertas-caso-seleccionado.window="$refs.contextoCaso.focus({ preventScroll: true }); $refs.contextoCaso.scrollIntoView({ block: 'nearest', behavior: 'instant' });" @rm-alertas-request="estado($event.detail)" @rm-alertas-error="errorSolicitud = $event.detail.message" :aria-busy="solicitudes > 0" @click.capture="proteger($event)" @keydown.escape.window.capture="proteger($event)" @unless($preview || $modalCrear || $modalAtender || $modalCerrar || $modalDetalle || $modalEspecialidad || $drawerGrafico || $drawerUbicacion) wire:poll.visible.60s @endunless>
+<div class="rm-pilot-alertas rm-emergency-workspace rm-page-layout" data-alert-workspace="{{ $perfil['foco'] }}" x-data="rmAlertasInteraccion()" @alertas-caso-seleccionado.window="$refs.contextoCaso?.focus({ preventScroll: true }); $refs.contextoCaso?.scrollIntoView({ block: 'nearest', behavior: 'instant' });" @rm-alertas-request="estado($event.detail)" @rm-alertas-error="errorSolicitud = $event.detail.message" :aria-busy="solicitudes > 0" @click.capture="proteger($event)" @keydown.escape.window.capture="proteger($event)" @unless($preview || $modalCrear || $modalAtender || $modalCerrar || $modalDetalle || $modalEspecialidad || $drawerGrafico || $drawerUbicacion) wire:poll.visible.60s @endunless>
     @use('App\Modulos\Alertas\Aplicacion\Formato\LenguajeAlerta')
     @if($perfil['foco'] === 'supervision')
         @include('alertas::livewire.alertas.gerencia')
     @else
-    <x-ui.page-header :title="$perfil['titulo']" :subtitle="$perfil['descripcion']" overline="Alertas · espacio de trabajo" :icon="$perfil['icono']" class="rm-alert-workspace-heading">
+    <x-ui.page-header :title="$perfil['titulo']" :subtitle="$perfil['descripcion']" :overline="$perfil['foco'] === 'turno' ? null : 'Alertas · espacio de trabajo'" :icon="$perfil['icono']" class="rm-alert-workspace-heading">
+        @if(request()->routeIs('admin.enfermeria.*'))<x-ui.nursing-report-link area="alertas" />@endif
         @if(auth()->user()->hasRole('SUPERADMINISTRADOR'))<a href="{{ route('admin.alertas-clinicas.por-rol') }}" class="rm-btn rm-btn-secondary"><i class="ph-bold ph-users-three" aria-hidden="true"></i>Vistas por rol</a>@endif
         @if($preview && in_array($perfil['foco'],['turno','coordinacion','auditoria'],true) && auth()->user()->can('alertas.gestionar'))<x-ui.action-button variant="secondary" wire:click="abrirCrear" loading="abrirCrear" icono="ph-eye">Consultar formulario de aviso</x-ui.action-button>@endif
         @if(!$preview && auth()->user()->can('alertas.gestionar') && ($puedeIntervenir || $puedeCoordinar))
-            <x-ui.action-button wire:click="abrirCrear" loading="abrirCrear" icono="ph-plus">Registrar alerta</x-ui.action-button>
-            <x-ui.action-button variant="secondary" wire:click="detectarAlertas" loading="detectarAlertas" icono="ph-magnifying-glass">Detectar pendientes</x-ui.action-button>
+            <x-ui.action-button wire:click="abrirCrear" loading="abrirCrear" icono="ph-plus" data-rm-action-icon aria-label="Registrar alerta" />
+            <x-ui.action-button variant="secondary" wire:click="detectarAlertas" loading="detectarAlertas" icono="ph-magnifying-glass" data-rm-action-icon aria-label="Detectar pendientes" />
         @endif
 
     </x-ui.page-header>
@@ -24,12 +25,6 @@
     <div wire:offline class="rm-callout" role="alert">Se perdió la conexión. Conserva tu captura y vuelve a intentar al recuperar el acceso.</div>
     <div wire:loading.delay wire:target="guardarAlerta,guardarAtencion,guardarCierre,guardarAccion,guardarRegistroEspecialidad,asignarResponsable,detectarAlertas" role="status" aria-live="polite" class="rm-alert-request-status"><i class="ph-bold ph-hourglass-medium" aria-hidden="true"></i><span x-text="guardados ? 'Procesando la operación. Conserva esta ventana hasta recibir el resultado.' : 'Consultando las alertas… puedes seguir revisando la información visible.'"></span></div>
     <div x-show="errorSolicitud" x-cloak role="alert" class="rm-callout rm-alert-request-error"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i><p x-text="errorSolicitud"></p><button type="button" class="rm-btn rm-btn-secondary" @click="errorSolicitud = ''">Mantener captura</button></div>
-    <section class="rm-alert-specialties rm-alert-trace" aria-label="Alertas por vínculo profesional">
-        <h2>{{ $filtroEspecialidad === '' ? 'Todas las especialidades de tu ámbito' : ($especialidadesDisponibles[$filtroEspecialidad] ?? 'Sin vínculo profesional verificable') }}</h2>
-        <p>Elige la especialidad relacionada con el responsable o con el profesional del registro de origen. Una valoración del residente, por sí sola, no vincula una alerta a esa especialidad.</p>
-        <x-ui.alerta-filtro-chips label="Especialidad vinculada" campo="filtroEspecialidad" :actual="$filtroEspecialidad" :opciones="[''=>'Todas las autorizadas'] + $especialidadesDisponibles + ['SIN_VINCULO'=>'Sin vínculo verificable']" />
-        <p class="rm-help">Los vínculos utilizan los roles profesionales actuales de las cuentas relacionadas. No equivalen a un diagnóstico ni a una derivación. Las prioridades activas de tu ámbito siguen visibles debajo.</p>
-    </section>
     @if($estadosHistoricos)
         <x-ui.callout variant="warning" title="Hay alertas de registros anteriores">
             <p>{{ array_sum($estadosHistoricos) }} alerta(s) conservan estados de registros anteriores. Se conservan sin reclasificar. «Urgentes» incluye solo prioridades altas o críticas del ciclo actual; «Por atender» incluye avisos actuales sin atención en curso.</p>
@@ -39,7 +34,7 @@
 
     @include('livewire.alertas.resumen-trabajo')
     @unless($perfil['foco'] === 'coordinacion')
-    <section class="rm-alert-kpis" aria-label="Resumen de la especialidad seleccionada, antes de los filtros de lista">
+    <section class="rm-alert-kpis" aria-label="Resumen de la bandeja">
         @foreach([['Urgentes','urgentes',$conteos['criticas']+$conteos['altas'],'Críticas y altas activas'],['Por atender','por_atender',$conteos['por_atender'],'Sin atención en curso'],['En atención','en_atencion',$conteos['en_atencion'],'Actuación registrada'],['Cerradas','cerradas',$conteos['cerradas'],'Historial conservado'],['Registros anteriores','anteriores',$conteos['anteriores'],'Estado original conservado'],['Todas','todas',$conteos['total'],'Alertas de tu ámbito'],['Sin responsable','sin_responsable',$conteos['sin_responsable'],'Activas sin asignación'],['Con límite superado','fuera_plazo',$conteos['vencidas'],'Fecha límite guardada']] as [$etiqueta,$clave,$cantidad,$ayuda])
             @continue(!in_array($clave, $perfil['indicadores'], true))
             <button type="button" class="rm-alert-kpi {{ $clave === 'urgentes' ? 'is-priority' : '' }}" wire:click="filtrarResumen('{{ $clave }}')" aria-pressed="{{ match($clave) { 'urgentes' => $filtroNivel === 'PRIORITARIAS' && $filtroEstado === '', 'por_atender' => $filtroEstado === 'POR_ATENDER', 'en_atencion' => $filtroEstado === 'EN_ATENCION', 'cerradas' => $filtroEstado === 'CERRADA', 'anteriores' => $filtroEstado === 'ANTERIORES', 'sin_responsable' => $filtroResponsabilidad === 'SIN_RESPONSABLE' && $filtroEstado === 'ACTIVAS', 'fuera_plazo' => $filtroEstado === 'CON_LIMITE_SUPERADO', 'todas' => $filtroEstado === '' && $filtroNivel === '', default => false } ? 'true' : 'false' }}" wire:loading.attr="disabled" aria-label="{{ $etiqueta }}: {{ $cantidad }}. {{ $ayuda }}"><strong>{{ $cantidad }}</strong><span class="rm-alert-kpi__copy"><span>{{ $etiqueta }}</span><small>{{ $ayuda }}</small></span></button>
@@ -55,25 +50,52 @@
     @endif
     <div class="rm-alert-workspace-grid">
     <div class="rm-alert-workspace-grid__main">
-    <x-ui.filter-bar>
+    @php($filtrosCompactos = request()->routeIs('admin.enfermeria.*') || ($perfil['foco'] === 'turno' && auth()->user()?->hasRole('ENFERMEROS')))
+    <x-ui.filter-bar :class="$filtrosCompactos ? 'rm-nursing-filters' : ''" aria-label="Filtros de alertas">
+        @if($filtrosCompactos)
+            <div class="rm-nursing-filters__row">
+                <x-ui.field label="Buscar alertas" for="alertas-buscar"><input id="alertas-buscar" type="search" wire:model.live.debounce.300ms="search" class="rm-input" placeholder="Residente o motivo"></x-ui.field>
+                <x-ui.field label="Estado" for="alertas-estado">
+                    <select id="alertas-estado" class="rm-select" wire:model.live="filtroEstado">
+                        @foreach(['ACTIVAS'=>'Activas','POR_ATENDER'=>'Por atender','EN_ATENCION'=>'En atención','ATENDIDA'=>'Atendidas · por cerrar','CERRADA'=>'Cerradas','ANULADA'=>'Anuladas','ANTERIORES'=>'Registros anteriores',''=>'Todas'] + ['CON_LIMITE_SUPERADO'=>'Activas con límite superado'] as $valor => $etiqueta)<option value="{{ $valor }}">{{ $etiqueta }}</option>@endforeach
+                    </select>
+                </x-ui.field>
+                <x-ui.field label="Prioridad" for="alertas-prioridad">
+                    <select id="alertas-prioridad" class="rm-select" wire:model.live="filtroNivel">
+                        @foreach([''=>'Todas las prioridades','PRIORITARIAS'=>'Críticas y altas activas','CRITICO'=>'Críticas','ALTO'=>'Altas','MEDIO'=>'Medias','BAJO'=>'Bajas'] as $valor => $etiqueta)<option value="{{ $valor }}">{{ $etiqueta }}</option>@endforeach
+                    </select>
+                </x-ui.field>
+                <x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" data-rm-action-icon aria-label="Limpiar filtros" wire:click="limpiarFiltros" />
+            </div>
+        @else
         <div class="rm-alert-filter-top"><h2>Encuentra y revisa una alerta</h2><button type="button" class="rm-btn rm-btn-ghost" wire:click="limpiarFiltros">Restablecer filtros</button></div>
         <x-ui.field label="Buscar alertas" for="alertas-buscar"><input id="alertas-buscar" type="search" wire:model.live.debounce.300ms="search" class="rm-input" placeholder="Nombre, habitación, cama, motivo o tipo"></x-ui.field>
         <p class="rm-help" role="status" aria-live="polite"><span wire:loading.remove wire:target="search">La lista se filtra mientras escribes. No necesitas actualizar la página.</span><span wire:loading.delay wire:target="search">Buscando coincidencias…</span></p>
         <x-ui.alerta-filtro-chips label="Estado" campo="filtroEstado" :actual="$filtroEstado" :opciones="['ACTIVAS'=>'Activas','POR_ATENDER'=>'Por atender','EN_ATENCION'=>'En atención','ATENDIDA'=>'Atendidas · por cerrar','CERRADA'=>'Cerradas','ANULADA'=>'Anuladas','ANTERIORES'=>'Registros anteriores',''=>'Todas']" />
         <x-ui.alerta-filtro-chips label="Prioridad" campo="filtroNivel" :actual="$filtroNivel" :opciones="[''=>'Todas las prioridades','PRIORITARIAS'=>'Críticas y altas activas','CRITICO'=>'Críticas','ALTO'=>'Altas','MEDIO'=>'Medias','BAJO'=>'Bajas']" />
-        <div class="rm-alert-more-filters" x-data="{ abierto: @js((bool)($filtroOrigen || $filtroResponsabilidad || $fechaDesde || $fechaHasta)) }">
-            <button type="button" class="rm-btn rm-btn-secondary rm-alert-disclosure" @click="abierto = !abierto" :aria-expanded="abierto" aria-controls="alertas-filtros-extra"><i class="ph-bold ph-faders-horizontal" aria-hidden="true"></i><span>Origen, responsable y fechas</span><i class="ph-bold" :class="abierto ? 'ph-minus' : 'ph-plus'" aria-hidden="true"></i></button>
+        @endif
+        <div class="rm-alert-more-filters" x-data="{ abierto: @js((bool)($filtroOrigen || $filtroResponsabilidad || $fechaDesde || $fechaHasta || ($especialidadesDisponibles && $filtroEspecialidad))) }">
+            <button type="button" class="rm-btn rm-btn-secondary rm-alert-disclosure" @click="abierto = !abierto" :aria-expanded="abierto" aria-controls="alertas-filtros-extra"><i class="ph-bold ph-faders-horizontal" aria-hidden="true"></i><span>Más filtros</span><i class="ph-bold" :class="abierto ? 'ph-minus' : 'ph-plus'" aria-hidden="true"></i></button>
             <div id="alertas-filtros-extra" class="rm-alert-filter-panel" x-show="abierto" x-cloak>
             <x-ui.alerta-filtro-chips label="Origen registrado" campo="filtroOrigen" :actual="$filtroOrigen" :opciones="[''=>'Todos los orígenes'] + collect($origenesDisponibles)->mapWithKeys(fn($o)=>[$o=>str_replace('_',' ',$o)])->all()" />
             <x-ui.alerta-filtro-chips label="Responsabilidad" campo="filtroResponsabilidad" :actual="$filtroResponsabilidad" :opciones="[''=>'Cualquier responsable','SIN_RESPONSABLE'=>'Sin responsable'] + (auth()->user()->personal ? ['PROPIAS'=>'A mi cargo'] : [])" />
             <div class="rm-alert-filters">
+                @if($especialidadesDisponibles)
+                    <x-ui.field label="Especialidad vinculada" for="alertas-especialidad">
+                        <select id="alertas-especialidad" class="rm-select" wire:model.live="filtroEspecialidad">
+                            @foreach(['' => 'Todas las autorizadas'] + $especialidadesDisponibles + ['SIN_VINCULO' => 'Sin vínculo verificable'] as $valor => $etiqueta)
+                                <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                    </x-ui.field>
+                @endif
                 <x-ui.field label="Registradas desde" for="alertas-desde" error="fechaDesde"><x-ui.calendario label="Registradas desde" id="alertas-desde" wire:model.live="fechaDesde" :max="$fechaHasta" aria-invalid="{{ $errors->has('fechaDesde') ? 'true' : 'false' }}" aria-describedby="alertas-desde-error" /></x-ui.field>
                 <x-ui.field label="Registradas hasta" for="alertas-hasta" error="fechaHasta"><x-ui.calendario label="Registradas hasta" id="alertas-hasta" wire:model.live="fechaHasta" :min="$fechaDesde" aria-invalid="{{ $errors->has('fechaHasta') ? 'true' : 'false' }}" aria-describedby="alertas-hasta-error" /></x-ui.field>
             </div>
             </div>
         </div>
     </x-ui.filter-bar>
-    <div class="rm-alert-list-heading" id="alertas-bandeja"><div><h2>{{ $perfil['bandeja'] }}</h2><p>{{ $alertas->total() }} de {{ $conteos['total'] }} alerta(s) de tu ámbito · {{ $filtroEstado === 'ACTIVAS' ? 'Pendientes actuales' : match($filtroEstado) { 'POR_ATENDER'=>'Por atender', 'ANTERIORES'=>'Registros anteriores', 'CON_LIMITE_SUPERADO'=>'Activas con límite superado', ''=>'Todos los estados', default=>LenguajeAlerta::estado($filtroEstado) } }}</p>@if(str_starts_with($filtroResponsabilidad,'PERSONAL:'))<button type="button" class="rm-btn rm-btn-ghost" wire:click="setFiltroRapido('filtroResponsabilidad','')">Quitar filtro de responsable</button>@endif</div>@if($alertas->total() > 0)<p class="rm-help">{{ $sinResponsableConsulta }} sin responsable registrado en esta consulta</p>@endif</div>
+    <div class="rm-alert-list-heading" id="alertas-bandeja"><div><h2>{{ $consultaPrioridades ? 'Prioridades activas de tu ámbito' : $perfil['bandeja'] }}</h2>@if($conteos['total'] > 0)<p>{{ $alertas->total() }} de {{ $conteos['total'] }} alerta(s) de tu ámbito · {{ $filtroEstado === 'ACTIVAS' ? 'Pendientes actuales' : match($filtroEstado) { 'POR_ATENDER'=>'Por atender', 'ANTERIORES'=>'Registros anteriores', 'CON_LIMITE_SUPERADO'=>'Activas con límite superado', ''=>'Todos los estados', default=>LenguajeAlerta::estado($filtroEstado) } }}</p>@endif @if(str_starts_with($filtroResponsabilidad,'PERSONAL:'))<button type="button" class="rm-btn rm-btn-ghost" wire:click="setFiltroRapido('filtroResponsabilidad','')">Quitar filtro de responsable</button>@endif</div>@if($alertas->total() > 0)<p class="rm-help">{{ $sinResponsableConsulta }} sin responsable registrado en esta consulta</p>@endif</div>
     <section class="rm-alert-case-list" aria-label="Alertas de la consulta">
         @forelse($alertas as $alerta)
             <article data-priority="{{ $alerta->prioridad }}" class="rm-alert-case {{ $traza && $traza['codigo'] === $alerta->getKey() ? 'is-selected' : '' }} {{ in_array($alerta->prioridad, ['CRITICO','CRITICA']) ? 'is-critical' : '' }}" wire:key="alerta-{{ $alerta->getKey() }}">
@@ -110,13 +132,13 @@
                 </footer>
             </article>
         @empty
-            <x-ui.empty-state icono="ph-bell-slash" :titulo="$conteos['total'] > 0 ? 'Ninguna alerta coincide con estos filtros' : ($filtroEspecialidad ? 'No hay alertas con este vínculo profesional' : 'Aún no hay alertas registradas en tu ámbito')" :texto="$conteos['total'] > 0 ? 'Ajusta el estado, la prioridad o las fechas para revisar las alertas de esta especialidad.' : ($filtroEspecialidad ? 'No consta un responsable ni una fuente autorizada que vincule alertas a esta selección. Puedes consultar Todas las autorizadas. No se crean avisos para llenar esta vista.' : 'Las alertas aparecerán aquí cuando se registre una situación que requiera seguimiento.')" />
-            @if($filtroEspecialidad)<button type="button" class="rm-btn rm-btn-secondary" wire:click="setFiltroRapido('filtroEspecialidad','')">Consultar todas las especialidades autorizadas</button>@endif
+            <x-ui.empty-state icono="ph-bell-slash" :titulo="$conteos['total'] > 0 ? 'Ninguna alerta coincide con estos filtros' : 'No hay alertas en esta bandeja'" :texto="$conteos['total'] > 0 ? 'Ajusta el estado, la prioridad o las fechas.' : 'Cuando se registre una alerta para tu rol, aparecerá aquí.'" />
             @if($conteos['total'] > 0)<button type="button" class="rm-btn rm-btn-secondary" wire:click="filtrarResumen('todas')">Ver todas las alertas</button>@endif
         @endforelse
     </section>
-    {{ $alertas->links() }}
+    @if($alertas->hasPages()){{ $alertas->links() }}@endif
     </div>
+    @if($perfil['foco'] !== 'turno' || $traza)
     <aside class="rm-alert-workspace-grid__aside" x-ref="contextoCaso" tabindex="-1" aria-label="Contexto de trabajo del caso seleccionado">
         @include('livewire.alertas.puesto-profesional')
         <x-ui.alerta-trazabilidad :traza="$traza" :titulo="$perfil['seleccionar']" :icono="$perfil['icono']" :foco="$perfil['foco']" :registro-especialidad="(bool)$definicionEspecialidad" />
@@ -128,6 +150,7 @@
         <section class="rm-alert-trace"><h3>Análisis de la consulta</h3><p>Distribuciones reales con los mismos filtros, antes de paginar.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="$toggle('mostrarAnalisis')" aria-expanded="{{ $mostrarAnalisis ? 'true' : 'false' }}" aria-controls="alertas-analisis">{{ $mostrarAnalisis ? 'Ocultar análisis y gráficos' : 'Ver análisis y gráficos' }}</button></section>
         <a href="#alertas-bandeja" class="rm-btn rm-btn-ghost">Volver a la bandeja de casos</a>
     </aside>
+    @endif
     </div>
     <div id="alertas-analisis">@if($mostrarAnalisis)
     @if($alertas->total() > 0)

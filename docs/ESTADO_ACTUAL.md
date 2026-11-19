@@ -29,6 +29,8 @@ runtime_verified: false
 
 **Revisión: 04/11/2026, America/La_Paz.** Referencia de código: `57285c7e`, más los cambios locales existentes de Gerencia, avisos y Reportes. Esta revisión documental contrasta archivos, decisiones y rutas registradas. No ejecuta una aceptación integral del producto, no consulta historias clínicas ni vuelve a contar la BDD operativa.
 
+**Actualización técnica posterior del04/11:** sobre `cf8ec4eb` y el árbol compartido se implementó, probó e instaló el guardado del resultado institucional y sus revisiones. El [informe específico](sistema-experto/CIERRE_RECORRIDO_INSTITUCIONAL_2026_11_04.md) registra pruebas SQLite/PostgreSQL/navegador, respaldo, comparación de historia previa y recuento122 físico/106 de negocio. Esta evidencia corresponde a ese recorrido y no convierte la revisión documental anterior en una aceptación global de los demás módulos.
+
 ## Organización comprobada
 
 RememberMind organiza una residencia geriátrica mediante **12 módulos Laravel y 10 roles**. El motor experto es PHP independiente, integrado mediante `ApoyoDecision`. Los recuentos y fuentes reproducibles están en el [inventario actual](sistema/INVENTARIO_ACTUAL.md), las [responsabilidades de módulos](modulos/README.md) y el [catálogo documental](INDICE_DOCUMENTAL.md).
@@ -43,7 +45,7 @@ Flujo institucional: **preadmisión → revisión → aprobación/rechazo → ad
 | Cuidados y Medicacion | Turno, residentes asignados, registros diarios, cuidados, pase de turno y agenda de dosis | Enfermería documenta/administra; la prescripción y su modificación conservan competencia médica. |
 | Alertas y Social | Incidentes/alertas con continuidad; actividades, participación y visitas | La información debe conservar fuente y permisos. Una lectura no genera nuevos eventos clínicos. |
 | Reportes | Consultas/exportaciones autorizadas, reportes de Enfermería por período, residente y áreas | Las ampliaciones locales y sus pruebas tienen alcance propio; no publican el expediente completo a Familia. |
-| ApoyoDecision | Reglas, red semántica, adquisición, inferencia explicable, abstención, captura/puntuación instrumental y observaciones conservadas | La **conservación institucional conjunta instrumental/Petersen sigue pendiente**. Un DTO transitorio no equivale a un resultado guardado. |
+| ApoyoDecision | Reglas, red semántica, adquisición, inferencia explicable, abstención, captura/puntuación instrumental, observaciones y resultado institucional conservados; historial paginado y revisiones independientes | Instalación y pruebas del [cierre del04/11](sistema-experto/CIERRE_RECORRIDO_INSTITUCIONAL_2026_11_04.md). La conservación íntegra del DTO/configuración/release para replay sigue pendiente; es distinta del resultado guardado. |
 
 ## BDD y decisiones vigentes
 
@@ -53,7 +55,7 @@ Inventario tras la [consolidación de registros clínicos, asignaciones y compon
 - [Gerencia35/37, 27/10](base-de-datos/DECISION_GERENCIA_DOCUMENTACION_HISTORIA_2026_10_27.md) y [aviso compartido instalado](base-de-datos/DECISION_AVISO_COMPARTIDO_CAMPOS_2026_10_27.md).
 - [Escolaridad y lectoescritura, 28/10](base-de-datos/DECISION_CONTEXTO_ESCOLARIDAD_4FN_2026_10_28.md): tres campos por atención.
 - [Idioma e informante principal, 29/10](base-de-datos/PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md): tres campos por atención y FK opcional autorizada al vínculo existente. Sin listas, JSON/EAV o backfill.
-- [Conservación conjunta propuesta, 31/10](base-de-datos/PROPUESTA_CONSERVACION_RESULTADO_INSTITUCIONAL_2026_10_31.md): **rechazada en ese alcance**; no instalar sus FK ni su permiso como si estuvieran aprobados.
+- [Decisión específica del04/11](base-de-datos/DECISION_RESULTADO_INSTITUCIONAL_2026_11_04.md): sucede al rechazo del31/10;19 columnas,cinco FK/CHECK y permiso Medicina/Psicología,ya instalados sin nuevas tablas. No aprueba el replay íntegro del DTO.
 
 Fuentes rectoras: [índice BDD](base-de-datos/README.md), baseline y decisiones específicas. No se ejecutaron migraciones en esta actualización.
 
@@ -63,7 +65,7 @@ Fuentes rectoras: [índice BDD](base-de-datos/README.md), baseline y decisiones 
 - **24 reglas fuente:** 17 cognitivas, 4 Petersen y 3 observacionales. La BDD conserva versiones, revisiones y reglas registradas; ese recuento de filas puede diferir del catálogo fuente.
 - **26 métodos instrumentales:** 23 por componentes y 3 perfiles iniciales descriptivos. MoCA 8.1 español, RUDAS-PE 2020 y FAQ B7S están activados localmente para captura de puntuaciones y cálculo descriptivo, con 35 campos de catálogo en conjunto. No reproducen estímulos ni generan automáticamente C02/C03 desde un total.
 - La denominación de investigación fue retirada del producto en `57285c7e`. El importador documental y su respaldo automático en consultas están retirados. Solo se preservan identificadores históricos y evidencias necesarias para comprobar versiones y huellas; la interfaz usa etiquetas neutras.
-- Las observaciones pueden conservarse y revisarse en su circuito. La preparación conjunta de dominios/Petersen, su explicación y replay técnico no acreditan guardado institucional conjunto.
+- Las observaciones conservan su circuito. El resultado institucional de dominios/Petersen dispone de guardado,recuperación e historial/revisiones propios; el DTO completo y su replay técnico no se anuncian como persistidos mediante ese contrato acotado.
 
 Entradas: [mapa del código](../motor-experto/README.md), [índice experto](sistema-experto/README.md), [activación instrumental](sistema-experto/ENTREGA_ACTIVACION_PERFILES_INICIALES_2026_11_04.md) y [matriz de trazabilidad](sistema-experto/MATRIZ_TRAZABILIDAD_DCL.md).
 

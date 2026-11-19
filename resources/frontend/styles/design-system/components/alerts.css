@@ -432,7 +432,6 @@
 .rm-alert-trace__controls { flex-wrap: wrap; margin-top: var(--rm-space-3); }
 .rm-alert-trace__selection .rm-alert-desk__fields { margin-top: var(--rm-space-3); }
 .rm-alert-trace__node .rm-alert-trace__value { font: 400 12px var(--rm-font-body); fill: var(--rm-text-secondary); }
-.rm-alert-specialties { margin-block: var(--rm-space-4); }
 .rm-alert-case__specialties { display: flex; flex-wrap: wrap; gap: var(--rm-space-3); padding: var(--rm-space-3) var(--rm-space-4); border-bottom: 1px solid var(--rm-border-soft); }
 .rm-alert-case__specialties p { display: grid; gap: var(--rm-space-1); margin: 0; min-width: 0; overflow-wrap: anywhere; }
 .rm-alert-case__specialties strong { color: var(--rm-text-primary); }

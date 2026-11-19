@@ -147,8 +147,11 @@ class RolePreviewTest extends TestCase
                 ->followingRedirects()->get(route('dashboard'))->assertOk();
 
             $response->assertSee('data-role="'.$acento.'"', false)
-                ->assertSee('data-accent="'.$acento.'"', false)
-                ->assertSee('class="rm-dashboard-header__role"><span aria-hidden="true"></span>'.$etiqueta, false);
+                ->assertSee('data-accent="'.$acento.'"', false);
+            $this->assertMatchesRegularExpression(
+                '/<span class="rm-dashboard-header__role(?: rm-dashboard-header__role--corner)?"><span aria-hidden="true"><\/span>'.preg_quote($etiqueta, '/').'<\/span>/u',
+                $response->getContent(),
+            );
         }
     }
 

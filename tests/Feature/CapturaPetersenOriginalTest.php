@@ -806,18 +806,27 @@ final class CapturaPetersenOriginalTest extends TestCase
         $dto = app(PrepararEvaluacionInstitucional::class)->preparar($this->usuario, $this->residente, CarbonImmutable::now());
         self::assertSame($patron, $dto->contenido['petersen']['contenido']['salida']['patron']);
         self::assertCount(5, $dto->contenido['instrumental']['contenido']['capturas']['capturas']);
+        (require base_path('database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php'))->up();
+        $this->seed(\Database\Seeders\PermisoEjecucionInstitucionalSeeder::class);
+        $guardado = app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\GuardarResultadoInstitucional::class)->ejecutar($this->usuario, $this->residente, (string) Str::uuid());
+        self::assertSame($patron, $guardado['contenido']['patron']);
+        self::assertTrue($guardado['persistido']);
+        self::assertNotEmpty($guardado['contenido']['hechos']);
+        self::assertCount(6, $guardado['contenido']['criterios']);
         $regla = ReglaExperta::query()->where('cod_version_modelo', $versionGobierno)->where('codigo_regla', $patron)->sole();
         app(GestionarReglasExpertas::class)->revisar($this->usuario, $regla->getKey(), 'RECHAZADA', 'Ensayo de rechazo sin modificar las fuentes originales.');
         $rechazado = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertNull($rechazado['patron']);
         self::assertContains('ABSTENCION_SIN_REGLA_PETERSEN_HABILITADA', $rechazado['impedimentos']);
         self::assertDatabaseCount('valoraciones_petersen_originales', 9);
-        self::assertDatabaseCount('evaluaciones_expertas', 0);
+        self::assertDatabaseCount('evaluaciones_expertas', 1);
         config(['sistema_experto.perfiles_instrumentales' => []]);
         $sinPerfil = app(ConsultarPetersenInstitucional::class)->consultar($this->usuario, $this->residente, CarbonImmutable::now(), '1.0');
         self::assertNull($sinPerfil['patron']);
         self::assertSame('U', $sinPerfil['dominios']['COG-MEM']['estado']);
         DB::table('respuestas_instrumento')->where('cod_aplicacion', reset($mediciones))->update(['valor_numero' => 0]);
+        $historico = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)->consultar($this->usuario, $this->residente, $guardado['contenido']['id']);
+        self::assertSame($guardado, $historico, 'El archivo de reglas y los cambios actuales no alteran el resultado emitido.');
         $consultas = 0;
         DB::listen(static function () use (&$consultas): void {
             $consultas++;
@@ -841,9 +850,44 @@ final class CapturaPetersenOriginalTest extends TestCase
             ->call('guardar')->assertHasErrors('justificacion');
         self::assertDatabaseCount('valoraciones_petersen_originales', 0);
         $panel->set('form.justificacion', 'Valoración original incompleta registrada explícitamente.')->call('guardar')
-            ->assertHasNoErrors()->assertSee('Valoración original registrada')->assertSet('solicitud', null);
+            ->assertHasNoErrors()->assertSee('Valoración original registrada')->assertSet('solicitud', null)
+            ->assertSee('Continuar al análisis')
+            ->assertSeeHtml('href="'.route('admin.psicologia.residente.resultados-experto', $this->residente).'"');
         self::assertDatabaseCount('valoraciones_petersen_originales', 1);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
         self::assertDatabaseHas('valoraciones_petersen_originales', ['cod_atencion' => $atencion->getKey(), 'cod_documento_clinico' => null, 'localizador_fuente' => null]);
+        $panel->call('nuevo', 'C04')->call('guardar')->assertHasErrors()
+            ->assertDontSee('Valoración original registrada');
+        self::assertDatabaseCount('valoraciones_petersen_originales', 1);
+    }
+
+    public function test_continuacion_al_analisis_respeta_la_captura_pendiente_y_no_escribe_evaluaciones(): void
+    {
+        Livewire::test(CapturaPetersenPanel::class, ['residente' => $this->residente])
+            ->assertSee('Continuar al análisis')->call('nuevo', 'C04')
+            ->assertDontSee('Continuar al análisis')->assertSee('Guarde o cancele esta captura')
+            ->call('cancelar')->assertSee('Continuar al análisis');
+        self::assertDatabaseCount('valoraciones_petersen_originales', 0);
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_continuacion_medica_conserva_al_residente_y_la_ruta_autorizada(): void
+    {
+        $medico = $this->profesional('MEDICO GENERAL/GERIATRA');
+        $this->actingAs($medico);
+        Livewire::test(CapturaPetersenPanel::class, ['residente' => $this->residente])
+            ->assertSee('Continuar al análisis')
+            ->assertSeeHtml('href="'.route('admin.medico.residente.resultados-experto', $this->residente).'"');
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
+    public function test_perder_lectura_de_resultados_retira_la_continuacion_sin_ampliar_permisos(): void
+    {
+        $this->usuario->roles->first()->revokePermissionTo('evaluaciones_expertas.revisar_psicologia');
+        Livewire::test(CapturaPetersenPanel::class, ['residente' => $this->residente])
+            ->assertDontSee('Continuar al análisis');
+        $this->get(route('admin.psicologia.residente.resultados-experto', $this->residente))->assertForbidden();
+        self::assertDatabaseCount('evaluaciones_expertas', 0);
     }
 
     public function test_rectificacion_iadl_respeta_el_corte_y_se_consulta_en_lote(): void

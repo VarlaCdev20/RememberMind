@@ -1,9 +1,7 @@
 @php
     $filtros = array_filter([
-        'search' => trim($search) !== '' ? 'Búsqueda: '.$search : '',
         'filtro_tipo' => $filtro_tipo !== '' ? 'Tipo: '.$filtro_tipo : '',
         'filtro_gravedad' => $filtro_gravedad !== '' ? 'Gravedad: '.ucfirst(strtolower($filtro_gravedad)) : '',
-        'filtro_estado' => $filtro_estado !== '' ? 'Estado: '.str_replace('_', ' ', strtolower($filtro_estado)) : '',
         'fecha_desde' => $fecha_desde !== '' ? 'Desde: '.$fecha_desde : '',
         'fecha_hasta' => $fecha_hasta !== '' ? 'Hasta: '.$fecha_hasta : '',
     ]);
@@ -11,6 +9,7 @@
 
 <x-ui.collection-header title="INCIDENTES" subtitle="Consulta lo ocurrido y continúa el seguimiento de tus residentes." icon="ph-warning-octagon" eyebrow="Continuidad asistencial">
     <x-slot:actions>
+        <x-ui.nursing-report-link area="incidentes" :desde="$fecha_desde" :hasta="$fecha_hasta" />
         @if($puedeRegistrar)
             <x-ui.action-button wire:click="abrirModalRegistro" icono="ph-plus" loading="abrirModalRegistro">Registrar incidente</x-ui.action-button>
         @endif
@@ -86,7 +85,7 @@
         @if(!$mostrarMasFiltros && ($errors->has('fecha_desde') || $errors->has('fecha_hasta')))
             <p class="rm-incidents-error" role="alert">{{ $errors->first('fecha_desde') ?: $errors->first('fecha_hasta') }} Abre «Más filtros» para corregir las fechas.</p>
         @endif
-        @if($filtros)
+        @if($filtros || $search || $filtro_estado)
             <div class="rm-incidents-active-filters" aria-label="Filtros aplicados">
                 @foreach($filtros as $campo => $texto)
                     <button type="button" class="rm-incidents-filter-chip" wire:click="limpiarFiltro('{{ $campo }}')" aria-label="Quitar filtro {{ $texto }}"><span>{{ $texto }}</span><i class="ph-bold ph-x" aria-hidden="true"></i></button>
@@ -147,5 +146,5 @@
             </x-ui.empty-state>
         @endforelse
     </div>
-    @if($incidentes->hasPages())<footer class="rm-incidents-pagination">{{ $incidentes->links() }}</footer>@endif
+    @if($incidentes->hasPages())<x-ui.paginacion class="rm-pagination--compact rm-incidents-pagination" :paginator="$incidentes" mode="livewire" :show-per-page="false" label="incidentes" />@endif
 </section>

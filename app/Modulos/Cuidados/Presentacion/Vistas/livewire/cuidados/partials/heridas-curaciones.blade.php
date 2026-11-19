@@ -7,6 +7,7 @@
     <span hidden data-wound-popup="{{ $emergente ? 'true' : 'false' }}" data-wound-operation="{{ $lesionId !== '' ? 'curacion' : 'nueva-herida' }}"></span>
     @if(!$emergente)
     <x-ui.section-card title="Heridas y evolución" subtitle="Cada herida conserva su identidad. Las curaciones se muestran del más reciente al más antiguo." icon="ph-bandaids">
+        <x-ui.nursing-report-link area="heridas" :residente="$adulto->getKey()" />
         @if($this->puedeMutarRegistro('heridas.crear'))
             <button type="button" class="rm-btn-primary" aria-haspopup="dialog" aria-controls="clinical-wound-form" @click="openForm($event, 'nueva-herida')"><i class="ph-bold ph-plus" aria-hidden="true"></i> Nueva herida</button>
         @endif

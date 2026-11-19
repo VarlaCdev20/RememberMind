@@ -15,6 +15,14 @@
         @can('consultar', [\App\Models\ControlFuncionalIadl::class, $residente])
             <a href="{{ route('admin.funcionamiento-cotidiano', $residente) }}" class="rm-btn rm-btn-secondary mt-3">Funcionamiento cotidiano</a>
         @endcan
+        @if($urlResultados && $form === [])
+            <div class="mt-4 space-y-2">
+                <a href="{{ $urlResultados }}" class="rm-btn rm-btn-primary">Continuar al análisis<span class="sr-only"> de {{ $residente->nombre_completo }}</span></a>
+                <p class="text-sm">Las valoraciones originales ya guardadas estarán disponibles en el análisis. Abrir la consulta no guarda una nueva evaluación conjunta.</p>
+            </div>
+        @elseif($urlResultados)
+            <p class="text-sm mt-3">Guarde o cancele esta captura antes de continuar al análisis.</p>
+        @endif
         @error('historial')<p role="alert" class="mt-3">{{ $message }}</p>@enderror
         <p class="text-sm mt-2">Registre lo que valoró y sus soportes originales. El estado del dominio es una interpretación clínica documentada; el sistema calcula C02 y el patrón. La información que no esté acreditada permanece pendiente.</p>
         @if($mensaje)<p role="status" class="mt-3">{{ $mensaje }}</p>@endif

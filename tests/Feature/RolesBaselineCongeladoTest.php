@@ -22,6 +22,7 @@ class RolesBaselineCongeladoTest extends TestCase
     private const PERMISOS_EXCLUIDOS_SUPERADMIN = [
         'fotografias_institucionales.gestionar',
         'evaluaciones_expertas.ejecutar_observaciones',
+        'evaluaciones_expertas.ejecutar_institucional',
         'reglas_expertas.gestionar',
         'reglas_expertas.revisar',
         'aplicaciones_instrumento.transcribir',
@@ -73,6 +74,7 @@ class RolesBaselineCongeladoTest extends TestCase
         $this->assertFalse($user->can('fotografias_institucionales.gestionar'));
         // Decisión explícita de la propietaria: el guardado observacional pertenece solo a Medicina/Psicología.
         $this->assertFalse($user->can('evaluaciones_expertas.ejecutar_observaciones'));
+        $this->assertFalse($user->can('evaluaciones_expertas.ejecutar_institucional'));
         $this->assertTrue($user->can('fotografias_institucionales.ver'));
     }
 
@@ -104,6 +106,7 @@ class RolesBaselineCongeladoTest extends TestCase
             $rol->fresh()->permissions()->count()
         );
         $this->assertFalse($rol->fresh()->hasPermissionTo('evaluaciones_expertas.ejecutar_observaciones'));
+        $this->assertFalse($rol->fresh()->hasPermissionTo('evaluaciones_expertas.ejecutar_institucional'));
         $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.gestionar'));
         $this->assertFalse($rol->fresh()->hasPermissionTo('reglas_expertas.revisar'));
         $this->assertTrue($rol->fresh()->hasPermissionTo('controles_funcionales_iadl.ver'));
@@ -133,6 +136,36 @@ class RolesBaselineCongeladoTest extends TestCase
             $this->assertSame(403, $e->getStatusCode());
         }
         $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+    }
+
+    public function test_editor_no_concede_ejecucion_institucional_a_roles_no_competentes(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $nombre = 'evaluaciones_expertas.ejecutar_institucional';
+        foreach (Role::query()->whereNotIn('name', ['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'])->get() as $rol) {
+            $antes = $rol->permissions()->pluck('name')->all();
+            try {
+                app(ActualizarPermisosRol::class)->guardar($actor, $rol, [...$antes, $nombre]);
+                $this->fail('Se aceptó una ejecución fuera de las competencias aprobadas: '.$rol->name);
+            } catch (HttpException $e) {
+                $this->assertSame(403, $e->getStatusCode());
+            }
+            $this->assertEqualsCanonicalizing($antes, $rol->fresh()->permissions()->pluck('name')->all());
+            $this->assertFalse($rol->fresh()->hasPermissionTo($nombre));
+        }
+    }
+
+    public function test_editor_conserva_ejecucion_institucional_para_medicina_y_psicologia(): void
+    {
+        $actor = $this->usuarioConRol('SUPERADMINISTRADOR');
+        $nombre = 'evaluaciones_expertas.ejecutar_institucional';
+        foreach (['MEDICO GENERAL/GERIATRA', 'PSICOLOGO/A'] as $nombreRol) {
+            $rol = Role::findByName($nombreRol, 'web');
+            $rol->revokePermissionTo($nombre);
+            $antes = $rol->permissions()->pluck('name')->all();
+            app(ActualizarPermisosRol::class)->guardar($actor, $rol, [...$antes, $nombre]);
+            $this->assertEqualsCanonicalizing([...$antes, $nombre], $rol->fresh()->permissions()->pluck('name')->all());
+        }
     }
 
     public function test_editor_no_concede_lectura_iadl_a_enfermeria(): void
@@ -230,7 +263,7 @@ class RolesBaselineCongeladoTest extends TestCase
         $gerente = $this->rutasSidebar('GERENTE');
         $this->assertContains('admin.personal-institucional', $gerente);
         $this->assertContains('admin.turnos-asignaciones.index', $gerente);
-        $this->assertContains('admin.reportes.institucional.preview', $gerente);
+        $this->assertNotContains('admin.reportes.institucional.preview', $gerente);
         $this->assertNotContains('admin.usuarios.index', $gerente);
 
         $administracion = $this->rutasSidebar('ADMINISTRADOR');
@@ -247,7 +280,7 @@ class RolesBaselineCongeladoTest extends TestCase
             ->assertOk()->assertSee('Superadministración')->assertSee('Residentes activos');
 
         $this->actingAs($this->usuarioConRol('GERENTE'))->get(route('dashboard'))
-            ->assertOk()->assertSee('Organización y planificación')->assertSee('Personal activo');
+            ->assertOk()->assertSee('Organizar el equipo')->assertSee('Personal activo');
 
         $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))->get(route('dashboard'))
             ->assertRedirect(route('admin.administracion.dashboard'));

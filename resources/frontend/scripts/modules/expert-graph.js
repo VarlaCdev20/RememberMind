@@ -165,7 +165,7 @@ if (typeof window !== 'undefined') {
 }
 
 /** DTO numérico autorizado. Eje temporal real; ninguna interpretación clínica en el cliente. */
-export function cognitiveTimeline(puntos, clave, unidad) {
+export function cognitiveTimeline(puntos, clave, unidad, destacado = false) {
     return {
         activo: null,
         get puntoActivo() { return puntos[this.activo] ?? null; },
@@ -184,6 +184,18 @@ export function cognitiveTimeline(puntos, clave, unidad) {
             config.options.plugins.tooltip = { ...config.options.plugins.tooltip, callbacks: { title: items => new Date(items[0].parsed.x).toLocaleString('es'), label: item => `${item.parsed.y} ${unidad}` } };
             config.options.onHover = (event, elements) => { if (elements.length) this.seleccionar(elements[0].index); };
             config.options.onClick = (event, elements) => { if (elements.length) this.seleccionar(elements[0].index); };
+            if (destacado) {
+                const serie = config.data.datasets[0];
+                serie.borderWidth = 3;
+                serie.pointRadius = puntos.length === 1 ? 7 : 5;
+                serie.pointHoverRadius = 8;
+                serie.pointBorderWidth = 2;
+                serie.pointBackgroundColor = api.getCss('--rm-chart-surface-bg');
+                serie.pointBorderColor = color;
+                config.options.scales.x.ticks.maxTicksLimit = 4;
+                config.options.scales.x.grid = { display: false };
+                config.options.plugins.legend = { display: false };
+            }
             api.init(clave, this.$refs.canvas, config, () => this.dibujar());
         },
         destroy() { window.RMCharts?.destroy(clave); },

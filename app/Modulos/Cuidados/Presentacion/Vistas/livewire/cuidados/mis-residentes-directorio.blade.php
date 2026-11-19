@@ -11,19 +11,21 @@
     @endphp
     @include('cuidados::livewire.cuidados.directorio.cabecera')
 
-    <x-ui.resident-filter-toolbar
-        :search="$search"
-        :filtro-rapido="$filtroRapido"
-        :filtro-alertas="$filtroAlertas"
-        :filtro-medicacion="$filtroMedicacion"
-        :filtro-cuidados="$filtroCuidados"
-        :filtro-habitacion="$filtroHabitacion"
-        :orden="$orden"
-        :vista-modo="$vistaModo"
-        :stats="$stats"
-        :habitaciones="$habitaciones"
-        :habitaciones-conteo="$habitacionesConteo ?? null"
-        :filtros-activos="$filtrosActivos" />
+    @if($stats['total'] > 0 || $filtrosActivos !== [])
+        <x-ui.resident-filter-toolbar
+            :search="$search"
+            :filtro-rapido="$filtroRapido"
+            :filtro-alertas="$filtroAlertas"
+            :filtro-medicacion="$filtroMedicacion"
+            :filtro-cuidados="$filtroCuidados"
+            :filtro-habitacion="$filtroHabitacion"
+            :orden="$orden"
+            :vista-modo="$vistaModo"
+            :stats="$stats"
+            :habitaciones="$habitaciones"
+            :habitaciones-conteo="$habitacionesConteo ?? null"
+            :filtros-activos="$filtrosActivos" />
+    @endif
 
     @include('cuidados::livewire.cuidados.directorio.resultados')
 

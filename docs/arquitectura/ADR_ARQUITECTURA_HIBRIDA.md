@@ -10,6 +10,6 @@ El baseline vigente contiene 71 tablas operativas y 23 tablas expertas aprobadas
 
 Se conserva Livewire 4, Blade y resources/frontend/styles/design-system. Los alias publicos se registran explicitamente; las vistas modulares conservan sus nombres logicos mediante rutas de busqueda compatibles. Las rutas se componen respetando orden, grupos, middleware y binding. Las policies movidas se registran explicitamente.
 
-El motor tecnico PHP existente se separa en motor-experto y no se reescribe en Python. No se autoriza activar inferencias clinicas, modificar reglas/umbrales o introducir pesos multicriterio. ApoyoDecision conserva lectura autorizada, persistencia tecnica y restricciones de prueba. La ejecucion clinica asincrona y la revision profesional requieren contrato/activacion aprobados; no se conecta un job a eventos clinicos sin esos contratos.
+El motor tecnico PHP existente se separa en motor-experto y no se reescribe en Python. No se autoriza activar inferencias clinicas, modificar reglas/umbrales o introducir pesos. ApoyoDecision conserva lectura autorizada, persistencia tecnica y restricciones de prueba. La ejecucion clinica asincrona y la revision profesional requieren contrato/activacion aprobados; no se conecta un job a eventos clinicos sin esos contratos.
 
 Los casos de uso criticos conservan transacciones y bloqueos. El trabajo se verifica por cortes y los limites de ejecucion se registran en INFORME_MIGRACION_HIBRIDA.md.

@@ -10,7 +10,7 @@ export function configurarGraficaReporte(api, grafica, tipo) {
     const valores = grafica.serie.map(punto => punto.valor);
     const comunes = { plugins: { legend: { display: false }, datalabels: { display: false } } };
     if (tipo === 'dona' || tipo === 'torta') {
-        return api.presets[tipo === 'dona' ? 'doughnut' : 'pie'](etiquetas, valores, colores.slice(0, valores.length), comunes);
+        return api.presets[tipo === 'dona' ? 'doughnut' : 'pie'](etiquetas, valores, valores.map((_, indice) => colores[indice % colores.length]), comunes);
     }
     if (tipo === 'radar') {
         const config = api.presets.radar(etiquetas.map((_, i) => String(i + 1)), [{ label: grafica.unidad, data: valores,

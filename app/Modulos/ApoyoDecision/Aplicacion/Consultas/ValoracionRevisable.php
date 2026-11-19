@@ -19,6 +19,10 @@ final readonly class ValoracionRevisable
         $usuario = User::query()->findOrFail($usuario->getKey());
         $evaluacion = EvaluacionExperta::with('residente', 'version')->findOrFail($evaluacion->getKey());
         Gate::forUser($usuario)->authorize('consultarResultados', [EvaluacionExperta::class, $evaluacion->residente]);
+        if ($evaluacion->version_conservacion === \App\Modulos\ApoyoDecision\Aplicacion\Contratos\ResultadoInstitucionalConservado::VERSION) {
+            app(ConsultarResultadoInstitucional::class)->consultar($usuario, $evaluacion->residente, $evaluacion->getKey());
+            return ['contrato' => $evaluacion->version_conservacion, 'alcance' => 'RESULTADO_INSTITUCIONAL'];
+        }
         if ($evaluacion->origen_activacion === 'OBSERVACIONAL' && in_array($evaluacion->version_conservacion, ['OBS-SNAP-1', 'OBS-SNAP-2'], true)
             && $evaluacion->estado_ejecucion === 'FINALIZADA') {
             $conservado = $this->observaciones->consultar($usuario, $evaluacion->residente, $evaluacion->getKey());

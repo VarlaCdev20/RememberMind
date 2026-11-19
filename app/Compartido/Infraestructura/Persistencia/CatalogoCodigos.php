@@ -7,7 +7,7 @@ use InvalidArgumentException;
 /** Identidad de almacenamiento; no sustituye códigos clínicos o semánticos. */
 final class CatalogoCodigos
 {
-    /** Diseño 35 aprobado para bases desechables; no forma parte del inventario instalado. */
+    /** Diseños35/37 autorizados e instalados. */
     public const EXTENSIONES_GERENCIA = [
         'historial_laboral_personal' => ['cod_historial_laboral', 'HLP'],
         'solicitudes_documentales_personal' => ['cod_solicitud_documental', 'SDP'],

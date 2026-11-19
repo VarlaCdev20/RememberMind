@@ -13,11 +13,12 @@
     }
 }" @click.capture="rememberTrigger($event)" @pase-ventana-cerrada.window="restoreTrigger()" @pase-captura-abierta.window="captureDirty = false; discardCapture = false" @pase-recepcion-abierta.window="receiptDirty = false; discardReceipt = false" @resize.window="contextOpen = window.matchMedia('(min-width: 1024px)').matches">
     <x-ui.collection-header title="Pases de turno" subtitle="Continuidad de cuidados y comunicación entre jornadas." icon="ph-arrows-left-right" eyebrow="Continuidad asistencial">
-        <x-slot:actions><div class="rm-handoff__tabs" role="group" aria-label="Vistas de pases">
+        <x-slot:actions><x-ui.nursing-report-link area="pases" /></x-slot:actions>
+    </x-ui.collection-header>
+    <div class="rm-handoff__tabs" role="group" aria-label="Vistas de pases">
             <x-ui.action-button :variant="$tabActivo === 'entrega' ? 'primary' : 'secondary'" icono="ph-handshake" wire:click="cambiarTab('entrega')" aria-pressed="{{ $tabActivo === 'entrega' ? 'true' : 'false' }}">Transferencia de guardia</x-ui.action-button>
             <x-ui.action-button :variant="$tabActivo === 'historial' ? 'primary' : 'secondary'" icono="ph-clock-counter-clockwise" wire:click="cambiarTab('historial')" aria-pressed="{{ $tabActivo === 'historial' ? 'true' : 'false' }}">Historial de pases</x-ui.action-button>
-        </div></x-slot:actions>
-    </x-ui.collection-header>
+    </div>
     @if(session()->has('mensaje'))<p class="rm-handoff__notice" role="status"><i class="ph-bold ph-check-circle" aria-hidden="true"></i>{{ session('mensaje') }}</p>@endif
     <section class="rm-handoff__context-bar rm-card" aria-label="Contexto del pase">
         <div><span>Jornada actual · saliente</span><strong>{{ $jornadaSaliente?->turno?->nombre ?? 'Fuera de jornada activa' }}</strong>@if($jornadaSaliente)<small>{{ $jornadaSaliente->fecha_jornada->format('d/m/Y') }} · {{ substr($jornadaSaliente->turno->hora_inicio, 0, 5) }}–{{ substr($jornadaSaliente->turno->hora_cierre, 0, 5) }}</small>@endif</div>
@@ -40,7 +41,13 @@
         @endif
         <section class="space-y-3" aria-labelledby="handoff-outgoing-title">
             <div class="rm-handoff__section-heading"><x-ui.section-header id="handoff-outgoing-title" level="2" title="Residentes a entregar" subtitle="Prepara el resumen, comunica pendientes y confirma la entrega." icon="ph-users-three" />
-                <div class="rm-handoff__tabs" role="group" aria-label="Filtrar residentes a entregar">@foreach(['todos' => 'Todos', 'criticos' => 'Con alerta / incidente', 'pendientes' => 'Por entregar'] as $filtro => $etiqueta)<x-ui.action-button :variant="$filtroEntrega === $filtro ? 'primary' : 'secondary'" wire:click="$set('filtroEntrega', '{{ $filtro }}')" aria-pressed="{{ $filtroEntrega === $filtro ? 'true' : 'false' }}">{{ $etiqueta }}</x-ui.action-button>@endforeach</div>
+                <x-ui.field label="Residentes a mostrar" for="handoff-entrega-filtro">
+                    <select id="handoff-entrega-filtro" class="rm-select" wire:model.live="filtroEntrega">
+                        @foreach(['todos' => 'Todos', 'criticos' => 'Con alerta o incidente', 'pendientes' => 'Por entregar'] as $filtro => $etiqueta)
+                            <option value="{{ $filtro }}">{{ $etiqueta }}</option>
+                        @endforeach
+                    </select>
+                </x-ui.field>
             </div>
             <div class="rm-handoff__grid">@forelse($residentesAEntregar as $item)
                 @php($pase = $item['pase'])
@@ -68,7 +75,7 @@
                     <p class="rm-handoff__excerpt">{{ \App\Compartido\Aplicacion\Formato\TextoVisible::sinCodigosInternos($pase->resumen) }}</p><x-ui.action-button variant="secondary" icono="ph-eye" wire:click="abrirVer('{{ $pase->getKey() }}')" loading="abrirVer">Ver detalle</x-ui.action-button>
                 </article>
             @empty<div class="rm-handoff__empty"><x-ui.empty-state icono="ph-clock-counter-clockwise" titulo="No hay pases para estos filtros" texto="Prueba otra fecha o limpia los filtros para consultar todo el historial autorizado." /></div>@endforelse</div>
-            <x-ui.paginacion :paginator="$historialPases" mode="livewire" :show-per-page="false" label="pases" />
+            <x-ui.paginacion class="rm-pagination--compact" :paginator="$historialPases" mode="livewire" :show-per-page="false" label="pases" />
         </section>
     @endif
 

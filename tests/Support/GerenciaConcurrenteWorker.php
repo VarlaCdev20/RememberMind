@@ -34,6 +34,8 @@ if (isset($datos['aplicacion'])) {
 $actor = User::findOrFail($datos['actor']);
 Auth::onceUsingId($actor->getKey());
 app('request')->setMethod('POST');
+config(['remembermind.avisos_planificacion_habilitados' => in_array($datos['modo'], ['aviso_compartido', 'revertir_campos_aviso'], true)]);
+if (in_array($datos['modo'], ['aviso_compartido', 'revertir_campos_aviso'], true)) config(['remembermind.avisos_planificacion_habilitados' => true]);
 if (in_array($datos['modo'], ['alta_personal', 'sustituir_documento'], true)) Mail::fake();
 file_put_contents($root.'/listo-'.$argv[2], '1');
 $inicio = microtime(true);
@@ -45,6 +47,14 @@ while (empty($datos['sin_barrera']) && (! is_file($root.'/listo-1') || ! is_file
 }
 try {
     $resultado = match ($datos['modo']) {
+        'aviso_compartido' => app(\App\Modulos\Institucion\Aplicacion\Acciones\GestionarAvisosPlanificacion::class)->reintentar($actor, $datos['evento']),
+        'revertir_campos_aviso' => (function () {
+            DB::transaction(function () {
+                (require dirname(__DIR__, 2).'/database/propuestas/gerencia/2026_11_16_000004_consolidacion_historia_laboral.php')->down();
+                (require dirname(__DIR__, 2).'/database/propuestas/gerencia/2026_10_27_000003_campos_aviso_evento_asignacion.php')->down();
+            });
+            return 'REVERTIDO';
+        })(),
         'alta_personal' => (function () use ($datos, $root, $actor, $argv) {
             $entrada = $datos['entradas'][(int) $argv[2] - 1];
             $entrada['contrasena_temporal'] = bin2hex(random_bytes(12));
@@ -74,6 +84,9 @@ try {
 } catch (ValidationException $error) {
     echo json_encode(['estado' => 'RECHAZADO', 'campos' => array_keys($error->errors()), 'bienvenidas' => 0], JSON_THROW_ON_ERROR);
 } catch (Throwable $error) {
+    if ($datos['modo'] === 'revertir_campos_aviso' && $error instanceof LogicException) {
+        echo json_encode(['estado' => 'RECHAZADO'], JSON_THROW_ON_ERROR); exit(0);
+    }
     if ($error instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface && $error->getStatusCode() === 403) {
         echo json_encode(['estado' => 'DENEGADO', 'bienvenidas' => 0], JSON_THROW_ON_ERROR);
         exit(0);

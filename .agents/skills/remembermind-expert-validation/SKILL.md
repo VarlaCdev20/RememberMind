@@ -11,7 +11,7 @@ Separar corrección técnica del experto de su evaluación posterior en uso real
 
 # Use when
 
-Revisión de base de conocimiento, reglas/modelo multicriterio, algoritmo, versión o explicación; comparación con referencia profesional.
+Revisión de base de conocimiento, reglas/modelo de inferencia, algoritmo, versión o explicación; comparación con referencia profesional.
 
 # Do not use when
 

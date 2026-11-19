@@ -12,7 +12,6 @@ use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesE
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Eloquent\CargadorConocimiento;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
-use App\Modulos\ApoyoDecision\Infraestructura\Simulacion\ContextoSimulacionLocal;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -72,30 +71,11 @@ try {
         app(CargadorConocimiento::class)->instantanea($version);
         $versiones++;
     }
-    $simulacionesRecuperadas = 0;
-    if (config('sistema_experto.simulacion_local.habilitada') && app()->environment('local')) {
-        $contexto = new ContextoSimulacionLocal(DB::getDefaultConnection());
-        $almacen = new AlmacenInstantaneas($contexto->conexion, null, new DateTimeZone(config('app.timezone')), $contexto);
-        $clasificaciones = ClasificacionDclInstantanea::query()->with('evaluacion.version')->get();
-        foreach ($clasificaciones as $fila) {
-            $evaluacion = $fila->evaluacion;
-            if ($evaluacion->version->codigo_version !== ContextoSimulacionLocal::VERSION) {
-                continue;
-            }
-            $recuperada = $almacen->obtenerClasificacion($evaluacion->id_evaluacion_dominio, $contexto->alias($evaluacion->cod_residente),
-                $evaluacion->cod_version_modelo, CodecInstantanea::leerFecha('fecha_corte', $evaluacion), $fila->version_contrato);
-            if ($recuperada === null || CodecInstantanea::huella($recuperada) !== $fila->huella_clasificacion) {
-                throw new RuntimeException('Una clasificación histórica no coincide con su huella conservada.');
-            }
-            $simulacionesRecuperadas++;
-        }
-    }
     echo json_encode(['expertas_presentes' => $inventario['expertas_presentes'], 'tablas_fisicas' => $inventario['tablas_fisicas'],
         'columnas_propietarios' => array_map(static fn ($t) => count(Schema::getColumnListing($t)),
             array_combine(['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'], ['evaluacion_criterios', 'nodos_semanticos', 'evaluaciones_expertas'])),
         'filas_recuperadas_eloquent' => $filas, 'versiones_conocimiento_leidas' => $versiones,
         'fk_entrantes_verificadas' => $fkVerificadas,
-        'clasificaciones_sinteticas_recuperadas' => $simulacionesRecuperadas,
         'solo_lectura' => true], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL;
 } finally {
     DB::rollBack();

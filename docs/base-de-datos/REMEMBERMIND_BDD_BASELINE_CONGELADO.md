@@ -31,6 +31,8 @@ related_modules: []
 
 **Decisión posterior autorizada e instalada del 16/11/2026:** [unión de documentos, valoraciones y textos clínicos](DECISION_CONSOLIDACION_DOCUMENTOS_VALORACIONES_TEXTOS_2026_11_16.md). El inventario instalado vigente es **64 operativas + 22 expertas = 86 de negocio**, más **16 técnicas**. El núcleo y los inventarios históricos siguientes mantienen sus fechas y contratos fuera de ese alcance.
 
+**Decisión posterior del04/11/2026:** [conservación del resultado institucional y revisiones](DECISION_RESULTADO_INSTITUCIONAL_2026_11_04.md):16 columnas en evaluaciones, tres referencias de origen en hechos, cinco FK indexadas/CHECK y permiso específico para Medicina/Psicología. Sin nuevas tablas ni backfill;106 de negocio+16 técnicas. No equivale a guardar íntegro el DTO para replay. La decisión y el informe de cierre distinguen autorización e instalación verificada.
+
 > Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
 
 **Extensión autorizada e instalada del 29/10/2026:** [idioma principal e informante principal por atención](PROPUESTA_CONTEXTO_IDIOMA_INFORMANTE_2026_10_29.md), tres columnas nullable, FK restrictiva al vínculo existente e índice de soporte. Conserva 4FN en este alcance,28.107 atenciones previas e inventario 106 de negocio + 16 técnicas; sin backfill ni uso inferencial automático.

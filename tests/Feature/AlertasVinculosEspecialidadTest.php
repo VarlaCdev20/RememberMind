@@ -74,6 +74,12 @@ class AlertasVinculosEspecialidadTest extends TestCase
         $metadatos = app(VinculosProfesionalesAlertas::class)->paraAlertas($super, Alerta::all());
         $this->assertSame([], $metadatos[$sinVinculo->getKey()]);
         $this->assertSame(['Responsable del seguimiento'], $metadatos[$esperadas['NUTRICIONISTA']][0]['motivos']);
+        $this->actingAs($super);
+        Livewire::test(AlertasPanel::class)
+            ->assertDontSee('Alertas por vínculo profesional')
+            ->assertSee('Especialidad vinculada')
+            ->set('filtroEspecialidad', 'NUTRICIONISTA')
+            ->assertViewHas('alertas', fn ($alertas) => $alertas->modelKeys() === [$esperadas['NUTRICIONISTA']]);
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
 
@@ -118,16 +124,22 @@ class AlertasVinculosEspecialidadTest extends TestCase
         $urgente = $this->alerta($residente, ['cod_personal_responsable' => $medico->personal->getKey(), 'prioridad' => 'CRITICA']);
         $this->actingAs($super);
         app(RolePreviewService::class)->activate($super, 'NUTRICIONISTA');
-        $panel = Livewire::test(AlertasPanel::class)->assertSet('filtroEspecialidad', 'NUTRICIONISTA');
+        $panel = Livewire::withQueryParams(['filtroEspecialidad' => 'MEDICO GENERAL/GERIATRA'])
+            ->test(AlertasPanel::class)
+            ->assertDontSee('Alertas por vínculo profesional')
+            ->assertDontSee('Especialidad vinculada');
         $this->assertSame([$nutricional->getKey()], $panel->viewData('alertas')->modelKeys());
         $this->assertSame([$urgente->getKey()], $panel->viewData('prioritarias')->modelKeys());
         $this->assertSame(1, $panel->viewData('conteos')['total']);
-        $panel->set('mostrarAnalisis', true);
+        $panel->set('filtroEspecialidad', '')->set('mostrarAnalisis', true);
+        $this->assertSame([$nutricional->getKey()], $panel->viewData('alertas')->modelKeys());
         $this->assertSame(1, array_sum($panel->viewData('chartData')['estados']));
         $panel->call('verDetalle', $urgente->getKey())->assertSet('modalDetalle', true);
-        $panel->call('cerrarModales')->call('verPrioritarias')->assertSet('filtroEspecialidad', '');
+        $panel->call('cerrarModales')->call('verPrioritarias')->assertSee('Prioridades activas de tu ámbito');
         $this->assertSame([$urgente->getKey()], $panel->viewData('alertas')->modelKeys());
         $this->assertNull($panel->viewData('contextoEspecialidad'));
+        $panel->call('limpiarFiltros');
+        $this->assertSame([$nutricional->getKey()], $panel->viewData('alertas')->modelKeys());
         $this->assertDatabaseCount('eventos_alerta', 0);
     }
 
@@ -163,12 +175,12 @@ class AlertasVinculosEspecialidadTest extends TestCase
             'cod_area' => $area->getKey(), 'tipo_atencion' => 'VALORACION', 'fecha_hora' => now(), 'estado' => 'ABIERTA']);
         ValoracionNutricional::create(['cod_residente' => $residente->getKey(), 'cod_personal' => $nutricionista->personal->getKey(),
             'cod_atencion' => $atencion->getKey(), 'fecha_hora' => now(), 'apetito' => 'Dato aislado del residente', 'estado' => 'VIGENTE']);
-        $alerta = $this->alerta($residente);
+        $alerta = $this->alerta($residente, ['prioridad' => 'ALTA']);
         $this->actingAs($super);
         app(RolePreviewService::class)->activate($super, 'NUTRICIONISTA');
-        $panel = Livewire::test(AlertasPanel::class)->assertSee('No hay alertas con este vínculo profesional');
+        $panel = Livewire::test(AlertasPanel::class)->assertSee('No hay alertas en esta bandeja');
         $this->assertSame(0, $panel->viewData('alertas')->total());
-        $panel->call('setFiltroRapido', 'filtroEspecialidad', '')->assertDontSee('Dato aislado del residente');
+        $panel->call('verPrioritarias')->assertDontSee('Dato aislado del residente');
         $this->assertNull($panel->viewData('contextoEspecialidad'));
         $this->assertNotContains('contexto-profesional', array_column($panel->viewData('traza')['nodos'], 'id'));
         $this->assertSame([], $this->ids($super, 'NUTRICIONISTA'));

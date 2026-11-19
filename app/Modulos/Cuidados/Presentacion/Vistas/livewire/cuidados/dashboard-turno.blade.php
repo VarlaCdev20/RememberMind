@@ -46,6 +46,10 @@
     @include('cuidados::livewire.cuidados.dashboard.conducta')
 
 <section class="rm-nursing-dashboard__analytics" aria-label="Resumen visual del turno">
+    <header class="flex items-center justify-between gap-2 col-span-full">
+        <h2 class="rm-section-title">Resumen visual del turno</h2>
+        <x-ui.nursing-report-link :desde="today()->toDateString()" :hasta="today()->toDateString()" />
+    </header>
     @include('cuidados::livewire.cuidados.dashboard.incidentes')
 
     @include('cuidados::livewire.cuidados.dashboard.seguimiento')

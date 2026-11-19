@@ -1336,6 +1336,9 @@ class FichaPaciente extends Component
 
         // 1. Pases de Turno
         foreach ($this->adultoMayor->pasesTurno as $pase) {
+            if ($pase->esBorrador() || $pase->esAnulado()) {
+                continue;
+            }
             $saliente = $pase->turnoSaliente->nombre ?? 'No registrado';
             $entrante = $pase->turnoEntrante->nombre ?? 'No registrado';
             $resumenPase = "Relevo: {$saliente} → {$entrante}";
@@ -1477,7 +1480,7 @@ class FichaPaciente extends Component
 
         // 6. Seguimientos Diarios
         foreach ($this->adultoMayor->seguimientosDiarios as $seg) {
-            if ($seg->tipo_atencion->tipo !== 'SEGUIMIENTO_DIARIO') {
+            if (! in_array($seg->tipo_atencion->tipo, ['SEGUIMIENTO_DIARIO', 'SEGUIMIENTO_ENFERMERIA'], true)) {
                 continue;
             }
             $alertaSeguimiento = $this->adultoMayor->alertas->firstWhere('cod_registro', $seg->cod_atencion);

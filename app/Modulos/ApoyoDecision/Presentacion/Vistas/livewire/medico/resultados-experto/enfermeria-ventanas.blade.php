@@ -36,7 +36,7 @@
 
 @include('apoyodecision::livewire.medico.resultados-experto.enfermeria-evolucion')
 
-<x-ui.drawer-livewire wire:model="consultaAbierta" title="Registros y evidencias" subtitle="Información disponible para el área seleccionada" :badge="false" icon="ph-notebook" size="lg" surface="reading" closeMethod="cerrarConsulta">
+<x-ui.drawer-livewire wire:model="consultaAbierta" title="Registros y evidencias" subtitle="Información disponible para el área seleccionada" :badge="false" icon="ph-notebook" size="lg" surface="reading" :docked="true" closeMethod="cerrarConsulta">
     <p class="rm-decision-note">{{ $residente->nombre_completo }} · {{ $petersenActual ? 'Consulta cognitiva actual' : $informe['actual']['nombre'] }} · {{ $datos['evaluacion']['fecha'] ?? 'Sin evaluación histórica guardada' }}</p>
     <div class="rm-decision-tabs" role="group" aria-label="Secciones de consulta">@foreach(['interpretacion' => 'Interpretación', 'registro' => 'Registros', 'cuidados' => 'Cuidados'] as $clave => $label)<button type="button" class="rm-btn rm-btn-secondary" wire:click="abrirConsulta(@js($clave))" aria-pressed="{{ $pestanaConsulta === $clave ? 'true' : 'false' }}">{{ $label }}</button>@endforeach</div>
     @if($pestanaConsulta === 'interpretacion')

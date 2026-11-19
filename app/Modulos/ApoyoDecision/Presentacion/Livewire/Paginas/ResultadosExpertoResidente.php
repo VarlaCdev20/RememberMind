@@ -191,6 +191,82 @@ class ResultadosExpertoResidente extends Component
         }
     }
 
+    #[\Livewire\Attributes\Url(as: 'resultadoGuardado')]
+    public ?string $resultadoInstitucionalId = null;
+
+    #[Locked]
+    public ?string $solicitudInstitucional = null;
+
+    #[Locked]
+    public int $paginaHistoriaInstitucional = 1;
+
+    #[Locked]
+    public ?string $mensajeGuardadoInstitucional = null;
+
+    public function guardarResultadoInstitucional(): void
+    {
+        $r = $this->autorizar();
+        $this->mensajeGuardadoInstitucional = null;
+        if ($this->disciplinaRevision !== null) {
+            $this->addError('guardadoInstitucional', 'Guarde o cancele la revisión antes de ejecutar otra evaluación.');
+            return;
+        }
+        $this->solicitudInstitucional ??= (string) \Illuminate\Support\Str::uuid();
+        try {
+            $d = app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\GuardarResultadoInstitucional::class)->ejecutar(auth()->user(), $r, $this->solicitudInstitucional);
+            $this->resultadoInstitucionalId = $d['contenido']['id'];
+            $this->mensajeGuardadoInstitucional = 'Evaluación guardada. Se recuperó y comprobó el resultado original desde la base de datos.';
+            $this->resetValidation('guardadoInstitucional');
+        } catch (DomainException|QueryException $e) {
+            report($e);
+            $this->addError('guardadoInstitucional', 'No se pudo conservar una evaluación íntegra. No se confirmó ningún guardado; vuelva a intentarlo.');
+        }
+    }
+
+    public function abrirResultadoInstitucional(string $id): void
+    {
+        $r = $this->autorizar();
+        if ($this->disciplinaRevision !== null) { $this->addError('revision', 'Guarde o cancele la revisión abierta.'); return; }
+        app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)->consultar(auth()->user(), $r, $id);
+        $this->resultadoInstitucionalId = $id;
+        $this->mensajeGuardadoInstitucional = null;
+    }
+
+    public function cambiarPaginaHistoriaInstitucional(int $pagina): void
+    {
+        $r = $this->autorizar();
+        $h = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)->historial(auth()->user(), $r);
+        abort_unless($pagina >= 1 && $pagina <= $h['ultima'], 404);
+        $this->paginaHistoriaInstitucional = $pagina;
+    }
+
+    public function volverAConsultaActual(): void
+    {
+        $this->autorizar();
+        if ($this->disciplinaRevision !== null) { $this->addError('revision', 'Guarde o cancele la revisión abierta.'); return; }
+        $this->resultadoInstitucionalId = null;
+        $this->solicitudInstitucional = null;
+        $this->mensajeGuardadoInstitucional = null;
+    }
+
+    public function prepararRevisionInstitucional(string $disciplina): void
+    {
+        $r = $this->autorizar();
+        abort_unless($this->resultadoInstitucionalId && $this->disciplinaRevision === null, 422);
+        app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)->consultar(auth()->user(), $r, $this->resultadoInstitucionalId);
+        $d = DisciplinaRevision::tryFrom($disciplina);
+        abort_unless($d, 422);
+        $revisiones = app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $this->resultadoInstitucionalId);
+        abort_unless($revisiones && $revisiones[$d->value]['puede_firmar'], 403);
+        $this->revisionEvaluacion = $this->resultadoInstitucionalId;
+        $this->revisionAnterior = $revisiones[$d->value]['cabeza'];
+        $this->disciplinaRevision = $d->value;
+        $this->revisionObservacional = false;
+        $this->decisionRevision = $this->justificacionRevision = '';
+        $this->mensajeRevision = null;
+        $this->resetValidation();
+    }
+
     private function cerrarVentanasConsulta(): void
     {
         $this->significadoAbierto = $this->informeCompletoAbierto = $this->detalleAreaAbierto = $this->evolucionAbierta = $this->consultaAbierta = $this->trazabilidadAbierta = false;
@@ -627,6 +703,22 @@ class ResultadosExpertoResidente extends Component
     {
         $residente = $this->autorizar();
         $residente->loadMissing('cama.habitacion');
+        $lectorInstitucional = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class);
+        $historialInstitucional = $lectorInstitucional->historial(auth()->user(), $residente, $this->paginaHistoriaInstitucional);
+        $puedeGuardarInstitucional = $lectorInstitucional->instalado() && Gate::allows('ejecutarInstitucional', [EvaluacionExperta::class, $residente]);
+        $resultadoInstitucional = null;
+        if ($this->resultadoInstitucionalId !== null) {
+            try {
+                $resultadoInstitucional = $lectorInstitucional->consultar(auth()->user(), $residente, $this->resultadoInstitucionalId);
+                $revisiones = $this->enfermeria ? null : app(ConsultarRevisionesValoracionExperta::class)->consultar(auth()->user(), $this->resultadoInstitucionalId);
+            } catch (DomainException $e) {
+                report($e);
+                $resultadoInstitucional = ['error' => true];
+                $revisiones = null;
+            }
+            return view('livewire.medico.resultados-experto-residente', compact('residente', 'resultadoInstitucional', 'historialInstitucional', 'puedeGuardarInstitucional', 'revisiones'))
+                ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
+        }
         $datos = null;
         $fuente = null;
         $errorLectura = false;
@@ -721,6 +813,9 @@ class ResultadosExpertoResidente extends Component
             : null;
         $registroComponente = collect($consultaEnfermeria['componentes'][$this->criterio] ?? [])->firstWhere('id', $this->componenteRegistro);
         abort_if($this->componenteRegistro && ! $errorInstrumental && ! $registroComponente, 404);
+        $seriesInformeEnfermeria = $this->enfermeria && ! $errorInstrumental
+            ? (new ConsultaCognitivaEnfermeria)->series($capturaInstrumental, $this->criterio, $perfilInstrumental['dominios'][$this->criterio]['componentes'] ?? [])
+            : [];
         $seriesEvolucion = $actividadCognitiva = $comparaciones = [];
         $errorEvolucion = false;
         if ($this->psicologia && ! $this->evolucionAbierta) {
@@ -765,6 +860,7 @@ class ResultadosExpertoResidente extends Component
         abort_if($this->cuidadoSeleccionado && ! $cuidadoDetalle, 404);
 
         return view('livewire.medico.resultados-experto-residente', compact('datos', 'informe', 'fuente', 'errorLectura', 'residente', 'revisiones', 'estadoRevision', 'puedeAuditar', 'hallazgosObservacionales', 'puedeEjecutarObservaciones', 'capturaInstrumental', 'perfilInstrumental', 'revisionesObservacionales', 'errorInstrumental', 'errorObservacional', 'exploracion', 'consultaEnfermeria', 'observacionesEnfermeria', 'resumenFuentes', 'seriesEvolucion', 'actividadCognitiva', 'comparaciones', 'errorEvolucion', 'cuidadoDetalle', 'registroComponente'), $continuidad)
+            ->with(compact('resultadoInstitucional', 'historialInstitucional', 'puedeGuardarInstitucional', 'seriesInformeEnfermeria'))
             ->with('conexionesResidente', $conexionesResidente)
             ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
     }

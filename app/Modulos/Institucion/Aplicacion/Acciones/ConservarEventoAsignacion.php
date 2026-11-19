@@ -29,12 +29,16 @@ final class ConservarEventoAsignacion
             return;
         }
         $previo = HistoriaLaboral::consulta('eventos_asignacion_personal')->where('cod_asignacion_personal', $asignacion->getKey())->orderByDesc('numero_evento')->first();
+        $avisos = app(GestionarAvisosPlanificacion::class);
+        $camposAviso = $avisos->camposIniciales($asignacion);
+        $codigo = app(CodigosEntidad::class)->siguiente('eventos_asignacion_personal');
         HistoriaLaboral::insertar('eventos_asignacion_personal', [[
-            'cod_evento_asignacion' => app(CodigosEntidad::class)->siguiente('eventos_asignacion_personal'),
+            'cod_evento_asignacion' => $codigo,
             'cod_asignacion_personal' => $asignacion->getKey(), 'numero_evento' => ($previo?->numero_evento ?? 0) + 1,
             'cod_evento_anterior' => $previo?->cod_evento_asignacion, 'tipo_evento' => $tipo, 'estado_anterior' => $estadoAnterior,
             'estado_nuevo' => $asignacion->estado, 'fecha_hora_efecto' => $efecto, 'fecha_hora_registro' => now(),
-            'cod_usuario_registro' => $actor->getKey(), 'motivo' => $motivo,
+            'cod_usuario_registro' => $actor->getKey(), 'motivo' => $motivo, ...$camposAviso,
         ]]);
+        if ($camposAviso) $avisos->despuesDeConfirmar($codigo);
     }
 }

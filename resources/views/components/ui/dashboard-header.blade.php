@@ -62,6 +62,7 @@
             </span>
             @if($scope)<span class="rm-dashboard-header__scope">{{ $scope }}</span>@endif
         </div>
+        @isset($actions)<div class="rm-dashboard-header-actions justify-center">{{ $actions }}</div>@endisset
     </div>
     @if($roleLabel && $rolePosition === 'corner')<span class="rm-dashboard-header__role rm-dashboard-header__role--corner"><span aria-hidden="true"></span>{{ $roleLabel }}</span>@endif
     @if($image)

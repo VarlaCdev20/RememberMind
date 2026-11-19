@@ -11,6 +11,12 @@ runtime_verified: false
 
 # Aceptación de Planificación y cobertura
 
+**Ejecución posterior del27/10:** PC14/PC15 quedan verificados para el alcance
+compartido adoptado según [informe44](44-INTEGRACION-AVISO-COMPARTIDO.md).
+Incluye postcommit, fallo/reintento, autorización y PostgreSQL concurrente.
+Los28 casos siguientes conservan su especificación original; no se declaran
+todos aceptados por cerrar esos dos puntos.
+
 ## 1. Contratos y pruebas localizadas
 
 Fuentes: [Planificación](14-PLANIFICACION-DEL-EQUIPO.md), [Cobertura](15-COBERTURA-DEL-EQUIPO.md) y [propuesta visual](17-DISENO-PLANIFICACION-COBERTURA.md). **Los 28 escenarios PC01–PC28 están ESPECIFICADOS, NO EJECUTADOS EN ESTA TAREA.** Las imágenes no son capturas de la aplicación ni prueba de aceptación.

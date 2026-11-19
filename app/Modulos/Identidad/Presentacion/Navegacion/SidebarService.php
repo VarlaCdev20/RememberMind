@@ -297,6 +297,7 @@ class SidebarService
             $sections[] = $cuidados;
         }
         $sections[] = $this->buildSection('Pase de turno', 'ph-arrows-clockwise', 'admin.enfermeria.pase-turno', [], false, 'pases_turno.ver');
+        $sections[] = $this->buildSection('Reportes de enfermería', 'ph-chart-bar', 'admin.enfermeria.reportes', [], false, 'enfermeria.ver_dashboard');
 
         return array_values(array_filter($sections));
     }

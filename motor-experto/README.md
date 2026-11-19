@@ -58,4 +58,4 @@ El producto contiene los evaluadores institucionales, conocimiento versionado, r
 
 Verificacion independiente: `php motor-experto/tests/independencia.php`. Ejecuta cuatro fixtures tecnicos validos y comprueba el rechazo del fixture con cobertura insuficiente, sin arrancar Laravel ni conectar una base de datos. Las pruebas de regresion completas del piloto permanecen en `tests/Unit/SistemaExperto` y `tests/Feature/SistemaExperto` de la raiz, usando este motor separado.
 
-El análisis multicriterio y el adaptador de salida remoto siguen pendientes porque no existe una metodología/servicio aprobado que migrar. No se conservan directorios de reserva vacíos para esas capacidades; la documentación mantiene su alcance pendiente. No son evidencia de inferencia clínica implementada.
+Las ampliaciones del análisis y el adaptador de salida remoto siguen pendientes porque no existe una metodología/servicio aprobado que migrar. No se conservan directorios de reserva vacíos para esas capacidades; la documentación mantiene su alcance pendiente. No son evidencia de inferencia clínica implementada.

@@ -5,95 +5,35 @@
         subtitle="Observación longitudinal y continuidad del cuidado durante el turno."
         overline="Enfermería y cuidados"
         icon="ph-chart-line-up">
+        <x-ui.nursing-report-link :area="$cuidado ?: 'seguimiento'" />
         @can('atenciones.crear')
-            <x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" id="resident-register-trigger" @click="feedbackAttempt = null; clinicalFormDirty = false; clinicalDiscardOpen = false" wire:click="abrirCrear">
-                Registrar seguimiento
-            </x-ui.action-button>
+            <x-ui.action-button variant="primary" size="sm" icono="ph-plus-circle" id="resident-register-trigger" data-rm-action-icon aria-label="Registrar seguimiento" @click="feedbackAttempt = null; clinicalFormDirty = false; clinicalDiscardOpen = false" wire:click="abrirCrear" loading="abrirCrear" />
         @endcan
     </x-ui.page-header>
     @if($cuidado !== '')
         <p class="text-sm text-[var(--rm-text-secondary)]">Este cuidado se registra dentro del seguimiento diario completo. {{ $cuidado === 'conducta' ? 'Describe la conducta observada, la intervención realizada y la respuesta del residente.' : 'Las observaciones cognitivas no constituyen un diagnóstico.' }}</p>
     @endif
 
-    <x-ui.filter-bar class="mb-4">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-            {{-- Buscador Principal formato alertas --}}
-            <div class="lg:col-span-6 relative flex items-center">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                    <i class="ph-bold ph-magnifying-glass text-base"></i>
-                </span>
-                <input type="text"
-                    aria-label="Buscar residente" wire:model.live.debounce.400ms="search"
-                    placeholder="Buscar residente..."
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
-                @if(!empty($search))
-                    <button type="button"
-                        wire:click="$set('search', '')"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
-                        title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
-                        <i class="ph-bold ph-x-circle text-base"></i>
-                    </button>
-                @endif
-            </div>
-
-            {{-- Turno --}}
-            <div class="lg:col-span-3">
-                <select id="seguimiento-filtroTurno" aria-invalid="{{ $errors->has('filtroTurno') ? 'true' : 'false' }}" @error('filtroTurno') aria-describedby="seguimiento-filtroTurno-error" @enderror aria-label="Filtrar por turno" wire:model.live="filtroTurno"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
+    <x-ui.filter-bar class="rm-nursing-filters" x-data aria-label="Filtros de seguimiento">
+        <div class="rm-nursing-filters__row">
+            <x-ui.field label="Buscar" for="seguimiento-buscar">
+                <input id="seguimiento-buscar" type="search" class="rm-input" wire:model.live.debounce.300ms="search" placeholder="Buscar residente…">
+            </x-ui.field>
+            <x-ui.field label="Turno" for="seguimiento-filtroTurno" error="filtroTurno">
+                <select id="seguimiento-filtroTurno" class="rm-select" wire:model.live="filtroTurno" aria-invalid="{{ $errors->has('filtroTurno') ? 'true' : 'false' }}" @error('filtroTurno') aria-describedby="seguimiento-filtroTurno-error" @enderror>
                     <option value="">Todos los turnos</option>
                     @foreach($turnos as $turno)
                         <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }} ({{ substr($turno->hora_inicio, 0, 5) }})</option>
                     @endforeach
                 </select>
-            </div>
-
-            {{-- Fecha --}}
-            <div class="lg:col-span-3">
-                <input id="seguimiento-filtroFecha" aria-invalid="{{ $errors->has('filtroFecha') ? 'true' : 'false' }}" @error('filtroFecha') aria-describedby="seguimiento-filtroFecha-error" @enderror type="date" wire:model.live="filtroFecha" title="Filtrar por fecha"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px] cursor-pointer">
-            </div>
+            </x-ui.field>
+            <x-ui.field label="Fecha" for="seguimiento-filtroFecha" error="filtroFecha">
+                <input id="seguimiento-filtroFecha" class="rm-input" type="date" wire:model.live="filtroFecha" aria-invalid="{{ $errors->has('filtroFecha') ? 'true' : 'false' }}" @error('filtroFecha') aria-describedby="seguimiento-filtroFecha-error" @enderror>
+            </x-ui.field>
+            @if($search || $filtroTurno || $filtroFecha)
+                <x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" data-rm-action-icon aria-label="Limpiar filtros" x-on:click="$wire.$set('search', '', false); $wire.$set('filtroTurno', '', false); $wire.$set('filtroFecha', null, false); $wire.$refresh()" />
+            @endif
         </div>
-
-        {{-- Chips de filtros activos formato alertas --}}
-        @php
-            $hasFiltrosSeg = !empty($search) || !empty($filtroTurno) || !empty($filtroFecha);
-        @endphp
-        @if($hasFiltrosSeg)
-            <div class="rm-filter-bar__active">
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="rm-filter-bar__active-label">
-                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                    </span>
-                    @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="$set('search', '')" aria-label="Quitar filtro de búsqueda" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs" aria-hidden="true"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroTurno))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-warning-soft)] border border-[var(--rm-warning)] text-[11px] font-bold text-[var(--rm-warning)]">
-                            <span>Turno filtrado</span>
-                            <button type="button" wire:click="$set('filtroTurno', '')" aria-label="Quitar filtro de turno" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs" aria-hidden="true"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroFecha))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Fecha: {{ $filtroFecha }}</span>
-                            <button type="button" wire:click="$set('filtroFecha', null)" aria-label="Quitar filtro de fecha" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs" aria-hidden="true"></i></button>
-                        </span>
-                    @endif
-                </div>
-
-                <div class="flex items-center gap-2.5">
-                    <button type="button"
-                        wire:click="$set('search', ''); $set('filtroTurno', ''); $set('filtroFecha', null);"
-                        class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-primary-soft)] hover:bg-[var(--rm-primary)] hover:text-white text-[var(--rm-primary)] border border-[var(--rm-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                        <span>Limpiar filtros</span>
-                    </button>
-                </div>
-            </div>
-        @endif
     </x-ui.filter-bar>
 
     <x-ui.section-card title="Seguimientos del turno" subtitle="Registros guardados, del más reciente al más antiguo." icon="ph-clock-counter-clockwise">

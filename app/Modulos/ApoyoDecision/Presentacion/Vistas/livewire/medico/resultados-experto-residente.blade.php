@@ -1,7 +1,13 @@
-<div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta'), vistaClinica: @js($psicologia ? 'resumen' : 'mapa') }" :class="{ 'has-consulta': consultaVisible && !@js($enfermeria) }"
+<div class="rm-expert-results text-rm-primary {{ $psicologia ? 'rm-expert-results--psychology' : ($enfermeria ? 'rm-expert-results--nursing' : 'rm-expert-results--medicine') }}" x-data="{ consultaVisible: @entangle('consultaAbierta'), vistaClinica: @js($psicologia ? 'resumen' : 'mapa') }" :class="{ 'has-consulta': consultaVisible }"
     x-on:decision-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
+    @unless($enfermeria && ! $resultadoInstitucional)
+        @include('apoyodecision::livewire.medico.resultados-experto.historia-institucional')
+    @endunless
+    @if($resultadoInstitucional)
+        @include('apoyodecision::livewire.medico.resultados-experto.resultado-institucional')
+    @else
     @if($enfermeria)
         @include('apoyodecision::livewire.medico.resultados-experto.enfermeria')
     @else
@@ -264,6 +270,7 @@
                 @include('livewire.medico.resultados-experto.fundamento', ['abierto' => true])
 
         </x-ui.drawer-livewire>
+    @endif
     @endif
     @endif
 </div>

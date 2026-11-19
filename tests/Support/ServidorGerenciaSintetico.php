@@ -36,7 +36,7 @@ if (!$preparar) {
     }
     $estatico = realpath($raiz.'/public'.rawurldecode($ruta));
     if ($estatico && str_starts_with($estatico, realpath($raiz.'/public').DIRECTORY_SEPARATOR) && is_file($estatico)) return false;
-    if (!in_array($ruta, ['/dashboard','/cambiar-contrasena-inicial','/admin/personal-institucional','/admin/personal-documentacion','/admin/turnos-asignaciones','/admin/areas-institucionales','/admin/cobertura-equipo','/admin/residentes','/admin/alertas-clinicas','/admin/galeria'], true)
+    if (!in_array($ruta, ['/dashboard','/cambiar-contrasena-inicial','/admin/personal-institucional','/admin/personal-documentacion','/admin/turnos-asignaciones','/admin/areas-institucionales','/admin/cobertura-equipo','/admin/residentes','/admin/alertas-clinicas','/admin/galeria','/admin/avisos-planificacion'], true)
         && !(getenv('RM_GERENCIA_QA_REFERENCIAS') === '1' && $ruta === '/admin/referencias-formularios')
         && !str_starts_with($ruta, '/admin/reportes/institucional')
         && $ruta !== '/admin/familia-social/red-apoyo'
@@ -44,7 +44,7 @@ if (!$preparar) {
         && !str_starts_with($ruta, '/admin/personal-documentacion/archivos/')
         && !(getenv('RM_GERENCIA_QA_CORRECCION') === '1' && $ruta === '/admin/usuarios/QA_DOC_TITULAR')
         && !preg_match('~^/livewire-[a-f0-9]+/(?:livewire(?:\.min)?\.js|update|upload-file|preview-file/.*)$~D', $ruta)) {
-        http_response_code(403); exit('Ruta fuera del ensayo.');
+        http_response_code(403); exit('Ruta fuera del ensayo: '.$ruta);
     }
 }
 foreach (['APP_ENV'=>'testing','APP_DEBUG'=>'false','APP_URL'=>getenv('APP_URL'),
@@ -52,7 +52,8 @@ foreach (['APP_ENV'=>'testing','APP_DEBUG'=>'false','APP_URL'=>getenv('APP_URL')
     'APP_CONFIG_CACHE'=>$archivo.'.config.php','APP_ROUTES_CACHE'=>$archivo.'.routes.php',
     'VIEW_COMPILED_PATH'=>$archivo.'.views', 'DB_CONNECTION'=>'sqlite','DB_DATABASE'=>$archivo,'DB_URL'=>'',
     'SESSION_DRIVER'=>'file','SESSION_COOKIE'=>'gerencia_qa_'.substr($token,0,8),
-    'CACHE_STORE'=>'array','MAIL_MAILER'=>'array','QUEUE_CONNECTION'=>'sync'] as $clave=>$valor) {
+    'CACHE_STORE'=>'array','MAIL_MAILER'=>'array','QUEUE_CONNECTION'=>'sync',
+    'AVISOS_PLANIFICACION_HABILITADOS'=>getenv('RM_GERENCIA_QA_AVISOS')==='1' ? 'true' : 'false'] as $clave=>$valor) {
     putenv($clave.'='.$valor); $_ENV[$clave] = $_SERVER[$clave] = $valor;
 }
 if (!is_dir($archivo.'.views')) mkdir($archivo.'.views');
@@ -65,7 +66,8 @@ if ($preparar) {
     if (getenv('RM_GERENCIA_QA_PERSONAL')==='1') (require $raiz.'/database/propuestas/gerencia/2026_11_04_000004_pais_documento_telefono_personal.php')->up();
     if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000001_documentacion_y_estado_laboral.php')->up();
     if (getenv('RM_GERENCIA_QA_HISTORIA')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_26_000002_historia_vinculos_asignaciones.php')->up();
-    if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1' || getenv('RM_GERENCIA_QA_HISTORIA')==='1') \Tests\Support\PrepararHistoriaLaboral::instalar();
+    if (getenv('RM_GERENCIA_QA_AVISOS')==='1') (require $raiz.'/database/propuestas/gerencia/2026_10_27_000003_campos_aviso_evento_asignacion.php')->up();
+    if (getenv('RM_GERENCIA_QA_AMPLIACION')==='1' || getenv('RM_GERENCIA_QA_HISTORIA')==='1' || getenv('RM_GERENCIA_QA_AVISOS')==='1') \Tests\Support\PrepararHistoriaLaboral::instalar();
     Artisan::call('db:seed', ['--class'=>Database\Seeders\RolesAndPermissionsSeeder::class,'--force'=>true]);
     $actor = User::factory()->create(['cod_usuario'=>'QA_GERENCIA','correo'=>'direccion@example.test','password'=>'TemporalGerencia#123']);
     Personal::create(['cod_usuario'=>$actor->getKey(),'nombres'=>'Dirección','apellido_paterno'=>'Sintética','numero_documento'=>'9100000','profesion'=>'GERENCIA','estado'=>'ACTIVO']);
@@ -82,11 +84,17 @@ if ($preparar) {
     $turno = Turno::create(['nombre'=>'Mañana','hora_inicio'=>'08:00:00','hora_cierre'=>'16:00:00','estado'=>'ACTIVO','orden'=>1]);
     $jornada = Jornada::create(['cod_turno'=>$turno->getKey(),'fecha_jornada'=>today(),'estado'=>'ABIERTA']);
     foreach (['Enfermería','Psicología','Administración'] as $i=>$funcion) {
-        $persona = User::factory()->create(['correo'=>'equipo'.($i+1).'@example.test']);
+        $identidadAviso = getenv('RM_GERENCIA_QA_AVISOS')==='1' && in_array($i,[0,2],true) ? ['cod_usuario'=>$i===0 ? 'QA_AVISO_AFECTADO' : 'QA_AVISO_ADMIN'] : [];
+        $persona = User::factory()->create(['correo'=>'equipo'.($i+1).'@example.test',...$identidadAviso]);
         $persona->assignRole(['ENFERMEROS','PSICOLOGO/A','ADMINISTRADOR'][$i]);
         if (getenv('RM_GERENCIA_QA_PRORROGA') === '1') $persona->forceFill(['fecha_hora_alta'=>now()])->save();
         $personal = Personal::create(['cod_usuario'=>$persona->getKey(),'nombres'=>'Profesional de prueba '.($i+1),'apellido_paterno'=>'Nombre extenso','numero_documento'=>(string)(9100001+$i),'profesion'=>$funcion,'estado'=>'ACTIVO']);
         AsignacionPersonal::create(['cod_jornada'=>$jornada->getKey(),'cod_area'=>$area->getKey(),'cod_personal'=>$personal->getKey(),'estado'=>'ACTIVA','funcion'=>$funcion]);
+        if (getenv('RM_GERENCIA_QA_AVISOS')==='1' && $i===0) {
+            \Illuminate\Support\Facades\Queue::fake();
+            \Illuminate\Support\Facades\DB::transaction(fn () => app(\App\Modulos\Institucion\Aplicacion\Acciones\ConservarEventoAsignacion::class)
+                ->conservar($personal->asignaciones()->first(), $actor, 'ALTA', null, now(), 'Alta sintética para aceptación de avisos'));
+        }
     }
     $habitacion = Habitacion::create(['codigo'=>'Habitación A','piso'=>'1','estado'=>'ACTIVA']);
     Cama::create(['cod_habitacion'=>$habitacion->getKey(),'codigo'=>'Cama A','estado'=>'DISPONIBLE']);
@@ -102,7 +110,6 @@ if ($preparar) {
     }
     $contacto=App\Models\Contacto::create(['nombres'=>'Contacto de prueba','apellido_paterno'=>'Identidad sintética','correo'=>'contacto@example.test','estado'=>'ACTIVO']);
     App\Models\ResidenteContacto::create(['cod_residente_contacto'=>'QA_VINCULO_FAMILIAR','cod_residente'=>$residentes[0]->getKey(),'cod_contacto'=>$contacto->getKey(),'parentesco'=>'Hija','responsable_principal'=>false,'contacto_emergencia'=>false,'autoriza_informacion'=>true,'autoriza_salida'=>false,'estado'=>'ACTIVO']);
-    if (getenv('RM_GERENCIA_QA_PLANIFICACION') === '1') require __DIR__.'/PlanificacionDisenoSintetica.php';
     if (getenv('RM_GERENCIA_QA_ARCHIVOS') === '1') {
         $actor->forceFill(['cambio_password_pendiente' => false])->save();
         $disk = \Illuminate\Support\Facades\Storage::build(['driver' => 'local', 'root' => $archivo.'.storage', 'throw' => true]);
@@ -115,7 +122,7 @@ if ($preparar) {
                 'fecha_hora_carga' => now()->subDays($i), 'fecha_emision' => today()->subDays(10), 'cod_usuario_carga' => $actor->getKey()]);
         }
     }
-
+    if (getenv('RM_GERENCIA_QA_PLANIFICACION') === '1') require __DIR__.'/PlanificacionDisenoSintetica.php';
     if (getenv('RM_GERENCIA_QA_CARPETAS') === '1') require __DIR__.'/DocumentacionCarpetasSintetica.php';
     if (getenv('RM_GERENCIA_QA_RED_APOYO') === '1') require __DIR__.'/RedApoyoVisualSintetica.php';
     echo 'PREPARADO'; exit;
@@ -124,7 +131,11 @@ final class AutenticarGerenciaSintetica
 {
     public function handle($request, Closure $next)
     {
-        Auth::onceUsingId('QA_GERENCIA');
+        $cuenta = 'QA_GERENCIA';
+        if (getenv('RM_GERENCIA_QA_AVISOS')==='1') $cuenta = match($request->header('X-RM-GERENCIA-QA-ROL')) {
+            'ADMINISTRADOR'=>'QA_AVISO_ADMIN', 'AFECTADO'=>'QA_AVISO_AFECTADO', default=>'QA_GERENCIA',
+        };
+        Auth::onceUsingId($cuenta);
         return $next($request);
     }
 }

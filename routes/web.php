@@ -160,6 +160,7 @@ Route::middleware([
 
             $rutas['Institucion']['ruta_035']();
             $rutas['Institucion']['galeria']();
+            $rutas['Institucion']['avisos_planificacion']();
 
             $rutas['Institucion']['ruta_036']();
 

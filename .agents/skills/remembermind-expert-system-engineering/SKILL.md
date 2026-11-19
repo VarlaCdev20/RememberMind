@@ -1,6 +1,6 @@
 ---
 name: remembermind-expert-system-engineering
-description: "Diseñar conocimiento, inferencia multicriterio y explicación del futuro sistema experto cognitivo de RememberMind mediante fases Buchanan. Usar en formalización o integración aprobada; no convierte propuestas en protocolo, diagnostica ni elige pesos/umbrales clínicos."
+description: "Diseñar conocimiento, inferencia y explicación del futuro sistema experto cognitivo de RememberMind mediante fases Buchanan. Usar en formalización o integración aprobada; no convierte propuestas en protocolo, diagnostica ni elige pesos/umbrales clínicos."
 ---
 
 **Orden de trabajo adoptado el 30/10/2026:** completar primero el funcionamiento integral y sus pruebas técnicas. Durante todo el desarrollo no solicitar estudios con residentes, firmas, referencias humanas ni avales externos como condición para programar, probar o integrar. La evaluación posterior en uso real queda fuera de esta etapa. Conservar reglas aprobadas, datos originales, permisos, trazabilidad y abstención por datos insuficientes; no inventar resultados.

@@ -25,6 +25,7 @@ export default defineConfig({
             input: [
                 'resources/frontend/styles/app.css',
                 'resources/frontend/scripts/app.js',
+                'resources/frontend/scripts/modules/nursing-report-print.js',
             ],
             refresh: true,
         }),

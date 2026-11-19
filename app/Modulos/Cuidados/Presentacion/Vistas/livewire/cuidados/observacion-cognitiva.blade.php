@@ -10,6 +10,7 @@
                 <details class="rm-cognicion__context-more"><summary>Profesional, jornada y fecha <i class="ph-bold ph-caret-down" aria-hidden="true"></i></summary><dl><div><dt>Profesional que registra</dt><dd>{{ $nombreProfesional }}</dd></div><div><dt>Jornada actual</dt><dd>{{ $jornada?->turno?->nombre ?: 'Sin jornada activa' }} @if($jornada?->turno) · {{ substr($jornada->turno->hora_inicio,0,5) }}–{{ substr($jornada->turno->hora_cierre,0,5) }}@endif</dd></div><div><dt>Fecha y hora del servidor</dt><dd>{{ now()->format('d/m/Y · H:i') }} · Se guardan al confirmar</dd></div></dl></details>
             </div>
             <x-ui.clinical-consultation-bar label="Consultar observaciones guardadas">
+                <x-ui.nursing-report-link area="cognicion" :residente="$residente->getKey()" />
                 <x-ui.action-button variant="secondary" icono="ph-clock-counter-clockwise" x-ref="historyTrigger" @click="openHistory($event.currentTarget)" x-bind:aria-expanded="historyOpen" aria-controls="cognicion-historial" aria-haspopup="dialog">Ver historial</x-ui.action-button>
                 <x-ui.action-button variant="secondary" icono="ph-chart-line" @click="openTrend($event.currentTarget)" x-bind:aria-expanded="trendOpen" aria-controls="cognicion-grafica" aria-haspopup="dialog">Ver evolución</x-ui.action-button>
             </x-ui.clinical-consultation-bar>

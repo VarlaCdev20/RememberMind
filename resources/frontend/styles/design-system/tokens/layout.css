@@ -15,8 +15,8 @@
        2. CONTENEDOR DE PÁGINA
        ------------------------------------------------------------ */
     --rm-page-max-width: 1360px;        /* Ancho máximo de contenido */
-    --rm-page-padding-x: 20px;          /* Relleno horizontal de pantalla */
-    --rm-page-padding-y: 16px;          /* Relleno vertical de pantalla */
+    --rm-page-padding-x: clamp(12px, 1.4vw, 20px);
+    --rm-page-padding-y: clamp(10px, 1.2vw, 16px);
     --rm-content-gap: 16px;             /* Separación entre secciones operativas */
     --rm-grid-gap: 12px;                /* Separación interna de grids */
     --rm-page-header-height: 76px;      /* Cabecera de vistas internas */

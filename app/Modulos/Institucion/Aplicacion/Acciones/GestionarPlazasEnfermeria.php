@@ -83,7 +83,8 @@ final class GestionarPlazasEnfermeria
                 $fin->addDay();
             }
             $vigentes = AsignacionPersonal::where('cod_personal', $personal->getKey())->whereIn('estado', ['ACTIVO', 'ACTIVA'])->with('jornada.turno')
-                ->whereHas('jornada', fn ($q) => $q->whereBetween('fecha_jornada', [$inicio->copy()->subDay()->toDateString(), $inicio->copy()->addDay()->toDateString()]))->get();
+                ->whereHas('jornada', fn ($q) => $q->whereDate('fecha_jornada', '>=', $inicio->copy()->subDays(2)->toDateString())
+                    ->whereDate('fecha_jornada', '<=', $inicio->copy()->addDays(2)->toDateString()))->get();
             foreach ($vigentes as $vigente) {
                 $desde = Carbon::parse($vigente->jornada->fecha_jornada)->setTimeFromTimeString($vigente->jornada->turno->hora_inicio);
                 $hasta = Carbon::parse($vigente->jornada->fecha_jornada)->setTimeFromTimeString($vigente->jornada->turno->hora_cierre);
@@ -91,16 +92,20 @@ final class GestionarPlazasEnfermeria
                     $hasta->addDay();
                 }
                 abort_if($inicio->lt($hasta) && $fin->gt($desde), 422, 'La asignación se superpone con otra jornada del profesional.');
+                $finDescanso = app(GestionarHorariosPersonal::class)->finConDescansoRotativo($vigente->jornada->turno, (string) $vigente->tipo_asignacion, $hasta);
+                abort_if($inicio->lt($finDescanso) && $fin->gt($desde), 422, 'La asignación invade las 24 horas de descanso posteriores a una noche rotativa.');
             }
             $jornada = Jornada::where('cod_turno', $turnoId)->whereDate('fecha_jornada', $fecha)->first();
             if (! $jornada) {
                 $jornada = Jornada::create([
                     'cod_jornada' => app(CodigosEntidad::class)->siguiente('jornadas'),
                     'cod_turno' => $turnoId, 'fecha_jornada' => $fecha, 'estado' => 'ACTIVA',
+                    'cod_usuario_apertura' => $actor->getKey(),
                 ]);
             }
             $jornada = Jornada::whereKey($jornada->getKey())->lockForUpdate()->firstOrFail();
             abort_unless(in_array($jornada->estado, ['PLANIFICADA', 'ABIERTA', 'ACTIVA', 'EN_CURSO'], true), 422, 'La jornada está cerrada y no admite nuevas asignaciones.');
+            $jornada->abrirAlConfirmarHorario($actor);
 
             $nueva = AsignacionPersonal::create([
                 'cod_jornada' => $jornada->cod_jornada, 'cod_personal' => $personal->cod_personal, 'cod_area' => $areaId,

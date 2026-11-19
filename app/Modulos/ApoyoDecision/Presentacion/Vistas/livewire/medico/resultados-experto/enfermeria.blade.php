@@ -1,5 +1,5 @@
 @php($texto = [\App\Modulos\ApoyoDecision\Aplicacion\DTOs\ConsultaCognitivaEnfermeria::class, 'texto'])
-<div class="rm-cognitive-reading" x-data="{
+<div class="rm-cognitive-reading rm-expert-report" x-data="{
     contextoFuera: false,
     contextoObserver: null,
     init() { this.$nextTick(() => {
@@ -8,23 +8,12 @@
     }); },
     destroy() { this.contextoObserver?.disconnect(); }
 }">
-    <header class="rm-expert-heading rm-expert-page-heading">
-        <div><p class="rm-expert-eyebrow">Mis residentes / {{ $residente->nombre_completo }} / Evaluación cognitiva</p><h1>Evaluación cognitiva y cuidados</h1><p class="rm-expert-subtitle">Resultados y evidencias disponibles</p></div>
-        <div class="rm-expert-heading-actions">
-            <a class="rm-btn rm-btn-primary" href="#expert-nursing-records"><i class="ph ph-folder-open" aria-hidden="true"></i>Ver registros y evidencias</a>
-            <a class="rm-btn rm-btn-secondary" href="#expert-nursing-care"><i class="ph ph-heart" aria-hidden="true"></i>Cuidados</a>
-            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes', ['residente' => $codResidente]) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver a Mis residentes</a>
-        </div>
-    </header>
-    @unless(isset($perfilInstrumental['petersen_institucional']))
-    <section class="rm-card rm-cognitive-identity" aria-label="Contexto del residente" x-ref="residenteContexto">
-        <div class="rm-cognitive-identity-header">
-            <div class="rm-cognitive-person"><span class="rm-cognitive-avatar" aria-hidden="true">{{ mb_substr($residente->nombres, 0, 1).mb_substr($residente->apellido_paterno ?? '', 0, 1) }}</span><div><p class="rm-cognitive-person-label">Residente en consulta</p><h2>{{ $residente->nombre_completo }}</h2><p>{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p></div></div>
-            <span class="rm-decision-state"><i class="ph ph-eye" aria-hidden="true"></i>Solo lectura · Enfermería</span>
-        </div>
-        <dl class="rm-cognitive-meta"><div><dt>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Fecha de la consulta' : 'Fecha de evaluación' }}</dt><dd>{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? $datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</dd></div><div><dt>Tipo de consulta</dt><dd>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Resultado orientativo actual, aún no guardado' : 'Resultados disponibles del expediente' }}</dd></div><div><dt>Acceso</dt><dd>Lectura de Enfermería</dd></div></dl>
+    <x-ui.dashboard-header class="rm-expert-report__hero" eyebrow="Mis residentes / Informe cognitivo" title="Evaluación cognitiva y cuidados" subtitle="Resultados y evidencias disponibles" scope="" :image="asset('images/FOTOS CENTRO DE ADULTOS MAYORES/625859129_1410592147745370_5928827647682583422_n.jpg')" image-alt="Imagen institucional: adulta mayor participando en una actividad de Psicología" image-label="Imagen institucional" />
+    <section class="rm-card rm-expert-report__identity" aria-label="Contexto del residente" x-ref="residenteContexto">
+        <div class="rm-cognitive-person"><span class="rm-cognitive-avatar" aria-hidden="true">{{ mb_substr($residente->nombres, 0, 1).mb_substr($residente->apellido_paterno ?? '', 0, 1) }}</span><div><h2>{{ $residente->nombre_completo }}</h2><p>{{ $residente->edad !== null ? $residente->edad.' años' : 'Edad no disponible' }} · {{ $residente->ubicacion_formateada }}</p></div></div>
+        <div class="rm-expert-report__identity-meta"><span>Solo lectura · Enfermería</span><span>{{ isset($perfilInstrumental['petersen_institucional']) ? 'Consulta actual' : 'Evaluación disponible' }} · {{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\FechaVisible::mostrar($perfilInstrumental['petersen_institucional']['fecha_corte'] ?? $datos['evaluacion']['fecha'] ?? null, 'Sin evaluación disponible') }}</span></div>
+        <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes', ['residente' => $codResidente]) }}"><i class="ph ph-arrow-left" aria-hidden="true"></i>Volver a Mis residentes</a>
     </section>
-    @endunless
     <div class="rm-cognitive-context" x-show="contextoFuera" x-cloak aria-label="Residente activo durante la consulta"><strong>{{ $residente->nombre_completo }}</strong><span>Solo lectura · Enfermería</span></div>
     @if($errorInstrumental)<section class="rm-decision-note" role="alert"><strong>No fue posible consultar las mediciones instrumentales.</strong><p>La información no pudo verificarse. Esto no significa que no existan registros.</p><button type="button" class="rm-btn rm-btn-secondary" wire:click="reintentar">Reintentar</button></section>@endif
     @unless($errorLectura)

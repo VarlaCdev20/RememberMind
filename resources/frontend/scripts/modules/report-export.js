@@ -1,5 +1,30 @@
 import { crearVisorGraficas } from './report-charts.js';
 
+function mensajeErrorExportacion(estado) {
+    if ([401, 403, 419].includes(estado)) return 'Tu sesión o tus permisos cambiaron. Revisa tu acceso antes de exportar.';
+    if ([404, 409].includes(estado)) return 'La preparación ya no está disponible. Cierra esta ventana y abre de nuevo la exportación.';
+    if (estado === 422) return 'Revisa la selección de contenido y vuelve a intentarlo.';
+    return 'No se pudo preparar el reporte. Vuelve a intentarlo.';
+}
+
+async function descargarArchivoReporte(destino, formato, nombreBase) {
+    const respuesta = await fetch(destino, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+    const tipo = formato === 'pdf' ? 'application/pdf' : 'text/csv';
+    if (!respuesta.ok) throw new Error(mensajeErrorExportacion(respuesta.status));
+    if (!respuesta.headers.get('Content-Type')?.includes(tipo)) {
+        throw new Error('El archivo no pudo prepararse. Revisa tu sesión y vuelve a intentarlo.');
+    }
+    const archivo = await respuesta.blob();
+    const enlace = document.createElement('a');
+    const nombre = respuesta.headers.get('Content-Disposition')?.match(/filename="?([^";]+)"?/i)?.[1];
+    enlace.href = URL.createObjectURL(archivo);
+    enlace.download = nombre || nombreBase + '.' + formato;
+    document.body.append(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
+}
+
 export function crearExportacionReporte() {
     return {
         ...crearVisorGraficas(),
@@ -50,7 +75,7 @@ export function crearExportacionReporte() {
                     headers: { Accept: 'application/json' },
                     credentials: 'same-origin', signal: solicitud.signal,
                 });
-                if (!respuesta.ok) throw new Error(this.mensajeErrorExportacion(respuesta.status));
+                if (!respuesta.ok) throw new Error(mensajeErrorExportacion(respuesta.status));
                 const datos = await respuesta.json();
                 if (solicitud.signal.aborted) return;
                 this.datosExportacion = datos;
@@ -86,21 +111,7 @@ export function crearExportacionReporte() {
                 destino.searchParams.set('solicitud', this.datosExportacion.solicitud);
                 destino.searchParams.set('tipo_grafica', this.tipoGraficas);
                 this.partesExportacion.forEach(parte => destino.searchParams.append('partes[]', parte));
-                const respuesta = await fetch(destino, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
-                const tipo = this.formatoExportacion === 'pdf' ? 'application/pdf' : 'text/csv';
-                if (!respuesta.ok) throw new Error(this.mensajeErrorExportacion(respuesta.status));
-                if (!respuesta.headers.get('Content-Type')?.includes(tipo)) {
-                    throw new Error('El archivo no pudo prepararse. Revisa tu sesión y vuelve a intentarlo.');
-                }
-                const archivo = await respuesta.blob();
-                const enlace = document.createElement('a');
-                const nombre = respuesta.headers.get('Content-Disposition')?.match(/filename="?([^";]+)"?/i)?.[1];
-                enlace.href = URL.createObjectURL(archivo);
-                enlace.download = nombre || 'reporte-gerencial.' + this.formatoExportacion;
-                document.body.append(enlace);
-                enlace.click();
-                enlace.remove();
-                setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
+                await descargarArchivoReporte(destino, this.formatoExportacion, 'reporte-gerencial');
                 this.resultadoExportacion = 'El archivo está preparado. La descarga se inició.';
             } catch (error) {
                 this.errorExportacion = error instanceof TypeError
@@ -110,15 +121,56 @@ export function crearExportacionReporte() {
             }
         },
 
-        mensajeErrorExportacion(estado) {
-            if ([401, 403, 419].includes(estado)) return 'Tu sesión o tus permisos cambiaron. Revisa tu acceso antes de exportar.';
-            if ([404, 409].includes(estado)) return 'La preparación ya no está disponible. Cierra esta ventana y abre de nuevo la exportación.';
-            if (estado === 422) return 'Revisa la selección de contenido y vuelve a intentarlo.';
-            return 'No se pudo preparar el reporte. Vuelve a intentarlo.';
-        },
-
         destroy() { clearTimeout(this.temporizadorGraficas); this.destruirGraficas(); this.solicitudExportacion?.abort(); },
     };
 }
 
-if (typeof window !== 'undefined') window.rmReportExport = crearExportacionReporte;
+export function crearExportacionEnfermeria() {
+    return {
+        exportacionAbierta: false,
+        descargandoExportacion: false,
+        errorExportacion: '',
+        resultadoExportacion: '',
+        formatoExportacion: 'pdf',
+
+        abrirExportacion() {
+            this.errorExportacion = '';
+            this.resultadoExportacion = '';
+            this.exportacionAbierta = true;
+        },
+
+        cerrarExportacion() {
+            if (!this.descargandoExportacion) this.exportacionAbierta = false;
+        },
+
+        async descargarExportacion(formulario) {
+            if (this.descargandoExportacion) return;
+            const campos = new FormData(formulario);
+            this.resultadoExportacion = '';
+            if (campos.get('desde') > campos.get('hasta')) {
+                this.errorExportacion = 'La fecha final debe ser igual o posterior a la inicial.';
+                formulario.elements.hasta.focus();
+                return;
+            }
+
+            this.descargandoExportacion = true;
+            this.errorExportacion = '';
+            try {
+                const url = new URL(formulario.dataset[this.formatoExportacion + 'Url'], window.location.origin);
+                url.search = new URLSearchParams(campos).toString();
+                await descargarArchivoReporte(url, this.formatoExportacion, 'reporte-enfermeria');
+                this.resultadoExportacion = 'El archivo está preparado. La descarga se inició.';
+            } catch (error) {
+                this.errorExportacion = error instanceof TypeError
+                    ? 'No se pudo conectar. Revisa tu conexión y vuelve a intentarlo.' : error.message;
+            } finally {
+                this.descargandoExportacion = false;
+            }
+        },
+    };
+}
+
+if (typeof window !== 'undefined') {
+    window.rmReportExport = crearExportacionReporte;
+    window.rmNursingReportExport = crearExportacionEnfermeria;
+}

@@ -70,7 +70,7 @@ class AppServiceProvider extends ServiceProvider
         Permission::created(function (Permission $permission): void {
             // La propietaria reservó esta ejecución a Medicina y Psicología, también al crear el permiso.
             if (in_array($permission->name, ['fotografias_institucionales.gestionar', 'aplicaciones_instrumento.transcribir',
-                'evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
+                'evaluaciones_expertas.ejecutar_observaciones', 'evaluaciones_expertas.ejecutar_institucional', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
                 'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
                 'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'], true)) {
                 return;

@@ -51,6 +51,8 @@ return [
             ->name('pacientes.ficha.pdf');
     },
     'ruta_155' => static function (): void {
+        Route::get('/reportes/csv', [\App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEnfermeriaController::class, 'csv'])
+            ->middleware('permission:enfermeria.ver_ficha_paciente')->name('reportes.csv');
         Route::get('/reportes/vista-previa', [\App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEnfermeriaController::class, 'mostrar'])
             ->middleware('permission:enfermeria.ver_dashboard')->name('reportes.preview');
         Route::get('/reportes/pdf', [\App\Modulos\Reportes\Presentacion\Http\Controllers\ReporteEnfermeriaController::class, 'pdf'])

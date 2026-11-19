@@ -34,8 +34,11 @@ $puedeEliminar = $true
 try {
     & (Join-Path $PostgresBin 'initdb.exe') -D $datos -U remembermind_test_admin -A trust --encoding=UTF8 --locale=C *> (Join-Path $cluster 'initdb.log')
     if ($LASTEXITCODE -ne 0) { throw 'Falló la creación del cluster desechable.' }
-    & (Join-Path $PostgresBin 'pg_ctl.exe') -D $datos -l (Join-Path $cluster 'server.log') -o "-h 127.0.0.1 -p $puertoPrueba" -w start
-    if ($LASTEXITCODE -ne 0) { throw 'No arrancó el servidor de pruebas.' }
+    # Esperar solo pg_ctl, no el árbol del servidor que acaba de iniciar.
+    $inicioPg = Start-Process -FilePath (Join-Path $PostgresBin 'pg_ctl.exe') -WindowStyle Hidden -PassThru `
+        -ArgumentList @('-D', ('"'+$datos+'"'), '-l', ('"'+(Join-Path $cluster 'server.log')+'"'), '-o', ('"-h 127.0.0.1 -p '+$puertoPrueba+'"'), '-w', 'start') `
+        -RedirectStandardOutput (Join-Path $cluster 'control-start.log') -RedirectStandardError (Join-Path $cluster 'control-start-error.log')
+    if (! $inicioPg.WaitForExit(30000) -or $inicioPg.ExitCode -ne 0) { throw 'No arrancó el servidor de pruebas.' }
     $iniciado = $true
     @"
 CREATE ROLE $runnerPrueba LOGIN PASSWORD '$passwordPrueba' NOSUPERUSER NOCREATEDB NOCREATEROLE;

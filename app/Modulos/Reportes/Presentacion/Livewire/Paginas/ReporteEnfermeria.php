@@ -25,8 +25,13 @@ class ReporteEnfermeria extends Component
 
     public function mount(): void
     {
-        $this->desde = now()->subDays(6)->toDateString();
-        $this->hasta = today()->toDateString();
+        foreach (['desde', 'hasta', 'tipo', 'codResidente'] as $campo) {
+            abort_if(request()->has($campo) && ! is_string(request()->query($campo)), 422, 'El filtro del reporte no es válido.');
+        }
+        $this->desde = (string) request()->query('desde', now()->subDays(6)->toDateString());
+        $this->hasta = (string) request()->query('hasta', today()->toDateString());
+        $this->tipo = (string) request()->query('tipo', 'TODOS');
+        $this->codResidente = (string) request()->query('codResidente', '');
         $this->aplicar();
     }
 
@@ -36,6 +41,12 @@ class ReporteEnfermeria extends Component
             'desde' => $this->desde, 'hasta' => $this->hasta, 'codResidente' => $this->codResidente, 'tipo' => $this->tipo,
         ]);
         $this->resetPage();
+    }
+
+    public function seleccionarSeccion(string $tipo): void
+    {
+        $this->tipo = $tipo;
+        $this->aplicar();
     }
 
     public function render()

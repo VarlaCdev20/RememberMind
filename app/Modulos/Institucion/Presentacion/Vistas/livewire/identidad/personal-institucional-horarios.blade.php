@@ -39,13 +39,13 @@
   <div><p class="rm-help">Trabajador</p><strong>{{ $nombrePersonal }}</strong></div>
   <x-ui.status-badge :estado="$estadoUsuario" />
  </div>
+ @if(!$formAbierto)
  <div class="rm-staff-schedule__heading">
   <x-ui.section-header title="Asignaciones de turno" icon="ph-calendar-check" />
-  @if(!$formAbierto)
    <x-ui.action-button wire:click="abrirFormNuevo" loading="abrirFormNuevo" icono="ph-plus"
     :disabled="$sinRol || in_array(strtoupper($estadoUsuario), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true)">Nueva asignación</x-ui.action-button>
-  @endif
  </div>
+ @endif
  @if($sinRol)
   <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>Este usuario no tiene un rol institucional. La creación y edición de horarios permanecerá bloqueada hasta asignarle uno.</span></p>
  @elseif(in_array(strtoupper($estadoUsuario), ['INACTIVO', 'SUSPENDIDO', 'RETIRADO', '0'], true))
@@ -56,6 +56,8 @@
 
  @if($formAbierto)
  <form wire:submit="solicitarGuardar" class="rm-staff-action__form" novalidate>
+  <div class="rm-schedule-editor">
+  <div class="rm-schedule-editor__fields">
   <x-ui.form-section :title="$modoEdicion ? 'Editar asignación' : 'Nueva asignación de turno'" :icon="$modoEdicion ? 'ph-pencil-simple' : 'ph-calendar-plus'" :columns="2">
    <x-ui.field label="Área" for="staff-schedule-f_cod_area" error="f_cod_area" required>
     <select id="staff-schedule-f_cod_area" wire:model="f_cod_area" class="rm-input" aria-invalid="{{ $errors->has('f_cod_area') ? 'true' : 'false' }}" @if($errors->has('f_cod_area')) aria-describedby="staff-schedule-f_cod_area-error" @endif required>
@@ -63,6 +65,12 @@
      @foreach($areas as $area)<option value="{{ $area['cod_area'] }}">{{ mb_strtoupper($area['nombre'], 'UTF-8') }}</option>@endforeach
     </select>
    </x-ui.field>
+   <x-ui.field label="Tipo de asignación" for="staff-schedule-f_tipo_asignacion" error="f_tipo_asignacion" required>
+    <select id="staff-schedule-f_tipo_asignacion" wire:model.live="f_tipo_asignacion" class="rm-input" aria-invalid="{{ $errors->has('f_tipo_asignacion') ? 'true' : 'false' }}" @if($errors->has('f_tipo_asignacion')) aria-describedby="staff-schedule-f_tipo_asignacion-error" @endif required>
+     <option value="FIJO">FIJO · HORARIO SEMANAL</option><option value="ROTATIVO">ROTATIVO · TURNOS ROTATIVOS</option><option value="TEMPORAL">TEMPORAL · VIGENCIA LIMITADA</option><option value="EVENTUAL">EVENTUAL · COBERTURA PUNTUAL</option>
+    </select>
+   </x-ui.field>
+   @if(!$esRotacionAutomatica)
    <x-ui.field label="Turno" for="staff-schedule-f_cod_turno" error="f_cod_turno" required>
     <select id="staff-schedule-f_cod_turno" wire:model.live="f_cod_turno" class="rm-input" aria-invalid="{{ $errors->has('f_cod_turno') ? 'true' : 'false' }}" @if($errors->has('f_cod_turno')) aria-describedby="staff-schedule-f_cod_turno-error" @endif required>
      <option value="">SELECCIONAR TURNO</option>
@@ -77,29 +85,98 @@
      <p class="rm-help"><i class="ph-bold ph-clock" aria-hidden="true"></i> Horario institucional: {{ $turnoSeleccionado['hora_inicio'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_inicio'])->format('H:i') : 'Sin hora' }}–{{ $turnoSeleccionado['hora_fin'] ? \Carbon\Carbon::parse($turnoSeleccionado['hora_fin'])->format('H:i') : 'Sin hora' }}</p>
     @endif
    </x-ui.field>
-   <x-ui.field label="Tipo de asignación" for="staff-schedule-f_tipo_asignacion" error="f_tipo_asignacion" required>
-    <select id="staff-schedule-f_tipo_asignacion" wire:model="f_tipo_asignacion" class="rm-input" aria-invalid="{{ $errors->has('f_tipo_asignacion') ? 'true' : 'false' }}" @if($errors->has('f_tipo_asignacion')) aria-describedby="staff-schedule-f_tipo_asignacion-error" @endif required>
-     <option value="FIJO">FIJO · HORARIO FIJO SEMANAL</option><option value="ROTATIVO">ROTATIVO · TURNOS ROTATIVOS</option><option value="TEMPORAL">TEMPORAL · VIGENCIA LIMITADA</option><option value="EVENTUAL">EVENTUAL · COBERTURA PUNTUAL</option>
-    </select>
-   </x-ui.field>
+   @else
+    <fieldset class="rm-schedule-shifts rm-staff-action__wide" @if($errors->has('f_turno_inicial')) aria-describedby="staff-schedule-f_turno_inicial-error" @endif>
+     <legend class="rm-label rm-label-required">Turno inicial</legend>
+     <div class="rm-schedule-shifts__options">
+      @foreach($turnosRotacion as $codigo => $definicion)
+       <label>
+        <input class="sr-only" type="radio" wire:model.live="f_turno_inicial" value="{{ $codigo }}" required>
+        <i class="ph-bold {{ ['MANANA'=>'ph-sun','TARDE'=>'ph-sun-horizon','NOCHE'=>'ph-moon'][$codigo] }}" aria-hidden="true"></i>
+        <strong>{{ mb_strtoupper($definicion['nombre']) }}</strong><span>{{ $definicion['inicio'] }}–{{ $definicion['fin'] }}</span>
+       </label>
+      @endforeach
+     </div>
+     @error('f_turno_inicial')<p id="staff-schedule-f_turno_inicial-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
+    </fieldset>
+   @endif
+   @if($esEnfermeria && !$modoEdicion && $f_tipo_asignacion === 'ROTATIVO')
+    <div class="rm-staff-action__wide">
+     <label class="rm-label min-h-11 flex items-center gap-2" for="staff-schedule-rotacion">
+      <input id="staff-schedule-rotacion" type="checkbox" wire:model.live="f_rotacion_automatica" aria-invalid="{{ $errors->has('f_rotacion_automatica') ? 'true' : 'false' }}" @if($errors->has('f_rotacion_automatica')) aria-describedby="staff-schedule-rotacion-error" @endif> Rotación automática de ocho horas
+     </label>
+     @error('f_rotacion_automatica')<p id="staff-schedule-rotacion-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
+     @if($esRotacionAutomatica)
+      <p class="rm-help">Mañana → tarde → noche → 24 horas de descanso → mañana.</p>
+      @can('turnos.gestionar')
+       <x-ui.action-button variant="secondary" wire:click="solicitarPrepararTurnos" icono="ph-clock" loading="solicitarPrepararTurnos,prepararTurnosRotacion">Preparar turnos de 8 horas</x-ui.action-button>
+      @endcan
+     @endif
+    </div>
+   @endif
    <x-ui.field label="Fecha de inicio" for="staff-schedule-f_fecha_inicio" error="f_fecha_inicio" required>
-    <input id="staff-schedule-f_fecha_inicio" type="date" wire:model="f_fecha_inicio" class="rm-input" aria-invalid="{{ $errors->has('f_fecha_inicio') ? 'true' : 'false' }}" @if($errors->has('f_fecha_inicio')) aria-describedby="staff-schedule-f_fecha_inicio-error" @endif required>
+    <input id="staff-schedule-f_fecha_inicio" type="date" wire:model.live="f_fecha_inicio" class="rm-input" aria-invalid="{{ $errors->has('f_fecha_inicio') ? 'true' : 'false' }}" @if($errors->has('f_fecha_inicio')) aria-describedby="staff-schedule-f_fecha_inicio-error" @endif required>
    </x-ui.field>
+   @if($permiteRepetir || $esRotacionAutomatica)
+    <x-ui.field :label="$esRotacionAutomatica ? 'Programar hasta' : 'Repetir hasta (opcional)'" for="staff-schedule-f_fecha_fin" error="f_fecha_fin" :required="$esRotacionAutomatica">
+     <input id="staff-schedule-f_fecha_fin" type="date" wire:model.live="f_fecha_fin" @if($esRotacionAutomatica) required @endif class="rm-input" aria-invalid="{{ $errors->has('f_fecha_fin') ? 'true' : 'false' }}" aria-describedby="staff-schedule-repeat-help{{ $errors->has('f_fecha_fin') ? ' staff-schedule-f_fecha_fin-error' : '' }}">
+     <p id="staff-schedule-repeat-help" class="rm-help">Hasta un año.@if(!$esRotacionAutomatica) Deja la fecha vacía para asignar solo la primera semana.@endif</p>
+    </x-ui.field>
+   @endif
    <x-ui.field label="Observaciones (opcional)" for="staff-schedule-f_observaciones" error="f_observaciones" class="rm-staff-action__wide">
     <textarea id="staff-schedule-f_observaciones" wire:model="f_observaciones" class="rm-input" rows="2" maxlength="1000" placeholder="Ej. cobertura temporal o reemplazo" aria-invalid="{{ $errors->has('f_observaciones') ? 'true' : 'false' }}" @if($errors->has('f_observaciones')) aria-describedby="staff-schedule-f_observaciones-error" @endif></textarea>
    </x-ui.field>
   </x-ui.form-section>
+  @if(!$esRotacionAutomatica)
   <fieldset class="rm-staff-action__days" @if($errors->has('f_dias_semana')) aria-describedby="staff-schedule-dias-error" @endif>
    <legend class="rm-label rm-label-required">Días laborales</legend>
+   <div class="rm-schedule-day-shortcuts" role="group" aria-label="Selección rápida de días">
+    <x-ui.action-button variant="ghost" size="sm" wire:click="seleccionarDias('laborables')">Lunes a viernes</x-ui.action-button>
+    <x-ui.action-button variant="ghost" size="sm" wire:click="seleccionarDias('todos')">Toda la semana</x-ui.action-button>
+    <x-ui.action-button variant="ghost" size="sm" wire:click="seleccionarDias('ninguno')">Limpiar</x-ui.action-button>
+   </div>
    <div class="rm-staff-action__day-options">
     @foreach($diasSemana as $dia)
-     <label><input class="sr-only" type="checkbox" wire:model="f_dias_semana" value="{{ $dia }}"><span><i class="ph-bold ph-check" aria-hidden="true"></i>{{ ['MIERCOLES'=>'MIÉRCOLES','SABADO'=>'SÁBADO'][$dia] ?? $dia }}</span></label>
+     <label><input class="sr-only" type="checkbox" wire:model.live="f_dias_semana" value="{{ $dia }}"><span><i class="ph-bold ph-check" aria-hidden="true"></i>{{ ['MIERCOLES'=>'MIÉRCOLES','SABADO'=>'SÁBADO'][$dia] ?? $dia }}</span></label>
     @endforeach
    </div>
    @error('f_dias_semana')<p id="staff-schedule-dias-error" class="rm-error" role="alert">{{ $message }}</p>@enderror
    @foreach($errors->get('f_dias_semana.*') as $mensajes) @foreach($mensajes as $mensaje)<p class="rm-error" role="alert">{{ $mensaje }}</p>@endforeach @endforeach
   </fieldset>
-  <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>Se guardará una jornada por cada día elegido dentro de los siete días desde el inicio. @if($modoEdicion)Las jornadas anteriores se conservan; se registrará una nueva versión.@endif</span></p>
+  @endif
+  <p class="rm-staff-action__note"><i class="ph-bold ph-info" aria-hidden="true"></i><span>
+   @if($esRotacionAutomatica)
+    Al terminar la noche a las 07:00, descansa hasta las 07:00 del día siguiente. Revisa las fechas antes de confirmar.
+   @elseif($permiteRepetir)
+    El turno se asignará cada semana en los días elegidos, hasta la fecha indicada inclusive.
+   @else
+    Se guardará una jornada por cada día elegido dentro de los siete días desde el inicio.
+   @endif
+   @if($modoEdicion)Las jornadas anteriores se conservan; se registrará una nueva versión.@endif
+  </span></p>
+  </div>
+  <aside class="rm-schedule-preview" aria-labelledby="staff-schedule-preview-title">
+   <div class="rm-schedule-preview__heading">
+    <h3 id="staff-schedule-preview-title"><i class="ph-bold ph-calendar-check" aria-hidden="true"></i> Vista previa</h3>
+    <x-ui.action-button variant="secondary" size="sm" wire:click="previsualizarHorario" loading="previsualizarHorario" icono="ph-arrows-clockwise">Ver calendario</x-ui.action-button>
+   </div>
+   @if($vistaPreviaHorario)
+    <p class="rm-help" role="status">{{ count(array_filter($vistaPreviaHorario, fn ($dia) => !$dia['descanso'])) }} turnos · {{ count(array_filter($vistaPreviaHorario, fn ($dia) => $dia['descanso'])) }} descansos · Sin guardar</p>
+    <ol class="rm-schedule-preview__dates">
+     @foreach(array_slice($vistaPreviaHorario, ($paginaVistaPrevia - 1) * 7, 7) as $dia)
+      <li class="{{ $dia['descanso'] ? 'is-rest' : '' }}"><time datetime="{{ $dia['fecha'] }}">{{ $dia['dia'] }}</time><div><strong>{{ $dia['nombre'] }}</strong><span>{{ $dia['horario'] }}{{ $dia['cruza_dia'] ? ' (+1 día)' : '' }}</span></div></li>
+     @endforeach
+    </ol>
+    <nav class="rm-schedule-preview__navigation" aria-label="Semanas de la vista previa">
+     <x-ui.action-button variant="icon" wire:click="moverVistaPrevia(-1)" aria-label="Fechas anteriores" icono="ph-caret-left" :disabled="$paginaVistaPrevia === 1" />
+     <span>{{ $paginaVistaPrevia }} / {{ (int) ceil(count($vistaPreviaHorario) / 7) }}</span>
+     <x-ui.action-button variant="icon" wire:click="moverVistaPrevia(1)" aria-label="Fechas siguientes" icono="ph-caret-right" :disabled="$paginaVistaPrevia * 7 >= count($vistaPreviaHorario)" />
+    </nav>
+   @else
+    <div class="rm-schedule-preview__empty"><i class="ph-bold ph-calendar-blank" aria-hidden="true"></i><p>Completa el horario y pulsa «Ver calendario» para revisar las fechas.</p></div>
+   @endif
+  </aside>
+  </div>
   <div class="rm-staff-action__actions">
    <x-ui.action-button variant="secondary" wire:click="cancelarFormulario">Cancelar</x-ui.action-button>
    <x-ui.action-button tipo="submit" loading="solicitarGuardar,guardar" icono="ph-check">{{ $modoEdicion ? 'Guardar cambios' : 'Crear asignación' }}</x-ui.action-button>
@@ -110,104 +187,27 @@
  {{-- ══ TABLA DE ASIGNACIONES ══ --}}
  @if(!$formAbierto)
  @if(count($asignaciones) > 0)
- <div class="bg-[var(--rm-surface-soft)] rounded-2xl border border-borde rm-staff-table-wrap">
-  <table role="table" class="rm-staff-table rm-data-table rm-data-table--actions w-full min-w-[760px] text-left text-sm">
-  <thead class="bg-fondo-tabla text-apoyo uppercase text-[10px] font-bold tracking-wider">
-   <tr>
-   <th class="px-4 py-3">Turno / Área</th>
-   <th class="px-4 py-3">Días</th>
-   <th class="px-4 py-3 text-center">Tipo</th>
-   <th class="px-4 py-3 text-center">Vigencia</th>
-   <th class="px-4 py-3 text-center">Estado</th>
-   <th class="px-4 py-3 text-right">Acciones</th>
-   </tr>
-  </thead>
-  <tbody role="rowgroup" class="divide-y divide-borde/50">
-   @foreach($asignaciones as $asig)
-   <tr role="row" wire:key="asig-{{ $asig['cod_asignacion'] }}"
-   class="hover:bg-fondo-hover/50 transition-colors {{ $asig['estado'] !== 'ACTIVA' ? 'opacity-60' : '' }}">
-
-   <td role="cell" data-label="Turno / Área" class="px-4 py-3">
-    <div class="flex items-center gap-2">
-    @if($asig['turno_color'])
-     <span class="h-3 w-3 rounded-full flex-shrink-0" style="background-color: {{ $asig['turno_color'] }}"></span>
-    @endif
-    <div>
-     <p class="font-bold text-titulo text-xs">{{ $asig['turno_nombre'] }}</p>
-     <p class="text-[11px] text-apoyo">{{ $asig['area_nombre'] }}</p>
-    </div>
-    </div>
-   </td>
-
-   <td role="cell" data-label="Días" class="px-4 py-3">
-    <div class="flex flex-wrap gap-1 max-w-[180px]">
-    @foreach($asig['dias_semana'] as $dia)
-     <span class="inline-block px-1.5 py-0.5 bg-boton-acento/10 text-boton-acento text-[10px] font-bold rounded">
-     {{ mb_substr($dia, 0, 3) }}
-     </span>
+ <div class="rm-table-surface rm-schedule-table-wrap">
+  <table class="rm-table rm-schedule-table">
+   <caption class="sr-only">Jornadas y horarios registrados del trabajador</caption>
+   <thead><tr><th scope="col">Fecha</th><th scope="col">Turno y área</th><th scope="col">Horario</th><th scope="col">Situación</th><th scope="col">Acciones</th></tr></thead>
+   <tbody>
+    @foreach($asignaciones as $asig)
+     <tr wire:key="asig-{{ $asig['cod_asignacion'] }}">
+      <td data-label="Fecha"><strong>{{ $asig['fecha_inicio'] }}</strong>@if($asig['fecha_fin'] && $asig['fecha_fin'] !== $asig['fecha_inicio'])<span class="rm-help">Hasta {{ $asig['fecha_fin'] }}</span>@endif</td>
+      <td data-label="Turno y área"><strong>{{ $asig['turno_nombre'] }}</strong><span class="rm-help">{{ $asig['area_nombre'] }}</span></td>
+      <td data-label="Horario"><span class="rm-schedule-table__hours"><i class="ph-bold ph-clock" aria-hidden="true"></i>{{ $asig['hora_inicio'] }}–{{ $asig['hora_fin'] }}</span>@if($asig['hora_fin'] <= $asig['hora_inicio'])<small class="rm-help">Termina al día siguiente</small>@endif</td>
+      <td data-label="Situación"><x-ui.status-badge :estado="$asig['estado']" /><span class="rm-help">{{ $asig['tipo_asignacion'] }}</span></td>
+      <td data-label="Acciones"><div class="rm-schedule-table__actions">
+       <x-ui.action-button variant="icon" wire:click="verDetalle('{{ $asig['cod_asignacion'] }}')" icono="ph-eye" aria-label="Ver detalle" title="Ver detalle" />
+       @if($asig['estado'] === 'ACTIVA')
+        <x-ui.action-button variant="icon" wire:click="editarAsignacion('{{ $asig['cod_asignacion'] }}')" icono="ph-pencil-simple" aria-label="Editar asignación" title="Editar asignación" />
+        <x-ui.action-button variant="icon" wire:click="prepararFinalizar('{{ $asig['cod_asignacion'] }}')" icono="ph-flag-checkered" aria-label="Finalizar asignación" title="Finalizar asignación" />
+       @endif
+      </div></td>
+     </tr>
     @endforeach
-    </div>
-   </td>
-
-   <td role="cell" data-label="Tipo" class="px-4 py-3 text-center">
-    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-    {{ $asig['tipo_asignacion'] === 'ROTATIVO'
-     ? 'bg-estado-infoBg text-estado-info border border-estado-infoBorde'
-     : 'bg-fondo-tabla text-apoyo border border-borde' }}">
-    {{ $asig['tipo_asignacion'] }}
-    </span>
-   </td>
-
-   <td role="cell" data-label="Vigencia" class="px-4 py-3 text-center text-[11px] text-apoyo font-semibold whitespace-nowrap">
-    {{ $asig['fecha_inicio'] }}
-    @if($asig['fecha_fin'])
-    <br><span class="text-[10px]">→ {{ $asig['fecha_fin'] }}</span>
-    @else
-    <br><span class="text-[10px] text-estado-exito">Indefinido</span>
-    @endif
-   </td>
-
-   <td role="cell" data-label="Estado" class="px-4 py-3 text-center">
-    @php
-    $estadoClasses = match($asig['estado']) {
-     'ACTIVA' => 'bg-estado-exitoBg text-estado-exito border-estado-exitoBorde',
-     'FINALIZADA' => 'bg-estado-infoBg text-estado-info border-estado-infoBorde',
-     default => 'bg-estado-peligroBg text-estado-peligro border-estado-peligroBorde',
-    };
-    @endphp
-    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border {{ $estadoClasses }}">
-    {{ $asig['estado'] }}
-    </span>
-   </td>
-
-   <td role="cell" data-label="Acciones" class="px-4 py-3 text-right">
-    <div class="flex items-center justify-end gap-1">
-    {{-- Ver detalle --}}
-    <button type="button" wire:click="verDetalle('{{ $asig['cod_asignacion'] }}')"
-     aria-label="Ver detalle" title="Ver detalle"
-     class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-fondo-hover hover:text-titulo transition-colors inline-flex items-center justify-center">
-     <i class="ph-bold ph-eye text-xs"></i>
-    </button>
-
-    @if($asig['estado'] === 'ACTIVA')
-     {{-- Editar --}}
-     <button type="button" wire:click="editarAsignacion('{{ $asig['cod_asignacion'] }}')"
-     aria-label="Editar asignación" title="Editar asignación"
-     class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-boton-acento/10 hover:text-boton-acento hover:border-boton-acento/30 transition-colors inline-flex items-center justify-center">
-     <i class="ph-bold ph-pencil-simple text-xs"></i>
-     </button>
-     {{-- Finalizar --}}
-     <button type="button" wire:click="prepararFinalizar('{{ $asig['cod_asignacion'] }}')"
-     aria-label="Finalizar asignación" title="Finalizar asignación"
-     class="h-7 w-7 rounded-lg border border-borde text-apoyo hover:bg-estado-advertenciaBg hover:text-estado-advertencia hover:border-estado-advertenciaBorde transition-colors inline-flex items-center justify-center">
-     <i class="ph-bold ph-flag-checkered text-xs"></i>
-     </button>
-    @endif
-    </div>
-   </td>
-   </tr>
-   @endforeach
-  </tbody>
+   </tbody>
   </table>
  </div>
  @else

@@ -17,7 +17,7 @@ final class ActualizarPermisosRol
         }
         $seleccion = Permission::query()->where('guard_name', $rol->guard_name)->whereIn('name', $permisosSeleccionados)->get();
         abort_unless($seleccion->count() === count(array_unique($permisosSeleccionados)), 422);
-        $permisosExpertosReservados = ['evaluaciones_expertas.ejecutar_observaciones', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
+        $permisosExpertosReservados = ['evaluaciones_expertas.ejecutar_observaciones', 'evaluaciones_expertas.ejecutar_institucional', 'reglas_expertas.gestionar', 'reglas_expertas.revisar',
             'valoraciones_petersen.crear', 'valoraciones_petersen.rectificar',
             'controles_funcionales_iadl.crear', 'controles_funcionales_iadl.rectificar'];
         abort_if($seleccion->whereIn('name', $permisosExpertosReservados)->isNotEmpty()

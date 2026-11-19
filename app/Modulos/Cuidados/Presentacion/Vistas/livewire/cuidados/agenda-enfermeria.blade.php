@@ -1,35 +1,24 @@
-<!-- rm-filter-bar -->
 <div class="space-y-4 font-sans bg-transparent p-3 sm:p-5">
     {{-- ==================================================
          1. CABECERA INSTITUCIONAL Y NAVEGACIÓN DE TURNO
          ================================================== --}}
     <x-ui.collection-header :title="$esSuperAdmin ? 'Agenda institucional de Enfermería' : 'Agenda operativa de cuidados'" :subtitle="$esSuperAdmin ? 'Supervisión de alertas, medicación y cuidados de los residentes.' : 'Programación asistencial del turno basada en planes clínicos individuales.'" icon="ph-calendar-check" eyebrow="Enfermería" :date="today()">
       <x-slot:actions>
+            <x-ui.nursing-report-link area="cuidados" :desde="today()->toDateString()" :hasta="today()->toDateString()" />
             <a href="{{ route('admin.enfermeria.dashboard') }}" 
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-primary)] dark:text-[var(--rm-text-inverse)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] transition">
+               class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="{{ $esSuperAdmin ? 'Resumen global' : 'Mi turno' }}">
                 <i class="ph ph-squares-four text-sm text-[var(--rm-action-primary-ink)]"></i>
                 <span>{{ $esSuperAdmin ? 'Resumen global' : 'Mi turno' }}</span>
             </a>
 
-            <a href="{{ route('admin.enfermeria.pacientes') }}" 
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-primary)] dark:text-[var(--rm-text-inverse)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] transition">
-                <i class="ph ph-users text-sm text-[var(--rm-action-primary)]"></i>
-                <span>{{ $esSuperAdmin ? 'Todos los residentes' : 'Mis residentes' }}</span>
-            </a>
-
             <a href="{{ route('admin.enfermeria.pase-turno') }}" 
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-surface)] dark:bg-[var(--rm-surface)] text-[var(--rm-text-primary)] dark:text-[var(--rm-text-inverse)] border border-[var(--rm-border)] dark:border-[var(--rm-border)] hover:bg-[var(--rm-surface-soft)] transition">
+               class="rm-btn rm-btn-secondary" data-rm-action-icon aria-label="Pases de turno">
                 <i class="ph ph-arrows-clockwise text-sm text-[var(--rm-action-primary)]"></i>
                 <span>Pases de turno</span>
             </a>
 
             @if(!$esSuperAdmin && $turno && !$recepcion)
-                <button type="button" 
-                        wire:click="recibirTurno" 
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--rm-action-primary)] hover:bg-[var(--rm-success)] text-white shadow-2xs transition cursor-pointer">
-                    <i class="ph ph-handshake text-sm"></i>
-                    <span>Recibir turno</span>
-                </button>
+                <x-ui.action-button icono="ph-handshake" wire:click="recibirTurno" loading="recibirTurno" data-rm-action-icon aria-label="Recibir turno" />
             @elseif($recepcion)
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-[var(--rm-success-soft)] dark:bg-[var(--rm-action-primary-soft)] text-[var(--rm-success)] dark:text-[var(--rm-success)] border border-[var(--rm-success-soft)] dark:border-[var(--rm-action-primary)]/40">
                     <i class="ph ph-check-circle"></i>
@@ -151,92 +140,33 @@
         </div>
 
         {{-- Barra de Filtros Complementarios (Búsqueda, Prioridad y Residente) --}}
-        <x-ui.filter-bar class="mb-4">
-            <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 items-center">
-                {{-- Búsqueda textual --}}
-                <div class="lg:col-span-5">
-                    <label for="agenda-buscar" class="rm-collection-filter-label">Buscar en la agenda</label>
-                    <div class="relative flex items-center">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                        <i class="ph-bold ph-magnifying-glass text-base"></i>
-                    </span>
-                    <input id="agenda-buscar" type="text"
-                        wire:model.live.debounce.300ms="buscar"
-                        placeholder="Buscar residente, intervención o plan..."
-                        class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px]" />
-                    @if(!empty($buscar))
-                        <button type="button" wire:click="$set('buscar', '')" class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-action-primary)] cursor-pointer" title="Limpiar búsqueda">
-                            <i class="ph-bold ph-x-circle text-base"></i>
-                        </button>
-                    @endif
-                    </div>
-                </div>
-
-                {{-- Prioridad --}}
-                <div class="lg:col-span-3">
-                    <label for="agenda-prioridad" class="rm-collection-filter-label">Prioridad</label>
-                    <select id="agenda-prioridad" wire:model.live="filtroPrioridad" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px] cursor-pointer">
+        <x-ui.filter-bar class="rm-nursing-filters" x-data aria-label="Filtros de agenda">
+            <div class="rm-nursing-filters__row">
+                <x-ui.field label="Buscar" for="agenda-buscar">
+                    <input id="agenda-buscar" type="search" class="rm-input" wire:model.live.debounce.300ms="buscar" placeholder="Residente o intervención…">
+                </x-ui.field>
+                <x-ui.field label="Prioridad" for="agenda-prioridad">
+                    <select id="agenda-prioridad" class="rm-select" wire:model.live="filtroPrioridad">
                         <option value="">Prioridad (Todas)</option>
                         <option value="ALTA">Alta</option>
                         <option value="MEDIA">Media</option>
                         <option value="BAJA">Baja</option>
                     </select>
-                </div>
-
-                {{-- Residente filtrado --}}
-                <div class="lg:col-span-4">
-                    <label for="agenda-residente" class="rm-collection-filter-label">Residente</label>
-                    <select id="agenda-residente" wire:model.live="filtroResidente" class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-action-primary)] focus:ring-1 focus:ring-[var(--rm-action-primary)] focus:outline-none h-[38px] cursor-pointer">
+                </x-ui.field>
+                <x-ui.field label="Residente" for="agenda-residente">
+                    <select id="agenda-residente" class="rm-select" wire:model.live="filtroResidente">
                         <option value="">Todos los residentes</option>
                         @foreach($residentes as $res)
                             <option value="{{ $res->cod_residente }}">
-                                {{ $res->apellido_paterno ?? $res->ap_paterno }} {{ $res->nombres }}
-                            </option>
+                        {{ $res->apellido_paterno ?? $res->ap_paterno }} {{ $res->nombres }}
+                        </option>
                         @endforeach
                     </select>
-                </div>
+                </x-ui.field>
+                @if($buscar || $filtroPrioridad || $filtroResidente || ($filtroEstado && $filtroEstado !== 'por_atender'))
+                    <x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" data-rm-action-icon aria-label="Limpiar filtros" x-on:click="$wire.$set('buscar', '', false); $wire.$set('filtroPrioridad', '', false); $wire.$set('filtroEstado', 'por_atender', false); $wire.$set('filtroResidente', '', false); $wire.$refresh()" />
+                @endif
             </div>
-
-            {{-- Chips de filtros activos --}}
-            @php
-                $hasFiltrosAgenda = !empty($buscar) || !empty($filtroPrioridad) || !empty($filtroResidente) || (!empty($filtroEstado) && $filtroEstado !== 'por_atender');
-            @endphp
-            @if($hasFiltrosAgenda)
-                <div class="rm-filter-bar__active">
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="rm-filter-bar__active-label">
-                            <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                        </span>
-                        @if(!empty($buscar))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                                <span>Búsqueda: "{{ Str::limit($buscar, 16) }}"</span>
-                                <button type="button" wire:click="$set('buscar', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                            </span>
-                        @endif
-                        @if(!empty($filtroPrioridad))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-action-primary-soft)] border border-[var(--rm-action-primary)] text-[11px] font-bold text-[var(--rm-action-primary)]">
-                                <span>Prioridad: {{ $filtroPrioridad }}</span>
-                                <button type="button" wire:click="$set('filtroPrioridad', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                            </span>
-                        @endif
-                        @if(!empty($filtroResidente))
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                                <span>Residente seleccionado</span>
-                                <button type="button" wire:click="$set('filtroResidente', '')" class="hover:text-[var(--rm-action-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="flex items-center gap-2.5">
-                        <button type="button"
-                            wire:click="$set('buscar', ''); $set('filtroPrioridad', ''); $set('filtroEstado', 'por_atender'); $set('filtroResidente', '');"
-                            class="inline-flex items-center gap-1 rounded-xl bg-[var(--rm-action-primary-soft)] hover:bg-[var(--rm-action-primary)] hover:text-white text-[var(--rm-action-primary)] border border-[var(--rm-action-primary)]/30 py-1 px-2.5 text-xs font-bold transition cursor-pointer">
-                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                            <span>Restablecer filtros</span>
-                        </button>
-                    </div>
-                </div>
-            @endif
         </x-ui.filter-bar>
 
         {{-- Listado Operativo de Intervenciones con panel de detalle previo --}}

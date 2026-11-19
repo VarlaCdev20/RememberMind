@@ -38,7 +38,7 @@ El motor PHP técnico COG-MEM existente se trasladó a motor-experto: 20 archivo
 
 SolicitudEvaluacionTecnicaV1 valida siete campos exactos, versión 1, uso PRUEBA_TECNICA, códigos existentes y fecha con zona horaria; calcula una clave estable de idempotencia. EvaluacionTecnicaSolicitada implementa ShouldDispatchAfterCommit. La prueba de contrato confirma emisión tras el commit exterior, ausencia tras rollback y espera en una transacción anidada. La persistencia técnica existente conserva locks y rechazo de duplicados.
 
-La clave no garantiza deduplicación durable del transporte por sí misma. **No están activados** publicador de valoraciones clínicas, job/listener clínico, cola de inferencia clínica, nuevos pesos multicriterio, metodología adicional ni revisión profesional simulada. Contratos v1 y README identifican las decisiones pendientes de activación, hechos autorizados, transporte durable, reintentos/errores y revisión. Las carpetas previstas vacías no se presentan como capacidades implementadas.
+La clave no garantiza deduplicación durable del transporte por sí misma. **No están activados** publicador de valoraciones clínicas, job/listener clínico, cola de inferencia clínica, nuevos pesos, metodología adicional ni revisión profesional simulada. Contratos v1 y README identifican las decisiones pendientes de activación, hechos autorizados, transporte durable, reintentos/errores y revisión. Las carpetas previstas vacías no se presentan como capacidades implementadas.
 
 ## Verificaciones ejecutadas
 

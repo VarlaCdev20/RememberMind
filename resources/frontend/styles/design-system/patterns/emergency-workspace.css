@@ -188,6 +188,7 @@
 }
 /* Composición operativa: la bandeja conserva el primer lugar en todos los anchos. */
 .rm-emergency-workspace .rm-alert-workspace-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, .42fr); gap: var(--rm-space-5); align-items: start; }
+.rm-emergency-workspace[data-alert-workspace="turno"] .rm-alert-workspace-grid:not(:has(> .rm-alert-workspace-grid__aside)) { grid-template-columns: minmax(0, 1fr); }
 .rm-emergency-workspace .rm-alert-workspace-grid__main, .rm-emergency-workspace .rm-alert-workspace-grid__aside { display: grid; gap: var(--rm-space-4); min-width: 0; }
 .rm-emergency-workspace .rm-alert-workspace-grid .rm-alert-case-list { grid-template-columns: minmax(0, 1fr); }
 .rm-emergency-workspace .rm-alert-filter-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rm-space-2); }

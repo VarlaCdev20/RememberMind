@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Route;
 
 // Registered by routes/web.php; do not execute while loading this file.
 return [
+    'avisos_planificacion' => static function (): void {
+        Route::get('/avisos-planificacion', \App\Modulos\Institucion\Presentacion\Livewire\Paginas\AvisosPlanificacionPanel::class)
+            ->name('avisos-planificacion.index');
+    },
     'galeria' => static function (): void {
         Route::get('/galeria', \App\Modulos\Institucion\Presentacion\Livewire\Paginas\GaleriaInstitucionalPanel::class)
             ->middleware('permission:fotografias_institucionales.ver')->name('galeria.index');

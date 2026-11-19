@@ -1,6 +1,46 @@
-/* Resumen de Enfermería: geometría local sobre los componentes institucionales. */
-.rm-nursing-report,
-.rm-nursing-report > :is(form, section) { min-width: 0; }
-.rm-nursing-report :is(.rm-input, .rm-select) { min-height: 44px; height: 44px; }
-.rm-nursing-report .rm-select { padding: 0 36px 0 12px; line-height: 1.4; }
-.rm-nursing-report__count { color: var(--rm-text-primary); font: 750 28px/1.2 var(--rm-font-heading); }
+.rm-nursing-report { --rm-dashboard-card-bg:var(--rm-surface); }
+.rm-nursing-report,.rm-nursing-report :is(form,section,aside),.rm-nursing-report__content { min-width:0; }
+.rm-nursing-report__content { display:grid; gap:16px; }
+.rm-nursing-report h2 { font:750 16px/1.4 var(--rm-font-heading); color:var(--rm-text-primary); }
+.rm-nursing-report :is(button,a,summary):focus-visible { outline:2px solid var(--rm-focus); outline-offset:3px; }
+.rm-nursing-report :is(.rm-input,.rm-select) { min-height:44px; height:44px; }
+.rm-nursing-report .rm-select { padding:0 30px 0 12px; line-height:1.4; }
+.rm-nursing-report__filters,.rm-nursing-report__summary,.rm-nursing-report__breakdown,.rm-nursing-report__records { padding:16px; gap:14px; }
+.rm-nursing-report__export { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.rm-nursing-report__metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.rm-nursing-report__metrics>div { display:grid; gap:4px; padding:12px; border:1px solid var(--rm-border-soft); border-radius:10px; }
+.rm-nursing-report__metrics span { color:var(--rm-text-secondary); font-size:12px; }
+.rm-nursing-report__count { color:var(--rm-text-primary); font:750 28px/1.2 var(--rm-font-heading); }
+.rm-nursing-report details>summary { min-height:44px; cursor:pointer; padding-block:10px; font-size:13px; font-weight:650; }
+.rm-nursing-report details { max-height:320px; overflow:auto; }
+.rm-nursing-report__day { display:flex; gap:12px; align-items:center; font-size:13px; padding:6px; }
+.rm-nursing-report__day meter { flex:1; min-width:0; accent-color:var(--rm-primary); }
+@media (max-width: 479px) {
+    .rm-nursing-report__metrics { gap: var(--rm-space-1); }
+    .rm-nursing-report__metrics > div { padding: var(--rm-space-2); overflow-wrap: anywhere; }
+    .rm-nursing-report__count { font-size: var(--rm-font-size-section); }
+}
+
+.rm-nursing-report__records { container-type: inline-size; }
+.rm-nursing-report__table td { overflow-wrap: anywhere; }
+.rm-nursing-report__export .rm-report-export-button { flex: 0 0 auto; }
+@container (max-width: 660px) {
+    .rm-nursing-report__table, .rm-nursing-report__table tbody { display: block; }
+    .rm-nursing-report__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .rm-nursing-report__table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--rm-space-2);
+        padding: var(--rm-space-3);
+    }
+    .rm-nursing-report__table tbody tr + tr { border-top: 1px solid var(--rm-border-soft); }
+    html .rm-shell [data-rm-main] .rm-nursing-report__table tbody td { display: block; padding: 0; min-width: 0; }
+    .rm-nursing-report__table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: var(--rm-font-size-meta);
+        font-weight: 700;
+        color: var(--rm-text-secondary);
+    }
+    .rm-nursing-report__table td:is([data-label="Detalle"], [colspan]) { grid-column: 1 / -1; }
+}

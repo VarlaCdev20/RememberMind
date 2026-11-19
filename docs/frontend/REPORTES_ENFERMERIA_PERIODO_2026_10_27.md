@@ -1,5 +1,7 @@
 # Resumen de Enfermería por período y residente
 
+Ampliación posterior del mismo día: [reportes por áreas, CSV/PDF e impresión](REPORTES_ENFERMERIA_AREAS_EXPORTACION_2026_10_27.md). Conserva los resultados de este primer corte y documenta las fuentes y capacidades añadidas.
+
 Entrega local del 27/10/2026, America/La_Paz. Alcance solicitado: resumen por período y residente, vista previa y PDF. Sin nuevas tablas, migraciones, permisos, reglas clínicas ni escrituras en expedientes institucionales.
 
 Actualización de revisión para publicación: el [corte de integración](../sistema/REVISION_PUBLICACION_2026_10_27.md)
@@ -71,7 +73,7 @@ Entorno PHP: SQLite `:memory:`, sin base institucional. Entorno navegador: PHP e
 
 ```text
 php artisan test --filter='ReporteEnfermeriaPeriodoTest|ReportesPortabilidadTest|ModuloEnfermeriaIntegralTest|test_reporte_individual_usa_signos_reales_y_genera_pdf|superadmin_consulta_residentes_ficha_alertas_registros_y_reportes_globales' --compact
-19 pruebas satisfactorias, 105 aserciones.
+20 pruebas satisfactorias, 114 aserciones.
 
 node --test tests/Frontend/reporte-enfermeria-e2e.test.js
 1 recorrido satisfactorio: cinco anchos, claro/oscuro, filtros, estado vacío, vista previa de 23 filas y PDF real.
@@ -80,11 +82,11 @@ npm run build
 Satisfactorio. Continúa la advertencia existente sobre chunks mayores de 500 kB.
 ```
 
-Se verifican cuenta/personal inactivos, permisos retirados, fuente restringida, residente ajeno por ambas rutas y por la URL individual, texto escapado, NULL frente a cero registrado, rango completo de días, programación frente a ejecución, incidentes originales, medicación PRN y conservación de todos los registros al paginar.
+Se verifican cuenta/personal inactivos, sesión anónima, permiso específico de exportación retirado, fuente restringida, residente ajeno por ambas rutas y por la URL individual, texto escapado, NULL frente a cero registrado, rango completo de días, programación frente a ejecución, incidentes originales, medicación PRN y conservación de todos los registros al paginar.
 
 La ejecución ampliada que incluyó toda `SuperadminEnfermeriaSupervisionTest` produjo **22 pruebas satisfactorias y dos fallidas, 119 aserciones**. Fallan `superadmin_ve_la_agenda_global_de_distintos_turnos` y `enfermero_conserva_el_alcance_de_sus_pacientes_asignados`: la agenda no contiene los residentes esperados. Ambos llaman `AgendaTurnoService::generar`, fuera de las clases cambiadas del reporte. Se informa la incidencia sin debilitar sus pruebas ni modificar reglas de agenda. La prueba de consulta global de residentes/ficha/alertas/registros/reportes sí pasa.
 
-Capturas y documento sintéticos: `output/reporte-enfermeria-20261027/`. Se inspeccionan capturas en móvil/escritorio y páginas renderizadas del PDF, además de comprobar su contenido. Las comprobaciones de reflow, labels, foco y tamaño de campos no constituyen una certificación integral WCAG ni aceptación de todas las pantallas de Enfermería.
+Capturas y documento sintéticos: `output/reporte-enfermeria-20261027/`. Se inspeccionaron capturas en móvil/escritorio y páginas primera y última renderizadas del PDF; la extracción normalizada confirma las 23 filas en tres páginas. DomPDF usa explícitamente media `print`, de modo que el CSS de pantalla no agranda la exportación. Se midió contraste texto/superficie de labels, cantidades y ayudas (mínimo 4,5:1) en los dos temas. Se corrigieron selectores con texto cortado y la superficie clara heredada del shell en modo oscuro. Las comprobaciones de reflow, labels, foco y campos de al menos 44 px no constituyen una certificación integral WCAG ni aceptación de todas las pantallas de Enfermería.
 
 ## Límites y pendientes
 
@@ -93,4 +95,4 @@ Capturas y documento sintéticos: `output/reporte-enfermeria-20261027/`. Se insp
 - No se ejecutó esta entrega contra PostgreSQL. No hay DDL ni pruebas de concurrencia nuevas.
 - El PDF es un resumen de registros de cinco categorías, no un expediente clínico completo ni un diagnóstico. Alimentación, hidratación, heridas y dolor conservan sus circuitos propios; no se muestran promedios ficticios de esas fuentes.
 - No se cierra todo el módulo Reportes ni la agenda. Quedan visibles los dos fallos ampliados indicados.
-- Sin commit ni push: árbol con modificaciones simultáneas ajenas, preservadas.
+- Esta tarea no ejecutó commit ni push. Durante el trabajo otro proceso consolidó el árbol en `b17c04d1`; quedaron ajustes posteriores locales. Se preservaron las modificaciones simultáneas ajenas y no se alteró el índice de Git.

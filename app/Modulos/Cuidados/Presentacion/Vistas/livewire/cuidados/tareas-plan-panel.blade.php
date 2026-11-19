@@ -1,16 +1,13 @@
-﻿<!-- rm-filter-bar -->
-<div class="space-y-6 font-sans">
+﻿<div class="space-y-6 font-sans">
     <x-ui.page-header
     title="Tareas de cuidado"
     subtitle="Programa cuidados, registra resultados y conserva la trazabilidad de cada cambio en el turno."
     overline="Enfermería operativa"
     icon="ph-calendar-check"
     :date="now()">
+    <x-ui.nursing-report-link area="cuidados" />
     @can('ejecuciones_cuidado.gestionar')
-    <button type="button" wire:click="abrirCrear" class="rm-btn rm-btn-primary">
-        <i class="ph-bold ph-plus-circle text-base"></i>
-        <span>Crear tarea</span>
-    </button>
+    <x-ui.action-button icono="ph-plus-circle" wire:click="abrirCrear" loading="abrirCrear" data-rm-action-icon aria-label="Crear tarea" />
     @endcan
 </x-ui.page-header>
 
@@ -21,101 +18,39 @@
         </div>
     @endif
 
-        <x-ui.filter-bar class="mb-4">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-            {{-- Búsqueda textual --}}
-            <div class="lg:col-span-3 relative flex items-center">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--rm-text-secondary)]">
-                    <i class="ph-bold ph-magnifying-glass text-base"></i>
-                </span>
-                <input type="text"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Buscar tarea o residente..."
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 pl-9 pr-8 text-xs font-medium text-[var(--rm-text-primary)] placeholder-[var(--rm-text-secondary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]" />
-                @if(!empty($search))
-                    <button type="button"
-                        wire:click="$set('search', '')"
-                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--rm-text-secondary)] hover:text-[var(--rm-primary)] cursor-pointer"
-                        title="Limpiar búsqueda">
-                        <i class="ph-bold ph-x-circle text-base"></i>
-                    </button>
-                @endif
-            </div>
-
-            {{-- Estado --}}
-            <div class="lg:col-span-3">
-                <select wire:model.live="filtroEstado"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+    <x-ui.filter-bar class="rm-nursing-filters" x-data aria-label="Filtros de tareas">
+        <div class="rm-nursing-filters__row">
+            <x-ui.field label="Buscar" for="tareas-buscar">
+                <input id="tareas-buscar" type="search" class="rm-input" wire:model.live.debounce.300ms="search" placeholder="Buscar tarea o residente…">
+            </x-ui.field>
+            <x-ui.field label="Estado" for="tareas-estado">
+                <select id="tareas-estado" class="rm-select" wire:model.live="filtroEstado">
                     <option value="">Todos los estados</option>
                     @foreach(['PENDIENTE' => 'Pendiente', 'EN_PROCESO' => 'En proceso', 'REALIZADA' => 'Realizada', 'OMITIDA' => 'Omitida', 'REPROGRAMADA' => 'Reprogramada'] as $valor => $etiqueta)
                         <option value="{{ $valor }}">{{ $etiqueta }}</option>
                     @endforeach
                 </select>
-            </div>
-
-            {{-- Turno --}}
-            <div class="lg:col-span-3">
-                <select wire:model.live="filtroTurno"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+            </x-ui.field>
+            <x-ui.field label="Turno" for="tareas-turno">
+                <select id="tareas-turno" class="rm-select" wire:model.live="filtroTurno">
                     <option value="">Todos los turnos</option>
                     @foreach($turnos as $turno)
                         <option value="{{ $turno->cod_turno }}">{{ $turno->nombre }}</option>
                     @endforeach
                 </select>
-            </div>
-
-            {{-- Área --}}
-            <div class="lg:col-span-3">
-                <select wire:model.live="filtroArea"
-                    class="w-full rounded-xl border border-[var(--rm-border)] bg-[var(--rm-input-bg)] py-2 px-3 text-xs font-medium text-[var(--rm-text-primary)] focus:border-[var(--rm-primary)] focus:ring-1 focus:ring-[var(--rm-primary)] focus:outline-none h-[38px]">
+            </x-ui.field>
+            <x-ui.field label="Área" for="tareas-area">
+                <select id="tareas-area" class="rm-select" wire:model.live="filtroArea">
                     <option value="">Todas las áreas</option>
                     @foreach(['SIGNOS','MEDICACION','MOVILIDAD','COGNITIVO','ALIMENTACION','HIDRATACION','HIGIENE','SUEÑO','SEGURIDAD','EMOCIONAL','FAMILIAR','REEVALUACION'] as $area)
                         <option value="{{ $area }}">{{ ucfirst(mb_strtolower(str_replace('_', ' ', $area))) }}</option>
                     @endforeach
                 </select>
-            </div>
+            </x-ui.field>
+            @if($search || $filtroEstado || $filtroTurno || $filtroArea)
+                <x-ui.action-button variant="ghost" icono="ph-arrow-counter-clockwise" data-rm-action-icon aria-label="Limpiar filtros" x-on:click="$wire.$set('search', '', false); $wire.$set('filtroEstado', '', false); $wire.$set('filtroTurno', '', false); $wire.$set('filtroArea', '', false); $wire.$refresh()" />
+            @endif
         </div>
-
-        @php
-            $hasFiltrosActivos = !empty($search) || !empty($filtroEstado) || !empty($filtroTurno) || !empty($filtroArea);
-        @endphp
-        @if($hasFiltrosActivos)
-            <div class="rm-filter-bar__active">
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="rm-filter-bar__active-label">
-                        <i class="ph-bold ph-funnel text-xs"></i> Filtros activos:
-                    </span>
-                    @if(!empty($search))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Búsqueda: "{{ Str::limit($search, 16) }}"</span>
-                            <button type="button" wire:click="$set('search', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroEstado))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Estado: {{ $filtroEstado }}</span>
-                            <button type="button" wire:click="$set('filtroEstado', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroTurno))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Turno seleccionado</span>
-                            <button type="button" wire:click="$set('filtroTurno', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                    @if(!empty($filtroArea))
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[var(--rm-surface-alt)] border border-[var(--rm-border)] text-[11px] font-semibold text-[var(--rm-text-primary)]">
-                            <span>Área: {{ $filtroArea }}</span>
-                            <button type="button" wire:click="$set('filtroArea', '')" class="hover:text-[var(--rm-primary)] cursor-pointer ml-0.5"><i class="ph-bold ph-x text-xs"></i></button>
-                        </span>
-                    @endif
-                </div>
-                <button type="button" wire:click="$set('search', ''); $set('filtroEstado', ''); $set('filtroTurno', ''); $set('filtroArea', '')" class="rm-filter-bar__clear-btn">
-                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
-                    Limpiar filtros
-                </button>
-            </div>
-        @endif
     </x-ui.filter-bar>
 
     <div class="space-y-3">

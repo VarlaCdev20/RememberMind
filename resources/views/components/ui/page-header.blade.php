@@ -46,8 +46,12 @@
     </div>
     @if($context || $date || ($resolvedActions && trim((string) $resolvedActions) !== ''))
         <div class="rm-collection-header__aside">
-            @if($context)<span class="rm-collection-header__context">{{ $context }}</span>@endif
-            @if($date)<time datetime="{{ $date instanceof \DateTimeInterface ? $date->format('Y-m-d') : $date }}">{{ $date instanceof \DateTimeInterface ? \Illuminate\Support\Carbon::instance($date)->translatedFormat('d \d\e F \d\e Y') : $date }}</time>@endif
+            @if($context || $date)
+                <div class="rm-collection-header__meta">
+                    @if($context)<span class="rm-collection-header__context">{{ $context }}</span>@endif
+                    @if($date)<time datetime="{{ $date instanceof \DateTimeInterface ? $date->format('Y-m-d') : $date }}">{{ $date instanceof \DateTimeInterface ? \Illuminate\Support\Carbon::instance($date)->translatedFormat('d \d\e F \d\e Y') : $date }}</time>@endif
+                </div>
+            @endif
             @if($resolvedActions && trim((string) $resolvedActions) !== '')<div class="rm-collection-header__actions">{{ $resolvedActions }}</div>@endif
         </div>
     @endif

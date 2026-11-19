@@ -425,7 +425,7 @@ class MisResidentesNavegacionTest extends TestCase
         // Verificaciones de modo solo lectura
         $this->assertTrue($comp->get('esModoConsulta'));
         $this->assertFalse($comp->get('esResidenteAsignado'));
-        $comp->assertSee('MODO CONSULTA / SOLO LECTURA');
+        $comp->assertSee('Solo lectura');
         $comp->assertDontSee('+ Registrar');
         $comp->assertSee('Ver ficha clínica');
 

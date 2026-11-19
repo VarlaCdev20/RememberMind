@@ -4,10 +4,10 @@
     <x-dropdown align="right" content-classes="rm-report-chart-choice__menu">
         <x-slot:trigger>
             <x-ui.action-button variant="secondary" icono="ph-chart-pie" class="rm-report-chart-choice" aria-label="Diseño de las gráficas"
-                aria-controls="inicio-gerencia-tipos-grafica" x-bind:aria-expanded="open" x-bind:disabled="cargandoGraficas" />
+                aria-controls="{{ $idSelectorGrafica ?? 'inicio-gerencia-tipos-grafica' }}" x-bind:aria-expanded="open" x-bind:disabled="cargandoGraficas" />
         </x-slot:trigger>
         <x-slot:content>
-            <div id="inicio-gerencia-tipos-grafica" class="rm-choice__options" role="group" aria-label="Diseño de las gráficas">
+            <div id="{{ $idSelectorGrafica ?? 'inicio-gerencia-tipos-grafica' }}" class="rm-choice__options" role="group" aria-label="Diseño de las gráficas">
                 @foreach($tiposDeGrafica as $tipo => $nombre)
                     <button type="button" value="{{ $tipo }}" :class="{ 'is-selected': tipoGraficas === $el.value }"
                         :aria-pressed="tipoGraficas === $el.value"

@@ -1,5 +1,5 @@
 {{-- PRÓXIMAS DOSIS — PALETA INSTITUCIONAL UNIFICADA --}}
-<div class="bg-[var(--rm-surface)] rounded-2xl border border-[var(--rm-border-soft)] shadow-sm overflow-hidden transition-colors font-sans">
+<x-ui.table-surface>
 
  {{-- Header de Sección --}}
  <div class="px-5 py-4 border-b border-[var(--rm-border-soft)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-[var(--rm-surface)] ">
@@ -22,7 +22,6 @@
  </div>
 
  {{-- Tabla Continua con Proporciones Estables y Scroll Horizontal Responsivo --}}
- <div class="w-full overflow-hidden">
  <table class="rm-medication-workspace__dose-table rm-data-table rm-data-table--actions w-full table-auto text-left border-collapse">
  <thead>
  <tr class="bg-[var(--rm-surface-soft)] text-[11px] font-[700] text-[var(--rm-text-muted)] uppercase tracking-wider border-b border-[var(--rm-border-soft)]">
@@ -119,14 +118,8 @@
 
   {{-- Acción: Botón Ver --}}
   <td data-label="Acción" class="px-2.5 py-2.5 text-right whitespace-nowrap" @click.stop>
-  <button
-  type="button"
-  wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $hora }}', '{{ $codRes }}')"
-  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--rm-surface-soft)] hover:bg-[var(--rm-surface)] border border-[var(--rm-border-soft)] text-[var(--rm-text-primary)] transition shadow-2xs cursor-pointer"
-  title="Ver ficha del paciente">
-  <span>Ver</span>
-  <i class="ph ph-arrow-right text-xs text-[var(--rm-action-primary)]"></i>
-  </button>
+  <x-ui.action-button variant="secondary" icono="ph-eye" data-rm-action-icon aria-label="Ver detalle de la dosis"
+   wire:click="abrirDrawerDosis('{{ $codPresc }}', '{{ $hora }}', '{{ $codRes }}')" />
   </td>
   </tr>
  @empty
@@ -143,5 +136,4 @@
  @endforelse
  </tbody>
  </table>
- </div>
-</div>
+</x-ui.table-surface>

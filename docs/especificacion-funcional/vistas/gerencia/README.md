@@ -13,7 +13,7 @@ runtime_verified: false
 
 Las [decisiones adoptadas](../../roles/GERENCIA_CUESTIONARIO_PENDIENTE.md#registro-y-próximos-pasos) gobiernan estas fichas. CURRENT en este índice no significa que las pantallas se hayan implementado o probado.
 
-**Actualización de implementación del 26/10:** el [informe 36](36-RENOVACION-GERENCIA-IMPLEMENTACION-Y-PRUEBAS.md) registra el código renovado y sus pruebas reales. Las columnas de esta tabla que dicen «pendiente» describen la especificación inicial; el informe 36 indica cuáles se resolvieron y cuáles siguen abiertas. La [propuesta 35](35-PROPUESTA-ESTRUCTURAL-PERSONAL.md) fue aprobada para desarrollo en bases desechables y todavía no está instalada en la base institucional.
+**Actualización posterior del27/10:**35/37 están aprobadas e instaladas según [informe40](40-INSTALACION-AUTORIZADA-Y-PRORROGA-EXPEDIENTE.md); P03/P17 están acreditados en [informe41](41-ALTAS-Y-SUSTITUCIONES-CONCURRENTES.md). El [informe44](44-INTEGRACION-AVISO-COMPARTIDO.md) integra y verifica PC14/PC15 con seis campos y sin nuevas tablas. Las columnas que dicen «pendiente» en las fichas iniciales conservan aquel corte; los informes posteriores identifican el estado actual y sus límites.
 
 | Documento | Alcance y estado |
 |---|---|
@@ -58,6 +58,9 @@ Las [decisiones adoptadas](../../roles/GERENCIA_CUESTIONARIO_PENDIENTE.md#regist
 | [39. Regresiones y catálogo de aceptación](39-ACEPTACION-REGRESIONES-Y-CASOS.md) | Mora documental, fotografía/sucesión/privacidad, edición obsoleta, nuevas carreras y teclado; inventario reproducible de212 casos sin aceptación automática |
 | [40. Instalación y prórroga por expediente](40-INSTALACION-AUTORIZADA-Y-PRORROGA-EXPEDIENTE.md) | Autorización específica, respaldo, instalación35/37,106 de negocio, P19 conciliado, pruebas SQL/carreras/navegador y pendientes restantes |
 | [41. Altas y sustituciones concurrentes](41-ALTAS-Y-SUSTITUCIONES-CONCURRENTES.md) | P03/P17 implementados y verificados: identidad única, referencia original, permisos tras espera, nueve carreras PostgreSQL y conflicto visible en dos pestañas |
+| [42. Propuesta de avisos con tabla](42-PROPUESTA-AVISOS-PLANIFICACION.md) | Rechazada expresamente; nunca instalada. Antecedente, no diseño vigente |
+| [43. Avisos sin tablas nuevas](43-AVISOS-SIN-TABLAS-NUEVAS.md) | Diccionario de seis columnas adoptado; el corte original de ensayo se conserva como antecedente |
+| [44. Aviso compartido integrado](44-INTEGRACION-AVISO-COMPARTIDO.md) | PC14/PC15 comprobados, seis campos instalados y capacidad habilitada localmente;106 tablas de negocio conservadas |
 
 Las fichas principales de Gerencia y la matriz de cobertura están documentadas. Esto no acredita aceptación completa del rol. Personal/documentos cuenta con 44 escenarios, Familiares/contactos con 24, Áreas/equipo con 20, Planificación/cobertura con 28, Residentes/ocupación con 24, Alertas con 24, Reportes con 24 y Galería con 24: 212 escenarios especificados en total. Los informes 36/38 acreditan ejecución posterior de grupos concretos, sin declarar los212 individualmente aceptados. DA01 fue adoptada expresamente después; DA02 sigue delimitando pertenencia permanente no aprobada.
 

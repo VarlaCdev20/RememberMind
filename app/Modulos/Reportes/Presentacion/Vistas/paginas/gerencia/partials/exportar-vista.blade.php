@@ -20,11 +20,7 @@
                         <p x-text="datosExportacion?.referencia"></p>
                         <p class="rm-help" x-text="datosExportacion?.ambito"></p>
                     </div>
-                    <fieldset class="rm-management-formats" :disabled="descargandoExportacion">
-                        <legend>¿En qué formato?</legend>
-                        <label><input type="radio" name="formato-{{ $origenReporte }}" value="pdf" x-model="formatoExportacion"><strong>PDF</strong><span>Lectura e impresión</span></label>
-                        <label><input type="radio" name="formato-{{ $origenReporte }}" value="csv" x-model="formatoExportacion"><strong>CSV</strong><span>Hoja de cálculo</span></label>
-                    </fieldset>
+                    <x-ui.report-export-formats :id="$origenReporte" />
                     <fieldset class="rm-report-export-dialog__parts" :disabled="descargandoExportacion" aria-describedby="{{ $modalExportacion }}-alcance">
                         <legend>¿Qué parte quieres exportar?</legend>
                         <label class="rm-report-export-dialog__all">

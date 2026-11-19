@@ -9,6 +9,12 @@ last_reviewed: 2026-10-08
 
 # Carga sintética histórica 2026
 
+La variante anual `historical2026-anual-v2`, con corte 12/11/2026 a las 10:00 de La Paz, amplía los casos documentados abajo. Crea 30 residentes sintéticos mediante admisión formal, con 404 a 677 días de cobertura por caso. En la base local requiere exactamente 30 camas habilitadas y disponibles, reutiliza sus códigos y exige autorización explícita del nombre de la base. En la suite aislada puede crear el inventario desechable.
+
+Los cinco casos de posible DCL cubren los cuatro perfiles como hipótesis clínicas de prueba en sus expedientes. Las alertas críticas de signos se generan mediante la evaluación y la decisión de alerta vigentes. Las fichas del catálogo conservan las presentaciones de AGEMED e incluyen un uso general de referencia. [NHS Medicines A to Z](https://www.nhs.uk/medicines/), [DailyMed](https://dailymed.nlm.nih.gov/dailymed/).
+
+La salida privada de la variante anual usa `storage/app/private/historical2026-anual-v2/`. Los resultados, fechas, rutas y comandos históricos del resto del documento corresponden a la versión original.
+
 > Alcance de inventario: las cifras de esta decisión describen su fecha. El [inventario vigente](README.md) incorpora las extensiones posteriores:106 tablas de negocio+16 técnicas. La decisión conserva exclusivamente sus columnas, relaciones y reglas autorizadas.
 
 Datos exclusivamente de desarrollo. No representan personas, diagnósticos ni órdenes reales. No cambian la estructura V2.1 + V2.2, las reglas clínicas ni los permisos.

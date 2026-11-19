@@ -14,7 +14,7 @@ Fuente de alcance: tarea actual de skills; diseños existentes son propuestas, s
 
 ## Vocabulario y cadena
 
-Dato fuente → hecho con contexto → conocimiento → criterio/variable → normalización/peso → regla/operador → agregación multicriterio → inferencia → riesgo/resultado → explicación → recomendación → seguimiento/alerta si el contrato lo autoriza.
+Dato fuente → hecho con contexto → conocimiento → criterio/variable → normalización/peso → regla/operador → agregación → inferencia → riesgo/resultado → explicación → recomendación → seguimiento/alerta si el contrato lo autoriza.
 
 Es cadena conceptual para explicitar responsabilidades, no pipeline clínico universal. Un método puede no incluir alguna etapa; justificar no aplica. Red semántica, AHP, Mamdani, LLM, Python y FastAPI no son requisitos aprobados por mencionarse históricamente.
 
@@ -57,7 +57,7 @@ Instrumentos V2 ya tienen versión según diccionario; no crear instrument_versi
 
 1. Fijar método/versiones, fuente profesional, casos/dataset autorizado y aceptación.
 2. Conocimiento: completitud y consistencia, reglas imposibles, solapamientos, contradicciones, prioridades/exclusiones.
-3. Multicriterio: normalización/unidades, pesos, agregación, evidencia duplicada y sensibilidad conforme método. No asumir monotonía/umbral global.
+3. Agregación: normalización/unidades, pesos, evidencia duplicada y sensibilidad conforme método. No asumir monotonía/umbral global.
 4. Casos: esperado/actual, normales/frontera/faltantes/contradictorios aplicables; reproducibilidad de explicación.
 5. Después del funcionamiento integral: comparación con referencia profesional y datos de uso real, registrando desacuerdos y limitaciones. No solicitar esa etapa durante el desarrollo.
 6. Métricas de confusión/exactitud/sensibilidad/especificidad/Kappa solo cuando metodología, referencia y datos aprobados permiten su cálculo. Sin muestra/resultados inventados.

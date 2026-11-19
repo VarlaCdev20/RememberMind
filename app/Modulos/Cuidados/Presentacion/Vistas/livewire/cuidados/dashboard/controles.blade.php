@@ -7,8 +7,5 @@
         @can('valoraciones_dolor.ver')
             <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes', ['cuidado' => 'dolor']) }}"><i class="ph-bold ph-hand-heart" aria-hidden="true"></i>Dolor</a>
         @endcan
-        @can('enfermeria.ver_pacientes_asignados')
-            <a class="rm-btn rm-btn-secondary" href="{{ route('admin.enfermeria.pacientes') }}">Ver residentes y cuidados</a>
-        @endcan
     </div>
 </x-ui.card>

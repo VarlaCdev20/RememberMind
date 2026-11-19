@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Vite;
 
 // Router exclusivo para QA con base temporal, nunca cargado por public/index.php.
@@ -39,7 +40,7 @@ if (! $preparar) {
     if ($estatico && str_starts_with($estatico, realpath($raiz.'/public').DIRECTORY_SEPARATOR) && is_file($estatico)) {
         return false;
     }
-    if (! in_array($ruta, ['/admin/enfermeria/reportes', '/admin/enfermeria/reportes/vista-previa', '/admin/enfermeria/reportes/pdf'], true)
+    if (! in_array($ruta, ['/admin/enfermeria/reportes', '/admin/enfermeria/reportes/vista-previa', '/admin/enfermeria/reportes/pdf', '/admin/enfermeria/reportes/csv', '/admin/enfermeria/cuidados', '/admin/enfermeria/medicacion', '/admin/enfermeria/pacientes', '/admin/enfermeria/dashboard', '/admin/enfermeria/alertas', '/admin/enfermeria/incidentes', '/admin/enfermeria/pase-turno', '/admin/enfermeria/agenda', '/admin/enfermeria/registros', '/admin/enfermeria/tareas', '/admin/enfermeria/seguimiento'], true)
         && ! preg_match('~^/livewire-[a-f0-9]+/(?:update|livewire(?:\.min)?\.js)$~D', $ruta)) {
         http_response_code(403);
         exit('Ruta fuera del ensayo.');
@@ -72,6 +73,10 @@ if ($preparar) {
     for ($i = 0; $i < 23; $i++) {
         SignoVital::create(['cod_signo' => 'SIG_QA_'.$i, 'cod_residente' => 'RES_QA_RPT', 'cod_personal' => 'PER_QA_RPT', 'cod_jornada' => 'JOR_QA_RPT', 'fecha_hora' => '2026-10-27 10:00:00', 'presion_sistolica' => 120, 'presion_diastolica' => 80, 'estado' => 'VIGENTE']);
     }
+    $base = ['cod_residente' => 'RES_QA_RPT', 'cod_personal' => 'PER_QA_RPT', 'cod_jornada' => 'JOR_QA_RPT', 'estado' => 'VIGENTE'];
+    DB::table('registros_consumo')->insert($base + ['tipo_evento' => 'INGESTA', 'cod_registro_consumo' => 'ING_QA_RPT', 'fecha_hora' => '2026-10-26 12:00:00', 'tipo_comida' => 'ALMUERZO', 'porcentaje_consumido' => 75, 'dificultad_deglucion' => false, 'observacion' => 'Registro sintético para verificar el reporte']);
+    DB::table('registros_consumo')->insert($base + ['tipo_evento' => 'HIDRATACION', 'cod_registro_consumo' => 'HID_QA_RPT', 'fecha_hora' => '2026-10-27 11:00:00', 'cantidad_ml' => 150, 'tipo_liquido' => 'AGUA']);
+    DB::table('registros_observaciones_cuidado')->insert($base + ['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SUE_QA_RPT', 'fecha' => '2026-10-27', 'horas_sueno' => 6, 'despertares' => 1, 'insomnio' => false]);
     echo 'PREPARADO';
     exit;
 }

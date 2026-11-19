@@ -24,6 +24,12 @@ Fase 2 fue una revisión estática. Fase 3 ejecutó verificación acotada en Pos
 
 ## 1. Propósito
 
+### Aplicación directa del horario laboral — 2026-11-11
+
+La propietaria pidió que Administración no tenga que aprobar los horarios ya asignados. Al confirmar un horario en Planificación o una plaza en la planilla de Enfermería, el sistema guarda la asignación activa. Si la jornada existente estaba planificada, queda abierta en la misma transacción y registra quién confirmó el horario. La hora de inicio y las asignaciones de residentes siguen determinando el alcance de la guardia.
+
+Cada trabajador activo puede consultar sus horarios vigentes y próximos desde el calendario. Administración recibe el aviso para coordinar la cobertura. La preparación del aviso es independiente de la consulta y aplicación del horario.
+
 ### Planificación asistencial en jornadas futuras — 2026-10-11
 
 La instrucción de la propietaria de mantener los residentes asignados durante una guardia continua de 48 horas requiere registrar también sus jornadas futuras. `GestionarAsignacionesJornada` admite esas fechas únicamente sobre jornadas existentes, abiertas a planificación, y con asignación laboral activa del profesional a un área activa. La cuenta y el perfil de Enfermería deben estar activos y el residente admitido. El actor necesita cuenta activa y `turnos.asignar`; los niveles de supervisión se indican expresamente por residente.
@@ -244,6 +250,16 @@ TECH-005 capa física/carreras; TECH-009 controles distintos en consumidores de 
 ## 35. Decisiones abiertas
 
 DEC-OPEN-001 solo estados institucionales dependientes; no se abre decisión nueva para elección técnica. [Registro DEC](../../../docs/DECISIONES_PENDIENTES.md). No se aprueba opción ni se duplica identificador.
+
+## Rotación de Enfermería adoptada el 11/11/2026
+
+La propietaria definió un ciclo automático de mañana, tarde, noche y 24 horas completas de descanso desde el fin de la noche. Los horarios son 07:00–15:00, 15:00–23:00 y 23:00–07:00 del día siguiente. Una noche iniciada el lunes termina el martes a las 07:00 y el siguiente turno de mañana comienza el miércoles a las 07:00.
+
+Gerencia elige trabajador, área, turno inicial, fecha inicial y fecha final en Planificación del equipo. El formulario activa la rotación automática al crear una asignación de Enfermería. La confirmación muestra cada fecha y el descanso previsto. El guardado conserva asignaciones independientes por jornada fechada, con sus eventos y auditoría habituales, hasta el horizonte elegido. El máximo técnico es un año por operación. Los cambios y las cancelaciones posteriores se gestionan por jornada. La definición del ciclo se conserva en el código del proceso y en esta decisión, sin representar una entidad maestra recurrente mediante observaciones.
+
+Los turnos necesarios deben existir una sola vez como activos en el catálogo. «Preparar turnos de 8 horas» exige los permisos existentes de asignar y gestionar turnos, confirma la operación y crea los registros faltantes. Un turno existente incompatible requiere revisión en el catálogo. Cada trabajador consulta sus jornadas en Mis horarios.
+
+El backend rechaza el ciclo completo ante cruces, jornadas cerradas o trabajo asignado durante el descanso. Las nuevas asignaciones individuales y por plazas también comprueban las 24 horas posteriores a una noche rotativa de 23:00–07:00. El descanso se determina a partir de esa asignación nocturna activa y de su turno.
 
 ## 36. Trazabilidad
 

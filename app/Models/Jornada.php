@@ -7,4 +7,11 @@ class Jornada extends ModeloOperativo {
     protected function casts(): array { return ['fecha_jornada'=>'date']; }
     public function turno(): BelongsTo { return $this->belongsTo(Turno::class,'cod_turno','cod_turno'); }
     public function asignacionesPersonal(): HasMany { return $this->hasMany(AsignacionPersonal::class,'cod_jornada','cod_jornada'); }
+
+    public function abrirAlConfirmarHorario(User $actor): void
+    {
+        if ($this->estado === 'PLANIFICADA') {
+            $this->update(['estado' => 'ABIERTA', 'cod_usuario_apertura' => $actor->getKey()]);
+        }
+    }
 }

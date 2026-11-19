@@ -42,10 +42,80 @@ test('sistema experto real: roles, grafo, teclado y cinco anchos', { skip: proce
         await page.waitForFunction(() => window.Livewire);
     };
     const click = async text => {
-        const h = await page.evaluateHandle(text => [...document.querySelectorAll('button')].find(e => e.textContent.trim() === text && e.getClientRects().length && !e.disabled), text);
+        const h = await page.evaluateHandle(text => [...document.querySelectorAll('button')].find(e => e.innerText.trim() === text && e.getClientRects().length && !e.disabled), text);
         assert.ok(h.asElement(), `Botón ${text}`); await h.asElement().click(); await page.waitForNetworkIdle({ idleTime: 200 });
     };
     const matrix = [];
+    if (phase === 'conservacion-institucional') {
+        await go('MED', '/admin/medico/residente/RES_QA_EXPERTO/evaluacion-cognitiva/resultados-experto');
+        await click('Evaluar y guardar resultado');
+        await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('Se recuperó y comprobó el resultado original'));
+        const savedUrl = page.url();
+        assert.match(savedUrl, /resultadoGuardado=/);
+        for (const width of [1440, 1280, 1024, 768, 390]) {
+            await page.setViewport({ width, height: 1000 });
+            assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `resultado guardado ${width}: reflow`);
+            await page.waitForFunction(() => innerWidth >= 768 || !document.querySelector(".rm-sidebar") || document.querySelector(".rm-sidebar").getBoundingClientRect().right <= 1);
+            assert.match(await page.$eval('h1', el => el.textContent), /Aún no se puede establecer/);
+            matrix.push({ role: 'medicina', width, overflow: 0 });
+            await page.screenshot({ path: evidence(`resultado-${width}.png`), fullPage: true });
+        }
+        await click('Revisar valoración');
+        await page.select('#decision-revision', 'CONFIRMADA');
+        await page.type('#justificacion-revision', 'Abstención técnicamente fundada en esta prueba sintética.');
+        await click('Guardar decisión profesional');
+        await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('Revisión de Medicina registrada.'));
+        const query = new URL(page.url()).search;
+        await go('PSI', '/admin/psicologia/residente/RES_QA_EXPERTO/resultados-experto' + query);
+        assert.match(await page.$eval('main', el => el.innerText), /Valoración confirmada/);
+        await click('Revisar valoración');
+        await page.select('#decision-revision', 'RECHAZADA');
+        await page.type('#justificacion-revision', 'Discrepancia de Psicología independiente, solo caso sintético.');
+        await click('Guardar decisión profesional');
+        await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('Revisión de Psicología registrada.'));
+        await page.reload({ waitUntil: 'networkidle0' });
+        assert.match(await page.$eval('main', el => el.innerText), /Valoración confirmada/);
+        assert.match(await page.$eval('main', el => el.innerText), /Valoración rechazada/);
+        await page.screenshot({ path: evidence('dos-revisiones-390.png'), fullPage: true });
+        assert.deepEqual(errors, []);
+        await writeFile(evidence('matriz.json'), JSON.stringify({ matrix, errores: errors, guardado: true, recuperacionTrasRecarga: true, revisionesIndependientes: true, replayCompleto: false }, null, 2));
+        return;
+    }
+    if (phase === 'continuacion-captura') {
+        await go('MED', '/admin/sistema-experto/residentes/RES_QA_EXPERTO/petersen');
+        for (const width of [1440, 1280, 1024, 768, 390]) {
+            await page.setViewport({ width, height: 1000 });
+            assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `captura ${width}: reflow`);
+            const enlace = await page.$eval('a[href$="/evaluacion-cognitiva/resultados-experto"]', el => ({ texto: el.textContent, alto: el.getBoundingClientRect().height }));
+            assert.match(enlace.texto, /Continuar al análisis/);
+            assert.ok(enlace.alto >= 44);
+            matrix.push({ role: 'medicina', width, overflow: 0 });
+            await page.screenshot({ path: evidence(`continuacion-${width}.png`), fullPage: true });
+        }
+        await click('Registrar Evaluación diferencial');
+        assert.equal(await page.$('a[href$="/evaluacion-cognitiva/resultados-experto"]'), null);
+        await page.$eval('#pet-fecha', el => { el.value = new Date(Date.now() - 86400000).toISOString().slice(0, 16); el.dispatchEvent(new Event('input', { bubbles: true })); });
+        await page.select('#pet-estado', 'N');
+        await page.type('#pet-justificacion', 'Registro sintético de revisión diferencial incompleta para verificar la continuidad del formulario.');
+        await click('Guardar valoración original');
+        await page.waitForSelector('#pet-confirmar-guardado [role="dialog"]', { visible: true });
+        await click('Confirmar registro');
+        await page.waitForFunction(() => [...document.querySelectorAll('[role="status"]')].some(el => el.innerText.includes('Valoración original registrada: Evaluación diferencial.')));
+        await page.$eval('a[href$="/evaluacion-cognitiva/resultados-experto"]', el => el.scrollIntoView({ block: 'center' }));
+        await page.screenshot({ path: evidence('captura-guardada-390.png'), fullPage: true });
+        const enlace = await page.$('a[href$="/evaluacion-cognitiva/resultados-experto"]');
+        await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), enlace.click()]);
+        assert.match(page.url(), /\/admin\/medico\/residente\/RES_QA_EXPERTO\/evaluacion-cognitiva\/resultados-experto$/);
+        assert.match(await page.$eval('main', el => el.innerText), /Elena sintética/);
+        await page.screenshot({ path: evidence('consulta-390.png'), fullPage: true });
+        await click('Resumen y análisis');
+        await click('Analizar evidencia');
+        await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('Resultado calculado para esta consulta:'));
+        await page.screenshot({ path: evidence('analisis-390.png'), fullPage: true });
+        assert.deepEqual(errors, []);
+        await writeFile(evidence('matriz.json'), JSON.stringify({ matrix, errores: errors, capturaGuardada: true, mismaPersona: true, analisisEjecutado: true }, null, 2));
+        return;
+    }
     for (const [role, actor, url] of [['superadmin', 'SA', '/admin/sistema-experto'], ['medicina', 'MED', '/admin/medico/residente/RES_QA_EXPERTO/evaluacion-cognitiva/resultados-experto'], ['enfermeria', 'ENF', '/admin/enfermeria/pacientes/RES_QA_EXPERTO/resultados-experto']]) {
         if (phase === 'antes' && existsSync(evidence(`${role}-1440.png`))) continue;
         await page.setViewport({ width: 1440, height: 1000 }); await go(actor, url);

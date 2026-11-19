@@ -30,7 +30,7 @@ if (getenv('APP_ENV') !== 'testing' || strlen($token) !== 48
 }
 $raiz = dirname(__DIR__, 2);
 if (! $preparar) {
-    $estatico = realpath($raiz.'/public'.parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+    $estatico = realpath($raiz.'/public'.rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));
     if ($estatico && str_starts_with($estatico, realpath($raiz.'/public').DIRECTORY_SEPARATOR) && is_file($estatico)) {
         return false;
     }
@@ -53,13 +53,13 @@ if ($preparar) {
     $app->make(Kernel::class)->bootstrap();
     Artisan::call('migrate', ['--force' => true]);
     Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class, '--force' => true]);
-    foreach (['SA' => 'SUPERADMINISTRADOR', 'MED' => 'MEDICO GENERAL/GERIATRA', 'ENF' => 'ENFERMEROS'] as $id => $rol) {
+    foreach (['SA' => 'SUPERADMINISTRADOR', 'MED' => 'MEDICO GENERAL/GERIATRA', 'ENF' => 'ENFERMEROS', 'PSI' => 'PSICOLOGO/A'] as $id => $rol) {
         $u = User::factory()->create(['cod_usuario' => 'QA_EXP_'.$id, 'estado' => 'ACTIVO']);
         $u->assignRole($rol);
         if ($id !== 'SA') {
             $personal[$id] = Personal::create(['cod_usuario' => $u->getKey(), 'nombres' => 'Profesional',
                 'apellido_paterno' => 'Sintético', 'numero_documento' => 'QA-EXP-'.$id,
-                'profesion' => $id === 'MED' ? 'MEDICINA' : 'ENFERMERIA', 'estado' => 'ACTIVO']);
+                'profesion' => match ($id) { 'MED' => 'MEDICINA', 'PSI' => 'PSICOLOGIA', default => 'ENFERMERIA' }, 'estado' => 'ACTIVO']);
         }
     }
     $r = Residente::factory()->create(['cod_residente' => 'RES_QA_EXPERTO', 'nombres' => 'Elena sintética',
@@ -80,6 +80,11 @@ if ($preparar) {
     }
     $medico->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar']);
     app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional::class)->ejecutar($medico);
+    if (getenv('RM_EXPERTO_FASE') === 'conservacion-institucional') {
+        (require $raiz.'/database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php')->up();
+        Artisan::call('db:seed', ['--class' => \Database\Seeders\PermisoEjecucionInstitucionalSeeder::class, '--force' => true]);
+        app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen::class)->ejecutar($medico);
+    }
     echo 'PREPARADO';
     exit;
 }
@@ -88,7 +93,7 @@ final class AutenticarExpertoSintetico
     public function handle($request, Closure $next)
     {
         $actor = $_SERVER['HTTP_X_RM_ACTOR'] ?? 'SA';
-        abort_unless(in_array($actor, ['SA', 'MED', 'ENF'], true), 403);
+        abort_unless(in_array($actor, ['SA', 'MED', 'ENF', 'PSI'], true), 403);
         Auth::onceUsingId('QA_EXP_'.$actor);
 
         return $next($request);
