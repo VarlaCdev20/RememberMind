@@ -189,3 +189,4 @@ import './modules/livewire-access-feedback.js';
 import './modules/alertas-interaccion.js';
 
 import './modules/valoraciones-explorador.js';
+import './modules/expert-stored-evidence.js';

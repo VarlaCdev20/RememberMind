@@ -19,6 +19,7 @@
         $conteosGrafico,
     ));
     $modoRadial = ($modoGrafico ?? 'barras') === 'radial' && $totalGrafico === 5;
+    $modoDona = ($modoGrafico ?? 'barras') === 'dona';
     $nodosRadiales = [[180, 52], [302, 140], [255, 284], [105, 284], [58, 140]];
 @endphp
 
@@ -71,6 +72,26 @@
                         <span class="rm-cognitive-status-chart__badge" data-status="{{ $areaGrafico['grupo'] }}">{{ $areaGrafico['estado'] }}</span>
                     </div>
                 @endforeach
+            </div>
+        @elseif($modoDona)
+            <div class="rm-cognitive-status-chart__donut-layout">
+                <svg class="rm-cognitive-status-chart__donut" viewBox="0 0 200 200" role="img" aria-label="Distribución de las {{ $totalGrafico }} áreas. {{ $resumenGrafico }}">
+                    <circle class="rm-cognitive-status-chart__donut-track" cx="100" cy="100" r="72" />
+                    @php($offsetGrafico = 0)
+                    @foreach($conteosGrafico as $grupo => $cantidad)
+                        @if($cantidad)
+                            <circle class="rm-cognitive-status-chart__segment" data-status="{{ $grupo }}" cx="100" cy="100" r="72" pathLength="100" stroke-dasharray="{{ $cantidad * 100 / $totalGrafico }} 100" stroke-dashoffset="{{ -$offsetGrafico }}" transform="rotate(-90 100 100)"><title>{{ $cantidad }}: {{ $categoriasGrafico[$grupo] }}</title></circle>
+                            @php($offsetGrafico += $cantidad * 100 / $totalGrafico)
+                        @endif
+                    @endforeach
+                    <text class="rm-cognitive-status-chart__center-label" x="100" y="100" text-anchor="middle">{{ $totalGrafico }}</text>
+                    <text class="rm-cognitive-status-chart__center-caption" x="100" y="119" text-anchor="middle">áreas cognitivas</text>
+                </svg>
+                <ul class="rm-cognitive-status-chart__legend" aria-label="Valores de la gráfica">
+                    @foreach($conteosGrafico as $grupo => $cantidad)
+                        @if($cantidad)<li><span class="rm-cognitive-status-chart__key" data-status="{{ $grupo }}" aria-hidden="true"></span><strong>{{ $cantidad }}</strong> {{ $categoriasGrafico[$grupo] }}</li>@endif
+                    @endforeach
+                </ul>
             </div>
         @else
         <div class="rm-cognitive-status-chart__bar" role="img" aria-label="Distribución de las {{ $totalGrafico }} áreas: {{ $resumenGrafico }}">

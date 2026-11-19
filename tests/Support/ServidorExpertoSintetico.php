@@ -51,6 +51,12 @@ if ($preparar) {
         throw new RuntimeException('Solo se prepara un archivo nuevo y vacío.');
     }
     $app->make(Kernel::class)->bootstrap();
+    if (getenv('RM_EXPERTO_FASE') === 'resultado-guardado') {
+        // El seeder solo admite SQLite en memoria. Exportar luego al archivo nuevo
+        // permite que el navegador lea el mismo resultado sin relajar su guardia.
+        config(['database.connections.sqlite.database' => ':memory:']);
+        DB::purge('sqlite');
+    }
     Artisan::call('migrate', ['--force' => true]);
     Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class, '--force' => true]);
     foreach (['SA' => 'SUPERADMINISTRADOR', 'MED' => 'MEDICO GENERAL/GERIATRA', 'ENF' => 'ENFERMEROS', 'PSI' => 'PSICOLOGO/A'] as $id => $rol) {
@@ -80,10 +86,27 @@ if ($preparar) {
     }
     $medico->givePermissionTo(['reglas_expertas.ver', 'reglas_expertas.gestionar']);
     app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional::class)->ejecutar($medico);
-    if (getenv('RM_EXPERTO_FASE') === 'conservacion-institucional') {
+    if (in_array(getenv('RM_EXPERTO_FASE'), ['conservacion-institucional', 'resultado-guardado'], true)) {
         (require $raiz.'/database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php')->up();
         Artisan::call('db:seed', ['--class' => \Database\Seeders\PermisoEjecucionInstitucionalSeeder::class, '--force' => true]);
         app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen::class)->ejecutar($medico);
+    }
+    if (getenv('RM_EXPERTO_FASE') === 'resultado-guardado') {
+        $r->update(['numero_documento' => '99120010', 'fecha_nacimiento' => '1945-01-01', 'observacion' => 'CASO SINTÉTICO DE PRUEBA']);
+        Residente::whereKey('RES_QA_AJENO')->update(['numero_documento' => '99120030']);
+        foreach (range(1, 29) as $n) {
+            if ($n === 10) continue;
+            Residente::factory()->create(['numero_documento' => sprintf('991200%02d', $n), 'fecha_nacimiento' => '1945-01-01',
+                'observacion' => 'CASO SINTÉTICO DE PRUEBA', 'estado' => 'ADMITIDO']);
+        }
+        $area = \App\Models\Area::create(['nombre' => 'Psicología sintética', 'estado' => 'ACTIVA']);
+        Auth::onceUsingId('QA_EXP_PSI');
+        request()->setMethod('POST');
+        app(\Database\Seeders\EscenariosDclResidentesSeeder::class)->ejecutar(':memory:', 'QA_EXP_PSI', $area->getKey());
+        // Otro resultado conservado, sin datos suficientes, para verificar la abstención.
+        app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\GuardarResultadoInstitucional::class)->ejecutar(
+            User::findOrFail('QA_EXP_PSI'), Residente::findOrFail('RES_QA_AJENO'), (string) \Illuminate\Support\Str::uuid());
+        DB::statement("VACUUM INTO '".str_replace("'", "''", $archivo)."'");
     }
     echo 'PREPARADO';
     exit;

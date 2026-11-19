@@ -113,7 +113,10 @@ final class EscenariosDclResidentesSeederTest extends TestCase
         self::assertSame('PET-01', $historico['contenido']['patron']);
         self::assertTrue($historico['persistido']);
         $this->actingAs($enfermera)->get(route('admin.enfermeria.pacientes.resultados-experto', $residente))
-            ->assertOk()->assertSee('Posible DCL amnésico de dominio único');
+            ->assertOk()->assertSee('Posible DCL amnésico de dominio único')
+            ->assertSee('Panorama cognitivo')->assertSee('Estado de cada área')
+            ->assertSee('Alteración sustentada en Memoria.')
+            ->assertSee('Fuentes del resultado')->assertSee('Consultar los datos originales');
         self::assertSame(10, EvaluacionExperta::count());
     }
 

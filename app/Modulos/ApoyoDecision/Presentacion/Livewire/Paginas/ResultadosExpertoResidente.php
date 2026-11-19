@@ -723,7 +723,9 @@ class ResultadosExpertoResidente extends Component
                 $resultadoInstitucional = ['error' => true];
                 $revisiones = null;
             }
-            return view('livewire.medico.resultados-experto-residente', compact('residente', 'resultadoInstitucional', 'historialInstitucional', 'puedeGuardarInstitucional', 'revisiones'))
+            $resumenGuardado = isset($resultadoInstitucional['contenido'])
+                ? \App\Modulos\ApoyoDecision\Presentacion\Soporte\ResultadoInstitucionalVisible::resumen($resultadoInstitucional['contenido']) : null;
+            return view('livewire.medico.resultados-experto-residente', compact('residente', 'resultadoInstitucional', 'resumenGuardado', 'historialInstitucional', 'puedeGuardarInstitucional', 'revisiones'))
                 ->layout($this->enfermeria ? 'layouts.enfermeria' : 'layouts.sistema');
         }
         $datos = null;

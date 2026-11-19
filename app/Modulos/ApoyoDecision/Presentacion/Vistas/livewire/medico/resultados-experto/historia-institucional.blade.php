@@ -1,6 +1,6 @@
-<section class="rm-card p-4 mb-4 space-y-3" aria-labelledby="historia-institucional-titulo">
+<section class="rm-card rm-expert-history {{ $resultadoInstitucional ? 'rm-expert-history--stored' : '' }} p-4 mb-4 space-y-3" aria-labelledby="historia-institucional-titulo">
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 id="historia-institucional-titulo" class="font-bold">Evaluaciones guardadas de {{ $residente->nombre_completo }}</h2><p class="text-sm text-rm-secondary">Resultados originales y revisiones independientes.</p></div>
+        <div><h2 id="historia-institucional-titulo" class="font-bold">{{ $resultadoInstitucional ? 'Evaluaciones guardadas' : 'Evaluaciones guardadas de '.$residente->nombre_completo }}</h2>@unless($resultadoInstitucional)<p class="text-sm text-rm-secondary">Resultados originales y revisiones independientes.</p>@endunless</div>
         @if($resultadoInstitucional)
             <button type="button" wire:click="volverAConsultaActual" wire:loading.attr="disabled" class="rm-btn rm-btn-secondary">Volver a la consulta actual</button>
         @elseif($puedeGuardarInstitucional)

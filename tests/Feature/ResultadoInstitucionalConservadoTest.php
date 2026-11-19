@@ -242,7 +242,7 @@ final class ResultadoInstitucionalConservadoTest extends TestCase
         $d = $this->guardar();
         DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', $d['contenido']['id'])->update(['institucional_c01' => 'S']);
         \Livewire\Livewire::test(\App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente::class, ['residente' => $this->residente])
-            ->set('resultadoInstitucionalId', $d['contenido']['id'])->assertSee('No se pudo verificar el resultado guardado')->assertDontSee('Revisar valoración');
+            ->set('resultadoInstitucionalId', $d['contenido']['id'])->assertSee('No se pudo verificar el resultado guardado')->assertDontSee('Revisar valoración')->assertDontSee('Panorama cognitivo');
         $this->assertDatabaseCount('revisiones_evaluacion_experta', 0);
     }
 
