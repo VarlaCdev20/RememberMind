@@ -13,6 +13,8 @@ runtime_verified: false
 
 # Consulta cognitiva y sistema experto
 
+**Carga local del 19/11/2026:** [diez escenarios reproducibles sobre el censo actual](ESCENARIOS_DCL10_2026_11_19.md), con inferencia real, fuentes y resultados conservados, cuatro perfiles orientativos y lectura desde Enfermería. Se mantienen treinta residentes y cien tablas físicas; los datos son ficticios y no constituyen diagnósticos confirmados.
+
 **Estado de incorporación comprobado el04/11:** [integración real, vínculos y conservación pendientes](ESTADO_INTEGRACION_TOTAL_2026_11_04.md). Contrasta código, rutas y catálogo configurado en solo lectura. Los tres perfiles iniciales ya están en los formularios normales; el resultado conjunto instrumental/Petersen sigue transitorio. Un ensayo o un script aislado no cuentan como incorporación total.
 
 **Revisión documental del 04/11:** el [estado actual](../ESTADO_ACTUAL.md) y el [mapa del código](../../motor-experto/README.md) recogen el árbol posterior a la limpieza de nombres. La denominación de investigación, su importador y su fallback están retirados del producto; las huellas históricas conservan sus identificadores originales. Las entregas siguientes mantienen su fecha y alcance.
