@@ -472,6 +472,13 @@ class ResultadosExpertoResidente extends Component
             || (auth()->user()?->hasRole('PSICOLOGO/A') && ! auth()->user()?->hasAnyRole(['MEDICO GENERAL/GERIATRA', 'SUPERADMINISTRADOR', 'ENFERMEROS']));
         abort_if(request()->query('simulacion') !== null, 404);
         $this->autorizar();
+        // La entrada normal presenta lo que ya fue guardado, sin ejecutar otra inferencia.
+        // Una selección explícita conserva su identidad y vuelve a autorizarse al leerla.
+        if ($this->resultadoInstitucionalId === null && request()->query('resultadoGuardado') === null) {
+            $historia = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)
+                ->historial(auth()->user(), $residente);
+            $this->resultadoInstitucionalId = $historia['items'][0]['id'] ?? null;
+        }
     }
 
     /** Relee la cuenta antes de cada interacción para respetar bajas y permisos revocados. */

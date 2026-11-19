@@ -112,8 +112,8 @@ final class EscenariosDclResidentesSeederTest extends TestCase
         $historico = app(ConsultarResultadoInstitucional::class)->consultar($enfermera, $residente, $r['casos'][0]['evaluacion']);
         self::assertSame('PET-01', $historico['contenido']['patron']);
         self::assertTrue($historico['persistido']);
-        $this->actingAs($enfermera)->get(route('admin.enfermeria.pacientes.resultados-experto', $residente)
-            .'?resultadoGuardado='.urlencode($r['casos'][0]['evaluacion']))->assertOk()->assertSee('Posible DCL amnésico de dominio único');
+        $this->actingAs($enfermera)->get(route('admin.enfermeria.pacientes.resultados-experto', $residente))
+            ->assertOk()->assertSee('Posible DCL amnésico de dominio único');
         self::assertSame(10, EvaluacionExperta::count());
     }
 

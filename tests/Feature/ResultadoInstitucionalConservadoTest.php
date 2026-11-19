@@ -148,6 +148,35 @@ final class ResultadoInstitucionalConservadoTest extends TestCase
         $this->assertDatabaseCount('evaluaciones_expertas', 1);
     }
 
+    public function test_entrada_abre_ultimo_resultado_sin_ejecutar_y_respeta_eleccion_y_consulta_actual(): void
+    {
+        $primero = $this->guardar()['contenido']['id'];
+        $this->travel(1)->minutes();
+        $ultimo = $this->guardar()['contenido']['id'];
+        $pagina = \Livewire\Livewire::test(\App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente::class, ['residente' => $this->residente]);
+        $pagina->assertSet('resultadoInstitucionalId', $ultimo)->assertSee('Evaluación guardada')
+            ->call('abrirResultadoInstitucional', $primero)->assertSet('resultadoInstitucionalId', $primero)
+            ->call('volverAConsultaActual')->assertSet('resultadoInstitucionalId', null)->assertSee('Evaluar y guardar resultado');
+        $this->assertDatabaseCount('evaluaciones_expertas', 2);
+        \Livewire\Livewire::withQueryParams(['resultadoGuardado' => $primero])
+            ->test(\App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSet('resultadoInstitucionalId', $primero);
+        $otro = Residente::factory()->create(['estado' => 'ADMITIDO']);
+        $this->getJson(route('admin.psicologia.residente.resultados-experto', $otro).'?resultadoGuardado='.urlencode($primero))->assertNotFound();
+        $this->assertDatabaseCount('evaluaciones_expertas', 2);
+    }
+
+    public function test_entrada_sin_resultados_no_fabrica_una_evaluacion_y_no_habilita_acceso_ajeno(): void
+    {
+        \Livewire\Livewire::test(\App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\ResultadosExpertoResidente::class, ['residente' => $this->residente])
+            ->assertSet('resultadoInstitucionalId', null)->assertSee('Evaluar y guardar resultado');
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+        $enfermero = User::factory()->create(['estado' => 'ACTIVO']);
+        $enfermero->assignRole('ENFERMEROS');
+        $this->actingAs($enfermero)->getJson(route('admin.enfermeria.pacientes.resultados-experto', $this->residente))->assertNotFound();
+        $this->assertDatabaseCount('evaluaciones_expertas', 0);
+    }
+
     public function test_fallo_en_traza_revierte_el_resultado_y_sus_hechos(): void
     {
         DB::connection()->beforeExecuting(function (string $sql): void {

@@ -32,8 +32,9 @@ protegidos. No se reactivan los antiguos instrumentos `COH30-*`/`TEST-*` ni se
 retiran las exclusiones del flujo operativo. Los perfiles docentes se configuran
 solo durante la carga y se restauran al terminar, incluso ante un fallo.
 La lectura histórica del resultado guardado conserva sus fuentes originales y
-funciona sin ese perfil temporal. La consulta actual no debe confundirse con
-el resultado histórico seleccionado.
+funciona sin ese perfil temporal. La entrada normal abre automáticamente el
+último resultado guardado del residente, sin ejecutar otra evaluación. La
+consulta actual no debe confundirse con el resultado histórico seleccionado.
 
 ## Casos y oráculo técnico
 
@@ -118,11 +119,37 @@ La evidencia final es:
 Natalia conserva exactamente sus cinco residentes actuales. Jorge Salinas
 Quispe tiene el escenario PET-01; Teresa Aguilar Rojas y Hugo Romero Torrico,
 PET-02. Se verificó la recuperación SQL de los tres resultados bajo los permisos
-y asignaciones reales de Natalia. Para verlos debe abrirse el resultado
-guardado del residente, no confundirlo con una nueva consulta actual.
+y asignaciones reales de Natalia. La entrada al apartado Sistema experto
+abre el último resultado guardado. El historial permite elegir otra evaluación;
+«Volver a la consulta actual» mantiene el acceso a las fuentes actuales, sin
+reescribir ni recalcular el resultado conservado.
 
-No se modifica el frontend: no corresponde reconstruir assets por estos
-archivos de seeder y pruebas. Las limitaciones generales de CI del corte
+La carga inicial no modificó el frontend; la corrección de entrada posterior
+se describe abajo. Las limitaciones generales de CI del corte
 [publicado el 19/11](../sistema/PUBLICACION_2026_11_19.md) siguen separadas de
 estas pruebas dirigidas. Los resultados técnicos no acreditan evaluación en
 personas ni aprobación clínica.
+
+## Corrección de la entrada normal
+
+La prueba inicial de carga abría un enlace que incluía `resultadoGuardado`.
+Eso acreditaba el guardado y la recuperación, pero no la entrada desde el botón
+normal. La incidencia comunicada por la propietaria reprodujo esa diferencia:
+la página entraba al lector anterior y Enfermería no mostraba el historial
+institucional en ese estado, aunque el resultado existiera.
+
+Se corrigió la selección inicial y la visibilidad del historial existente.
+No se inventan resultados cuando no hay evaluaciones, no se selecciona un
+perfil favorable por encima de un resultado posterior, no se sustituye un
+resultado corrupto por otro silenciosamente y se conserva la autorización
+del residente y de las fuentes al leer.
+
+La regresión cambió el acceso de la prueba al enlace normal sin parámetros y
+falló antes de la corrección. Tras el parche: **4 pruebas, 182 aserciones** en
+SQLite y **4 pruebas, 182 aserciones** en PostgreSQL temporal, sin errores,
+fallos u omisiones. Cubren entrada al último resultado, selección explícita,
+consulta actual, ausencia de resultados, acceso ajeno, corrupción y perfil
+positivo desde Enfermería. Build aprobado, con el aviso previo de tamaño de
+bundle. Se comprobó además la ventana real de Chrome con la sesión de Natalia:
+la dirección normal de Jorge mostró «Posible DCL amnésico de dominio único»,
+su fecha y los estados guardados de los cinco dominios.

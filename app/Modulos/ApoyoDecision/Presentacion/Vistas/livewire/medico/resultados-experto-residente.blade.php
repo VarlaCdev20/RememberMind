@@ -2,7 +2,7 @@
     x-on:decision-navigate.window="vistaClinica = 'resumen'; $nextTick(() => { const section = document.getElementById($event.detail.seccion); if (section) { if (section.tagName === 'DETAILS') section.open = true; let parent = section.parentElement?.closest('details'); while (parent) { parent.open = true; parent = parent.parentElement?.closest('details'); } section.scrollIntoView({ block: 'start' }); section.querySelector('summary, h2')?.focus({ preventScroll: true }); } })"
     x-on:expert-trace-opened.window="$nextTick(() => document.getElementById('drawer-trazabilidadabierta-title')?.focus())"
     x-on:expert-trace-closed.window="$nextTick(() => $refs.traceTrigger?.focus())">
-    @unless($enfermeria && ! $resultadoInstitucional)
+    @unless($enfermeria && ! $resultadoInstitucional && $historialInstitucional['total'] === 0)
         @include('apoyodecision::livewire.medico.resultados-experto.historia-institucional')
     @endunless
     @if($resultadoInstitucional)
