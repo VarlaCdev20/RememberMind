@@ -33,8 +33,8 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         $control = F::evidencia(['memoria_reciente' => null, 'repite_preguntas' => false]);
         $comun = ['cod_residente' => 'SINTETICO-RES', 'cod_personal' => 'SIM-PER', 'cod_atencion' => 'SIM-AT',
             'fecha_hora' => '2026-10-16 12:00:00'];
-        DB::table('valoraciones_psicopedagogicas')->insert($comun + ['tipo_evento' => 'PSICOLOGICA', 'cod_valoracion_profesional' => 'SIM-PSI', 'estado' => 'VIGENTE',
-            'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']);
+        RegistrosConsumo::insertar('valoraciones_psicologicas', [$comun + ['cod_valoracion_psicologica' => 'SIM-PSI', 'estado' => 'VIGENTE',
+            'comunicacion' => 'Relato artificial sin interpretación automática.', 'impresion_cognitiva' => 'Texto ficticio; no es un criterio computable.']]);
         RegistrosConsumo::insertar('valoraciones_funcionales', [$comun + ['cod_valoracion_funcional' => 'SIM-FUNC', 'estado' => 'ACTIVA']]);
         RegistrosConsumo::insertar('diagnosticos', [$comun + ['cod_diagnostico' => 'SIM-DIAG', 'nombre' => 'Contexto médico ficticio', 'estado' => 'VIGENTE']]);
         RegistrosConsumo::insertar('antecedentes_clinicos', [['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
@@ -100,8 +100,8 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
     public function test_futuro_y_fecha_ausente_no_exponen_valores_ni_fabrican_un_instante(): void
     {
         [$autor, $selecciones] = $this->prepararFuentes();
-        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('valoraciones_psicologicas')->where('cod_valoracion_profesional', 'SIM-PSI')->update(['fecha_hora' => '2026-10-18 12:00:00']);
-        RegistrosConsumo::consulta('antecedentes_clinicos')->where('cod_registro_clinico', 'SIM-ANT')->update(['fecha_referencia' => null]);
+        DB::table('valoraciones_psicopedagogicas')->where('cod_valoracion_profesional', 'SIM-PSI')->update(['fecha_hora' => '2026-10-18 12:00:00']);
+        DB::table('registros_clinicos')->where('cod_registro_clinico', 'SIM-ANT')->update(['fecha_referencia' => null]);
         $fuentes = (new Recolector)->recoger($autor, 'SINTETICO-RES', 'SIM-INTEGRAL-01',
             new DateTimeImmutable('2026-10-17T23:59:59-04:00'), array_intersect_key($selecciones, ['valoraciones_psicologicas' => true, 'antecedentes_clinicos' => true]));
         self::assertSame([], $fuentes[0]['valores']);

@@ -23,7 +23,17 @@ final class SeparacionContextoResidente20261120
                 usort($actual, fn ($a, $b) => $a['name'] <=> $b['name']);
                 usort($esperado, fn ($a, $b) => $a['name'] <=> $b['name']);
             }
-            if ($actual !== $esperado) {
+            $variantes = $esquema['variantes_restricciones'] ?? [];
+            if ($tipo === 'restricciones') {
+                // PG18 asigna otro nombre a NOT NULL al reconstruir la columna.
+                // Su semántica ya se coteja exactamente en nullable de cada atributo.
+                $sinNombresNotNull = fn ($filas) => array_values(array_filter($filas, fn ($r) => $r['contype'] !== 'n'));
+                $actual = $sinNombresNotNull($actual);
+                $esperado = $sinNombresNotNull($esperado);
+                $variantes = array_map($sinNombresNotNull, $variantes);
+            }
+            $varianteRestaurada = $tipo === 'restricciones' && in_array($actual, $variantes, true);
+            if ($actual !== $esperado && ! $varianteRestaurada) {
                 throw new RuntimeException('El contrato PostgreSQL clínico cambió desde el corte autorizado: '.$tabla.' ('.$tipo.').');
             }
         }

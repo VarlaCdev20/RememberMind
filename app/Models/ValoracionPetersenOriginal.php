@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Compartido\Infraestructura\Persistencia\ConservaContextoResidente;
 use App\Modulos\ApoyoDecision\Presentacion\Policies\ValoracionPetersenPolicy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +16,8 @@ use MotorExperto\hechos\ValoracionOriginalPetersen;
 #[UsePolicy(ValoracionPetersenPolicy::class)]
 final class ValoracionPetersenOriginal extends ModeloOperativo
 {
+    use ConservaContextoResidente;
+
     protected $table = 'valoraciones_petersen_originales';
 
     protected $primaryKey = 'cod_valoracion_petersen';

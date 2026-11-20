@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Compartido\Infraestructura\Persistencia\ConservaContextoResidente;
+use App\Compartido\Infraestructura\Persistencia\ContextosResidente;
 use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 
 abstract class RegistroConsumo extends ModeloOperativo
@@ -10,6 +11,13 @@ abstract class RegistroConsumo extends ModeloOperativo
     use ConservaContextoResidente;
 
     protected const TIPO = '';
+
+    public function save(array $options = [])
+    {
+        $this->tipo_evento = static::TIPO;
+
+        return ContextosResidente::guardar($this, fn () => parent::save($options));
+    }
 
     protected const ENTIDAD = '';
 

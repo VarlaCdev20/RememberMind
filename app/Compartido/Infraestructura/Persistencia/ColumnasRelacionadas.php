@@ -23,6 +23,12 @@ final class ColumnasRelacionadas
         'aplicaciones_instrumento' => ['cod_residente', 'cod_aplicacion'],
         'controles_cognitivos' => ['cod_residente', 'cod_control_cognitivo'],
         'controles_funcionales_iadl' => ['cod_residente', 'cod_control_iadl'],
+        'derivaciones' => ['cod_residente', 'cod_derivacion'],
+        'documentos' => ['cod_residente', 'cod_documento'],
+        'registros_clinicos' => ['cod_residente', 'cod_registro_clinico'],
+        'registros_textuales_clinicos' => ['cod_residente', 'cod_registro_textual'],
+        'valoraciones_psicopedagogicas' => ['cod_residente', 'cod_valoracion_profesional'],
+        'valoraciones_petersen_originales' => ['cod_residente', 'cod_valoracion_petersen'],
     ];
 
     public static function origen(Connection $db, string $tabla): Builder

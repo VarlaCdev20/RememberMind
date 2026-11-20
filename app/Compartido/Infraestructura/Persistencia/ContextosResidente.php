@@ -18,6 +18,12 @@ final class ContextosResidente
         'aplicaciones_instrumento' => ['cod_aplicacion', 'residentes_aplicaciones_instrumento'],
         'controles_cognitivos' => ['cod_control_cognitivo', 'residentes_controles_cognitivos'],
         'controles_funcionales_iadl' => ['cod_control_iadl', 'residentes_controles_funcionales_iadl'],
+        'derivaciones' => ['cod_derivacion', 'residentes_derivaciones'],
+        'documentos' => ['cod_documento', 'residentes_documentos'],
+        'registros_clinicos' => ['cod_registro_clinico', 'residentes_registros_clinicos'],
+        'registros_textuales_clinicos' => ['cod_registro_textual', 'residentes_registros_textuales_clinicos'],
+        'valoraciones_psicopedagogicas' => ['cod_valoracion_profesional', 'residentes_valoraciones_psicopedagogicas'],
+        'valoraciones_petersen_originales' => ['cod_valoracion_petersen', 'residentes_valoraciones_petersen'],
     ];
 
     /** Inspección de las dos rutas físicas, sin consultar residentes ni atribuir disponibilidad clínica. */
@@ -141,6 +147,9 @@ final class ContextosResidente
         if (isset($datos['cod_atencion'])) {
             self::contrastar($db, $tabla, $datos);
         } else {
+            if (self::documentoSinSujeto($tabla, $datos)) {
+                return;
+            }
             if (! isset($datos['cod_residente']) || ! is_string($datos['cod_residente']) || $datos['cod_residente'] === '') {
                 throw ValidationException::withMessages(['cod_residente' => 'Selecciona el residente del registro.']);
             }
@@ -151,9 +160,15 @@ final class ContextosResidente
     private static function contrastar(Connection $db, string $tabla, array $datos): void
     {
         $canonica = self::valor($db, $tabla, $datos);
-        if ($canonica === null || (isset($datos['cod_residente']) && $canonica !== $datos['cod_residente'])) {
+        if (($canonica === null && ! self::documentoSinSujeto($tabla, $datos)) || (isset($datos['cod_residente']) && $canonica !== $datos['cod_residente'])) {
             throw ValidationException::withMessages(['cod_residente' => 'El residente no corresponde al contexto original del registro.']);
         }
+    }
+
+    private static function documentoSinSujeto(string $tabla, array $datos): bool
+    {
+        return $tabla === 'documentos' && ($datos['tipo_evento'] ?? null) === 'ADMINISTRATIVO'
+            && ($datos['cod_atencion'] ?? null) === null && ($datos['cod_residente'] ?? null) === null;
     }
 
     private static function bloquearAtencion(Connection $db, array $datos): void

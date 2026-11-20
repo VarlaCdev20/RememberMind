@@ -46,7 +46,7 @@ final class ActividadPsicologicaGeneral extends Component
 
         $personal = $usuario->personal;
         $registros = $seccion === 'informes'
-            ? DB::table('valoraciones_psicopedagogicas as registro')->where('registro.tipo_evento', 'PSICOLOGICA')
+            ? \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'valoraciones_psicopedagogicas', 'registro')->where('registro.tipo_evento', 'PSICOLOGICA')
             : DB::table('atenciones as registro');
 
         $registros->join('residentes as residente', 'residente.cod_residente', '=', 'registro.cod_residente')

@@ -67,12 +67,12 @@ try {
         ->leftJoin('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')
         ->where(fn ($w) => $w->whereNull('p.cod_pregunta')->orWhereColumn('p.cod_instrumento', '!=', 'a.cod_instrumento')
             ->orWhere(fn ($x) => $x->whereNotNull('r.cod_opcion')->where(fn ($y) => $y->whereNull('o.cod_opcion')->orWhereColumn('o.cod_pregunta', '!=', 'r.cod_pregunta'))))->count();
-    $originales = DB::table('valoraciones_petersen_originales')->where('cod_residente', $residente)
+    $originales = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'valoraciones_petersen_originales')->where('cod_residente', $residente)
         ->select('elemento', 'estado_original')->selectRaw('count(*) as cantidad')->groupBy('elemento', 'estado_original')->orderBy('elemento')->get()->all();
     $sinAutor = (clone $aplicaciones)->leftJoin('personal as p', 'p.cod_personal', '=', 'a.cod_personal')->whereNull('p.cod_personal')->count();
     $originalesPorElemento = [];
     foreach (['COG-MEM', 'COG-ATE', 'COG-EJE', 'COG-LEN', 'COG-VIS', 'C01', 'C03', 'C04', 'C05'] as $elemento) {
-        $cantidad = DB::table('valoraciones_petersen_originales')->where('cod_residente', $residente)->where('elemento', $elemento)->count();
+        $cantidad = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'valoraciones_petersen_originales')->where('cod_residente', $residente)->where('elemento', $elemento)->count();
         $originalesPorElemento[$elemento] = ['registros_originales' => $cantidad,
             'situacion' => $cantidad === 0 ? 'SIN_VALORACION_ORIGINAL' : 'REQUIERE_LECTURA_DEL_CONTRATO_Y_SUS_SOPORTES'];
     }

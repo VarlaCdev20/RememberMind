@@ -23,6 +23,8 @@ runtime_verified: false
 
 **Contexto cognitivo, quinto bloque.** La [separación de aplicaciones, controles cognitivos e IADL](VERIFICACION_5FN_CONTEXTO_COGNITIVO_2026_11_20.md) conserva las fuentes del experto y sus originales. Se verificaron la reversión y las protecciones SQL completas sobre copia poblada. Resultado del checkout: **91 tablas de negocio y 16 técnicas**. Permanecen pendientes otros bloques e integración final; la base operativa sigue sin estas migraciones.
 
+**Contexto clínico, sexto bloque.** Las [seis familias restantes](VERIFICACION_5FN_CONTEXTO_CLINICO_2026_11_20.md) conservan sujetos, documentos administrativos sin residente y cadenas Petersen. Integración: SQLite 19 casos/828 comprobaciones; PostgreSQL 12/663, con omisiones específicas de motor identificadas. Copia poblada sin pérdidas ni filas adicionales: **97 tablas de negocio y 16 técnicas**. Pendientes otros bloques y regresión ampliada; sin instalación operativa.
+
 **Auditoría de 5FN, 20/11/2026.** La [revisión de las 84 tablas de negocio](AUDITORIA_5FN_NEGOCIO_2026_11_20.md) confirma el inventario y documenta dependencias no clave en subconjuntos poblados, contratos condicionales y límites de la comprobación. **No certifica 5FN global ni modifica el esquema.** Incluye la matriz completa por relación y pruebas SQL de solo lectura.
 
 **Residente derivado en valoraciones funcionales y nutricionales, 18/11/2026.** La [decisión autorizada](DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md) reduce `valoraciones_profesionales` a 29 atributos. Se conserva el inventario de 100 tablas físicas. El reparto de 30 atributos por tabla corresponde al corte anterior.

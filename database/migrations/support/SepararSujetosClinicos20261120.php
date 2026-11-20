@@ -11,7 +11,7 @@ require_once __DIR__.'/SeparacionContextoResidente20261120.php';
 /** Transición fechada compartida: las familias se declaran explícitamente en cada migración. */
 final class SepararSujetosClinicos20261120 extends Migration
 {
-    public function __construct(private readonly array $tablas, private readonly array $esquemas, private readonly array $triggersReemplazados = []) {}
+    public function __construct(private readonly array $tablas, private readonly array $esquemas, private readonly array $triggersReemplazados = [], private readonly array $guardasSuspendidasPostgres = []) {}
 
     public function up(): void
     {
@@ -109,6 +109,12 @@ final class SepararSujetosClinicos20261120 extends Migration
             $triggers = SeparacionContextoResidente20261120::suspenderSQLite();
             if (! $separar && $pg) {
                 $this->guardas($esquemas, false);
+                foreach ($this->guardasSuspendidasPostgres as $nombre => $tabla) {
+                    if (DB::selectOne('SELECT tgenabled FROM pg_trigger WHERE tgname=? AND tgrelid=to_regclass(?)', [$nombre, 'public.'.$tabla])?->tgenabled !== 'O') {
+                        throw new RuntimeException('La guarda histórica no está habilitada conforme al contrato.');
+                    }
+                    DB::statement('ALTER TABLE '.$tabla.' DISABLE TRIGGER '.$nombre);
+                }
             }
             foreach ($this->tablas as $tabla => [$pk,$directa]) {
                 $e = $esquemas[$tabla];
@@ -121,6 +127,9 @@ final class SepararSujetosClinicos20261120 extends Migration
                     $crear = $separar ? SeparacionContextoResidente20261120::crearSinResidente($tabla, $e) : $e['crear'];
                     if ($separar) {
                         $crear = preg_replace('/^(CREATE TABLE\s+"?'.$tabla.'"?\s*\()/i', '$1 cod_contexto_directo VARCHAR(20) GENERATED ALWAYS AS (CASE WHEN cod_atencion IS NULL THEN '.$pk.' ELSE NULL END) STORED UNIQUE, ', $crear, 1);
+                        if ($tabla === 'valoraciones_petersen_originales') {
+                            $crear = substr($crear, 0, -1).', CONSTRAINT ctx20_petersen_anterior_f FOREIGN KEY (cod_valoracion_anterior) REFERENCES '.$tabla.'('.$pk.') ON DELETE RESTRICT)';
+                        }
                     }
                     $campos = array_values(array_filter($e['columnas_insertables'], fn ($c) => ! $separar || $c !== 'cod_residente'));
                     $origen = $this->lectura($tabla, $e, $separar)->select(array_map(fn ($c) => 't.'.$c, $campos));
@@ -158,6 +167,11 @@ final class SepararSujetosClinicos20261120 extends Migration
             }
             if ($separar) {
                 $this->guardas($esquemas, true);
+            }
+            if (! $separar && $pg) {
+                foreach ($this->guardasSuspendidasPostgres as $nombre => $tabla) {
+                    DB::statement('ALTER TABLE '.$tabla.' ENABLE TRIGGER '.$nombre);
+                }
             }
             foreach ($this->tablas as $tabla => [$pk,$directa]) {
                 $consulta = $this->lectura($tabla, $esquemas[$tabla], ! $separar);
@@ -207,7 +221,13 @@ final class SepararSujetosClinicos20261120 extends Migration
             DB::statement('ALTER TABLE '.$tabla.' DROP COLUMN cod_residente');
             [$pk] = $this->tablas[$tabla];
             DB::statement('ALTER TABLE '.$tabla.' ADD COLUMN cod_contexto_directo VARCHAR(20) GENERATED ALWAYS AS (CASE WHEN cod_atencion IS NULL THEN '.$pk.' ELSE NULL END) STORED UNIQUE');
+            if ($tabla === 'valoraciones_petersen_originales') {
+                DB::statement('ALTER TABLE '.$tabla.' ADD CONSTRAINT ctx20_petersen_anterior_f FOREIGN KEY (cod_valoracion_anterior) REFERENCES '.$tabla.'('.$pk.') ON DELETE RESTRICT');
+            }
         } else {
+            if ($tabla === 'valoraciones_petersen_originales') {
+                DB::statement('ALTER TABLE '.$tabla.' DROP CONSTRAINT ctx20_petersen_anterior_f');
+            }
             DB::statement('ALTER TABLE '.$tabla.' ADD COLUMN cod_residente VARCHAR(20)');
             [$pk] = $this->tablas[$tabla];
             DB::statement('UPDATE '.$tabla.' SET cod_residente=(SELECT s.cod_residente FROM ctx20_copia_'.$tabla.' s WHERE s.'.$pk.'='.$tabla.'.'.$pk.')');
@@ -246,11 +266,15 @@ final class SepararSujetosClinicos20261120 extends Migration
             if ($tabla === 'mediciones_clinicas') {
                 $fallos[] = 'NEW.cod_valoracion_origen IS NOT NULL AND NOT EXISTS (SELECT 1 FROM mediciones_clinicas o LEFT JOIN atenciones a ON a.cod_atencion=o.cod_atencion LEFT JOIN '.$directa.' d ON d.'.$pk.'=o.'.$pk.' WHERE o.cod_valoracion_dolor=NEW.cod_valoracion_origen AND COALESCE(a.cod_residente,d.cod_residente)='.$r.')';
             }
+            if ($tabla === 'valoraciones_petersen_originales') {
+                $fallos[] = 'NEW.cod_valoracion_anterior IS NOT NULL AND NOT EXISTS (SELECT 1 FROM '.$tabla.' o LEFT JOIN atenciones a ON a.cod_atencion=o.cod_atencion LEFT JOIN '.$directa.' d ON d.'.$pk.'=o.'.$pk.' WHERE o.'.$pk.'=NEW.cod_valoracion_anterior AND o.elemento=NEW.elemento AND COALESCE(a.cod_residente,d.cod_residente)='.$r.')';
+            }
             $condicion = implode(' OR ', array_map(fn ($v) => '('.$v.')', $fallos));
             $padre = 'OLD.cod_residente <> NEW.cod_residente AND ('.($pg ? "current_setting('transaction_isolation') <> 'read committed' OR " : '').'EXISTS (SELECT 1 FROM '.$tabla.' WHERE cod_atencion=OLD.cod_atencion))';
             if ($pg) {
                 if ($crear) {
-                    DB::unprepared('CREATE FUNCTION '.$id.'() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE v_residente TEXT; BEGIN IF TG_OP=\'UPDATE\' AND OLD.cod_atencion IS DISTINCT FROM NEW.cod_atencion THEN RAISE EXCEPTION \'El episodio clínico original se conserva\' USING ERRCODE=\'23514\'; END IF; PERFORM 1 FROM atenciones WHERE cod_atencion=NEW.cod_atencion FOR SHARE; v_residente := '.$this->residenteNuevo($directa, $pk).'; IF ('.$condicion.") THEN RAISE EXCEPTION 'El registro clínico no cumple su contexto y contrato original' USING ERRCODE='23514'; END IF; RETURN NEW; END; $$;");
+                    $bloqueoAnterior = $tabla === 'valoraciones_petersen_originales' ? 'PERFORM 1 FROM '.$tabla.' WHERE '.$pk.'=NEW.cod_valoracion_anterior FOR SHARE; ' : '';
+                    DB::unprepared('CREATE FUNCTION '.$id.'() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE v_residente TEXT; BEGIN IF TG_OP=\'UPDATE\' AND OLD.cod_atencion IS DISTINCT FROM NEW.cod_atencion THEN RAISE EXCEPTION \'El episodio clínico original se conserva\' USING ERRCODE=\'23514\'; END IF; PERFORM 1 FROM atenciones WHERE cod_atencion=NEW.cod_atencion FOR SHARE; '.$bloqueoAnterior.'v_residente := '.$this->residenteNuevo($directa, $pk).'; IF ('.$condicion.") THEN RAISE EXCEPTION 'El registro clínico no cumple su contexto y contrato original' USING ERRCODE='23514'; END IF; RETURN NEW; END; $$;");
                     DB::statement('CREATE TRIGGER '.$id.' BEFORE INSERT OR UPDATE ON '.$tabla.' FOR EACH ROW EXECUTE FUNCTION '.$id.'()');
                     DB::unprepared('CREATE FUNCTION '.$id.'_directo() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_OP<>\'INSERT\' OR EXISTS (SELECT 1 FROM '.$tabla.' WHERE '.$pk.'=NEW.'.$pk.") THEN RAISE EXCEPTION 'El sujeto original del registro se conserva' USING ERRCODE='23514'; END IF; RETURN NEW; END; $$;");
                     DB::statement('CREATE TRIGGER '.$id.'_directo BEFORE INSERT OR UPDATE OR DELETE ON '.$directa.' FOR EACH ROW EXECUTE FUNCTION '.$id.'_directo()');
