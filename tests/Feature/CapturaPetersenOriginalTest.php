@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
+use App\Compartido\Infraestructura\Persistencia\ContextosResidente;
 use App\Models\AplicacionInstrumento;
 use App\Models\Area;
 use App\Models\Atencion;
@@ -20,15 +22,19 @@ use App\Models\User;
 use App\Models\ValoracionPetersenOriginal;
 use App\Models\ValoracionPsicologica;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GestionarReglasExpertas;
+use App\Modulos\ApoyoDecision\Aplicacion\Acciones\GuardarResultadoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarConocimientoPetersen;
 use App\Modulos\ApoyoDecision\Aplicacion\Acciones\RegistrarValoracionPetersenOriginal;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarPetersenInstitucional;
+use App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional;
 use App\Modulos\ApoyoDecision\Aplicacion\Consultas\PrepararEvaluacionInstitucional;
 use App\Modulos\ApoyoDecision\Presentacion\Livewire\Paginas\CapturaPetersenPanel;
 use Carbon\CarbonImmutable;
+use Database\Seeders\PermisoEjecucionInstitucionalSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
+use ExpertoNominal\MembresiasSQL;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -36,10 +42,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
+use MotorExperto\conservacion\CapturaInstrumentalCanonica;
+use MotorExperto\conservacion\CodecInstantanea;
 use MotorExperto\conservacion\InstantaneaEvaluacionInstitucional;
 use MotorExperto\conservacion\InstantaneaPetersen;
-use ExpertoNominal\MembresiasSQL;
+use MotorExperto\hechos\ContextoEjecucion;
+use MotorExperto\instrumentos\RegistroMetodosInstrumentales;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -281,8 +289,8 @@ final class CapturaPetersenOriginalTest extends TestCase
         $d = $dto->contenido;
         $d['procedencia_valoraciones'][0]['registrado_en'] = '2026-10-19T11:59:59.999999-04:00';
         // La inferencia y las FK nominales no bastan para detectar esta fecha histórica falsa.
-        $alterada = InstantaneaPetersen::verificar($d, \MotorExperto\conservacion\CodecInstantanea::huella(
-            \MotorExperto\conservacion\CapturaInstrumentalCanonica::ordenar($d)));
+        $alterada = InstantaneaPetersen::verificar($d, CodecInstantanea::huella(
+            CapturaInstrumentalCanonica::ordenar($d)));
         try {
             $repo->guardar('MEMBRESIAS-TEST', $alterada);
             self::fail('La fecha debe coincidir con el registro SQL original.');
@@ -320,7 +328,8 @@ final class CapturaPetersenOriginalTest extends TestCase
         $ajeno['cod_valoracion_petersen'] = 'JUICIO-AJENO-TEST';
         $ajeno['solicitud_uuid'] = (string) Str::uuid();
         $ajeno['cod_residente'] = Residente::factory()->create(['estado' => 'ADMITIDO'])->getKey();
-        DB::table('valoraciones_petersen_originales')->insert($ajeno);
+        unset($ajeno['cod_contexto_directo']);
+        ContextosResidente::insertar(DB::connection(), 'valoraciones_petersen_originales', [$ajeno]);
         try {
             $repo->guardar('MEMBRESIAS-TEST', $dto, static function (PDO $db): void {
                 $q = $db->prepare('INSERT INTO juicios_petersen_adquiridos(cod_juicio_adquirido,cod_evaluacion_experta,cod_valoracion_petersen,
@@ -372,9 +381,9 @@ final class CapturaPetersenOriginalTest extends TestCase
         $d['valoraciones'] = $d['procedencia_valoraciones'] = $d['membresias_soportes'] = $d['soportes_originales'] = [];
         $d['adquisicion']['valoraciones_al_corte'] = 0;
         // Crear una captura vacía legítima ejecuta el motor con cero juicios; no altera una salida ya emitida.
-        $vacia = InstantaneaPetersen::crear(new \MotorExperto\hechos\ContextoEjecucion(
+        $vacia = InstantaneaPetersen::crear(new ContextoEjecucion(
             $d['contexto']['evaluacion'], $d['contexto']['residente'], $d['contexto']['version'],
-            \MotorExperto\conservacion\CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte'])),
+            CodecInstantanea::leerFecha('corte', (object) $d['contexto']['fecha_corte'])),
             [], null, null, $this->usuario->getKey(), $d['adquisicion'], soportesOriginales: []);
         self::assertTrue($repo->guardar('MEMBRESIAS-TEST', $vacia));
         $fila = (array) DB::table('evaluaciones_expertas')->where('cod_evaluacion_experta', 'MEMBRESIAS-TEST')->sole();
@@ -693,7 +702,7 @@ final class CapturaPetersenOriginalTest extends TestCase
             'atencion_ajena' => ['cod_atencion' => $atencion->getKey()],
             default => ['estado' => 'INACTIVO'],
         };
-        $this->mock(\App\Compartido\Aplicacion\Contratos\ArchivosAplicacion::class, static function ($archivos): void {
+        $this->mock(ArchivosAplicacion::class, static function ($archivos): void {
             $archivos->shouldNotReceive('existe');
             $archivos->shouldNotReceive('hash');
         });
@@ -807,8 +816,8 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertSame($patron, $dto->contenido['petersen']['contenido']['salida']['patron']);
         self::assertCount(5, $dto->contenido['instrumental']['contenido']['capturas']['capturas']);
         (require base_path('database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php'))->up();
-        $this->seed(\Database\Seeders\PermisoEjecucionInstitucionalSeeder::class);
-        $guardado = app(\App\Modulos\ApoyoDecision\Aplicacion\Acciones\GuardarResultadoInstitucional::class)->ejecutar($this->usuario, $this->residente, (string) Str::uuid());
+        $this->seed(PermisoEjecucionInstitucionalSeeder::class);
+        $guardado = app(GuardarResultadoInstitucional::class)->ejecutar($this->usuario, $this->residente, (string) Str::uuid());
         self::assertSame($patron, $guardado['contenido']['patron']);
         self::assertTrue($guardado['persistido']);
         self::assertNotEmpty($guardado['contenido']['hechos']);
@@ -825,7 +834,7 @@ final class CapturaPetersenOriginalTest extends TestCase
         self::assertNull($sinPerfil['patron']);
         self::assertSame('U', $sinPerfil['dominios']['COG-MEM']['estado']);
         DB::table('respuestas_instrumento')->where('cod_aplicacion', reset($mediciones))->update(['valor_numero' => 0]);
-        $historico = app(\App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarResultadoInstitucional::class)->consultar($this->usuario, $this->residente, $guardado['contenido']['id']);
+        $historico = app(ConsultarResultadoInstitucional::class)->consultar($this->usuario, $this->residente, $guardado['contenido']['id']);
         self::assertSame($guardado, $historico, 'El archivo de reglas y los cambios actuales no alteran el resultado emitido.');
         $consultas = 0;
         DB::listen(static function () use (&$consultas): void {

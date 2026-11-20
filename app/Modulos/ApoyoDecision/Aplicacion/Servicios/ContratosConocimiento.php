@@ -151,10 +151,9 @@ final class ContratosConocimiento
     private function mapeos(string $version): Collection
     {
         return DB::table('mapeos_variables_fuente as m')
-            ->join('nodos_semanticos as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
+            ->join('declaraciones_nodo as v', 'v.cod_variable_experta', '=', 'm.cod_variable_experta')
             ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'v.cod_nodo_semantico')
             ->join('fuentes_datos_expertas as f', 'f.cod_fuente_dato_experta', '=', 'm.cod_fuente_dato_experta')
-            ->where('v.cod_version_modelo', $version)
             ->where('n.cod_version_modelo', $version)->where('f.cod_version_modelo', $version)
             ->get(['m.cod_mapeo_variable_fuente', 'm.tipo_extraccion', 'm.campo_valor', 'm.clave_selector',
                 'n.codigo_semantico', 'f.codigo_fuente']);

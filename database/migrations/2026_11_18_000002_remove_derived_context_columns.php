@@ -20,7 +20,7 @@ return new class extends Migration
         DB::transaction(function (): void {
             $this->bloquear();
             foreach (self::COLUMNAS as $tabla => $campo) {
-                $origen = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::origen(DB::connection(), $tabla);
+                $origen = ($tabla === 'mapeos_variables_fuente' ? DB::table('nodos_semanticos')->whereNotNull('cod_variable_experta')->select(['cod_variable_experta as clave_relacion', 'cod_version_modelo']) : \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::origen(DB::connection(), $tabla));
                 $clave = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::CONTRATOS[$tabla][1];
                 if (DB::table($tabla.' as actual')->leftJoinSub($origen, 'origen', 'origen.clave_relacion', '=', 'actual.'.$clave)
                     ->where(fn ($q) => $q->whereNull('origen.'.$campo)->orWhereColumn('actual.'.$campo, '<>', 'origen.'.$campo))->exists()) {
@@ -62,7 +62,7 @@ return new class extends Migration
             DB::statement('DROP INDEX se03_u1');
             foreach (array_reverse(self::COLUMNAS, true) as $tabla => $campo) {
                 Schema::table($tabla, fn (Blueprint $t) => $t->string($campo, 20)->nullable());
-                $origen = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::origen(DB::connection(), $tabla);
+                $origen = ($tabla === 'mapeos_variables_fuente' ? DB::table('nodos_semanticos')->whereNotNull('cod_variable_experta')->select(['cod_variable_experta as clave_relacion', 'cod_version_modelo']) : \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::origen(DB::connection(), $tabla));
                 $clave = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::CONTRATOS[$tabla][1];
                 $sql = $origen->toSql();
                 DB::update('UPDATE '.$tabla.' SET '.$campo.' = (SELECT '.$campo.' FROM ('.$sql.') AS origen WHERE origen.clave_relacion = '.$tabla.'.'.$clave.')', $origen->getBindings());

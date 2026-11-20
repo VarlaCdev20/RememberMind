@@ -10,7 +10,7 @@ class CriterioDominioResultado extends ModeloBloqueExperto
 {
     protected const BLOQUE = 'criterios_dominios_resultado';
 
-    protected $table = 'nodos_semanticos';
+    protected $table = 'declaraciones_nodo';
 
     protected $primaryKey = 'cod_criterio_dominio_resultado';
 

@@ -10,7 +10,7 @@ class VariableExperta extends ModeloBloqueExperto
 {
     protected const BLOQUE = 'variables_expertas';
 
-    protected $table = 'nodos_semanticos';
+    protected $table = 'declaraciones_nodo';
 
     protected $primaryKey = 'cod_variable_experta';
 

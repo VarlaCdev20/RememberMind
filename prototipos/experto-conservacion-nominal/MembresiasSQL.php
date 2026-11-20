@@ -201,7 +201,16 @@ final class MembresiasSQL
             }
         }
 
-        return implode(";\n", $sql).";\n";
+        return self::conSujetoCanonico(implode(";\n", $sql).";\n");
+    }
+
+    /** El ensayo consume el mismo sujeto conservado por la atención o el vínculo directo. */
+    private static function conSujetoCanonico(string $sql): string
+    {
+        return str_replace('valoraciones_petersen_originales v', '(SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v', $sql);
     }
 
     /** Retira únicamente el ensayo desechable, incluso poblado; nunca es un rollback institucional. */
@@ -269,8 +278,8 @@ final class MembresiasSQL
             }
             $juiciosAdquiridos = [];
             foreach ($p['procedencia_valoraciones'] as $orden => $original) {
-                $q = $this->db->prepare('SELECT '.implode(',', array_keys($original))
-                    .' FROM valoraciones_petersen_originales WHERE cod_valoracion_petersen=?');
+                $q = $this->db->prepare(self::conSujetoCanonico('SELECT '.implode(',', array_keys($original))
+                    .' FROM valoraciones_petersen_originales v WHERE cod_valoracion_petersen=?'));
                 $q->execute([$original['cod_valoracion_petersen']]);
                 $actual = $q->fetch(PDO::FETCH_ASSOC);
                 if ($actual === false || C::ordenar(array_diff_key($actual, array_flip(['fecha_hora', 'registrado_en'])))
@@ -358,10 +367,10 @@ final class MembresiasSQL
 
     private function leerDentro(string $evaluacion): array
     {
-        $q = $this->db->prepare('SELECT j.*,v.cod_residente,v.cod_personal,v.cod_usuario_registro,v.elemento,v.tipo_registro,
+        $q = $this->db->prepare(self::conSujetoCanonico('SELECT j.*,v.cod_residente,v.cod_personal,v.cod_usuario_registro,v.elemento,v.tipo_registro,
             v.cod_valoracion_anterior,v.cod_documento_clinico,v.localizador_fuente FROM juicios_petersen_adquiridos j
             JOIN valoraciones_petersen_originales v ON v.cod_valoracion_petersen=j.cod_valoracion_petersen
-            WHERE j.cod_evaluacion_experta=? ORDER BY j.orden_procedencia');
+            WHERE j.cod_evaluacion_experta=? ORDER BY j.orden_procedencia'));
         $q->execute([$evaluacion]);
         $juicios = $q->fetchAll(PDO::FETCH_ASSOC);
         $procedencia = $membresias = [];

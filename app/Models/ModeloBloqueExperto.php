@@ -26,6 +26,25 @@ abstract class ModeloBloqueExperto extends ModeloExperto
         });
     }
 
+    /** Las lecturas sin scopes también deben conservar la entidad lógica y su contexto. */
+    public function fresh($with = [])
+    {
+        if (! $this->exists) return null;
+        return $this->setKeysForSelectQuery($this->consultaOriginal())
+            ->useWritePdo()->with(is_string($with) ? func_get_args() : $with)->first();
+    }
+
+    protected function refreshUsingQuery(Builder $query)
+    {
+        $query->fromSub(BloquesExpertos::consulta(static::BLOQUE, $this->getConnectionName()), $this->getTable());
+        return parent::refreshUsingQuery($query);
+    }
+
+    private function consultaOriginal(): Builder
+    {
+        return $this->newQueryWithoutScopes()->fromSub(BloquesExpertos::consulta(static::BLOQUE, $this->getConnectionName()), $this->getTable());
+    }
+
     protected function performInsert(Builder $query)
     {
         if ($this->fireModelEvent('creating') === false) {

@@ -30,7 +30,10 @@ CREATE TABLE soportes_petersen_adquiridos (
 CREATE INDEX mp_juicio_original_i ON juicios_petersen_adquiridos(cod_valoracion_petersen);
 CREATE INDEX mp_soporte_original_i ON soportes_petersen_adquiridos(cod_soporte_petersen);
 CREATE TRIGGER mp_mismo_residente_insert BEFORE INSERT ON juicios_petersen_adquiridos
-                    WHEN NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN valoraciones_petersen_originales v ON v.cod_residente=e.cod_residente
+                    WHEN NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN (SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v ON v.cod_residente=e.cod_residente
                         WHERE e.cod_evaluacion_experta=NEW.cod_evaluacion_experta AND v.cod_valoracion_petersen=NEW.cod_valoracion_petersen)
                         OR EXISTS(SELECT 1 FROM soportes_petersen_adquiridos s JOIN soportes_valoracion_petersen o ON o.cod_soporte_petersen=s.cod_soporte_petersen
                             WHERE s.cod_juicio_adquirido=NEW.cod_juicio_adquirido AND o.cod_valoracion_petersen<>NEW.cod_valoracion_petersen)
@@ -40,7 +43,10 @@ CREATE TRIGGER mp_mismo_juicio_insert BEFORE INSERT ON soportes_petersen_adquiri
                         WHERE j.cod_juicio_adquirido=NEW.cod_juicio_adquirido AND s.cod_soporte_petersen=NEW.cod_soporte_petersen)
                     BEGIN SELECT RAISE(ABORT,'Soporte de otro juicio'); END;
 CREATE TRIGGER mp_mismo_residente_update BEFORE UPDATE ON juicios_petersen_adquiridos
-                    WHEN NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN valoraciones_petersen_originales v ON v.cod_residente=e.cod_residente
+                    WHEN NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN (SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v ON v.cod_residente=e.cod_residente
                         WHERE e.cod_evaluacion_experta=NEW.cod_evaluacion_experta AND v.cod_valoracion_petersen=NEW.cod_valoracion_petersen)
                         OR EXISTS(SELECT 1 FROM soportes_petersen_adquiridos s JOIN soportes_valoracion_petersen o ON o.cod_soporte_petersen=s.cod_soporte_petersen
                             WHERE s.cod_juicio_adquirido=NEW.cod_juicio_adquirido AND o.cod_valoracion_petersen<>NEW.cod_valoracion_petersen)
@@ -81,7 +87,10 @@ CREATE TRIGGER mp_guardar_cabecera BEFORE UPDATE ON evaluaciones_expertas
             OR (SELECT count(*) FROM juicios_petersen_adquiridos j WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta)<>NEW.membresias_petersen_juicios
             OR (SELECT count(*) FROM soportes_petersen_adquiridos s JOIN juicios_petersen_adquiridos j ON j.cod_juicio_adquirido=s.cod_juicio_adquirido
                 WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta)<>NEW.membresias_petersen_soportes
-            OR EXISTS(SELECT 1 FROM juicios_petersen_adquiridos j JOIN valoraciones_petersen_originales v ON v.cod_valoracion_petersen=j.cod_valoracion_petersen
+            OR EXISTS(SELECT 1 FROM juicios_petersen_adquiridos j JOIN (SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v ON v.cod_valoracion_petersen=j.cod_valoracion_petersen
                 WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta AND v.cod_residente<>NEW.cod_residente)
             OR EXISTS(SELECT 1 FROM soportes_petersen_adquiridos s JOIN juicios_petersen_adquiridos j ON j.cod_juicio_adquirido=s.cod_juicio_adquirido
                 JOIN soportes_valoracion_petersen o ON o.cod_soporte_petersen=s.cod_soporte_petersen

@@ -6,6 +6,7 @@ use App\Compartido\Aplicacion\Contratos\ArchivosAplicacion;
 use App\Models\Documento;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -24,8 +25,9 @@ final class RegistrarDocumentoHttp
             'archivo' => ['required', 'file', 'max:20480'],
             'fecha_vencimiento' => ['nullable', 'date'],
             'observacion' => ['nullable', 'string'],
-            'cod_documento_anterior' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento_ref')
-                ->where('cod_residente', $residente->getKey())],
+            'cod_documento_anterior' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento')
+                ->where(fn ($query) => $query->whereIn('cod_documento', RegistrosConsumo::consulta('documentos')
+                    ->select('cod_documento')->where('cod_residente', $residente->getKey())))],
         ], ['cod_documento_anterior.exists' => 'Selecciona un documento anterior del expediente de este residente.'])->validate();
         $archivo = data_get($entrada, 'archivo');
         $ruta = $this->ficheros->recibir($archivo, 'documentos', 'local');

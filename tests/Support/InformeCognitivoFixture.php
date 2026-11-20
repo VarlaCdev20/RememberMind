@@ -85,6 +85,13 @@ final class InformeCognitivoFixture
 
             return;
         }
+        if (\App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\DeclaracionesNodo::admite($tabla)) {
+            if ($tabla === 'variables_expertas') {
+                $fila += ['tipo_semantico' => 'F4_'.$fila['cod_variable_experta'], 'papel_inferencial' => 'F4_'.$fila['cod_variable_experta']];
+            }
+            BloquesExpertos::insertar($tabla, $fila + ['estado' => 'ACTIVO', 'fecha_hora_creacion' => now()->subDay()->format('Y-m-d H:i:s'), 'cod_usuario_creacion' => auth()->id()]);
+            return;
+        }
         $bloque = BloquesExpertos::DEFINICIONES[$tabla] ?? null;
         $columnas = Schema::getColumns($bloque['tabla'] ?? $tabla);
         if ($bloque !== null) {

@@ -6,6 +6,7 @@ use App\Models\Consentimiento;
 use App\Models\Residente;
 use App\Models\ResidenteContacto;
 use App\Models\User;
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Models\Visita;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -33,8 +34,9 @@ final class RegistrarVisitaConsentimientoHttp
         $admision = $residente->admisiones()->where('estado', 'ACTIVA')->latest('fecha_hora_admision')->firstOrFail();
         $datos = Validator::make($entrada, [
             'cod_residente_contacto' => ['nullable', 'exists:residentes_contactos,cod_residente_contacto'],
-            'cod_documento' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento_ref')
-                ->where('cod_residente', $residente->getKey())],
+            'cod_documento' => ['nullable', 'string', Rule::exists('documentos', 'cod_documento')
+                ->where(fn ($query) => $query->whereIn('cod_documento', RegistrosConsumo::consulta('documentos')
+                    ->select('cod_documento')->where('cod_residente', $residente->getKey())))],
             'tipo_consentimiento' => ['required', 'string', 'max:80'],
             'firma_residente' => ['required', 'boolean'],
             'fecha_consentimiento' => ['nullable', 'date'],

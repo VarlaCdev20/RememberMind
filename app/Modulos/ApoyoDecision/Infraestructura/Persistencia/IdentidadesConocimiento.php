@@ -49,11 +49,11 @@ final class IdentidadesConocimiento implements \App\Modulos\ApoyoDecision\Aplica
             }
             foreach (DB::getSchemaBuilder()->getForeignKeys($tabla) as $fk) {
                 foreach ($fk['columns'] as $i => $campo) {
-                    if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_variable_experta') {
+                    if ($fk['foreign_table'] === 'declaraciones_nodo' && $fk['foreign_columns'][$i] === 'cod_variable_experta') {
                         $referencias[$tabla][$campo] = 'variables_expertas';
                         continue;
                     }
-                    if ($fk['foreign_table'] === 'nodos_semanticos' && $fk['foreign_columns'][$i] === 'cod_criterio_dominio_resultado') {
+                    if ($fk['foreign_table'] === 'declaraciones_nodo' && $fk['foreign_columns'][$i] === 'cod_criterio_dominio_resultado') {
                         $referencias[$tabla][$campo] = 'criterios_dominios_resultado';
                         continue;
                     }

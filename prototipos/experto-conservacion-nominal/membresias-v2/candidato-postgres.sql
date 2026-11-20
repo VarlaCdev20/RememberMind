@@ -52,7 +52,10 @@ CREATE FUNCTION mp_proteger_hija() RETURNS trigger LANGUAGE plpgsql AS $$
                     SELECT membresias_petersen_estado INTO actual FROM evaluaciones_expertas WHERE cod_evaluacion_experta=codigo FOR UPDATE;
                     IF actual IS DISTINCT FROM 'ABIERTA' THEN RAISE EXCEPTION 'Membresía fuera de adquisición abierta' USING ERRCODE='55000'; END IF;
                     IF TG_TABLE_NAME='juicios_petersen_adquiridos' AND TG_OP<>'DELETE' THEN
-                        IF NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN valoraciones_petersen_originales v ON v.cod_residente=e.cod_residente
+                        IF NOT EXISTS(SELECT 1 FROM evaluaciones_expertas e JOIN (SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v ON v.cod_residente=e.cod_residente
                             WHERE e.cod_evaluacion_experta=NEW.cod_evaluacion_experta AND v.cod_valoracion_petersen=NEW.cod_valoracion_petersen)
                             OR EXISTS(SELECT 1 FROM soportes_petersen_adquiridos s JOIN soportes_valoracion_petersen o ON o.cod_soporte_petersen=s.cod_soporte_petersen
                                 WHERE s.cod_juicio_adquirido=NEW.cod_juicio_adquirido AND o.cod_valoracion_petersen<>NEW.cod_valoracion_petersen)
@@ -81,7 +84,10 @@ CREATE FUNCTION mp_proteger_cabecera() RETURNS trigger LANGUAGE plpgsql AS $$
             OR (SELECT count(*) FROM juicios_petersen_adquiridos j WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta)<>NEW.membresias_petersen_juicios
             OR (SELECT count(*) FROM soportes_petersen_adquiridos s JOIN juicios_petersen_adquiridos j ON j.cod_juicio_adquirido=s.cod_juicio_adquirido
                 WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta)<>NEW.membresias_petersen_soportes
-            OR EXISTS(SELECT 1 FROM juicios_petersen_adquiridos j JOIN valoraciones_petersen_originales v ON v.cod_valoracion_petersen=j.cod_valoracion_petersen
+            OR EXISTS(SELECT 1 FROM juicios_petersen_adquiridos j JOIN (SELECT p.*,
+            COALESCE((SELECT a.cod_residente FROM atenciones a WHERE a.cod_atencion=p.cod_atencion),
+                (SELECT d.cod_residente FROM residentes_valoraciones_petersen d WHERE d.cod_valoracion_petersen=p.cod_valoracion_petersen)) AS cod_residente
+            FROM valoraciones_petersen_originales p) v ON v.cod_valoracion_petersen=j.cod_valoracion_petersen
                 WHERE j.cod_evaluacion_experta=NEW.cod_evaluacion_experta AND v.cod_residente<>NEW.cod_residente)
             OR EXISTS(SELECT 1 FROM soportes_petersen_adquiridos s JOIN juicios_petersen_adquiridos j ON j.cod_juicio_adquirido=s.cod_juicio_adquirido
                 JOIN soportes_valoracion_petersen o ON o.cod_soporte_petersen=s.cod_soporte_petersen

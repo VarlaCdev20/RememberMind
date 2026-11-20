@@ -6,8 +6,8 @@ declare(strict_types=1);
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 require __DIR__.'/MembresiasSQL.php';
 
-use MotorExperto\conservacion\MembresiasOriginalesPetersen as M;
 use ExpertoNominal\MembresiasSQL;
+use MotorExperto\conservacion\MembresiasOriginalesPetersen as M;
 
 $check = ($argv[1] ?? null) === '--check';
 if (count($argv) > 2 || (isset($argv[1]) && ! $check)) {
@@ -17,7 +17,9 @@ $db = new PDO('sqlite::memory:', options: [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXC
 $db->exec('PRAGMA foreign_keys=ON');
 // Sólo referencias para introspección del DDL. La compatibilidad real se prueba sobre las migraciones Laravel desechables.
 $db->exec('CREATE TABLE evaluaciones_expertas(cod_evaluacion_experta VARCHAR(20) PRIMARY KEY,cod_residente VARCHAR(20));
-    CREATE TABLE valoraciones_petersen_originales(cod_valoracion_petersen VARCHAR(20) PRIMARY KEY,cod_residente VARCHAR(20));
+    CREATE TABLE atenciones(cod_atencion VARCHAR(20) PRIMARY KEY,cod_residente VARCHAR(20));
+    CREATE TABLE valoraciones_petersen_originales(cod_valoracion_petersen VARCHAR(20) PRIMARY KEY,cod_atencion VARCHAR(20));
+    CREATE TABLE residentes_valoraciones_petersen(cod_valoracion_petersen VARCHAR(20) PRIMARY KEY,cod_residente VARCHAR(20));
     CREATE TABLE soportes_valoracion_petersen(cod_soporte_petersen VARCHAR(20) PRIMARY KEY,cod_valoracion_petersen VARCHAR(20))');
 $sqlite = MembresiasSQL::ddl('sqlite');
 $db->exec($sqlite);

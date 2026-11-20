@@ -38,11 +38,6 @@ final class BloquesExpertos
         'trazas_inferencia' => ['tabla' => 'evaluacion_criterios', 'propietario' => 'cod_evaluacion_criterio', 'id' => 'cod_traza_inferencia',
             'campos' => ['cod_traza_inferencia' => 'cod_traza_inferencia', 'cod_evaluacion_criterio' => 'cod_evaluacion_criterio',
                 'estado_inferencia' => 'traza_estado_inferencia', 'fecha_hora_inicio' => 'traza_fecha_hora_inicio', 'fecha_hora_fin' => 'traza_fecha_hora_fin']],
-        'variables_expertas' => ['tabla' => 'nodos_semanticos', 'propietario' => 'cod_nodo_semantico', 'id' => 'cod_variable_experta',
-            'campos' => ['cod_variable_experta' => 'cod_variable_experta', 'cod_version_modelo' => 'cod_version_modelo', 'cod_nodo_semantico' => 'cod_nodo_semantico',
-                'cod_nodo_propietario_primario' => 'cod_nodo_propietario_primario', 'cod_dominio_valores' => 'cod_dominio_valores',
-                'tipo_semantico' => 'tipo_semantico', 'papel_inferencial' => 'papel_inferencial', 'estado' => 'estado_variable',
-                'fecha_hora_creacion' => 'fecha_hora_creacion_variable', 'cod_usuario_creacion' => 'cod_usuario_creacion_variable', 'observacion' => 'observacion_variable']],
         'clasificaciones_dcl_instantanea' => ['tabla' => 'evaluaciones_expertas', 'propietario' => 'cod_evaluacion_experta', 'id' => 'cod_clasificacion_dcl_instantanea',
             'campos' => ['cod_clasificacion_dcl_instantanea' => 'cod_clasificacion_dcl_instantanea', 'cod_evaluacion_experta' => 'cod_evaluacion_experta',
                 'cod_funcionalidad_instantanea' => 'cod_funcionalidad_instantanea', 'version_contrato' => 'dcl_version_contrato',
@@ -52,21 +47,14 @@ final class BloquesExpertos
                 'funcionalidad_revisor_sintetico_id' => 'funcionalidad_revisor_sintetico_id', 'funcionalidad_justificacion' => 'funcionalidad_justificacion']],
     ];
 
-    private const CRITERIO_DOMINIO = [
-        'tabla' => 'nodos_semanticos', 'propietario' => 'cod_nodo_criterio', 'id' => 'cod_criterio_dominio_resultado',
-        'campos' => ['cod_criterio_dominio_resultado' => 'cod_criterio_dominio_resultado', 'cod_nodo_criterio' => 'cod_nodo_semantico',
-            'cod_dominio_valores' => 'criterio_cod_dominio_valores', 'estado' => 'criterio_estado',
-            'fecha_hora_creacion' => 'criterio_fecha_hora_creacion', 'cod_usuario_creacion' => 'criterio_cod_usuario_creacion',
-            'observacion' => 'criterio_observacion'],
-    ];
-
     private static function definicion(string $entidad): ?array
     {
-        return $entidad === 'criterios_dominios_resultado' ? self::CRITERIO_DOMINIO : (self::DEFINICIONES[$entidad] ?? null);
+        return self::DEFINICIONES[$entidad] ?? null;
     }
 
     public static function tablaFisica(string $entidad): string
     {
+        if (DeclaracionesNodo::admite($entidad)) return DeclaracionesNodo::TABLA;
         if (isset(self::TIPADOS[$entidad])) {
             return self::TIPADOS[$entidad][0];
         }
@@ -76,6 +64,7 @@ final class BloquesExpertos
 
     public static function columnasLogicas(string $entidad): ?array
     {
+        if (DeclaracionesNodo::admite($entidad)) return DeclaracionesNodo::columnas($entidad);
         if (isset(self::TIPADOS[$entidad])) {
             [, , , $clave, $columnas] = self::TIPADOS[$entidad];
 
@@ -88,6 +77,7 @@ final class BloquesExpertos
 
     public static function consulta(string $entidad, ?string $conexion = null, ?string $alias = null): Builder
     {
+        if (DeclaracionesNodo::admite($entidad)) return DeclaracionesNodo::consulta($entidad,$conexion,$alias);
         $db = DB::connection($conexion);
         if (isset(self::TIPADOS[$entidad])) {
             [$tabla, $codigo, $tipo, $clave, $columnas] = self::TIPADOS[$entidad];
@@ -113,6 +103,7 @@ final class BloquesExpertos
             return;
         }
         $filas = array_is_list($filas) ? $filas : [$filas];
+        if (DeclaracionesNodo::admite($entidad)) { DeclaracionesNodo::insertar($entidad,$filas,$conexion); return; }
         $db = DB::connection($conexion);
         if (isset(self::TIPADOS[$entidad])) {
             [$tabla, $codigo, $tipo, $clave] = self::TIPADOS[$entidad];

@@ -48,8 +48,8 @@ final class ColumnasRelacionadas
                 ->select(['p.cod_prescripcion as clave_relacion', 'a.cod_residente']),
             'relaciones_semanticas' => $db->table('nodos_semanticos')
                 ->select(['cod_nodo_semantico as clave_relacion', 'cod_version_modelo']),
-            'mapeos_variables_fuente' => $db->table('nodos_semanticos')->whereNotNull('cod_variable_experta')
-                ->select(['cod_variable_experta as clave_relacion', 'cod_version_modelo']),
+            'mapeos_variables_fuente' => $db->table('declaraciones_nodo as d')->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'd.cod_nodo_semantico')->whereNotNull('d.cod_variable_experta')
+                ->select(['d.cod_variable_experta as clave_relacion', 'n.cod_version_modelo']),
         };
     }
 

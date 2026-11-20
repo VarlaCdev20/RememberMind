@@ -67,12 +67,13 @@ try {
     $tablasCatalogo = ['reglas_expertas', 'versiones_modelo_experto', 'condiciones_regla_experta',
         'consecuencias_regla_experta', 'nodos_semanticos', 'valores_semanticos'];
     $catalogoDisponible = count(array_filter($tablasCatalogo, fn ($tabla) => $esquema->hasTable(BloquesExpertos::tablaFisica($tabla)))) === count($tablasCatalogo)
-        && $esquema->hasColumn('nodos_semanticos', 'cod_variable_experta');
+        && $esquema->hasTable('declaraciones_nodo');
     if ($catalogoDisponible) {
         $visibles = \App\Modulos\ApoyoDecision\Aplicacion\Consultas\ConsultarConocimientoAdministrativo::institucionales()
             ->pluck('cod_version_modelo')->all();
         $condiciones = $conexion->query()->fromSub(BloquesExpertos::consulta('condiciones_regla_experta', $conexion->getName()), 'c')
-            ->join('nodos_semanticos as n', 'n.cod_variable_experta', '=', 'c.cod_variable_experta')
+            ->joinSub(BloquesExpertos::consulta('variables_expertas', $conexion->getName()), 'dv', 'dv.cod_variable_experta', '=', 'c.cod_variable_experta')
+            ->join('nodos_semanticos as n', 'n.cod_nodo_semantico', '=', 'dv.cod_nodo_semantico')
             ->join('valores_semanticos as v', 'v.cod_valor_semantico', '=', 'c.cod_valor_semantico')
             ->orderBy('n.codigo_semantico')->get(['c.cod_regla_experta', 'n.codigo_semantico as variable', 'v.codigo_valor as valor_esperado'])
             ->groupBy('cod_regla_experta');

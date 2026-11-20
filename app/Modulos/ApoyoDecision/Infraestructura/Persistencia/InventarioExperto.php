@@ -25,6 +25,7 @@ final class InventarioExperto
     public const TABLAS = [
         'versiones_modelo_experto',
         'nodos_semanticos',
+        'declaraciones_nodo',
         'relaciones_semanticas',
         'dominios_valores_expertos',
         'valores_semanticos',

@@ -9,6 +9,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
+use RememberMind\Database\Migrations\BloquesExpertos20261022 as BloquesExpertos;
+
+require_once base_path('database/migrations/support/BloquesExpertos20261022.php');
 
 /** Transición reversible de cuatro relaciones 0..1. Compara todas las filas antes de retirar sus orígenes. */
 final class TransicionBloquesExpertos
