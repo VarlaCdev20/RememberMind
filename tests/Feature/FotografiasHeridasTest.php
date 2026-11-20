@@ -275,7 +275,7 @@ class FotografiasHeridasTest extends TestCase
         $proceso = new Process([PHP_BINARY, '-d', 'upload_max_filesize=8M', '-d', 'post_max_size=45M', '-S', $host, '-t', public_path(), base_path('tests/Support/heridas_upload_router.php')], base_path(), [
             'RM_QA_HTTP_ROOT' => $root, 'APP_KEY' => config('app.key'), 'APP_URL' => $base,
         ]);
-        $proceso->setTimeout(45);
+        $proceso->setTimeout(150);
         try {
             $proceso->start();
             $this->assertTrue($proceso->waitUntil(function () use ($host) {
@@ -290,7 +290,9 @@ class FotografiasHeridasTest extends TestCase
             URL::forceRootUrl($base);
             // La sesión HTTP usa el reloj real del SO; la captura clínica del test sigue congelada.
             $url = Carbon::withTestNow(null, fn () => app(GenerateSignedUploadUrl::class)->forLocal());
-            $cliente = Http::acceptJson()->timeout(30)->withOptions(['cookies' => new CookieJar]);
+            // El servidor PHP de QA en Windows puede tardar más de 30 s en recibir 40 MB.
+            // Se conserva la carga completa y las comprobaciones de seguridad y persistencia.
+            $cliente = Http::acceptJson()->timeout(120)->withOptions(['cookies' => new CookieJar]);
             $login = $cliente->get($base.'/login');
             $this->assertSame(200, $login->status());
             $this->assertSame(1, preg_match('/name="csrf-token"\s+content="([^"]+)"/', $login->body(), $token));

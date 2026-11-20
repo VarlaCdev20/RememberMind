@@ -29,4 +29,6 @@ Se ampliaron las huellas de guardas a once familias: 77 guardas SQLite y 33 Post
 
 ## Pendientes
 
+La carga HTTP de cinco fotografías de 8 MB pasó por separado con **1 caso / 44 comprobaciones**. El plazo anterior de 30 s era inferior a los 32,901 s medidos en una reproducción mínima con el servidor PHP de Windows, sin Laravel ni BDD. Se amplió únicamente el plazo del cliente de QA a 120 s y el del proceso de QA a 150 s; se conservan tamaños, cantidad, CSRF, firma y persistencia privada. La ejecución extensa iniciada con el plazo anterior no se presenta como verde.
+
 Se está verificando el uso de fotografías de heridas, documentos, pase de turno y captura Petersen. La ejecución anterior extensa de captura instrumental fue interrumpida al comenzar este bloque; no se presenta como completa. Las declaraciones semánticas, respuestas, administración, ocupación y revisión integral permanecen pendientes en el plan. No se cambiaron permisos ni reglas del experto y no se migró o reinició la base operativa.
