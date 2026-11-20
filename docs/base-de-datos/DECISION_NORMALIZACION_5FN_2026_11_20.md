@@ -20,6 +20,21 @@ garantías de integridad y reversión verificadas. PostgreSQL y SQLite se prueba
 de forma separada. La aplicación local se preserva mientras se desarrolla y
 prueba en un checkout aislado.
 
-Estado: **AUTORIZADO, EN IMPLEMENTACIÓN**. La instalación no se deduce de esta
-decisión. El inventario y la evidencia final se actualizarán al aplicar los
-cambios comprobados.
+## Instalación local del 20/11/2026
+
+El lote 50 instaló las siete migraciones del 20/11 en PostgreSQL
+`remembermind_dev`, con respaldo previo y una transacción para todo el lote.
+El inventario pasó de 84 a **98 tablas de negocio**. Con las 16 técnicas
+hay **114 tablas físicas**.
+
+Antes de confirmar la transacción se reconstruyeron las 84 relaciones
+originales y se compararon sus 15 297 filas en ambos sentidos con
+`EXCEPT ALL`. El resultado fue cero filas perdidas y cero adicionales.
+La reversión y la reaplicación se ensayaron sobre una copia restaurada.
+Después de la instalación, la aplicación consultó 30 residentes, 51 cuentas,
+30 documentos administrativos, 87 variables expertas y 44 criterios expertos.
+
+La verificación corresponde a las siete migraciones instaladas. Sigue
+pendiente cerrar el análisis de dependencias de respuestas de instrumento,
+administraciones de medicación y ocupaciones de cama para una conclusión
+global sobre la 5FN.
