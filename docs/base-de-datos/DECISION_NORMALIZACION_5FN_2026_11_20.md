@@ -34,7 +34,4 @@ La reversión y la reaplicación se ensayaron sobre una copia restaurada.
 Después de la instalación, la aplicación consultó 30 residentes, 51 cuentas,
 30 documentos administrativos, 87 variables expertas y 44 criterios expertos.
 
-La verificación corresponde a las siete migraciones instaladas. Sigue
-pendiente cerrar el análisis de dependencias de respuestas de instrumento,
-administraciones de medicación y ocupaciones de cama para una conclusión
-global sobre la 5FN.
+El lote 51 completó ocupaciones, respuestas y administraciones en la base activa. Conserva las 98 tablas de negocio. Véanse los ensayos, la comparación de datos y los límites del dictamen en la [verificación del lote 51](VERIFICACION_5FN_EVENTOS_2026_11_20.md).

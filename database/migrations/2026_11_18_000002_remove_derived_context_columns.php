@@ -75,7 +75,7 @@ return new class extends Migration
                 Schema::table($tabla, fn (Blueprint $t) => $t->foreign($campo, $nombre)->references($campo)
                     ->on($campo === 'cod_residente' ? 'residentes' : 'versiones_modelo_experto')->restrictOnDelete());
             }
-            Schema::table('prescripciones', fn (Blueprint $t) => $t->unique(['cod_prescripcion', 'cod_residente'], 'uq_prescripcion_residente_par'));
+            DB::statement('CREATE UNIQUE INDEX uq_prescripcion_residente_par ON prescripciones (cod_prescripcion, cod_residente)');
             foreach (['prescripciones' => 'prescripcion', 'estudios_clinicos' => 'estudio'] as $tabla => $nombre) {
                 Schema::table($tabla, fn (Blueprint $t) => $t->foreign(['cod_atencion', 'cod_residente'], 'fk_'.$nombre.'_atencion_residente')
                     ->references(['cod_atencion', 'cod_residente'])->on('atenciones')->restrictOnDelete());

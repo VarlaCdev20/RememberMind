@@ -18,7 +18,7 @@ combinaciones espurias. Tampoco se deduce la autoría histórica desde la cuenta
 actual de un trabajador, ni se recalculan mediciones originales o resultados
 conservados del experto.
 
-## Bloques y estado
+## Bloques y estado histórico de diseño
 
 | Bloque | Cambio | Estado |
 | --- | --- | --- |
@@ -62,10 +62,6 @@ Los adaptadores conservan las entradas vigentes `dias_semana` y las lecturas
 de agenda; el almacenamiento de la selección es relacional. Debe completarse
 la regresión de medicación, cuidados y pase de turno antes de instalar.
 
-## Instalación
+## Instalación en la base activa
 
-La base operativa sigue sin estas migraciones. Antes de aplicar: terminar los
-bloques pendientes, revisión independiente, pruebas PostgreSQL con conexiones
-separadas, respaldo y ensayo sobre copia poblada. No ejecutar un reinicio de
-la base operativa. La reversión debe comprobarse sobre la copia, conservando
-los datos y detectando cualquier estado que no pueda representarse fielmente.
+Los siete primeros bloques se instalaron en el lote 50 y las tres relaciones de eventos en el lote 51. El almacenamiento condicional de pregunta y prescripción permitió conservar 98 tablas de negocio. La [verificación posterior](VERIFICACION_5FN_EVENTOS_2026_11_20.md) recoge la evidencia de conservación, concurrencia y reversión y el alcance del dictamen de 5FN.
