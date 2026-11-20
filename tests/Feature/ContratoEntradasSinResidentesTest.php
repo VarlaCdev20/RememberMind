@@ -49,6 +49,15 @@ final class ContratoEntradasSinResidentesTest extends TestCase
         }
     }
 
+    public function test_un_alias_de_pregunta_sin_el_vinculo_de_opcion_no_acredita_la_captura(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') self::markTestSkipped('DDL de vista SQLite.');
+        DB::statement('DROP VIEW respuestas_instrumento');
+        DB::statement('CREATE VIEW respuestas_instrumento AS SELECT cod_respuesta,cod_aplicacion,cod_pregunta_libre AS cod_pregunta,cod_opcion,valor_numero,valor_texto,valor_logico,puntaje,observacion FROM capturas_instrumento');
+        $mapa = InventarioExperto::entradas(DB::connection());
+        self::assertFalse($mapa['captura_original']['respuestas_instrumento']['estructura_verificada']);
+    }
+
     public function test_postgres_rechaza_guardas_deshabilitadas_o_con_otra_funcion(): void
     {
         if (DB::getDriverName() !== 'pgsql') {

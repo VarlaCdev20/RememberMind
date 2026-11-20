@@ -143,23 +143,33 @@ final class InventarioExperto
     private static function describirEntrada(Builder $esquema, Model $modelo, array $campos, array $relaciones): array
     {
         $tabla = $modelo->getTable();
-        $presente = $esquema->hasTable($tabla);
+        $captura = $modelo instanceof RespuestaInstrumento && $esquema->hasTable('capturas_instrumento');
+        $fisica = $captura ? 'capturas_instrumento' : $tabla;
+        $presente = $captura ? self::proyeccionRespuestasDisponible($esquema) : $esquema->hasTable($tabla);
         $columnas = $presente ? $esquema->getColumnListing($tabla) : [];
         sort($columnas, SORT_STRING);
         $contextualizado = isset(ContextosResidente::CONTRATOS[$tabla]);
         $contextoDisponible = $contextualizado && ContextosResidente::estructuraDisponible($esquema->getConnection(), $tabla);
         $derivados = $contextoDisponible ? ['cod_residente'] : [];
+        if ($captura && $presente) $derivados[] = 'cod_pregunta';
         $faltantes = array_values(array_diff([$modelo->getKeyName(), ...$campos], [...$columnas, ...$derivados]));
-        $pk = $presente && collect($esquema->getIndexes($tabla))->contains(
+        $pk = $presente && collect($esquema->getIndexes($fisica))->contains(
             fn ($indice) => $indice['primary'] && $indice['columns'] === [$modelo->getKeyName()]);
-        $fks = $presente ? $esquema->getForeignKeys($tabla) : [];
+        $fks = $presente ? $esquema->getForeignKeys($fisica) : [];
         $enlaces = [];
         foreach ($relaciones as [$campo, $destino, $clave]) {
-            $verificada = collect($fks)->contains(static fn ($fk) => $fk['columns'] === [$campo]
+            $origen = $captura && $campo === 'cod_pregunta' ? 'cod_pregunta_libre' : $campo;
+            $verificada = collect($fks)->contains(static fn ($fk) => $fk['columns'] === [$origen]
                 && $fk['foreign_table'] === $destino && $fk['foreign_columns'] === [$clave]
                 && in_array($fk['foreign_schema'] ?? null, [null, 'main', 'public'], true));
+            if ($captura && $campo === 'cod_pregunta') {
+                $verificada = $verificada && collect($esquema->getForeignKeys('opciones_pregunta'))->contains(
+                    fn ($fk) => $fk['columns'] === ['cod_pregunta'] && $fk['foreign_table'] === $destino
+                        && $fk['foreign_columns'] === [$clave] && in_array($fk['foreign_schema'] ?? null, [null, 'main', 'public'], true));
+            }
             if ($contextualizado && $campo === 'cod_residente') $verificada = $contextoDisponible;
             $enlaces[] = ['campo' => $campo, 'tabla_destino' => $destino, 'clave_destino' => $clave, 'verificada' => $verificada]
+                + ($captura && $campo === 'cod_pregunta' ? ['tipo_vinculo'=>'PREGUNTA_LIBRE_O_DERIVADA_DE_OPCION','fk_directa_en_tabla'=>false] : [])
                 + ($contextualizado && $campo === 'cod_residente' ? ['tipo_vinculo' => 'DERIVADO_DE_ATENCION_O_ASOCIACION_DIRECTA', 'fk_directa_en_tabla' => false] : []);
         }
 
@@ -167,6 +177,27 @@ final class InventarioExperto
             'clave_primaria_verificada' => $pk, 'campos_existentes' => $columnas, 'campos_derivados_disponibles' => $derivados, 'campos_base_faltantes' => $faltantes,
             'relaciones' => $enlaces, 'estructura_verificada' => $presente && $pk && $faltantes === []
                 && ! in_array(false, array_column($enlaces, 'verificada'), true)];
+    }
+
+    /** Verifica la consulta canónica sin ejecutar la vista ni leer respuestas de residentes. */
+    private static function proyeccionRespuestasDisponible(Builder $esquema): bool
+    {
+        $db = $esquema->getConnection();
+        $pg = $db->getDriverName() === 'pgsql';
+        $ddl = $pg
+            ? $db->scalar("SELECT pg_get_viewdef(c.oid,true) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='v' AND n.nspname='public' AND c.relname='respuestas_instrumento'")
+            : $db->scalar("SELECT sql FROM sqlite_master WHERE type='view' AND name='respuestas_instrumento'");
+        if (!$ddl) return false;
+
+        $fuente = $pg ? '' : 'CREATE VIEW respuestas_instrumento AS ';
+        $e = $pg ? '' : 'e.';
+        $campos = ['cod_respuesta','cod_aplicacion','cod_pregunta','cod_opcion','valor_numero','valor_texto','valor_logico','puntaje','observacion'];
+        $proyeccion = array_map(fn ($campo) => $campo === 'cod_pregunta'
+            ? "COALESCE({$e}cod_pregunta_libre,(SELECT p.cod_pregunta FROM opciones_pregunta p WHERE p.cod_opcion=e.cod_opcion)) AS cod_pregunta"
+            : $e.$campo, $campos);
+        $esperado = $fuente.'SELECT '.implode(',', $proyeccion).' FROM capturas_instrumento e';
+        $firma = static fn ($sql) => strtolower(preg_replace('/\s+|::text|;/', '', $sql));
+        return $firma($ddl) === $firma($esperado);
     }
 
     /** Solo metadata y conteos opcionales; no lee valores clínicos ni decide qué tablas eliminar. */
