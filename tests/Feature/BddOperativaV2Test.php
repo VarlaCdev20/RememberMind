@@ -71,7 +71,7 @@ class BddOperativaV2Test extends TestCase
         sort($esperadas);
         sort($reales);
 
-        $this->assertCount(59, $reales);
+        $this->assertCount(63, $reales);
         $this->assertSame($esperadas, $reales);
         foreach ($esperadas as $tabla) {
             $this->assertTrue(Schema::hasTable($tabla), "Falta la tabla operativa {$tabla}");
@@ -238,7 +238,7 @@ class BddOperativaV2Test extends TestCase
             'cod_personal' => 'PER_FALSO', 'temperatura' => 36.8, 'saturacion_oxigeno' => 97,
         ])->assertCreated();
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS', 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, 'temperatura' => 36.8]);
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS', 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, 'temperatura' => 36.8])->exists());
     }
 
     public function test_familiar_no_puede_acceder_por_idor_a_otro_expediente(): void
@@ -410,6 +410,8 @@ class BddOperativaV2Test extends TestCase
         return [
             'valoraciones_petersen_originales', 'soportes_valoracion_petersen',
             'fotografias_institucionales',
+            'patrones_semanales', 'dias_patron_semanal',
+            'residentes_mediciones_clinicas', 'residentes_observaciones_cuidado',
             'usuarios', 'personal', 'areas', 'turnos', 'contactos', 'residentes', 'habitaciones', 'camas', 'tipos_estudio_clinico', 'medicamentos', 'instrumentos',
             'jornadas', 'preadmisiones', 'valoraciones_enfermeria_preadmision', 'admisiones', 'historial_estados_residente', 'documentos', 'consentimientos', 'atenciones', 'registros_textuales_clinicos', 'registros_clinicos', 'seguros_residente', 'mediciones_clinicas', 'objetivos_signos_vitales', 'estudios_clinicos', 'registros_estudio', 'derivaciones', 'incidentes', 'registros_observaciones_cuidado', 'controles_cognitivos', 'controles_funcionales_iadl', 'registros_consumo', 'heridas', 'curaciones_herida', 'planes_cuidado', 'ejecuciones_cuidado', 'prescripciones', 'administraciones_medicacion', 'aplicaciones_instrumento', 'valoraciones_profesionales', 'valoraciones_psicopedagogicas', 'actividades', 'visitas', 'alertas', 'eventos_alerta',
             'asignaciones_jornada', 'residentes_contactos', 'ocupaciones_cama', 'respuestas_instrumento', 'participantes_actividad',

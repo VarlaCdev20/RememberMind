@@ -7,8 +7,8 @@ trait LeeColumnasRelacionadas
 {
     public function qualifyColumn($column)
     {
-        $campo = ColumnasRelacionadas::CONTRATOS[$this->getTable()][0];
-        if ($column === $campo || $column === $this->getTable().'.'.$campo) {
+        $campo = ColumnasRelacionadas::CONTRATOS[$this->getTable()][0] ?? null;
+        if ($campo !== null && ($column === $campo || $column === $this->getTable().'.'.$campo)) {
             return 'relacion_'.$this->getTable().'.'.$campo;
         }
 
@@ -17,15 +17,22 @@ trait LeeColumnasRelacionadas
 
     public function initializeLeeColumnasRelacionadas(): void
     {
-        $this->appends[] = ColumnasRelacionadas::CONTRATOS[$this->getTable()][0];
+        if (isset(ColumnasRelacionadas::CONTRATOS[$this->getTable()])) {
+            $this->appends[] = ColumnasRelacionadas::CONTRATOS[$this->getTable()][0];
+        }
     }
 
     public static function bootLeeColumnasRelacionadas(): void
     {
         static::addGlobalScope('columnas_relacionadas', static function ($query): void {
-            ColumnasRelacionadas::unir($query->getQuery(), $query->getModel()->getTable());
+            if (isset(ColumnasRelacionadas::CONTRATOS[$query->getModel()->getTable()])) {
+                ColumnasRelacionadas::unir($query->getQuery(), $query->getModel()->getTable());
+            }
         });
         static::saving(static function ($registro): void {
+            if (! isset(ColumnasRelacionadas::CONTRATOS[$registro->getTable()])) {
+                return;
+            }
             ColumnasRelacionadas::preparar($registro->getConnection(), $registro->getTable(), $registro->getAttributes());
             $campo = ColumnasRelacionadas::CONTRATOS[$registro->getTable()][0];
             unset($registro[$campo]);
@@ -34,7 +41,8 @@ trait LeeColumnasRelacionadas
 
     protected function valorRelacionado(?string $valor): ?string
     {
-        return $valor ?? ColumnasRelacionadas::valor($this->getConnection(), $this->getTable(), $this->getAttributes());
+        return $valor ?? (isset(ColumnasRelacionadas::CONTRATOS[$this->getTable()])
+            ? ColumnasRelacionadas::valor($this->getConnection(), $this->getTable(), $this->getAttributes()) : null);
     }
 
     protected function guardarConVinculoProtegido(array $options): bool

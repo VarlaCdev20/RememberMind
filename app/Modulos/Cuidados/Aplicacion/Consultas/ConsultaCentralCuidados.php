@@ -89,8 +89,8 @@ final class ConsultaCentralCuidados
             }
             $modelo = new $clase;
             $tabla = $modelo->getTable();
-            $consulta = $modelo->newQuery()->toBase();
-            $columnaResidente = $tabla.'.cod_residente';
+            $consulta = $modelo->newQuery()->select([])->toBase();
+            $columnaResidente = $modelo->qualifyColumn('cod_residente');
             if ($origen === 'curaciones') {
                 $consulta->join('heridas', 'heridas.cod_herida', '=', $tabla.'.cod_herida');
                 $columnaResidente = 'heridas.cod_residente';

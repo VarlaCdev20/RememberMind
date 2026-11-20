@@ -163,14 +163,21 @@ class TallaCanonicaTest extends TestCase
         ]);
 
         // Intento con talla = 1.70 (en metros) debe fallar por check ck_med_ant_talla
-        $this->expectException(QueryException::class);
-        DB::table('mediciones_clinicas')->insert([
-            'tipo_evento' => 'ANTROPOMETRIA', 'cod_registro_medicion' => 'MED_TEST_'.Str::random(5),
-            'cod_residente' => $residente->cod_residente,
-            'cod_personal' => $personal->cod_personal,
-            'fecha_hora' => now(),
-            'talla' => 1.70,
-        ]);
+        $codigo='MED_TEST_'.Str::random(5);
+        try {
+            DB::transaction(function () use ($codigo,$residente,$personal): void {
+                DB::table('residentes_mediciones_clinicas')->insert(['cod_registro_medicion'=>$codigo,'cod_residente'=>$residente->cod_residente]);
+                DB::table('mediciones_clinicas')->insert([
+                    'tipo_evento'=>'ANTROPOMETRIA','cod_registro_medicion'=>$codigo,
+                    'cod_personal'=>$personal->cod_personal,'fecha_hora'=>now(),'talla'=>1.70,
+                ]);
+            });
+            $this->fail('La talla en metros debe rechazarse por el contrato clínico.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('contrato original',$e->getMessage());
+        }
+        $this->assertDatabaseMissing('mediciones_clinicas',['cod_registro_medicion'=>$codigo]);
+        $this->assertDatabaseMissing('residentes_mediciones_clinicas',['cod_registro_medicion'=>$codigo]);
     }
 
     public function test_insercion_valida_en_centimetros_persiste_exitosamente(): void
@@ -188,7 +195,7 @@ class TallaCanonicaTest extends TestCase
         ]);
 
         $codMed = 'MED_TEST_'.Str::random(5);
-        DB::table('mediciones_clinicas')->insert([
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(),'mediciones_clinicas',[[
             'tipo_evento' => 'ANTROPOMETRIA', 'cod_registro_medicion' => $codMed,
             'cod_residente' => $residente->cod_residente,
             'cod_personal' => $personal->cod_personal,
@@ -196,7 +203,7 @@ class TallaCanonicaTest extends TestCase
             'peso' => 68.5,
             'talla' => 168.0,
             'imc' => 24.3,
-        ]);
+        ]]);
 
         $guardado = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta('mediciones_antropometricas')->where('cod_registro_medicion', $codMed)->first();
         $this->assertNotNull($guardado);

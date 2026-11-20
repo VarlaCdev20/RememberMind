@@ -117,6 +117,12 @@ try {
         ['nodos_semanticos', 'cod_nodo_propietario_primario', 'cod_version_modelo'],
     ] as [$tabla, $det, $dep]) {
         $columnas = array_column($tablas[$tabla]['columnas'], 'name');
+        if (! in_array($det,$columnas,true) || ! in_array($dep,$columnas,true)) {
+            $reconstrucciones[] = ['tabla'=>$tabla,'determinante'=>$det,'dependiente'=>$dep,
+                'estado'=>'DEPENDENCIA_NO_ALMACENADA_EN_ESTA_RELACION',
+                'nota'=>'La reconstrucción de la descomposición se verifica mediante pruebas pobladas de migración y reversión.'];
+            continue;
+        }
         $restantes = array_values(array_diff($columnas, [$dep]));
         $proyeccion = implode(',', array_map(static fn ($v) => ($v === $dep ? 'p.' : 'r.').$q($v), $columnas));
         $sql = 'WITH original AS (SELECT * FROM '.$q($tabla).' WHERE '.$q($det).' IS NOT NULL), '

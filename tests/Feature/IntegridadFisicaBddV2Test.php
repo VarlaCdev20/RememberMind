@@ -42,15 +42,21 @@ class IntegridadFisicaBddV2Test extends TestCase
         $this->assertNotNull($atencion);
         $this->assertNotNull($personal);
 
-        $this->expectException(QueryException::class);
-        DB::table('mediciones_clinicas')->insert([
-            'tipo_evento' => 'SIGNOS', 'cod_registro_medicion' => 'SIG_CRUZADO',
-            'cod_residente' => 'RES_OTRO',
-            'cod_personal' => $personal->cod_personal,
-            'cod_atencion' => $atencion->cod_atencion,
-            'fecha_hora' => now(),
-            'estado' => 'REGISTRADO',
-        ]);
+        try {
+            DB::transaction(function () use ($atencion,$personal): void {
+                DB::table('residentes_mediciones_clinicas')->insert(['cod_registro_medicion'=>'SIG_CRUZADO','cod_residente'=>'RES_OTRO']);
+                DB::table('mediciones_clinicas')->insert([
+                    'tipo_evento' => 'SIGNOS', 'cod_registro_medicion' => 'SIG_CRUZADO',
+                    'cod_personal' => $personal->cod_personal, 'cod_atencion' => $atencion->cod_atencion,
+                    'fecha_hora' => now(), 'estado' => 'REGISTRADO',
+                ]);
+            });
+            $this->fail('La atención no admite un sujeto directo adicional de otro residente.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('contrato original',$e->getMessage());
+        }
+        $this->assertDatabaseMissing('mediciones_clinicas',['cod_registro_medicion'=>'SIG_CRUZADO']);
+        $this->assertDatabaseMissing('residentes_mediciones_clinicas',['cod_registro_medicion'=>'SIG_CRUZADO']);
     }
 
     public function test_la_base_rechaza_una_dosis_negativa(): void
@@ -104,26 +110,33 @@ class IntegridadFisicaBddV2Test extends TestCase
         ]);
         $administracion = [
             'cod_administracion' => 'AMD_F4_PROPIA', 'cod_prescripcion' => $this->codPrescripcion,
-            'cod_residente' => 'RES_BASE', 'cod_jornada' => 'JOR_F4_SQL', 'cod_personal' => 'COD_PER_000001',
+            'cod_jornada' => 'JOR_F4_SQL', 'cod_personal' => 'COD_PER_000001',
             'fecha_hora_administracion' => now(), 'resultado' => 'ADMINISTRADA',
             'dosis_administrada' => 1, 'estado' => 'REGISTRADA',
         ];
         DB::table('administraciones_medicacion')->insert($administracion);
-        $this->assertDatabaseHas('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_PROPIA', 'cod_residente' => 'RES_BASE']);
+        $this->assertSame('RES_BASE', \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'administraciones_medicacion')->where('cod_administracion', 'AMD_F4_PROPIA')->value('cod_residente'));
 
-        $administracion['cod_administracion'] = 'AMD_F4_CRUZADA';
-        $administracion['cod_residente'] = 'RES_OTRO';
+        $otraAtencion = (array) DB::table('atenciones')->where('cod_atencion', $this->codAtencion)->first();
+        $otraAtencion['cod_atencion'] = 'ATN_F4_OTRA';
+        $otraAtencion['cod_residente'] = 'RES_OTRO';
+        DB::table('atenciones')->insert($otraAtencion);
+        $otraPrescripcion = (array) DB::table('prescripciones')->where('cod_prescripcion', $this->codPrescripcion)->first();
+        $otraPrescripcion['cod_prescripcion'] = 'PRS_F4_OTRA';
+        $otraPrescripcion['cod_atencion'] = 'ATN_F4_OTRA';
+        DB::table('prescripciones')->insert($otraPrescripcion);
         try {
-            DB::transaction(fn () => DB::table('administraciones_medicacion')->insert($administracion));
+            DB::transaction(fn () => DB::table('administraciones_medicacion')->where('cod_administracion', 'AMD_F4_PROPIA')->update(['cod_prescripcion' => 'PRS_F4_OTRA']));
             $this->fail('SQL directo no debe cruzar administración y residente de la prescripción.');
         } catch (QueryException $e) {
             $this->assertStringContainsString(
-                DB::getDriverName() === 'pgsql' ? 'fk_administracion_prescripcion_residente' : 'La prescripción no corresponde al residente.',
+                'El vínculo no puede cambiar el residente o la versión histórica',
                 $e->getMessage()
             );
         }
 
-        $this->assertDatabaseMissing('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_CRUZADA']);
+        $this->assertDatabaseHas('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_PROPIA', 'cod_prescripcion' => $this->codPrescripcion]);
+        $this->assertDatabaseMissing('administraciones_medicacion', ['cod_administracion' => 'AMD_F4_PROPIA', 'cod_prescripcion' => 'PRS_F4_OTRA']);
     }
 
     private function crearEscenarioClinico(): void
@@ -166,7 +179,6 @@ class IntegridadFisicaBddV2Test extends TestCase
         ]);
         DB::table('prescripciones')->insert([
             'cod_prescripcion' => $this->codPrescripcion,
-            'cod_residente' => 'RES_BASE',
             'cod_atencion' => $this->codAtencion,
             'cod_medicamento' => 'MED_INTEGRIDAD',
             'cod_personal' => 'COD_PER_000001',

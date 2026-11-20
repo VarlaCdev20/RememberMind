@@ -18,10 +18,16 @@ final class ColumnasRelacionadas
         'administraciones_medicacion' => ['cod_residente', 'cod_prescripcion'],
         'relaciones_semanticas' => ['cod_version_modelo', 'cod_nodo_origen'],
         'mapeos_variables_fuente' => ['cod_version_modelo', 'cod_variable_experta'],
+        'mediciones_clinicas' => ['cod_residente', 'cod_registro_medicion'],
+        'registros_observaciones_cuidado' => ['cod_residente', 'cod_observacion_cuidado'],
     ];
 
     public static function origen(Connection $db, string $tabla): Builder
     {
+        if (isset(ContextosResidente::CONTRATOS[$tabla])) {
+            return ContextosResidente::origen($db, $tabla);
+        }
+
         return match ($tabla) {
             'consentimientos' => $db->table('admisiones')->select(['cod_admision as clave_relacion', 'cod_residente']),
             'ejecuciones_cuidado' => $db->table('intervenciones_cuidado as i')->join('planes_cuidado as p', 'p.cod_plan', '=', 'i.cod_plan')
@@ -59,6 +65,9 @@ final class ColumnasRelacionadas
 
     public static function valor(Connection $db, string $tabla, array $datos): ?string
     {
+        if (isset(ContextosResidente::CONTRATOS[$tabla])) {
+            return ContextosResidente::valor($db, $tabla, $datos);
+        }
         [$campo, $clave] = self::CONTRATOS[$tabla];
 
         return self::origen($db, $tabla)->select($campo)->where($clave === 'cod_prescripcion' ? 'p.cod_prescripcion'

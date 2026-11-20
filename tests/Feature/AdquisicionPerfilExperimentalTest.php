@@ -40,9 +40,9 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         RegistrosConsumo::insertar('antecedentes_clinicos', [['cod_antecedente' => 'SIM-ANT', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'tipo_antecedente' => 'PRUEBA_TECNICA', 'descripcion' => 'Antecedente ficticio.',
             'fecha_referencia' => '2026-10-15', 'estado' => 'VIGENTE']]);
-        DB::table('registros_observaciones_cuidado')->insert(['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SIM-SUE', 'cod_residente' => 'SINTETICO-RES',
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SIM-SUE', 'cod_residente' => 'SINTETICO-RES',
             'cod_personal' => 'SIM-PER', 'fecha' => '2026-10-16', 'horas_sueno' => '0.00', 'despertares' => 0,
-            'insomnio' => false, 'somnolencia_diurna' => null, 'estado' => 'VIGENTE']);
+            'insomnio' => false, 'somnolencia_diurna' => null, 'estado' => 'VIGENTE']]);
         DB::table('actividades')->insert(['cod_actividad' => 'SIM-ACT', 'cod_area' => 'SIM-AREA', 'cod_personal' => 'SIM-PER',
             'tipo' => 'PRUEBA_TECNICA', 'nombre' => 'Actividad ficticia', 'fecha_hora' => '2026-10-16 12:00:00', 'estado' => 'VIGENTE']);
         RegistrosConsumo::insertar('seguimientos_pedagogicos', [['cod_seguimiento_pedagogico' => 'SIM-SEG', 'cod_residente' => 'SINTETICO-RES',

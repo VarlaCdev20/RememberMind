@@ -218,7 +218,7 @@ final class RoleDashboardDataService
             ->groupByRaw('DATE(fecha_hora)')->orderBy('label')->get();
         $relatedTable = 'mediciones_clinicas';
         $relatedTitle = $discipline === 'nutricion' ? 'Mediciones recientes' : 'Registros de dolor recientes';
-        $related = DB::table($relatedTable)->where('cod_personal', $code)
+        $related = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), $relatedTable)->where('cod_personal', $code)
             ->where('tipo_evento', $discipline === 'nutricion' ? 'ANTROPOMETRIA' : 'DOLOR')
             ->where('fecha_hora', '>=', now()->subDays(30))
             ->join('residentes as r', 'r.cod_residente', '=', $relatedTable.'.cod_residente')

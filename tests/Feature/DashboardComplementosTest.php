@@ -75,7 +75,7 @@ class DashboardComplementosTest extends TestCase
 
     private function nota(string $codigo, array $cambios = []): void
     {
-        DB::table('registros_observaciones_cuidado')->insert(array_replace(['tipo_evento' => 'CONDUCTA', 'cod_observacion_cuidado' => $codigo, 'cod_residente' => $this->residente->cod_residente, 'cod_personal' => 'PER_TEST', 'cod_jornada' => 'JOR_TEST', 'fecha_hora' => now()->subMinutes(5), 'descripcion' => 'Observación registrada', 'estado' => 'VIGENTE'], $cambios));
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [array_replace(['tipo_evento' => 'CONDUCTA', 'cod_observacion_cuidado' => $codigo, 'cod_residente' => $this->residente->cod_residente, 'cod_personal' => 'PER_TEST', 'cod_jornada' => 'JOR_TEST', 'fecha_hora' => now()->subMinutes(5), 'descripcion' => 'Observación registrada', 'estado' => 'VIGENTE'], $cambios)]);
     }
 
     public function test_tareas_reales_aislamiento_limite_y_progreso_verificado(): void

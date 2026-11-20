@@ -63,7 +63,7 @@ class RegistroConductaTest extends TestCase
         foreach (RegistrarConducta::INDICADORES as $campo) {
             $this->assertNull($registro->fresh()->{$campo});
         }
-        $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'CONDUCTA', 'cod_personal' => 'PER_CONDUCTA', 'cod_residente' => 'RES_CONDUCTA', 'cod_jornada' => 'JOR_CONDUCTA', 'estado' => 'VIGENTE']);
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'registros_observaciones_cuidado')->where(['tipo_evento' => 'CONDUCTA', 'cod_personal' => 'PER_CONDUCTA', 'cod_residente' => 'RES_CONDUCTA', 'cod_jornada' => 'JOR_CONDUCTA', 'estado' => 'VIGENTE'])->exists());
         $this->assertTrue($registro->fecha_hora->equalTo(now()));
         $this->assertSame(1, \App\Models\RegistroConductual::count());
         $this->assertDatabaseHas('activity_log', ['subject_id' => $registro->getKey(), 'causer_id' => $this->enfermera->getKey()]);

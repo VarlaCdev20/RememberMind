@@ -76,7 +76,7 @@ if ($preparar) {
     $base = ['cod_residente' => 'RES_QA_RPT', 'cod_personal' => 'PER_QA_RPT', 'cod_jornada' => 'JOR_QA_RPT', 'estado' => 'VIGENTE'];
     DB::table('registros_consumo')->insert($base + ['tipo_evento' => 'INGESTA', 'cod_registro_consumo' => 'ING_QA_RPT', 'fecha_hora' => '2026-10-26 12:00:00', 'tipo_comida' => 'ALMUERZO', 'porcentaje_consumido' => 75, 'dificultad_deglucion' => false, 'observacion' => 'Registro sintético para verificar el reporte']);
     DB::table('registros_consumo')->insert($base + ['tipo_evento' => 'HIDRATACION', 'cod_registro_consumo' => 'HID_QA_RPT', 'fecha_hora' => '2026-10-27 11:00:00', 'cantidad_ml' => 150, 'tipo_liquido' => 'AGUA']);
-    DB::table('registros_observaciones_cuidado')->insert($base + ['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SUE_QA_RPT', 'fecha' => '2026-10-27', 'horas_sueno' => 6, 'despertares' => 1, 'insomnio' => false]);
+    \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [$base + ['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SUE_QA_RPT', 'fecha' => '2026-10-27', 'horas_sueno' => 6, 'despertares' => 1, 'insomnio' => false]]);
     echo 'PREPARADO';
     exit;
 }

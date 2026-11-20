@@ -248,13 +248,13 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('guardarSignos')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $pacienteAsignado->cod_residente,
             'presion_sistolica' => 135,
             'presion_diastolica' => 85,
             'frecuencia_cardiaca' => 78,
             'temperatura' => 36.8,
-        ]);
+        ])->exists());
 
         // ─── PASO 4: OMITIR MEDICACIÓN (CON MOTIVO REAL) ──────────────────────
         $ficha->call('abrirAdministrarMed', $med->cod_prescripcion)
@@ -264,12 +264,12 @@ class TurnoCompletoEnfermeroTest extends TestCase
             ->call('confirmarAdministracionMed')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('administraciones_medicacion', [
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'administraciones_medicacion')->where([
             'cod_residente' => $pacienteAsignado->cod_residente,
             'cod_prescripcion' => $med->cod_prescripcion,
             'resultado' => 'OMITIDA',
             'motivo_omision' => 'Paciente presenta náuseas y rechaza la toma oral matutina',
-        ]);
+        ])->exists());
 
         // ─── PASO 5: EJECUTAR TAREA DE CUIDADOS ────────────────────────────────
         $ficha->call('completarTarea', $tarea->cod_tarea)

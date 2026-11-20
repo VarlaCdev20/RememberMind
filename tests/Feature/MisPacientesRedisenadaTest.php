@@ -1200,11 +1200,11 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('mostrarSelectorModal', false)
             ->assertSee('PA 124/78');
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 124,
             'presion_diastolica' => 78,
-        ]);
+        ])->exists());
         $this->assertSame('10:00', SignoVital::query()->latest('fecha_hora')->firstOrFail()->fecha_hora->format('H:i'));
     }
 
@@ -1331,11 +1331,11 @@ class MisPacientesRedisenadaTest extends TestCase
 
         $this->assertSame($anteriores + 1, SignoVital::query()
             ->where('cod_residente', $this->residenteEstable->cod_residente)->count());
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'frecuencia_cardiaca' => 72,
             'temperatura' => null,
-        ]);
+        ])->exists());
     }
 
     public function test_temperatura_invalida_bloquea_pero_lectura_clinicamente_alta_puede_registrarse(): void
@@ -1356,10 +1356,10 @@ class MisPacientesRedisenadaTest extends TestCase
                 $formulario->call('guardarSignos')->assertHasNoErrors();
             }
         }
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'temperatura' => 39.4,
-        ]);
+        ])->exists());
     }
 
     public function test_advertencia_de_pulso_no_exige_segunda_confirmacion(): void
@@ -1384,10 +1384,10 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('signosConfirmacionPendiente', false);
 
         $this->assertSame($alertasAntes, Alerta::query()->count());
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'glucemia' => 251,
-        ]);
+        ])->exists());
     }
 
     public function test_presion_atipica_pide_confirmacion_contextual_sin_borrar_la_lectura(): void
@@ -1399,18 +1399,18 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarSignos')
             ->assertSet('signosConfirmacionPendiente', true)
             ->assertSee('Presión arterial atípica');
-        $this->assertDatabaseMissing('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertFalse(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 80,
             'presion_diastolica' => 90,
-        ]);
+        ])->exists());
 
         $formulario->call('guardarSignos')->assertHasNoErrors();
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'presion_sistolica' => 80,
             'presion_diastolica' => 90,
-        ]);
+        ])->exists());
     }
 
     public function test_lectura_critica_exige_dialogo_de_confirmacion_antes_de_guardar_y_generar_alerta(): void
@@ -1701,7 +1701,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardar')->assertHasNoErrors()
             ->assertSet('guardado.resultado', 'ADMINISTRADA');
 
-        $this->assertDatabaseHas('administraciones_medicacion', [
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'administraciones_medicacion')->where([
             'cod_prescripcion' => $prescripcion->cod_prescripcion,
             'cod_horario_prescripcion' => $horario->cod_horario_prescripcion,
             'cod_residente' => $this->residenteEstable->cod_residente,
@@ -1710,7 +1710,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'dosis_administrada' => 250.125,
             'observacion' => 'Dosis tolerada',
             'estado' => 'REGISTRADA',
-        ]);
+        ])->exists());
     }
 
     public function test_estado_hora_y_motivo_condicional_se_validan(): void
@@ -1917,7 +1917,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->assertSet('dolorResultado.mediciones.0.valor', '6 / 10')
             ->call('volverResidenteDesdeDolor')->assertSet('drawerPaso', 'resident-summary');
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'DOLOR',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'DOLOR',
             'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal,
             'intensidad' => 6,
@@ -1927,7 +1927,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'intervencion' => 'Reposo y aviso a enfermería',
             'respuesta' => null,
             'estado' => 'VIGENTE',
-        ]);
+        ])->exists());
     }
 
     public function test_eva_cero_no_exige_intervencion_ni_reevaluacion(): void
@@ -2926,7 +2926,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->call('guardarCuidado')->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result')->assertSee('Movilidad registrada');
 
-        $this->assertDatabaseHas('registros_observaciones_cuidado', [
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'registros_observaciones_cuidado')->where([
             'tipo_evento' => 'MOVILIDAD', 'cod_residente' => $this->residenteEstable->cod_residente,
             'cod_personal' => $this->personal->cod_personal,
             'cod_jornada' => 'JOR_MIS_PACIENTES',
@@ -2938,7 +2938,7 @@ class MisPacientesRedisenadaTest extends TestCase
             'riesgo_caida' => 'MEDIO',
             'observacion' => 'Usó andador con supervisión.',
             'estado' => 'VIGENTE',
-        ]);
+        ])->exists());
     }
 
     public function test_movilidad_rechaza_residente_no_asignado_y_usuario_sin_permiso(): void
@@ -3217,8 +3217,8 @@ class MisPacientesRedisenadaTest extends TestCase
         $this->travel(10)->minutes();
         $formulario->call('guardarSignos')->assertHasNoErrors()
             ->assertSet('drawerPaso', 'register-result');
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $this->residenteEstable->cod_residente,
-            'frecuencia_cardiaca' => 72, 'fecha_hora' => Carbon::parse($fecha)]);
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS','cod_residente' => $this->residenteEstable->cod_residente,
+            'frecuencia_cardiaca' => 72, 'fecha_hora' => Carbon::parse($fecha)])->exists());
     }
 
     public function test_fecha_hora_no_admite_manipulacion_del_cliente_ni_genera_registros(): void
@@ -3924,7 +3924,7 @@ class MisPacientesRedisenadaTest extends TestCase
             ->set('tipo', 'MOVILIDAD')->set('subtipo', 'ASISTIDA')->set('ayudaTecnica', 'BASTON')
             ->set('dolor', 5)->call('guardarCuidado')->assertHasNoErrors();
         $this->assertSame(2, \App\Models\RegistroMovilidad::count());
-        $this->assertDatabaseHas('registros_observaciones_cuidado', ['tipo_evento' => 'MOVILIDAD', 'cod_residente' => $this->residenteEstable->cod_residente, 'dispositivo' => 'BASTON', 'marcha' => 'ASISTIDA']);
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'registros_observaciones_cuidado')->where(['tipo_evento' => 'MOVILIDAD', 'cod_residente' => $this->residenteEstable->cod_residente, 'dispositivo' => 'BASTON', 'marcha' => 'ASISTIDA'])->exists());
         $this->assertSame($painCount, ValoracionDolor::count());
     }
 

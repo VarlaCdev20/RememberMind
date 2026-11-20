@@ -97,7 +97,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->assertNull(NotaClinica::find($indicacion->getKey()));
         $this->rechazar(fn () => DB::table('mediciones_clinicas')->where('cod_registro_medicion', $reevaluacion->getKey())
             ->update(['cod_valoracion_origen' => $signo->getKey()]));
-        $this->rechazar(fn () => DB::table('mediciones_clinicas')->where('cod_registro_medicion', $reevaluacion->getKey())
+        $this->rechazar(fn () => DB::table('residentes_mediciones_clinicas')->where('cod_registro_medicion', $reevaluacion->getKey())
             ->update(['cod_residente' => $otro->getKey()]));
         $this->rechazar(fn () => DB::table('valoraciones_psicopedagogicas')->where('cod_valoracion_profesional', $psicologia->getKey())
             ->update(['cod_atencion' => null]));
@@ -116,6 +116,8 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $this->rechazar(fn () => DB::table('soportes_valoracion_petersen')->where('cod_soporte_petersen', 'SVP-DOC-16')
             ->update(['cod_documento_clinico' => $admin->getKey()]));
 
+        $contextoCuidados = require database_path('migrations/2026_11_20_000004_separate_optional_care_residents.php');
+        $contextoCuidados->down();
         $contexto = require database_path('migrations/2026_11_18_000004_derive_professional_assessment_resident.php');
         $contexto->down();
         $reparto = require database_path('migrations/2026_11_18_000003_partition_professional_assessments.php');
@@ -140,6 +142,7 @@ class ConsolidacionDocumentosValoracionesTextosTest extends TestCase
         $pases->up();
         $reparto->up();
         $contexto->up();
+        $contextoCuidados->up();
         $this->assertSame($dolor->getKey(), $reevaluacion->fresh()->origen->getKey());
         $this->assertSame($reevaluacion->getKey(), $dolor->fresh()->reevaluaciones->sole()->getKey());
         $this->assertSame($nota->getKey(), $correccion->fresh()->anterior->getKey());

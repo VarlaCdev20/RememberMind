@@ -40,6 +40,8 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     private ?string $triggersOriginales;
 
+    private int $tablasSeparadas;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -76,6 +78,9 @@ class ConsolidacionControlesObservacionesTest extends TestCase
             $t->foreign('cod_control_iadl')->references('cod_control_iadl')->on('controles_funcionales_iadl')->restrictOnDelete();
         });
         DB::table('qa_referencias_control')->insert(['cod_control_cognitivo' => 'COG-ORIGINAL-60', 'cod_control_iadl' => 'IAD-ORIGINAL-60']);
+        // Este ensayo verifica el contrato histórico previo a la separación de contexto.
+        (require database_path('migrations/2026_11_20_000004_separate_optional_care_residents.php'))->down();
+        $this->tablasSeparadas = count(Schema::getTableListing());
         $this->triggersOriginales = DB::getDriverName() === 'sqlite' ? DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson() : null;
         $this->originales = $this->capturar();
         $this->migracion->down();
@@ -94,13 +99,13 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     public function test_conserva_valores_rectificaciones_referencias_y_reversion_poblada(): void
     {
-        $this->assertCount(93, Schema::getTableListing()); // Núcleo histórico y referencia del ensayo.
+        $this->assertCount($this->tablasSeparadas - 3, Schema::getTableListing());
         $this->migracion->up();
-        $this->assertCount(96, Schema::getTableListing());
+        $this->assertCount($this->tablasSeparadas, Schema::getTableListing());
         $this->assertCount(44, Schema::getColumnListing('registros_observaciones_cuidado'));
         $this->assertSame(1, ControlCognitivo::count());
         $this->assertSame(2, ControlFuncionalIadl::count());
-        $this->assertSame(1, RegistroMovilidad::count());
+        $this->assertSame(1, DB::table('registros_observaciones_cuidado')->where('tipo_evento', 'MOVILIDAD')->count());
         $control = ControlCognitivo::sole();
         foreach ($this->cognitivo as $campo => $valor) {
             $this->assertEquals($valor, $campo === 'fecha_hora' ? $control->$campo->toDateTimeString() : $control->$campo);

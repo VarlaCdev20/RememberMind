@@ -1046,12 +1046,12 @@ class MiTurnoFueraDeJornadaTest extends TestCase
             ->call('guardarSignos')
             ->assertSuccessful();
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->residenteCarlos->cod_residente,
             'cod_personal' => $superUser->personal->cod_personal,
             'presion_sistolica' => 120,
             'presion_diastolica' => 80,
-        ]);
+        ])->exists());
 
         $sinJornada = Residente::crearDesdeAdmision([
             'cod_residente' => 'RES_SIN_JORNADA',
@@ -1065,6 +1065,6 @@ class MiTurnoFueraDeJornadaTest extends TestCase
         Livewire::test(DashboardTurno::class)
             ->call('abrirRegistrarSignos', $sinJornada->cod_residente)
             ->assertForbidden();
-        $this->assertDatabaseMissing('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $sinJornada->cod_residente]);
+        $this->assertFalse(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS','cod_residente' => $sinJornada->cod_residente])->exists());
     }
 }

@@ -219,9 +219,9 @@ class ReporteEnfermeriaPeriodoTest extends TestCase
         DB::table('registros_consumo')->insert($base + $fecha + $jornada + ['tipo_evento' => 'INGESTA', 'cod_registro_consumo' => 'ING_RPT', 'tipo_comida' => 'ALMUERZO', 'porcentaje_consumido' => 0, 'dificultad_deglucion' => false, 'observacion' => 'Detalle ingesta sintética']);
         DB::table('registros_consumo')->insert($base + $fecha + $jornada + ['tipo_evento' => 'HIDRATACION', 'cod_registro_consumo' => 'HID_RPT', 'cantidad_ml' => 150, 'tipo_liquido' => 'AGUA', 'observacion' => 'Detalle hidratación sintética']);
         DB::table('registros_consumo')->insert($base + $fecha + $jornada + ['tipo_evento' => 'ELIMINACION', 'cod_registro_consumo' => 'ELI_RPT', 'tipo_eliminacion' => 'URINARIA', 'volumen_ml' => 120, 'presencia_sangre' => false, 'observacion' => 'Detalle eliminación sintética']);
-        DB::table('registros_observaciones_cuidado')->insert($base + $fecha + $jornada + ['tipo_evento' => 'MOVILIDAD', 'cod_observacion_cuidado' => 'MOV_RPT', 'marcha' => 'ASISTIDA', 'distancia_metros' => 12, 'mareo' => false, 'observacion' => 'Detalle movilidad sintética']);
-        DB::table('registros_observaciones_cuidado')->insert($base + $jornada + ['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SUE_RPT', 'fecha' => '2026-10-27', 'horas_sueno' => 6, 'despertares' => 0, 'insomnio' => false, 'observacion' => 'Detalle sueño sintético']);
-        DB::table('registros_observaciones_cuidado')->insert($base + $fecha + $jornada + ['tipo_evento' => 'CONDUCTA', 'cod_observacion_cuidado' => 'CON_RPT', 'ansiedad' => false, 'estado_animo' => 'TRANQUILO', 'descripcion' => 'Detalle conducta sintética', 'intervencion' => 'Acompañamiento sintético', 'respuesta' => 'Respuesta sintética']);
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [$base + $fecha + $jornada + ['tipo_evento' => 'MOVILIDAD', 'cod_observacion_cuidado' => 'MOV_RPT', 'marcha' => 'ASISTIDA', 'distancia_metros' => 12, 'mareo' => false, 'observacion' => 'Detalle movilidad sintética']]);
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [$base + $jornada + ['tipo_evento' => 'SUENO', 'cod_observacion_cuidado' => 'SUE_RPT', 'fecha' => '2026-10-27', 'horas_sueno' => 6, 'despertares' => 0, 'insomnio' => false, 'observacion' => 'Detalle sueño sintético']]);
+        \App\Compartido\Infraestructura\Persistencia\ContextosResidente::insertar(DB::connection(), 'registros_observaciones_cuidado', [$base + $fecha + $jornada + ['tipo_evento' => 'CONDUCTA', 'cod_observacion_cuidado' => 'CON_RPT', 'ansiedad' => false, 'estado_animo' => 'TRANQUILO', 'descripcion' => 'Detalle conducta sintética', 'intervencion' => 'Acompañamiento sintético', 'respuesta' => 'Respuesta sintética']]);
         RegistrosConsumo::insertar('controles_cognitivos', [$base + $fecha + $jornada + ['cod_control_cognitivo' => 'COG_RPT', 'repite_preguntas' => false, 'observacion' => 'Detalle cognición sintética']]);
         RegistrosConsumo::insertar('valoraciones_dolor', [$base + $fecha + ['cod_valoracion_dolor' => 'DOL_RPT', 'intensidad' => 0, 'ubicacion' => 'Rodilla sintética', 'respuesta' => 'Detalle dolor sintético']]);
         DB::table('heridas')->insert($base + ['cod_herida' => 'HER_RPT', 'tipo_herida' => 'Herida sintética', 'ubicacion' => 'Brazo sintético', 'fecha_hora_identificacion' => '2026-10-27 10:00:00']);
@@ -322,7 +322,7 @@ class ReporteEnfermeriaPeriodoTest extends TestCase
                 'cod_jornada' => $this->jornada->getKey(), 'fecha_hora' => '2026-10-27 10:00:00', 'presion_sistolica' => 120, 'estado' => 'VIGENTE'];
         }
         foreach (array_chunk($filas, 200) as $lote) {
-            DB::table('mediciones_clinicas')->insert(array_map(static fn ($fila) => ['tipo_evento' => 'SIGNOS', 'cod_registro_medicion' => $fila['cod_signo']] + array_diff_key($fila, ['cod_signo' => true]), $lote));
+            RegistrosConsumo::insertar('signos_vitales', $lote);
         }
         DB::enableQueryLog();
         $inicio = hrtime(true);

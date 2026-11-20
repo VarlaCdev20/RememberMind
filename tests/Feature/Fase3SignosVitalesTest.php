@@ -269,9 +269,9 @@ class Fase3SignosVitalesTest extends TestCase
             ->set('fc', '75')->set('saturacion', '89')
             ->assertDontSee('Saturación crítica')->call('guardar')->assertOk()
             ->assertHasNoErrors()->assertSet('mostrar', false)->assertDispatched('signos-guardados');
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $this->residente->cod_residente,
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS','cod_residente' => $this->residente->cod_residente,
             'cod_personal' => $this->usuario->personal->cod_personal,
-            'frecuencia_cardiaca' => 75, 'saturacion_oxigeno' => 89]);
+            'frecuencia_cardiaca' => 75, 'saturacion_oxigeno' => 89])->exists());
         $this->assertDatabaseCount('alertas', 0);
     }
 }

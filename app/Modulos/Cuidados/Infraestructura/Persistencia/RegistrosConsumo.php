@@ -4,6 +4,7 @@ namespace App\Modulos\Cuidados\Infraestructura\Persistencia;
 
 use App\Compartido\Dominio\Calendario\SeleccionSemanal;
 use App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas;
+use App\Compartido\Infraestructura\Persistencia\ContextosResidente;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -74,7 +75,9 @@ final class RegistrosConsumo
                 }
             }
             unset($fila);
-            if ($tabla === 'valoraciones_profesionales') {
+            if (isset(ContextosResidente::CONTRATOS[$tabla])) {
+                ContextosResidente::insertar(DB::connection(), $tabla, $filas);
+            } elseif ($tabla === 'valoraciones_profesionales') {
                 DB::transaction(function () use ($tabla, $filas): void {
                     DB::table('atenciones')->whereIn('cod_atencion', array_column($filas, 'cod_atencion'))
                         ->orderBy('cod_atencion')->sharedLock()->get(['cod_atencion']);

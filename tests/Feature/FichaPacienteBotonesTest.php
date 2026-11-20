@@ -165,13 +165,13 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('modalSignos', false);
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS',
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'mediciones_clinicas')->where(['tipo_evento' => 'SIGNOS',
             'cod_residente' => $this->adulto->cod_residente,
             'presion_sistolica' => 125,
             'presion_diastolica' => 80,
             'frecuencia_cardiaca' => 74,
             'temperatura' => 36.6,
-        ]);
+        ])->exists());
     }
 
     public function test_modal_administrar_medicacion_completo(): void
@@ -219,10 +219,10 @@ class FichaPacienteBotonesTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('modalMed', false);
 
-        $this->assertDatabaseHas('administraciones_medicacion', [
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(\Illuminate\Support\Facades\DB::connection(), 'administraciones_medicacion')->where([
             'cod_residente' => $this->adulto->cod_residente,
             'resultado' => 'ADMINISTRADA',
-        ]);
+        ])->exists());
     }
 
     public function test_modal_tarea_cuidados_completar(): void
