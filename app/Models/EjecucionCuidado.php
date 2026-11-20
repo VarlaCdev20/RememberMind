@@ -2,13 +2,27 @@
 
 namespace App\Models;
 
+use App\Compartido\Infraestructura\Persistencia\GeneradorCodigo;
+use App\Compartido\Infraestructura\Persistencia\LeeColumnasRelacionadas;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 use LogicException;
 
 class EjecucionCuidado extends ModeloOperativo
 {
+    use LeeColumnasRelacionadas;
+
+    public function getCodResidenteAttribute(?string $valor): ?string
+    {
+        return $this->valorRelacionado($valor);
+    }
+
+    public function save(array $options = [])
+    {
+        return $this->guardarConVinculoProtegido($options);
+    }
+
     protected $table = 'ejecuciones_cuidado';
+
     protected $primaryKey = 'cod_ejecucion';
 
     protected $fillable = [
@@ -29,7 +43,7 @@ class EjecucionCuidado extends ModeloOperativo
     {
         static::creating(function (EjecucionCuidado $model) {
             if (empty($model->cod_ejecucion)) {
-                $model->cod_ejecucion = app(\App\Compartido\Infraestructura\Persistencia\GeneradorCodigo::class)->siguiente('ejecuciones_cuidado', $model->getConnectionName());
+                $model->cod_ejecucion = app(GeneradorCodigo::class)->siguiente('ejecuciones_cuidado', $model->getConnectionName());
             }
             if (empty($model->cod_residente)) {
                 throw new LogicException('La ejecución de cuidado requiere un residente explícito.');

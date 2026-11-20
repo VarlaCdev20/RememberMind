@@ -2,13 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarEgresoResidente;
-use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
-use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\EgresoResidente;
 use App\Models\Admision;
 use App\Models\Cama;
+use App\Models\Consentimiento;
 use App\Models\Contacto;
 use App\Models\Habitacion;
 use App\Models\HistorialEstadoResidente;
@@ -16,6 +12,11 @@ use App\Models\OcupacionCama;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\CambiarAlojamientoResidente;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Aplicacion\Acciones\RegistrarEgresoResidente;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\AlojamientoResidente;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\EgresoResidente;
 use App\Modulos\Residentes\Presentacion\Policies\ResidentePolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,6 +70,28 @@ class AlojamientoResidenteTest extends TestCase
         $this->get($ficha)->assertSee('Sin ocupación vigente')->assertDontSee('Registrar egreso');
         $formulario->call('confirmar')->assertHasErrors('egreso');
         $this->assertDatabaseCount('historial_estados_residente', 2);
+    }
+
+    public function test_ficha_administrativa_lee_solo_los_consentimientos_del_residente(): void
+    {
+        $datos = $this->escenario('CONS');
+        $datos['usuario']->givePermissionTo(Permission::findOrCreate('admisiones.ver_dashboard', 'web'));
+        $admision = Admision::where('cod_residente', $datos['residente']->getKey())->sole();
+        Consentimiento::create([
+            'cod_admision' => $admision->getKey(), 'cod_residente' => $datos['residente']->getKey(),
+            'cod_usuario_registro' => $datos['usuario']->getKey(), 'tipo_consentimiento' => 'ATENCION_SINTETICA',
+            'firma_residente' => true, 'fecha_consentimiento' => now(), 'estado' => 'VIGENTE',
+        ]);
+        $otro = $this->escenario('AJENO');
+        $admisionAjena = Admision::where('cod_residente', $otro['residente']->getKey())->sole();
+        Consentimiento::create([
+            'cod_admision' => $admisionAjena->getKey(), 'cod_residente' => $otro['residente']->getKey(),
+            'cod_usuario_registro' => $otro['usuario']->getKey(), 'tipo_consentimiento' => 'NO_EXPONER_AJENO',
+            'firma_residente' => true, 'fecha_consentimiento' => now(), 'estado' => 'VIGENTE',
+        ]);
+        $this->actingAs($datos['usuario'])->get(route('admin.administracion.residentes.show', [
+            $datos['residente'], 'tab' => 'consentimientos',
+        ]))->assertOk()->assertSeeText('ATENCION_SINTETICA')->assertDontSeeText('NO_EXPONER_AJENO');
     }
 
     public function test_egreso_revalida_permiso_y_ocupacion_antes_de_guardar(): void

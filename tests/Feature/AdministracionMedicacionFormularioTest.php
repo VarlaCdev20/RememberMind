@@ -633,10 +633,11 @@ class AdministracionMedicacionFormularioTest extends TestCase
                 continue;
             }
             $quote = fn ($value) => '"'.str_replace('"', '""', $value).'"';
-            $columnas = array_keys((array) $filas->first());
+            $generadas = array_column(array_filter(DB::select('PRAGMA table_xinfo('.$quote($tabla->name).')'), fn ($columna) => $columna->hidden >= 2), 'name');
+            $columnas = array_values(array_diff(array_keys((array) $filas->first()), $generadas));
             $insertar = $copia->prepare('INSERT INTO '.$quote($tabla->name).' ('.implode(',', array_map($quote, $columnas)).') VALUES ('.implode(',', array_fill(0, count($columnas), '?')).')');
             foreach ($filas as $fila) {
-                $insertar->execute(array_values((array) $fila));
+                $insertar->execute(array_map(fn ($columna) => $fila->$columna, $columnas));
             }
         }
         foreach (DB::select("SELECT sql FROM sqlite_master WHERE type IN ('index','trigger','view') AND sql IS NOT NULL") as $estructura) {

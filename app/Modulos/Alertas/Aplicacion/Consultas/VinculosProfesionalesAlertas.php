@@ -39,7 +39,7 @@ final class VinculosProfesionalesAlertas
     {
         $q->whereHas('responsable.usuario.roles', fn ($r) => $r->whereIn('name', $roles));
         if (in_array(self::ROL_MEDICO, $roles, true)) {
-            $q->orWhereRaw("UPPER(TRIM(modulo)) = ?", ['SOLICITUD_MEDICA']);
+            $q->orWhereRaw('UPPER(TRIM(modulo)) = ?', ['SOLICITUD_MEDICA']);
         }
 
         foreach ($this->fuentes($usuario) as $fuente) {
@@ -133,7 +133,7 @@ final class VinculosProfesionalesAlertas
     {
         $q = $fuente['modelo']::query();
         if ($fuente['modelo'] === EjecucionCuidado::class) {
-            $q->whereHas('intervencion.plan', fn ($p) => $p->whereColumn('planes_cuidado.cod_residente', 'ejecuciones_cuidado.cod_residente'));
+            $q->whereHas('intervencion.plan', fn ($p) => $p->whereColumn('planes_cuidado.cod_residente', (new EjecucionCuidado)->qualifyColumn('cod_residente')));
         }
         if (isset($fuente['tipo'])) {
             // El lector de procedencia da precedencia al incidente real si coincide su referencia.

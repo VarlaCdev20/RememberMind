@@ -2,9 +2,10 @@
 
 namespace App\Modulos\Institucion\Aplicacion\Consultas;
 
-use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
+use App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas;
 use App\Models\Cama;
 use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use App\Modulos\Residentes\Aplicacion\Consultas\DirectorioResidentesService;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
@@ -225,7 +226,7 @@ class ConsultaOperativaService
                 );
             case 'consentimientos':
                 return $this->armar(
-                    DB::table('consentimientos as co')->join('residentes as r', 'r.cod_residente', '=', 'co.cod_residente')
+                    ColumnasRelacionadas::consulta(DB::connection(), 'consentimientos', 'co')->join('residentes as r', 'r.cod_residente', '=', 'co.cod_residente')
                         ->select('co.cod_consentimiento as codigo', 'co.cod_residente as _cod_residente', 'co.tipo_consentimiento as titulo',
                             DB::raw($this->nombreCompleto('r').' as detalle'), 'co.fecha_consentimiento as fecha', 'co.estado as estado')
                         ->selectRaw("CASE WHEN co.firma_residente = TRUE THEN 'Residente' ELSE 'Contacto responsable' END as firmante"),

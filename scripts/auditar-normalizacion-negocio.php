@@ -33,10 +33,10 @@ try {
             'filas' => $c->table($nombre)->count(),
             'columnas' => $s->getColumns($nombre),
             'indices' => $s->getIndexes($nombre),
-            'indices_sql' => $c->select("SELECT x.relname AS nombre, i.indisunique AS unico, i.indisprimary AS primario, i.indisvalid AS valido, pg_get_expr(i.indpred, i.indrelid) AS predicado, pg_get_expr(i.indexprs, i.indrelid) AS expresiones, pg_get_indexdef(i.indexrelid) AS definicion FROM pg_index i JOIN pg_class x ON x.oid = i.indexrelid WHERE i.indrelid = to_regclass(?) ORDER BY x.relname", ['public.'.$nombre]),
+            'indices_sql' => $c->select('SELECT x.relname AS nombre, i.indisunique AS unico, i.indisprimary AS primario, i.indisvalid AS valido, pg_get_expr(i.indpred, i.indrelid) AS predicado, pg_get_expr(i.indexprs, i.indrelid) AS expresiones, pg_get_indexdef(i.indexrelid) AS definicion FROM pg_index i JOIN pg_class x ON x.oid = i.indexrelid WHERE i.indrelid = to_regclass(?) ORDER BY x.relname', ['public.'.$nombre]),
             'fk' => $s->getForeignKeys($nombre),
-            'restricciones' => $c->select("SELECT conname, contype, convalidated, pg_get_constraintdef(oid) AS definicion FROM pg_constraint WHERE conrelid = to_regclass(?) ORDER BY conname", ['public.'.$nombre]),
-            'triggers' => $c->select("SELECT tgname, pg_get_triggerdef(oid) AS definicion, pg_get_functiondef(tgfoid) AS funcion FROM pg_trigger WHERE tgrelid = to_regclass(?) AND NOT tgisinternal ORDER BY tgname", ['public.'.$nombre]),
+            'restricciones' => $c->select('SELECT conname, contype, convalidated, pg_get_constraintdef(oid) AS definicion FROM pg_constraint WHERE conrelid = to_regclass(?) ORDER BY conname', ['public.'.$nombre]),
+            'triggers' => $c->select('SELECT tgname, pg_get_triggerdef(oid) AS definicion, pg_get_functiondef(tgfoid) AS funcion FROM pg_trigger WHERE tgrelid = to_regclass(?) AND NOT tgisinternal ORDER BY tgname', ['public.'.$nombre]),
         ];
     }
     $claves = static fn (array $t): array => array_values(array_filter($t['indices'], static function ($i) use ($t): bool {
@@ -45,15 +45,20 @@ try {
                 return $i['unique'] && $sql->valido && $sql->predicado === null && $sql->expresiones === null;
             }
         }
+
         return false;
     }));
     $q = static fn (string $columna): string => $c->getQueryGrammar()->wrap($columna);
     $dependencias = [];
     foreach ($tablas as $nombre => $t) {
         foreach ($t['fk'] as $fk) {
-            if ($fk['foreign_schema'] !== 'public' || ! isset($tablas[$fk['foreign_table']])) continue;
+            if ($fk['foreign_schema'] !== 'public' || ! isset($tablas[$fk['foreign_table']])) {
+                continue;
+            }
             foreach ($claves($tablas[$fk['foreign_table']]) as $k) {
-                if (count($k['columns']) >= count($fk['foreign_columns']) || array_diff($k['columns'], $fk['foreign_columns'])) continue;
+                if (count($k['columns']) >= count($fk['foreign_columns']) || array_diff($k['columns'], $fk['foreign_columns'])) {
+                    continue;
+                }
                 $det = array_map(static fn ($v) => $fk['columns'][array_search($v, $fk['foreign_columns'], true)], $k['columns']);
                 $dep = array_values(array_diff($fk['columns'], $det));
                 // MATCH SIMPLE no impone la dependencia si cualquier componente es NULL.
@@ -78,6 +83,20 @@ try {
         'dias_horario' => "SELECT COUNT(*)::int AS filas, COUNT(*) FILTER (WHERE dias_semana IS NOT NULL AND BTRIM(dias_semana)<>'')::int AS con_seleccion FROM horarios_prescripcion",
         'dias_cuidado' => "SELECT COUNT(*)::int AS filas, COUNT(*) FILTER (WHERE dias_semana IS NOT NULL AND BTRIM(dias_semana)<>'')::int AS con_seleccion FROM programaciones_cuidado",
     ] as $id => $sql) {
+        $derivados = ['consentimiento_admision' => 'consentimientos', 'ejecucion_plan' => 'ejecuciones_cuidado'];
+        if (isset($derivados[$id]) && ! $s->hasColumn($derivados[$id], 'cod_residente')) {
+            $comprobaciones[$id] = [
+                'estado' => 'CONTEXTO_DERIVADO_SIN_COLUMNA_REDUNDANTE',
+                'filas' => $c->table($derivados[$id])->count(),
+                'nota' => 'La conservación de la migración y sus guardas se verifican mediante pruebas separadas.',
+            ];
+
+            continue;
+        }
+        $semanales = ['dias_horario' => 'horarios_prescripcion', 'dias_cuidado' => 'programaciones_cuidado'];
+        if (isset($semanales[$id]) && $s->hasColumn($semanales[$id], 'cod_patron_semanal')) {
+            $sql = "SELECT COUNT(*)::int AS filas, COUNT(*) FILTER (WHERE cod_patron_semanal <> 'SEM_TODOS')::int AS con_seleccion FROM ".$q($semanales[$id]);
+        }
         $comprobaciones[$id] = $c->selectOne($sql);
     }
     foreach ([

@@ -2,6 +2,7 @@
 
 namespace App\Modulos\Cuidados\Infraestructura\Persistencia;
 
+use App\Compartido\Dominio\Calendario\SeleccionSemanal;
 use App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,7 @@ final class RegistrosConsumo
 
     public static function insertar(string $entidad, array $filas): void
     {
+        $filas = array_map(fn ($fila) => SeleccionSemanal::preparar($entidad, $fila), $filas);
         if (isset(self::ORIGENES[$entidad])) {
             [$tabla, $codigo, $tipo, $campo] = self::ORIGENES[$entidad];
             foreach ($filas as &$fila) {
@@ -85,6 +87,9 @@ final class RegistrosConsumo
             return;
         }
 
-        DB::table($entidad)->insert(array_map(fn ($fila) => ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));
+        DB::transaction(function () use ($entidad, $filas): void {
+            ColumnasRelacionadas::bloquearEntrada(DB::connection(), $entidad, $filas);
+            DB::table($entidad)->insert(array_map(fn ($fila) => ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));
+        });
     }
 }

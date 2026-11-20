@@ -36,4 +36,13 @@ trait LeeColumnasRelacionadas
     {
         return $valor ?? ColumnasRelacionadas::valor($this->getConnection(), $this->getTable(), $this->getAttributes());
     }
+
+    protected function guardarConVinculoProtegido(array $options): bool
+    {
+        return $this->getConnection()->transaction(function () use ($options): bool {
+            ColumnasRelacionadas::bloquearEntrada($this->getConnection(), $this->getTable(), [$this->getAttributes(), $this->getRawOriginal()]);
+
+            return parent::save($options);
+        });
+    }
 }

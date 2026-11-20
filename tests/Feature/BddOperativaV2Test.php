@@ -11,8 +11,10 @@ use App\Models\AsignacionResidenteJornada;
 use App\Models\Atencion;
 use App\Models\Cama;
 use App\Models\ComponenteEstudio;
+use App\Models\Consentimiento;
 use App\Models\Contacto;
 use App\Models\Habitacion;
+use App\Models\InformeEstudio;
 use App\Models\Instrumento;
 use App\Models\Jornada;
 use App\Models\Medicamento;
@@ -23,6 +25,7 @@ use App\Models\PreguntaInstrumento;
 use App\Models\Prescripcion;
 use App\Models\Residente;
 use App\Models\RespuestaInstrumento;
+use App\Models\ResultadoEstudio;
 use App\Models\TipoEstudioClinico;
 use App\Models\Turno;
 use App\Models\User;
@@ -123,7 +126,7 @@ class BddOperativaV2Test extends TestCase
         $this->assertDatabaseHas('residentes_contactos', ['cod_residente' => $residente->cod_residente]);
         $this->assertDatabaseHas('ocupaciones_cama', ['cod_residente' => $residente->cod_residente, 'estado' => 'ACTIVA']);
         $this->assertDatabaseHas('historial_estados_residente', ['cod_residente' => $residente->cod_residente, 'estado_nuevo' => 'ADMITIDO']);
-        $this->assertDatabaseHas('consentimientos', ['cod_residente' => $residente->cod_residente, 'estado' => 'VIGENTE']);
+        $this->assertTrue(Consentimiento::query()->where('cod_residente', $residente->cod_residente)->where('estado', 'VIGENTE')->exists());
     }
 
     public function test_creacion_directa_de_residente_esta_bloqueada(): void
@@ -235,7 +238,7 @@ class BddOperativaV2Test extends TestCase
             'cod_personal' => 'PER_FALSO', 'temperatura' => 36.8, 'saturacion_oxigeno' => 97,
         ])->assertCreated();
 
-        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS','cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, 'temperatura' => 36.8]);
+        $this->assertDatabaseHas('mediciones_clinicas', ['tipo_evento' => 'SIGNOS', 'cod_residente' => $residente->cod_residente, 'cod_personal' => $personal->cod_personal, 'temperatura' => 36.8]);
     }
 
     public function test_familiar_no_puede_acceder_por_idor_a_otro_expediente(): void
@@ -284,7 +287,7 @@ class BddOperativaV2Test extends TestCase
         $solicitud = $this->actingAs($medico)->postJson(route('admin.estudios.store', $residente), ['cod_atencion' => $atencion->cod_atencion, 'cod_tipo_estudio' => $tipo->cod_tipo_estudio])->assertCreated();
         $codigo = $solicitud->json('cod_estudio');
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $ajeno->cod_componente, 'valor_numerico' => 95]]])->assertStatus(422);
-        $this->assertSame(0, \App\Models\ResultadoEstudio::count());
+        $this->assertSame(0, ResultadoEstudio::count());
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $componente->cod_componente, 'valor_numerico' => 13.5]]])->assertCreated();
         $this->actingAs($medico)->postJson(route('admin.estudios.resultados', $codigo), ['resultados' => [['cod_componente' => $componente->cod_componente, 'valor_numerico' => 14.0]]])->assertStatus(409);
         $this->assertDatabaseHas('registros_estudio', ['tipo_evento' => 'RESULTADO', 'cod_estudio' => $codigo, 'cod_componente' => $componente->cod_componente]);
@@ -294,8 +297,8 @@ class BddOperativaV2Test extends TestCase
                 'conclusion' => $conclusion, 'origen' => 'INTERNO',
             ])->assertCreated();
         }
-        $this->assertSame(1, \App\Models\ResultadoEstudio::where('cod_estudio', $codigo)->count());
-        $this->assertSame(2, \App\Models\InformeEstudio::where('cod_estudio', $codigo)->count());
+        $this->assertSame(1, ResultadoEstudio::where('cod_estudio', $codigo)->count());
+        $this->assertSame(2, InformeEstudio::where('cod_estudio', $codigo)->count());
         $migracion = require database_path('migrations/2026_11_14_000009_consolidate_registros_estudio.php');
         $migracion->down();
         try {

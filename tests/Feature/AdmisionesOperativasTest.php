@@ -2,17 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Modulos\Institucion\Aplicacion\Consultas\ConsultaOperativaService;
-use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
-use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
 use App\Models\Admision;
 use App\Models\Cama;
+use App\Models\Consentimiento;
 use App\Models\Contacto;
 use App\Models\Habitacion;
 use App\Models\OcupacionCama;
 use App\Models\Preadmision;
 use App\Models\Residente;
 use App\Models\User;
+use App\Modulos\Admisiones\Aplicacion\Acciones\FormalizarAdmision;
+use App\Modulos\Admisiones\Presentacion\Livewire\Paginas\PreadmisionesPanel;
+use App\Modulos\Institucion\Aplicacion\Consultas\ConsultaOperativaService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -102,7 +103,7 @@ class AdmisionesOperativasTest extends TestCase
             $this->assertDatabaseHas('admisiones', ['cod_residente' => $residente->getKey(), 'cod_preadmision' => $datos['solicitud']->getKey()]);
             $this->assertDatabaseHas('ocupaciones_cama', ['cod_residente' => $residente->getKey(), 'cod_cama' => $datos['cama']->getKey(), 'estado' => 'ACTIVA']);
             $this->assertDatabaseHas('historial_estados_residente', ['cod_residente' => $residente->getKey(), 'estado_nuevo' => 'ADMITIDO']);
-            $this->assertDatabaseHas('consentimientos', ['cod_residente' => $residente->getKey(), 'estado' => 'VIGENTE']);
+            $this->assertTrue(Consentimiento::query()->where('cod_residente', $residente->getKey())->where('estado', 'VIGENTE')->exists());
             $this->assertSame(0, app(ConsultaOperativaService::class)->resumenAdmision()['camas_disponibles']);
         }
     }

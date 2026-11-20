@@ -412,9 +412,10 @@ class MiTurnoAuditoriaCierreTest extends TestCase
         // G. cod_residente de administración debe coincidir con la prescripción
         // El modelo valida y rechaza si cod_residente no coincide con la prescripción
         $exceptionLanzada = false;
+        $codigoRechazado = 'ADM_ERR_'.strtoupper(Str::random(4));
         try {
             AdministracionMedicacion::create([
-                'cod_administracion' => 'ADM_ERR_'.strtoupper(Str::random(4)),
+                'cod_administracion' => $codigoRechazado,
                 'cod_prescripcion' => $pDobleHorario->cod_prescripcion,
                 'cod_horario_prescripcion' => $h2->cod_horario_prescripcion,
                 'cod_residente' => $this->residente2->cod_residente, // Mismatched!
@@ -427,9 +428,10 @@ class MiTurnoAuditoriaCierreTest extends TestCase
             ]);
         } catch (ValidationException $e) {
             $exceptionLanzada = true;
-            $this->assertStringContainsString('no corresponde al residente', $e->getMessage());
+            $this->assertArrayHasKey('cod_prescripcion', $e->errors());
         }
         $this->assertTrue($exceptionLanzada, 'El modelo debe rechazar administración con residente no coincidente');
+        $this->assertDatabaseMissing('administraciones_medicacion', ['cod_administracion' => $codigoRechazado]);
 
         $datos = $this->service->obtenerDatosDashboard($this->enfermeraUser);
         $agenda = $datos['agenda'];

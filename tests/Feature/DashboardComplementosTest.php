@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Area;
+use App\Models\EjecucionCuidado;
 use App\Models\Jornada;
 use App\Models\Personal;
 use App\Models\Residente;
@@ -69,7 +70,7 @@ class DashboardComplementosTest extends TestCase
 
     private function tarea(string $codigo, array $cambios = []): void
     {
-        DB::table('ejecuciones_cuidado')->insert(array_replace(['cod_ejecucion' => $codigo, 'cod_intervencion' => 'INT_TEST', 'cod_residente' => $this->residente->cod_residente, 'cod_jornada' => 'JOR_TEST', 'cod_personal' => 'PER_TEST', 'fecha_hora_programada' => now(), 'estado' => 'PENDIENTE'], $cambios));
+        EjecucionCuidado::create(array_replace(['cod_ejecucion' => $codigo, 'cod_intervencion' => 'INT_TEST', 'cod_residente' => $this->residente->cod_residente, 'cod_jornada' => 'JOR_TEST', 'cod_personal' => 'PER_TEST', 'fecha_hora_programada' => now(), 'estado' => 'PENDIENTE'], $cambios));
     }
 
     private function nota(string $codigo, array $cambios = []): void

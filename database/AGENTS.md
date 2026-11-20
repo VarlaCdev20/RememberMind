@@ -14,6 +14,8 @@ The current code is not authority over the frozen baseline.
 
 ## Frozen schema
 
+Owner authorization 2026-11-20 permits the 5NF normalization of business relations, including necessary decompositions, preserving existing data and behavior. The ceiling for this work is **100 business tables plus the 16 technical tables**, superseding the former 100-physical ceiling only for this scope. Approval is not evidence of installation or global 5NF verification. See `DECISION_NORMALIZACION_5FN_2026_11_20.md` under `docs/base-de-datos/`.
+
 Owner approval 2026-11-18 removes only `valoraciones_profesionales.cod_residente` and derives the resident from the mandatory attention, retaining its historical identity. The table has 29 columns after migration and the inventory remains 100 physical tables. See `docs/base-de-datos/DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md`. Other structural decisions remain scoped to their recorded authorizations.
 
 Owner approval 2026-11-18 additionally authorizes the professional-assessment partition in `docs/base-de-datos/DECISION_REPARTO_VALORACIONES_2026_11_18.md`: preserve Functional/Nutrition in `valoraciones_profesionales` and move Psychology/Pedagogy to `valoraciones_psicopedagogicas`, 30 columns each. The final local inventory is **64 operational + 20 expert + 16 technical = 100 physical tables**. This scope-specific approval supersedes the preceding 99-table cut; it does not authorize further tables or unrelated structural changes.
