@@ -13,11 +13,13 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Support\EsquemaHistoricoHechos;
 use Tests\Support\EntornoPruebas;
 use Tests\TestCase;
 
 final class PreflightReduccionExpertaTest extends TestCase
 {
+    use EsquemaHistoricoHechos;
 
     private bool $basePostgresPropia = false;
 
@@ -53,6 +55,7 @@ final class PreflightReduccionExpertaTest extends TestCase
 
     public function test_referencia_entrante_fuera_del_mapa_bloquea_el_plan(): void
     {
+        $this->transicionesPosterioresDeHechos(true);
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         (new TransicionReduccionConservacion)->bajar();
@@ -63,7 +66,7 @@ final class PreflightReduccionExpertaTest extends TestCase
         try {
             $this->expectException(DomainException::class);
             $this->expectExceptionMessage('FK entrante');
-            (new EvaluarReduccionConservacion)->evaluar(DB::connection());
+            (new EvaluarReduccionConservacion)->evaluar(DB::connection(), P::HECHOS);
         } finally {
             Schema::drop('prueba_fk_consolidacion');
         }
@@ -86,6 +89,7 @@ final class PreflightReduccionExpertaTest extends TestCase
         if (DB::getDriverName() !== 'pgsql') {
             $this->markTestSkipped('El caso de esquemas separados requiere PostgreSQL.');
         }
+        $this->transicionesPosterioresDeHechos(true);
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
         (new TransicionReduccionConservacion)->bajar();
@@ -94,7 +98,7 @@ final class PreflightReduccionExpertaTest extends TestCase
             DB::statement('CREATE TABLE prueba_fk_externa.origen (cod_cognitiva varchar(20) REFERENCES public.evidencias_cognitivas_instantanea(cod_evidencia_cognitiva_instantanea))');
             $this->expectException(DomainException::class);
             $this->expectExceptionMessage('otro esquema');
-            (new EvaluarReduccionConservacion)->evaluar(DB::connection());
+            (new EvaluarReduccionConservacion)->evaluar(DB::connection(), P::HECHOS);
         } finally {
             DB::statement('DROP TABLE IF EXISTS prueba_fk_externa.origen');
             DB::statement('DROP SCHEMA prueba_fk_externa');

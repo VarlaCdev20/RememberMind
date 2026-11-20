@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Schema;
 use MotorExperto\conservacion\CodecInstantanea as Codec;
 use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\EsquemaHistoricoHechos;
 use Tests\Support\CorromperConservacionParaPrueba;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 
 /** Migración poblada y reversión reales, dentro de las bases sintéticas del runner. */
 final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
 {
+    use EsquemaHistoricoHechos;
     use CorromperConservacionParaPrueba;
 
     private function almacen(): AlmacenInstantaneas
@@ -37,15 +39,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         $this->almacen()->guardar($perfil->cognicion);
         $this->almacen()->guardarClasificacion($r);
         // Cada transición histórica recibe su esquema real, no un corte posterior.
-        foreach ([
-            '2026_11_20_000003_derive_iadl_functional_context.php',
-            '2026_11_18_000002_remove_derived_context_columns.php',
-            '2026_11_17_000004_consolidate_instantaneas_reglas.php',
-            '2026_11_17_000003_consolidate_evaluaciones_reglas.php',
-            '2026_11_14_000013_consolidate_componentes_regla.php',
-        ] as $archivo) {
-            (require database_path('migrations/'.$archivo))->down();
-        }
+        $this->transicionesPosterioresDeHechos(true);
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         // Este contrato prueba la migración histórica del 20/10 sobre su esquema de entrada de 104.
         (new TransicionBloquesExpertos)->bajar();
@@ -80,17 +74,16 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
             self::assertFalse(Schema::hasTable($tabla));
         }
         self::assertSame($p->canonizar($antes), $p->canonizar($p->restaurar($this->filas([P::HECHOS, P::CLASIFICACIONES, P::VINCULOS]))));
+        if (DB::getDriverName() === 'sqlite') {
+            foreach ($triggers as $nombre => $sql) {
+                self::assertSame($sql, DB::table('sqlite_master')->where('name', $nombre)->value('sql'));
+            }
+            self::assertSame([], DB::select('PRAGMA foreign_key_check'));
+        }
         (new TransicionBloquesExpertos)->subir();
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->up();
-        foreach ([
-            '2026_11_14_000013_consolidate_componentes_regla.php',
-            '2026_11_17_000003_consolidate_evaluaciones_reglas.php',
-            '2026_11_17_000004_consolidate_instantaneas_reglas.php',
-            '2026_11_18_000002_remove_derived_context_columns.php',
-            '2026_11_20_000003_derive_iadl_functional_context.php',
-        ] as $archivo) {
-            (require database_path('migrations/'.$archivo))->up();
-        }
+        $this->transicionesPosterioresDeHechos(false);
+
         $consultas = [];
         DB::listen(static function ($q) use (&$consultas) {
             $consultas[] = $q->sql;
@@ -101,12 +94,6 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
             foreach (T::RETIRADAS as $tabla) {
                 self::assertStringNotContainsString($tabla, $sql);
             }
-        }
-        if (DB::getDriverName() === 'sqlite') {
-            foreach ($triggers as $nombre => $sql) {
-                self::assertSame($sql, DB::table('sqlite_master')->where('name', $nombre)->value('sql'));
-            }
-            self::assertSame([], DB::select('PRAGMA foreign_key_check'));
         }
     }
 
@@ -224,7 +211,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         if ($caso === 'evidencia_evaluacion') {
             $h = DB::table(P::HECHOS)->where('id_hecho_dominio', 'SIM-IADL')->first();
             $this->corromperConservacion(fn () => DB::table(P::HECHOS)->where('cod_hecho_instantanea', $h->cod_hecho_instantanea)
-                ->update(['cod_evidencia_evaluacion' => 'SIM-EVID', 'tipo_origen' => 'D137', 'cod_atencion' => 'SIM-AT']));
+                ->update(['cod_evidencia_evaluacion' => 'SIM-EVID', 'tipo_origen' => 'D137', 'cod_atencion' => 'SIM-AT']), P::HECHOS);
             DB::table(P::VINCULOS)->insert(['cod_evidencia_criterio' => 'V-CONTEXTO', 'cod_evaluacion_criterio' => $criterio,
                 'cod_evidencia_evaluacion' => 'SIM-EVID', 'rol_en_criterio' => 'SOPORTE_EXPERIMENTAL', 'estado_participacion' => 'PRUEBA_TECNICA',
                 'fecha_hora_vinculacion' => '2026-10-20 10:00:00', 'orden_conservacion' => 999]);
@@ -287,7 +274,7 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         try {
             $pdo->exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
             try {
-                $pdo->exec("INSERT INTO hechos_instantanea_experta(cod_hecho_instantanea) VALUES ('RR-RECHAZADO')");
+                $pdo->exec("INSERT INTO hechos_evaluacion_experta(cod_hecho_instantanea) VALUES ('RR-RECHAZADO')");
                 self::fail('Las guardas deben rechazar el snapshot de escritura.');
             } catch (\PDOException $e) {
                 self::assertStringContainsString('red_hecho_requiere_read_committed', $e->getMessage());

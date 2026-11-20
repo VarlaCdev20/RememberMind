@@ -116,7 +116,7 @@ final class EscenariosDclResidentesSeederTest extends TestCase
             ->assertOk()->assertSee('Posible DCL amnésico de dominio único')
             ->assertSee('Panorama cognitivo')->assertSee('Estado de cada área')
             ->assertSee('Alteración sustentada en Memoria.')
-            ->assertSee('Fuentes del resultado')->assertSee('Consultar los datos originales');
+            ->assertSee('Fuentes del resultado')->assertSee('Datos utilizados en la evaluación');
         self::assertSame(10, EvaluacionExperta::count());
     }
 

@@ -40,6 +40,7 @@ use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as Su
 use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum as Op;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\EsquemaHistoricoHechos;
 use Tests\Support\CorromperConservacionParaPrueba;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 use Tests\Unit\SistemaExperto\Domain\Services\Inferencia\EscenarioInferencia;
@@ -48,6 +49,7 @@ use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
 /** Demuestra recuperación durable, atomicidad e inmutabilidad. */
 final class ConservacionExpertaTest extends RepositoriosTestCase
 {
+    use EsquemaHistoricoHechos;
     use CorromperConservacionParaPrueba;
 
     protected function setUp(): void
@@ -159,7 +161,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         }
         self::assertTrue($disparado);
         self::assertSame(0, DB::table('evaluaciones_expertas')->count());
-        self::assertSame(0, DB::table('hechos_instantanea_experta')->count());
+        self::assertSame(0, DB::table('hechos_evaluacion_experta')->count());
         self::assertEquals($antes, DB::table('secuencias_codigos')->orderBy('entidad')->get()->all());
     }
 
@@ -228,7 +230,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         $this->repo()->guardar(E::perfil()->cognicion);
         $this->expectException(QueryException::class);
-        DB::transaction(fn () => DB::table('hechos_instantanea_experta')->update(['valor_tipo' => 'NULL', 'valor_texto' => 'Indebido']));
+        DB::transaction(fn () => DB::table('hechos_evaluacion_experta')->update(['valor_tipo' => 'NULL', 'valor_texto' => 'Indebido']));
     }
 
     public function test_nuevos_modelos_no_admiten_sobrescritura_masiva(): void
@@ -241,11 +243,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         [$modelo] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
-        (require database_path('migrations/2026_11_20_000003_derive_iadl_functional_context.php'))->down();
-        (require database_path('migrations/2026_11_18_000002_remove_derived_context_columns.php'))->down();
-        (require database_path('migrations/2026_11_17_000004_consolidate_instantaneas_reglas.php'))->down();
-        (require database_path('migrations/2026_11_17_000003_consolidate_evaluaciones_reglas.php'))->down();
-        foreach (['000013_consolidate_componentes_regla', '000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
+        $this->transicionesPosterioresDeHechos(true);
+        foreach (['000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
             (require database_path('migrations/2026_11_14_'.$posterior.'.php'))->down();
         }
         (new TransicionBloquesExpertos)->bajar();
@@ -262,6 +261,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     public function test_down_rechaza_historia_incluso_si_la_cabecera_fue_desmarcada(): void
     {
         $this->repo()->guardar(E::perfil()->cognicion);
+        (require database_path('migrations/2026_11_20_000009_rename_expert_evaluation_facts.php'))->down();
         DB::table('evaluaciones_expertas')->update(['version_conservacion' => null]);
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
         try {
@@ -320,7 +320,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         }
         self::assertTrue($disparado);
         self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
-        self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
+        self::assertSame(0, DB::table('hechos_evaluacion_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
         self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         self::assertNotNull($this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha()));
@@ -365,7 +365,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             self::fail('El valor original ya no coincide.');
         } catch (DomainException) {
             self::assertNull(DB::table('evaluaciones_expertas')->value('version_conservacion'));
-            self::assertSame(0, DB::table('hechos_instantanea_experta')->count());
+            self::assertSame(0, DB::table('hechos_evaluacion_experta')->count());
         }
     }
 
@@ -387,7 +387,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $m = E::memoria([], [$h]);
         $v = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
         $this->repo()->guardar($v);
-        DB::transaction(fn () => DB::table('hechos_instantanea_experta')->update(['valor_entero' => 'garbage']));
+        DB::transaction(fn () => DB::table('hechos_evaluacion_experta')->update(['valor_entero' => 'garbage']));
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
 
@@ -428,7 +428,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $evidencia['cod_evaluacion_experta'] = 'SIM-OTRA';
         DB::table('evidencias_evaluacion')->insert($evidencia);
         $this->expectException(QueryException::class);
-        DB::table('hechos_instantanea_experta')->update(['cod_evidencia_evaluacion' => 'SIM-OTRA-EVID']);
+        DB::table('hechos_evaluacion_experta')->update(['cod_evidencia_evaluacion' => 'SIM-OTRA-EVID']);
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
 
@@ -477,7 +477,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         $this->repo()->guardar(E::perfil()->cognicion);
         $this->expectException(QueryException::class);
-        DB::transaction(fn () => DB::table('hechos_instantanea_experta')->where('orden', 0)->update(['orden' => 'garbage']));
+        DB::transaction(fn () => DB::table('hechos_evaluacion_experta')->where('orden', 0)->update(['orden' => 'garbage']));
         $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
     }
 }

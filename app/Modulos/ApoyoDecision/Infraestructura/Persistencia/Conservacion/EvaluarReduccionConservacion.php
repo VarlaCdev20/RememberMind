@@ -10,13 +10,13 @@ use Illuminate\Database\Connection;
 /** Preflight técnico de lectura. Devuelve conteos y comparación, nunca filas clínicas. */
 final class EvaluarReduccionConservacion
 {
-    public function evaluar(Connection $db): array
+    public function evaluar(Connection $db, string $hechos = 'hechos_evaluacion_experta'): array
     {
         if ($db->transactionLevel() !== 0 || ! in_array($db->getDriverName(), ['pgsql', 'sqlite'], true)) {
             throw new DomainException('El preflight requiere una transacción propia en PostgreSQL o SQLite.');
         }
 
-        return $db->transaction(function () use ($db): array {
+        return $db->transaction(function () use ($db, $hechos): array {
             if ($db->getDriverName() === 'pgsql') {
                 $db->statement('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY');
                 $externas = $db->select("SELECT 1 FROM pg_constraint c
@@ -30,15 +30,15 @@ final class EvaluarReduccionConservacion
                 }
             }
 
-            return $this->validarEnTransaccion($db);
+            return $this->validarEnTransaccion($db, $hechos);
         });
     }
 
     /** Lectura reutilizada por la migración dentro de su propia transacción. */
-    public function validarEnTransaccion(Connection $db): array
+    public function validarEnTransaccion(Connection $db, string $hechos = ProyeccionReduccionExperta::HECHOS): array
     {
         $plan = new ProyeccionReduccionExperta;
-        $reducida = $db->getSchemaBuilder()->hasColumn(ProyeccionReduccionExperta::HECHOS, 'cognitiva_dominio');
+        $reducida = $db->getSchemaBuilder()->hasColumn($hechos, 'cognitiva_dominio');
         if (! $reducida) {
             $permitidas = [ProyeccionReduccionExperta::COGNITIVAS => [], ProyeccionReduccionExperta::IADL => [],
                 ProyeccionReduccionExperta::SINTETICOS => [], ProyeccionReduccionExperta::FUNCIONALIDAD => [ProyeccionReduccionExperta::IADL, ProyeccionReduccionExperta::CLASIFICACIONES]];
@@ -56,17 +56,20 @@ final class EvaluarReduccionConservacion
         $conteos = [];
         $t = [];
         $vinculosUnificados = $db->getSchemaBuilder()->hasTable('vinculos_evidencia_experta');
+        $consultas = [];
         foreach ($tablas as $tabla) {
-            $consulta = $vinculosUnificados && $tabla === ProyeccionReduccionExperta::VINCULOS
-                ? BloquesExpertos::consulta($tabla, $db->getName()) : $db->table($tabla);
+            $consulta = match (true) {
+                $tabla === ProyeccionReduccionExperta::HECHOS && $hechos !== $tabla => ContextoIadl::consulta($db, $hechos),
+                $tabla === ProyeccionReduccionExperta::VINCULOS && $vinculosUnificados => BloquesExpertos::consulta($tabla, $db->getName()),
+                default => $db->table($tabla),
+            };
+            $consultas[$tabla] = $consulta;
             $conteos[$tabla] = $consulta->count();
         }
         if (array_sum($conteos) > 100000) {
             throw new DomainException('El preflight en memoria admite hasta 100000 filas; se requiere un cotejo por lotes para este volumen.');
         }
-        foreach ($tablas as $tabla) {
-            $consulta = $vinculosUnificados && $tabla === ProyeccionReduccionExperta::VINCULOS
-                ? BloquesExpertos::consulta($tabla, $db->getName()) : $db->table($tabla);
+        foreach ($consultas as $tabla => $consulta) {
             $t[$tabla] = array_map(static fn ($fila) => (array) $fila, $consulta->get()->all());
         }
         if ($reducida) {

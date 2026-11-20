@@ -51,10 +51,10 @@ if (! DB::scalar("SELECT pg_try_advisory_lock(hashtext('remembermind-resultado-i
 try {
     $verificado = DB::transaction(function () use ($ddl, $nombre, $hashDdl, $tablas): array {
         DB::statement("SET LOCAL lock_timeout = '10s'"); DB::statement("SET LOCAL statement_timeout = '90s'");
-        DB::statement('LOCK TABLE evaluaciones_expertas, hechos_instantanea_experta IN ACCESS EXCLUSIVE MODE');
+        DB::statement('LOCK TABLE evaluaciones_expertas, hechos_evaluacion_experta IN ACCESS EXCLUSIVE MODE');
         if (hash_file('sha256', base_path($ddl)) !== $hashDdl) { throw new RuntimeException('El DDL cambió durante la preparación.'); }
         $columnas = $hashes = $cantidades = [];
-        foreach (['evaluaciones_expertas', 'hechos_instantanea_experta'] as $tabla) {
+        foreach (['evaluaciones_expertas', 'hechos_evaluacion_experta'] as $tabla) {
             $columnas[$tabla] = Schema::getColumnListing($tabla);
             $seleccion = implode(',', array_map(fn ($c) => '"'.$c.'"', $columnas[$tabla]));
             $hashes[$tabla] = DB::scalar("SELECT md5(COALESCE(string_agg(md5(row_to_json(t)::text),'' ORDER BY md5(row_to_json(t)::text)),'')) FROM (SELECT {$seleccion} FROM {$tabla}) t");
@@ -71,7 +71,7 @@ try {
                 throw new RuntimeException('No se permite rellenar historia desconocida.');
             }
         }
-        if (count($nuevas['evaluaciones_expertas']) !== 16 || count($nuevas['hechos_instantanea_experta']) !== 3) { throw new RuntimeException('Extensión fuera de las19 columnas aprobadas.'); }
+        if (count($nuevas['evaluaciones_expertas']) !== 16 || count($nuevas['hechos_evaluacion_experta']) !== 3) { throw new RuntimeException('Extensión fuera de las19 columnas aprobadas.'); }
         (new PermisoEjecucionInstitucionalSeeder)->run();
         DB::table('migrations')->insert(['migration' => $nombre, 'batch' => (int) DB::table('migrations')->max('batch') + 1]);
         $despues = Schema::getTableListing(); sort($despues);

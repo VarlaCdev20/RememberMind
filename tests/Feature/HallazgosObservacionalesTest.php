@@ -129,7 +129,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, $solicitud);
         self::assertSame($id, app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, $solicitud));
         self::assertDatabaseCount('evaluaciones_expertas', 1);
-        self::assertDatabaseCount('hechos_instantanea_experta', 4);
+        self::assertDatabaseCount('hechos_evaluacion_experta', 4);
         self::assertSame(3, BloquesExpertos::consulta('evaluaciones_reglas')->count());
         self::assertSame(3, BloquesExpertos::consulta('evaluaciones_condiciones_regla')->count());
         self::assertSame(3, \App\Models\EvidenciaSoporteCondicion::count());
@@ -154,7 +154,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $r = app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
         self::assertSame(13, $r['registros']->total());
         self::assertCount(39, $r['informe_completo']['resultados']);
-        self::assertDatabaseCount('hechos_instantanea_experta', 52);
+        self::assertDatabaseCount('hechos_evaluacion_experta', 52);
         $otra = Residente::factory()->create(['estado' => 'ADMITIDO']);
         $sinDatos = app(EjecutarObservaciones::class)->ejecutar($this->medico, $otra, (string) Str::uuid());
         $vacio = app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $otra, $sinDatos);
@@ -196,7 +196,7 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        $this->corromperConservacion(fn () => DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'repite_preguntas')->update(['valor_logico' => false]));
+        $this->corromperConservacion(fn () => DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'repite_preguntas')->update(['valor_logico' => false]));
         Livewire::test(ResultadosExpertoResidente::class, ['residente' => $this->residente])
             ->assertSee('No se pudieron consultar los hallazgos observacionales')->assertDontSee('Se documentó un episodio de repetición de preguntas.');
     }
@@ -214,7 +214,7 @@ final class HallazgosObservacionalesTest extends TestCase
             app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
             self::fail('La operación debía fallar antes de confirmar.');
         } catch (QueryException $e) {
-            foreach (['versiones_modelo_experto', 'evaluaciones_expertas', 'hechos_instantanea_experta', 'evidencias_evaluacion', 'evaluaciones_reglas'] as $tabla) {
+            foreach (['versiones_modelo_experto', 'evaluaciones_expertas', 'hechos_evaluacion_experta', 'evidencias_evaluacion', 'evaluaciones_reglas'] as $tabla) {
                 self::assertDatabaseCount($tabla, 0);
             }
             self::assertFalse(DB::table('activity_log')->where('event', 'observaciones_ejecutadas')->exists());
@@ -231,7 +231,7 @@ final class HallazgosObservacionalesTest extends TestCase
             self::fail('No se debe retirar una FK que conserva historia.');
         } catch (\RuntimeException $e) {
             self::assertStringContainsString('instantáneas conservadas', $e->getMessage());
-            self::assertDatabaseCount('hechos_instantanea_experta', 4);
+            self::assertDatabaseCount('hechos_evaluacion_experta', 4);
         }
     }
 
@@ -250,29 +250,29 @@ final class HallazgosObservacionalesTest extends TestCase
         $reduccion->bajar();
         InformeCognitivoFixture::insertar('evaluaciones_expertas', ['cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'cod_version_modelo' => $paquete['version'], 'cod_residente' => $this->residente->getKey(), 'origen_activacion' => 'PRUEBA_TECNICA']);
-        DB::table('hechos_instantanea_experta')->insert(['cod_hecho_instantanea' => 'LEGACY-OBS-HECHO', 'cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
+        DB::table('hechos_evaluacion_experta')->insert(['cod_hecho_instantanea' => 'LEGACY-OBS-HECHO', 'cod_evaluacion_experta' => 'LEGACY-OBS-EVAL',
             'id_hecho_dominio' => 'LEGACY', 'fuente_id_dominio' => 'REFERENCIA', 'origen_id_dominio' => 'ORIGINAL', 'episodio_id_dominio' => 'EPISODIO',
             'concepto_dominio' => 'OBSERVACION', 'orden' => 0, 'tipo_origen' => 'REFERENCIA_EXTERNA_SINTETICA']
             + CodecInstantanea::fecha('fecha_hecho', now()->toDateTimeImmutable()) + CodecInstantanea::escalar('valor', false));
-        $antes = (array) DB::table('hechos_instantanea_experta')->first();
+        $antes = (array) DB::table('hechos_evaluacion_experta')->first();
         $migracion = require database_path('migrations/2026_10_18_001000_extend_origen_observacional_instantaneas.php');
         $migracion->down();
         $migracion->up();
-        self::assertEqualsCanonicalizing($antes, (array) DB::table('hechos_instantanea_experta')->first());
-        self::assertSame(false, CodecInstantanea::leerEscalar('valor', DB::table('hechos_instantanea_experta')->first()));
+        self::assertEqualsCanonicalizing($antes, (array) DB::table('hechos_evaluacion_experta')->first());
+        self::assertSame(false, CodecInstantanea::leerEscalar('valor', DB::table('hechos_evaluacion_experta')->first()));
     }
 
     public function test_fk_y_check_del_origen_exigen_control_y_autor_originales(): void
     {
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        $fila = (array) DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->first();
+        $fila = (array) DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $id)->first();
         $fila['cod_hecho_instantanea'] = 'OBS-INVALIDO';
         $fila['id_hecho_dominio'] = 'OBS-INVALIDO';
         $fila['orden'] = 99;
         $fila['cod_personal_autor'] = null;
         $this->expectException(QueryException::class);
-        DB::table('hechos_instantanea_experta')->insert($fila);
+        DB::table('hechos_evaluacion_experta')->insert($fila);
     }
 
     public function test_conservacion_observacional_no_reemplaza_la_lectura_cognitiva(): void
@@ -327,7 +327,7 @@ final class HallazgosObservacionalesTest extends TestCase
     {
         $this->control(['estado' => 'ANULADO']);
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
-        $this->corromperConservacion(fn () => DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'estado')->update(['valor_texto' => 'RECTIFICADO']));
+        $this->corromperConservacion(fn () => DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $id)->where('concepto_dominio', 'estado')->update(['valor_texto' => 'RECTIFICADO']));
         $this->expectException(DomainException::class);
         app(ConsultarObservacionesConservadas::class)->consultar($this->medico, $this->residente, $id);
     }
@@ -337,7 +337,7 @@ final class HallazgosObservacionalesTest extends TestCase
         $this->control();
         $id = app(EjecutarObservaciones::class)->ejecutar($this->medico, $this->residente, (string) Str::uuid());
         $this->expectException(QueryException::class);
-        DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->update(['valor_tipo' => 'INVALIDO']);
+        DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $id)->update(['valor_tipo' => 'INVALIDO']);
     }
 
     public static function restriccionesGuardado(): array

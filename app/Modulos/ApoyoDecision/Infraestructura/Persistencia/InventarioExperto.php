@@ -43,7 +43,7 @@ final class InventarioExperto
     ];
 
     public const CONSERVACION = [
-        'hechos_instantanea_experta',
+        'hechos_evaluacion_experta',
         'motivos_dcl_instantanea',
         'reglas_aplicadas_dcl_instantanea',
     ];

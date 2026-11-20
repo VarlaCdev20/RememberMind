@@ -125,7 +125,7 @@ final class GobiernoReglasConcurrenciaPostgresTest extends TestCase
                 } else {
                     self::assertCount(3, $resultado['resumen']);
                 }
-                self::assertDatabaseCount('hechos_instantanea_experta', 4);
+                self::assertDatabaseCount('hechos_evaluacion_experta', 4);
                 self::assertDatabaseCount('evidencias_evaluacion', 3);
             } else {
                 self::assertSame(count(array_filter($salidas, fn ($s) => $s === 'guardado')), $firmas + $sucesoras);

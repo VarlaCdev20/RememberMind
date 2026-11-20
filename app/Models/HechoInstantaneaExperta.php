@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class HechoInstantaneaExperta extends ModeloExperto
 {
-    protected $table = 'hechos_instantanea_experta';
+    protected $table = 'hechos_evaluacion_experta';
 
     protected $primaryKey = 'cod_hecho_instantanea';
 

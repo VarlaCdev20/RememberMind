@@ -176,7 +176,7 @@ final class ConservarObservaciones implements ConservacionObservacional
     private function hecho(string $id, array $r, string $campo, bool|string|null $valor, string $evidencia, int $orden): void
     {
         $atencion = str_starts_with($r['episodio'], 'atencion:') ? substr($r['episodio'], strlen('atencion:')) : null;
-        $this->insertar('hechos_instantanea_experta', ['cod_evaluacion_experta' => $id, 'id_hecho_dominio' => $r['id'].':'.$campo,
+        $this->insertar('hechos_evaluacion_experta', ['cod_evaluacion_experta' => $id, 'id_hecho_dominio' => $r['id'].':'.$campo,
             'fuente_id_dominio' => 'controles_cognitivos', 'origen_id_dominio' => $r['id'], 'episodio_id_dominio' => $r['episodio'],
             'concepto_dominio' => $campo, 'orden' => $orden, 'tipo_origen' => 'CONTROL_COGNITIVO',
             'cod_evidencia_evaluacion' => $evidencia, 'cod_control_cognitivo' => $r['id'], 'cod_personal_autor' => $r['autor'],

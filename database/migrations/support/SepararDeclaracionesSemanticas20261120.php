@@ -49,7 +49,7 @@ final class SepararDeclaracionesSemanticas20261120 extends Migration
             }
             if ($subir) $this->verificar($esquemas, $pg);
             foreach (self::TABLAS as $tabla) {
-                $lectura = $tabla === 'nodos_semanticos' && ! $subir ? $this->nodosOriginales($esquemas[$tabla]) : DB::table($tabla);
+                $lectura = $tabla === 'nodos_semanticos' && ! $subir ? $this->nodosOriginales($esquemas[$tabla]) : DB::table($tabla)->select(array_column($esquemas[$tabla]['columnas'], 'name'));
                 DB::statement('CREATE TEMPORARY TABLE dec20_copia_'.$tabla.' AS '.$lectura->toSql(), $lectura->getBindings());
             }
             $triggers = SeparacionContextoResidente20261120::suspenderSQLite();
@@ -117,12 +117,35 @@ final class SepararDeclaracionesSemanticas20261120 extends Migration
         foreach ($esquemas as $tabla => $e) {
             if ($pg) { SeparacionContextoResidente20261120::verificarPostgres($tabla, $e); continue; }
             $sql = DB::table('sqlite_master')->where('type','table')->where('name',$tabla)->value('sql');
-            if (SeparacionContextoResidente20261120::firmaSQL($sql) !== SeparacionContextoResidente20261120::firmaSQL($e['crear'])) throw new RuntimeException('Contrato SQLite semántico distinto: '.$tabla);
+            if ($this->declaracionesOrdenadas($sql) !== $this->declaracionesOrdenadas($e['crear'])) {
+                throw new RuntimeException('Contrato SQLite semántico distinto: '.$tabla);
+            }
             foreach (['index' => 'indices_sql', 'trigger' => 'triggers'] as $tipo => $clave) {
                 $actual = DB::table('sqlite_master')->where('type', $tipo)->where('tbl_name', $tabla)->whereNotNull('sql')->orderBy('name')->get(['name','sql'])->map(fn($r)=>(array)$r)->all();
-                if ($actual !== $e[$clave]) throw new RuntimeException('Índices o guardas semánticas distintos: '.$tabla);
+                $firmas = static fn (array $objetos) => array_map(SeparacionContextoResidente20261120::firmaSQL(...), array_column($objetos, 'sql', 'name'));
+                if ($firmas($actual) !== $firmas($e[$clave])) {
+                    throw new RuntimeException('Índices o guardas semánticas distintos: '.$tabla);
+                }
             }
         }
+    }
+
+    private function declaracionesOrdenadas(string $sql): array
+    {
+        // SQLite puede devolver la misma FK en la columna o como declaración de tabla tras un ALTER.
+        $partes = [];
+        foreach (SeparacionContextoResidente20261120::declaraciones($sql) as $declaracion) {
+            if (preg_match('/^\s*("?\w+"?)\s+(varchar\(\d+\))\s+(references\s+"?\w+"?\s*\(\s*"?\w+"?\s*\)\s+on\s+delete\s+restrict)$/iD', trim($declaracion), $fk)) {
+                $partes[] = SeparacionContextoResidente20261120::firmaSQL($fk[1].' '.$fk[2]);
+                $declaracion = 'FOREIGN KEY('.$fk[1].') '.$fk[3];
+            }
+            $firma = SeparacionContextoResidente20261120::firmaSQL($declaracion);
+            $partes[] = str_starts_with($firma, 'foreignkey(') ? preg_replace('/onupdatenoaction$/D', '', $firma) : $firma;
+        }
+        sort($partes, SORT_STRING);
+        $partes[] = SeparacionContextoResidente20261120::firmaSQL(substr($sql, strrpos($sql, ')') + 1));
+
+        return $partes;
     }
 
     private function crearDeclaraciones(): void

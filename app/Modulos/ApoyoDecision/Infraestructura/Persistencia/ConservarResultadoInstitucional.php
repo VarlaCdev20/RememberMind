@@ -101,7 +101,7 @@ final class ConservarResultadoInstitucional
         if (($this->origenes[$tabla.':'.$origen] ?? null) !== $this->residente) {
             throw new DomainException('La fuente no pertenece al residente evaluado.');
         }
-        return $this->insertar('hechos_instantanea_experta', ['cod_evaluacion_experta' => $evaluacion, 'id_hecho_dominio' => $tipo.':'.$origen.':'.$campo,
+        return $this->insertar('hechos_evaluacion_experta', ['cod_evaluacion_experta' => $evaluacion, 'id_hecho_dominio' => $tipo.':'.$origen.':'.$campo,
             'fuente_id_dominio' => $tabla, 'origen_id_dominio' => $origen, 'episodio_id_dominio' => $tabla.':'.$origen, 'concepto_dominio' => $campo,
             'tipo_origen' => $tipo, $fk => $origen, 'cod_personal_autor' => $autor, 'orden' => $orden]
             + Codec::escalar('valor', $valor) + Codec::fecha('fecha_hecho', new DateTimeImmutable($fecha)));

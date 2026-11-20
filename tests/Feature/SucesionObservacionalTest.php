@@ -105,7 +105,7 @@ final class SucesionObservacionalTest extends TestCase
         $resultado = $this->ejecutar();
         self::assertCount(4, $resultado['resumen']);
         self::assertSame('CUMPLE', $resultado['resumen']['OBS-MEM-NUEVA']['estado']);
-        self::assertDatabaseCount('hechos_instantanea_experta', 4);
+        self::assertDatabaseCount('hechos_evaluacion_experta', 4);
         self::assertDatabaseCount('evidencias_evaluacion', 3);
         self::assertDatabaseCount('evaluacion_criterios', 3);
         self::assertSame(1, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
@@ -132,7 +132,7 @@ final class SucesionObservacionalTest extends TestCase
         $r = $this->ejecutar();
         self::assertSame([], $r['resumen']);
         self::assertSame([], $r['resultados']);
-        self::assertDatabaseCount('hechos_instantanea_experta', 4);
+        self::assertDatabaseCount('hechos_evaluacion_experta', 4);
         self::assertDatabaseCount('evidencias_evaluacion', 3);
         self::assertSame(0, BloquesExpertos::consulta('evaluaciones_reglas')->count());
         self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('resultados_criterio')->count());
@@ -201,7 +201,7 @@ final class SucesionObservacionalTest extends TestCase
             self::assertStringContainsString('ambigua', $e->getMessage());
         }
         self::assertDatabaseCount('evaluaciones_expertas', 0);
-        self::assertDatabaseCount('hechos_instantanea_experta', 0);
+        self::assertDatabaseCount('hechos_evaluacion_experta', 0);
     }
 
     public function test_prueba_observacional_distingue_sin_dato_de_no_y_no_guarda_evaluaciones(): void

@@ -41,7 +41,7 @@ return new class extends Migration
             if (! $derivar) {
                 $columnas[] = self::CAMPO;
             }
-            $origen = $derivar ? DB::table(self::TABLA) : ContextoIadl::consulta(DB::connection());
+            $origen = $derivar ? DB::table(self::TABLA) : ContextoIadl::consulta(DB::connection(), self::TABLA);
             if ($derivar && DB::table(self::TABLA.' as h')->join('evaluaciones_expertas as e', 'e.cod_evaluacion_experta', '=', 'h.cod_evaluacion_experta')
                 ->whereNotNull('h.cod_evidencia_iadl_instantanea')->where(fn ($q) => $q->whereNull('e.cod_funcionalidad_instantanea')->orWhereColumn('h.'.self::CAMPO, '<>', 'e.cod_funcionalidad_instantanea'))->exists()) {
                 throw new RuntimeException('La caracterización IADL difiere de la funcionalidad conservada.');
@@ -82,7 +82,7 @@ return new class extends Migration
             if ($derivar) {
                 $this->contexto(true);
             }
-            $reconstruida = ($derivar ? ContextoIadl::consulta(DB::connection()) : DB::table(self::TABLA))->select($columnas);
+            $reconstruida = ($derivar ? ContextoIadl::consulta(DB::connection(), self::TABLA) : DB::table(self::TABLA))->select($columnas);
             $sql = $reconstruida->toSql();
             foreach (['SELECT * FROM fn5_copia_iadl EXCEPT ALL '.$sql, $sql.' EXCEPT ALL SELECT * FROM fn5_copia_iadl'] as $diferencia) {
                 if (! $pg) {

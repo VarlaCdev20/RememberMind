@@ -11,7 +11,7 @@ use MotorExperto\conservacion\IdentificadoresHistoricos;
 /** Garantías físicas de bloques y soportes; PostgreSQL serializa por evaluación. */
 final class GuardasReduccionConservacion
 {
-    public function __construct(private readonly bool $vinculosUnificados = false) {}
+    public function __construct(private readonly bool $vinculosUnificados = false, private readonly string $tablaHechos = ProyeccionReduccionExperta::HECHOS) {}
 
     private function tablaVinculos(): string
     {
@@ -22,7 +22,7 @@ final class GuardasReduccionConservacion
     {
         $this->instalarHechos($funcionalidadDerivada);
         $formato = IdentificadoresHistoricos::CONSERVACION;
-        $h = ProyeccionReduccionExperta::HECHOS;
+        $h = $this->tablaHechos;
         $v = $this->tablaVinculos();
         $criterioNuevo = $this->vinculosUnificados ? "NEW.tipo_evento = 'CRITERIO'" : 'TRUE';
         $clave = $this->vinculosUnificados ? 'cod_vinculo_evidencia' : 'cod_evidencia_criterio';
@@ -56,7 +56,7 @@ final class GuardasReduccionConservacion
     public function instalarHechos(bool $funcionalidadDerivada = false): void
     {
         $formato = IdentificadoresHistoricos::CONSERVACION;
-        $h = ProyeccionReduccionExperta::HECHOS;
+        $h = $this->tablaHechos;
         $v = $this->tablaVinculos();
         $iad = array_values(ProyeccionReduccionExperta::IAD);
         if ($funcionalidadDerivada) {
@@ -96,7 +96,7 @@ final class GuardasReduccionConservacion
             'criterio' => ['evaluacion_criterios', $iguales(['cod_evaluacion_experta', 'version_conservacion', 'tipo_registro']),
                 "EXISTS (SELECT 1 FROM {$vinculos} WHERE cod_evaluacion_criterio=OLD.cod_evaluacion_criterio)"],
             'evidencia' => ['evidencias_evaluacion', $iguales(['cod_evaluacion_experta']),
-                "EXISTS (SELECT 1 FROM {$vinculos} WHERE cod_evidencia_evaluacion=OLD.cod_evidencia_evaluacion AND cod_evaluacion_criterio IS NOT NULL) OR EXISTS (SELECT 1 FROM hechos_instantanea_experta WHERE cod_evidencia_evaluacion=OLD.cod_evidencia_evaluacion)"],
+                "EXISTS (SELECT 1 FROM {$vinculos} WHERE cod_evidencia_evaluacion=OLD.cod_evidencia_evaluacion AND cod_evaluacion_criterio IS NOT NULL) OR EXISTS (SELECT 1 FROM {$this->tablaHechos} WHERE cod_evidencia_evaluacion=OLD.cod_evidencia_evaluacion)"],
         ];
         foreach ($padres as $nombre => [$tabla, $igual, $referencias]) {
             if ($pg) {
@@ -135,7 +135,7 @@ final class GuardasReduccionConservacion
     public function retirarHechos(): void
     {
         if (DB::getDriverName() === 'pgsql') {
-            DB::unprepared('DROP TRIGGER red_hecho_guard ON '.ProyeccionReduccionExperta::HECHOS);
+            DB::unprepared('DROP TRIGGER red_hecho_guard ON '.$this->tablaHechos);
             DB::unprepared('DROP FUNCTION red_hecho_guard()');
         } else {
             foreach (['red_hecho_delete', 'red_hecho_update', 'red_hecho_insert_origen', 'red_hecho_update_origen'] as $n) {

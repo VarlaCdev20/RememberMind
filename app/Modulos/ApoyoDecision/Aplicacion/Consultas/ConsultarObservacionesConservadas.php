@@ -79,7 +79,7 @@ final class ConsultarObservacionesConservadas
         $campos = array_column(Motor::REGLAS, 'campo');
         $mapeos = array_column($paquete['campos'] ?? $paquete['reglas'], 'mapeo', 'campo');
         $evidencias = DB::table('evidencias_evaluacion')->where('cod_evaluacion_experta', $evaluacion)->get()->keyBy('cod_evidencia_evaluacion');
-        $filas = DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $evaluacion)->orderBy('orden')->get();
+        $filas = DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $evaluacion)->orderBy('orden')->get();
         foreach ($filas as $h) {
             $id = $h->cod_control_cognitivo;
             $campo = $h->concepto_dominio;

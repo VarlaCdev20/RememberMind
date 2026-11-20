@@ -20,7 +20,7 @@ final class CatalogoCodigos
         'valoraciones_petersen_originales' => ['cod_valoracion_petersen', 'VPO'],
         'soportes_valoracion_petersen' => ['cod_soporte_petersen', 'SVP'],
         'revisiones_evaluacion_experta' => ['cod_revision_experta', 'RVE'],
-        'hechos_instantanea_experta' => ['cod_hecho_instantanea', 'HIX'],
+        'hechos_evaluacion_experta' => ['cod_hecho_instantanea', 'HIX'],
         'motivos_dcl_instantanea' => ['cod_motivo_dcl_instantanea', 'MIX'],
         'reglas_aplicadas_dcl_instantanea' => ['cod_elemento_regla_dcl', 'RIX'],
         'actividades' => ['cod_actividad', 'ACT'],

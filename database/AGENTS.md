@@ -14,6 +14,8 @@ The current code is not authority over the frozen baseline.
 
 ## Frozen schema
 
+La decisión del 20/11/2026 renombra la tabla de hechos del motor a `hechos_evaluacion_experta`. El alcance y la reversión están en [la decisión de nombre de hechos](../docs/base-de-datos/DECISION_NOMBRE_HECHOS_EVALUACION_2026_11_20.md).
+
 Owner authorization 2026-11-20 permits the 5NF normalization of business relations, including necessary decompositions, preserving existing data and behavior. The ceiling for this work is **100 business tables plus the 16 technical tables**, superseding the former 100-physical ceiling only for this scope. Approval is not evidence of installation or global 5NF verification. See `DECISION_NORMALIZACION_5FN_2026_11_20.md` under `docs/base-de-datos/`.
 
 Owner approval 2026-11-18 removes only `valoraciones_profesionales.cod_residente` and derives the resident from the mandatory attention, retaining its historical identity. The table has 29 columns after migration and the inventory remains 100 physical tables. See `docs/base-de-datos/DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md`. Other structural decisions remain scoped to their recorded authorizations.

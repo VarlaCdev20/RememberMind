@@ -39,7 +39,7 @@ try {
         if ($datos['modo'] === 'clasificacion') {
             (new AlmacenInstantaneas('pgsql'))->guardarClasificacion((new ClasificadorPetersenService)->clasificar(E::perfil()));
         } elseif ($datos['modo'] === 'iadl') {
-            DB::table('hechos_instantanea_experta')->where('cod_hecho_instantanea', $datos['hecho'])->update($datos['cambios'][$i]);
+            DB::table('hechos_evaluacion_experta')->where('cod_hecho_instantanea', $datos['hecho'])->update($datos['cambios'][$i]);
         } elseif ($datos['modo'] === 'padre' && $i === '2') {
             DB::table('evaluacion_criterios')->where('cod_evaluacion_criterio', $datos['criterio'])->update(['cod_evaluacion_experta' => 'SIM-EVAL-OTRA']);
         } else {

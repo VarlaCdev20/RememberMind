@@ -22,7 +22,7 @@ final class ResultadoInstitucionalSQL
         foreach (R::DOMINIOS as $codigo => $campo) { $dominios[$codigo] = $e->{'institucional_'.$campo}; }
         foreach (['C01', 'C02', 'C03', 'C04', 'C05'] as $codigo) { $requisitos[$codigo] = $e->{'institucional_'.strtolower($codigo)}; }
         $hechos = [];
-        foreach (DB::table('hechos_instantanea_experta')->where('cod_evaluacion_experta', $id)->orderBy('orden')->get() as $h) {
+        foreach (DB::table('hechos_evaluacion_experta')->where('cod_evaluacion_experta', $id)->orderBy('orden')->get() as $h) {
             $hechos[] = ['id' => $h->cod_hecho_instantanea, 'orden' => (int) $h->orden, 'tipo' => $h->tipo_origen,
                 'fuente' => $h->fuente_id_dominio, 'origen' => $h->origen_id_dominio, 'concepto' => $h->concepto_dominio,
                 'autor' => $h->cod_personal_autor, 'respuesta' => $h->cod_respuesta, 'aplicacion' => $h->cod_aplicacion,

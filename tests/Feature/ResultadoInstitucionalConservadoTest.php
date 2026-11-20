@@ -184,7 +184,7 @@ final class ResultadoInstitucionalConservadoTest extends TestCase
         });
         try { $this->guardar(); self::fail('Debía fallar'); } catch (DomainException $e) { self::assertSame('Fallo técnico provocado en prueba.', $e->getMessage()); }
         $this->assertDatabaseCount('evaluaciones_expertas', 0);
-        $this->assertDatabaseCount('hechos_instantanea_experta', 0);
+        $this->assertDatabaseCount('hechos_evaluacion_experta', 0);
         $this->assertDatabaseCount('evaluacion_criterios', 0);
     }
 
@@ -200,7 +200,7 @@ final class ResultadoInstitucionalConservadoTest extends TestCase
         $u = User::factory()->create(['estado' => 'ACTIVO']); $u->assignRole('SUPERADMINISTRADOR');
         self::assertFalse($u->checkPermissionTo('evaluaciones_expertas.ejecutar_institucional', 'web'));
         self::assertFalse(\Illuminate\Support\Facades\Gate::forUser($u)->allows('ejecutarInstitucional', [\App\Models\EvaluacionExperta::class, $this->residente]));
-        foreach (['evaluaciones_expertas' => ['cod_version_petersen', 'cod_usuario_ejecucion'], 'hechos_instantanea_experta' => ['cod_respuesta', 'cod_aplicacion', 'cod_valoracion_petersen']] as $tabla => $columnas) {
+        foreach (['evaluaciones_expertas' => ['cod_version_petersen', 'cod_usuario_ejecucion'], 'hechos_evaluacion_experta' => ['cod_respuesta', 'cod_aplicacion', 'cod_valoracion_petersen']] as $tabla => $columnas) {
             $fks = \Illuminate\Support\Facades\Schema::getForeignKeys($tabla);
             foreach ($columnas as $columna) {
                 $fk = collect($fks)->first(fn ($f) => $f['columns'] === [$columna]);

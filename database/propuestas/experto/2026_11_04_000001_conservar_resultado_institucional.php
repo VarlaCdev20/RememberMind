@@ -12,7 +12,7 @@ return new class extends Migration
 {
     public const DOMINIOS = ['memoria', 'atencion', 'ejecutiva', 'lenguaje', 'visuoespacial'];
     public const REQUISITOS = ['c01', 'c02', 'c03', 'c04', 'c05'];
-    private const FUENTES = ['cod_respuesta' => 'respuestas_instrumento', 'cod_aplicacion' => 'aplicaciones_instrumento',
+    private const FUENTES = ['cod_respuesta' => 'capturas_instrumento', 'cod_aplicacion' => 'aplicaciones_instrumento',
         'cod_valoracion_petersen' => 'valoraciones_petersen_originales'];
 
     public function up(): void
@@ -32,7 +32,7 @@ return new class extends Migration
                 $t->text('institucional_explicacion')->nullable();
                 $t->char('institucional_ejecutor', 64)->nullable();
             });
-            Schema::table('hechos_instantanea_experta', function (Blueprint $t): void {
+            Schema::table('hechos_evaluacion_experta', function (Blueprint $t): void {
                 foreach (self::FUENTES as $campo => $tabla) {
                     $t->string($campo, 20)->nullable();
                     $t->index($campo, 'ri_'.$campo.'_ix');
@@ -52,12 +52,12 @@ return new class extends Migration
     public function down(): void
     {
         if (DB::table('evaluaciones_expertas')->whereNotNull('cod_usuario_ejecucion')->exists()
-            || DB::table('hechos_instantanea_experta')->where(fn ($q) => $q->whereNotNull('cod_respuesta')->orWhereNotNull('cod_aplicacion')->orWhereNotNull('cod_valoracion_petersen'))->exists()) {
+            || DB::table('hechos_evaluacion_experta')->where(fn ($q) => $q->whereNotNull('cod_respuesta')->orWhereNotNull('cod_aplicacion')->orWhereNotNull('cod_valoracion_petersen'))->exists()) {
             throw new RuntimeException('No se retira conservación institucional con historia poblada.');
         }
         $this->transicion(function (): void {
             $this->retirar('evaluaciones_expertas', 'ri_cabecera');
-            Schema::table('hechos_instantanea_experta', function (Blueprint $t): void {
+            Schema::table('hechos_evaluacion_experta', function (Blueprint $t): void {
                 foreach (self::FUENTES as $campo => $tabla) {
                     $t->dropForeign(DB::getDriverName() === 'sqlite' ? [$campo] : 'ri_'.$campo.'_fk');
                     $t->dropIndex('ri_'.$campo.'_ix');
@@ -93,7 +93,7 @@ return new class extends Migration
                 }
                 $base = "({$base} AND {$nulos}) OR ".implode(' OR ', $ramas);
             }
-            $this->check('hechos_instantanea_experta', $nombre, $base);
+            $this->check('hechos_evaluacion_experta', $nombre, $base);
         }
     }
 

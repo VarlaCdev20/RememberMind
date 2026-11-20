@@ -46,7 +46,7 @@
     <div class="rm-card rm-stored-expert__details">
         <details class="rm-expert-supplement"><summary>Explicación original y limitaciones</summary><p class="rm-stored-expert__narrative">{{ \App\Modulos\ApoyoDecision\Presentacion\Soporte\ResultadoInstitucionalVisible::narrativa($ri['explicacion']) }}</p></details>
         <details class="rm-expert-supplement rm-stored-expert__evidence" x-data="rmStoredEvidence(@js($resumenGuardado['hechos']))">
-            <summary>Consultar los datos originales <span>{{ count($resumenGuardado['hechos']) }} datos</span></summary>
+            <summary>Datos utilizados en la evaluación <span>{{ count($resumenGuardado['hechos']) }} datos</span></summary>
             <p class="rm-stored-expert__hint">Valores de esta evaluación guardada, sin completar con el expediente actual.</p>
             <div class="rm-stored-expert__filters">
                 <label class="rm-field" for="guardado-buscar">Buscar dato o valor<input id="guardado-buscar" class="rm-filter-control" type="search" x-model="busqueda" @input="filtrar" placeholder="Ej. memoria" /></label>

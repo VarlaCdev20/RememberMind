@@ -52,7 +52,7 @@ final class NormalizacionIadlConservadaTest extends TestCase
         $original = (new ClasificadorPetersenService)->clasificar($perfil);
         $this->almacen()->guardar($perfil->cognicion);
         $this->almacen()->guardarClasificacion($original);
-        self::assertFalse(Schema::hasColumn('hechos_instantanea_experta', 'iadl_cod_funcionalidad_instantanea'));
+        self::assertFalse(Schema::hasColumn('hechos_evaluacion_experta', 'iadl_cod_funcionalidad_instantanea'));
         $recuperado = $this->almacen()->obtenerClasificacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha(), $perfil->versionContrato);
         self::assertSame($patron, $recuperado->patronCandidato?->value);
         self::assertSame(CodecInstantanea::huella($original), CodecInstantanea::huella($recuperado));
@@ -80,11 +80,20 @@ final class NormalizacionIadlConservadaTest extends TestCase
         $antes = ContextoIadl::consulta(DB::connection())->orderBy('cod_hecho_instantanea')->get()->all();
         $tablas = Schema::getTables();
         $m = require database_path('migrations/2026_11_20_000003_derive_iadl_functional_context.php');
+        $nombre = require database_path('migrations/2026_11_20_000009_rename_expert_evaluation_facts.php');
+        $contador = DB::table('secuencias_codigos')->where('entidad', 'hechos_evaluacion_experta')->value('ultimo_valor');
+        self::assertNotNull($contador);
+        $nombre->down();
+        self::assertFalse(Schema::hasTable('hechos_evaluacion_experta'));
+        self::assertSame($contador, DB::table('secuencias_codigos')->where('entidad', 'hechos_instantanea_experta')->value('ultimo_valor'));
         $m->down();
         self::assertTrue(Schema::hasColumn('hechos_instantanea_experta', 'iadl_cod_funcionalidad_instantanea'));
         self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNull('cod_evidencia_iadl_instantanea')->whereNotNull('iadl_cod_funcionalidad_instantanea')->count());
         self::assertGreaterThan(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->whereNotNull('iadl_cod_funcionalidad_instantanea')->count());
         $m->up();
+        $nombre->up();
+        self::assertFalse(Schema::hasTable('hechos_instantanea_experta'));
+        self::assertSame($contador, DB::table('secuencias_codigos')->where('entidad', 'hechos_evaluacion_experta')->value('ultimo_valor'));
         self::assertEquals($antes, ContextoIadl::consulta(DB::connection())->orderBy('cod_hecho_instantanea')->get()->all());
         self::assertCount(count($tablas), Schema::getTables());
         self::assertSame(CodecInstantanea::huella($original), CodecInstantanea::huella($this->almacen()->obtenerClasificacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha(), $perfil->versionContrato)));
@@ -94,9 +103,9 @@ final class NormalizacionIadlConservadaTest extends TestCase
     {
         $this->preparar();
         $this->almacen()->guardar(E::perfil()->cognicion);
-        $hecho = DB::table('hechos_instantanea_experta')->where('id_hecho_dominio', 'SIM-IADL')->sole();
+        $hecho = DB::table('hechos_evaluacion_experta')->where('id_hecho_dominio', 'SIM-IADL')->sole();
         try {
-            DB::transaction(fn () => DB::table('hechos_instantanea_experta')->where('cod_hecho_instantanea', $hecho->cod_hecho_instantanea)->update([
+            DB::transaction(fn () => DB::table('hechos_evaluacion_experta')->where('cod_hecho_instantanea', $hecho->cod_hecho_instantanea)->update([
                 'cod_evidencia_iadl_instantanea' => 'IADL-SIN-FUNCION', 'iadl_actividad_id_dominio' => 'COMPRAS',
                 'iadl_estado' => 'CONSERVADA', 'iadl_oportunidad' => 'OBSERVADA', 'iadl_orden' => 0,
             ]));
@@ -104,8 +113,8 @@ final class NormalizacionIadlConservadaTest extends TestCase
         } catch (QueryException $e) {
             self::assertStringContainsString('funcionalidad', $e->getMessage());
         }
-        self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
-        self::assertEquals($hecho, DB::table('hechos_instantanea_experta')->where('cod_hecho_instantanea', $hecho->cod_hecho_instantanea)->sole());
+        self::assertSame(0, DB::table('hechos_evaluacion_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
+        self::assertEquals($hecho, DB::table('hechos_evaluacion_experta')->where('cod_hecho_instantanea', $hecho->cod_hecho_instantanea)->sole());
     }
 
     public function test_reinstalar_guardas_tras_un_ensayo_no_rompe_el_anexo_del_motor(): void
@@ -114,14 +123,14 @@ final class NormalizacionIadlConservadaTest extends TestCase
         $perfil = E::perfil();
         $original = (new ClasificadorPetersenService)->clasificar($perfil);
         $this->almacen()->guardar($perfil->cognicion);
-        $hecho = DB::table('hechos_instantanea_experta')->where('id_hecho_dominio', 'SIM-IADL')->sole();
-        $this->corromperConservacion(fn () => DB::table('hechos_instantanea_experta')
+        $hecho = DB::table('hechos_evaluacion_experta')->where('id_hecho_dominio', 'SIM-IADL')->sole();
+        $this->corromperConservacion(fn () => DB::table('hechos_evaluacion_experta')
             ->where('cod_hecho_instantanea', $hecho->cod_hecho_instantanea)
             ->update(['concepto_dominio' => $hecho->concepto_dominio]));
         $this->almacen()->guardarClasificacion($original);
         self::assertSame(CodecInstantanea::huella($original), CodecInstantanea::huella($this->almacen()->obtenerClasificacion(
             'SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha(), $perfil->versionContrato)));
-        self::assertGreaterThan(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
+        self::assertGreaterThan(0, DB::table('hechos_evaluacion_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
     }
 
     public function test_postgres_bloquea_evidencia_antes_de_evaluacion_sin_invertir_el_orden(): void
@@ -132,10 +141,10 @@ final class NormalizacionIadlConservadaTest extends TestCase
         $this->preparar();
         EscenarioRepositorios::evidencia();
         $this->almacen()->guardar(E::perfil()->cognicion);
-        $fila = (array) DB::table('hechos_instantanea_experta')->orderBy('cod_hecho_instantanea')->first();
+        $fila = (array) DB::table('hechos_evaluacion_experta')->orderBy('cod_hecho_instantanea')->first();
         $fila['cod_hecho_instantanea'] = 'HECHO-CONCURRENT-FN5';
         $fila['id_hecho_dominio'] = 'SIM-CONCURRENCIA-5FN';
-        $fila['orden'] = DB::table('hechos_instantanea_experta')->max('orden') + 1;
+        $fila['orden'] = DB::table('hechos_evaluacion_experta')->max('orden') + 1;
         $fila['cod_evidencia_evaluacion'] = 'SIM-EVID';
         $fila['tipo_origen'] = 'D137';
         $fila['cod_atencion'] = 'SIM-AT';
@@ -157,7 +166,7 @@ final class NormalizacionIadlConservadaTest extends TestCase
             $campos = implode(',', array_map(fn ($c) => $db->getQueryGrammar()->wrap($c), array_keys($fila)));
             $marcadores = implode(',', array_map(fn ($n) => '$'.$n, range(1, count($fila))));
             $parametros = array_map(static fn ($valor) => is_bool($valor) ? ($valor ? 'true' : 'false') : $valor, array_values($fila));
-            self::assertTrue(pg_send_query_params($nativa, 'INSERT INTO hechos_instantanea_experta ('.$campos.') VALUES ('.$marcadores.')', $parametros));
+            self::assertTrue(pg_send_query_params($nativa, 'INSERT INTO hechos_evaluacion_experta ('.$campos.') VALUES ('.$marcadores.')', $parametros));
             $esperando = false;
             $limite = microtime(true) + 3;
             do {
@@ -177,7 +186,7 @@ final class NormalizacionIadlConservadaTest extends TestCase
             $db->commit();
             $resultado = pg_get_result($nativa);
             self::assertSame(PGSQL_COMMAND_OK, pg_result_status($resultado), pg_result_error($resultado));
-            self::assertSame(1, DB::table('hechos_instantanea_experta')->where('cod_hecho_instantanea', $fila['cod_hecho_instantanea'])->count());
+            self::assertSame(1, DB::table('hechos_evaluacion_experta')->where('cod_hecho_instantanea', $fila['cod_hecho_instantanea'])->count());
         } finally {
             while ($db->transactionLevel() > 0) {
                 $db->rollBack();

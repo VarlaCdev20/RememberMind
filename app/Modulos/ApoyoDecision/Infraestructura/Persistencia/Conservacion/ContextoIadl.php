@@ -11,13 +11,13 @@ use Illuminate\Database\Query\Builder;
 /** La evaluación conserva una sola funcionalidad; un hecho sin IADL no la proyecta. */
 final class ContextoIadl
 {
-    public static function consulta(Connection $db): Builder
+    public static function consulta(Connection $db, string $tabla = 'hechos_evaluacion_experta'): Builder
     {
-        $origen = $db->table('hechos_instantanea_experta as h')
+        $origen = $db->table($tabla.' as h')
             ->join('evaluaciones_expertas as e', 'e.cod_evaluacion_experta', '=', 'h.cod_evaluacion_experta')
             ->select('h.*')->selectRaw('CASE WHEN h.cod_evidencia_iadl_instantanea IS NOT NULL THEN e.cod_funcionalidad_instantanea END AS iadl_cod_funcionalidad_instantanea');
 
-        return $db->query()->fromSub($origen, 'hechos_instantanea_experta');
+        return $db->query()->fromSub($origen, $tabla);
     }
 
     public static function preparar(Connection $db, array $datos): array

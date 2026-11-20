@@ -12,15 +12,15 @@ use RuntimeException;
 /** Inyección controlada de corrupción para probar el lector además de las guardas SQL. */
 trait CorromperConservacionParaPrueba
 {
-    private function corromperConservacion(Closure $operacion): void
+    private function corromperConservacion(Closure $operacion, string $hechos = 'hechos_evaluacion_experta'): void
     {
         $db = DB::connection();
         if (! app()->environment('testing') || ! ($db->getDriverName() === 'sqlite' && $db->getDatabaseName() === ':memory:')
             && ! EntornoPruebas::postgresDesechable($db->getDatabaseName(), $db->getConfig('username'), $db->getConfig('host'))) {
             throw new RuntimeException('La corrupción sintética requiere la base desechable del runner.');
         }
-        $guardas = new GuardasReduccionConservacion($db->getSchemaBuilder()->hasTable('vinculos_evidencia_experta'));
-        $funcionalidadDerivada = ! $db->getSchemaBuilder()->hasColumn('hechos_instantanea_experta', 'iadl_cod_funcionalidad_instantanea');
+        $guardas = new GuardasReduccionConservacion($db->getSchemaBuilder()->hasTable('vinculos_evidencia_experta'), $hechos);
+        $funcionalidadDerivada = ! $db->getSchemaBuilder()->hasColumn($hechos, 'iadl_cod_funcionalidad_instantanea');
         $sqlite = $db->getDriverName() === 'sqlite';
         $bloques = $sqlite
             ? DB::select("SELECT name, tbl_name, sql FROM sqlite_master WHERE type='trigger' AND (name LIKE 'b4_%' OR name LIKE 'fn5_iadl_%' OR name LIKE 'dec20_variable_%')")
