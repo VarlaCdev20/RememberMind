@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ContextoIadl;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ProyeccionReduccionExperta;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -35,6 +36,18 @@ final class HechoInstantaneaExperta extends ModeloExperto
     protected $table = 'hechos_instantanea_experta';
 
     protected $primaryKey = 'cod_hecho_instantanea';
+
+    protected static function booted(): void
+    {
+        parent::booted();
+        self::addGlobalScope('funcionalidad_original', static function ($q): void {
+            $q->fromSub(ContextoIadl::consulta($q->getModel()->getConnection()), $q->getModel()->getTable());
+        });
+        self::creating(static function (self $hecho): void {
+            ContextoIadl::preparar($hecho->getConnection(), $hecho->getAttributes());
+            unset($hecho['iadl_cod_funcionalidad_instantanea']);
+        });
+    }
 
     /** Sin parámetros: devuelve una relación BelongsTo con la FK original, sin ejecutar SQL ni crear registros. */
     public function evaluacion(): BelongsTo

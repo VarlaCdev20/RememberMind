@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Database\Connection;
+use MotorExperto\conservacion\CodecInstantanea;
 use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
 use MotorExperto\dominio\Entities\Cognicion\ResultadoSubcomponente;
 use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
@@ -41,16 +42,12 @@ use MotorExperto\dominio\ValueObjects\Dcl\SubtipoDclEnum as Patron;
 use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoDiferencialEnum as Diferencial;
 use MotorExperto\dominio\ValueObjects\Funcionalidad\EstadoIadlEnum as EstadoIadl;
 use MotorExperto\dominio\ValueObjects\Funcionalidad\OportunidadIadlEnum as Oportunidad;
-use MotorExperto\conservacion\CodecInstantanea;
 
 /** Conserva y recupera instantáneas verificables sin depender de un proceso anterior. */
 final readonly class AlmacenInstantaneas
 {
     /**
      * Prepara capacidades sin abrir conexiones ni ejecutar SQL.
-     * @param string $conexion
-     * @param Closure|null $extraerOriginal
-     * @param DateTimeZone $zona
      */
     public function __construct(private string $conexion, private ?Closure $extraerOriginal = null,
         private DateTimeZone $zona = new DateTimeZone('UTC')) {}
@@ -63,8 +60,7 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Resuelve identidad original o cabecera anterior sin inventar referencias.
-     * @param string $id
-     * @return object|null
+     *
      * @throws RuntimeException
      */
     public function cabecera(string $id): ?object
@@ -91,8 +87,7 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Conserva la cognición completa o ninguna fila; el reintento no sobrescribe.
-     * @param VectorCognitivo $vector
-     * @return void
+     *
      * @throws DomainException
      * @throws RuntimeException
      */
@@ -279,11 +274,7 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Recupera valores originales; no vuelve a consultar fuentes mutables.
-     * @param string $id
-     * @param string $residente
-     * @param string $version
-     * @param DateTimeImmutable $corte
-     * @return VectorCognitivo|null
+     *
      * @throws DomainException
      * @throws RuntimeException
      */
@@ -456,8 +447,7 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Conserva DCL solo sobre una cognición previa idéntica.
-     * @param ResultadoClasificacionDcl $r
-     * @return void
+     *
      * @throws DomainException
      * @throws RuntimeException
      */
@@ -498,7 +488,7 @@ final readonly class AlmacenInstantaneas
                 'justificacion' => $r->justificacion, 'uso' => $r::USO, 'huella_clasificacion' => $hash]);
             foreach ($f->evidencias as $i => $v) {
                 $cambio = ['cod_evidencia_iadl_instantanea' => app(CodigosEntidad::class)->siguiente('evidencias_iadl_instantanea', $this->conexion),
-                    'iadl_cod_funcionalidad_instantanea' => $funcion, 'iadl_actividad_id_dominio' => $v->actividadId,
+                    'iadl_actividad_id_dominio' => $v->actividadId,
                     'iadl_estado' => $v->estado->value, 'iadl_oportunidad' => $v->oportunidad->value, 'iadl_nivel_previo' => $v->nivelPrevio?->value,
                     'iadl_causa_ayuda' => $v->causaAyuda, 'iadl_atribucion_cognitiva_simulada' => $v->atribucionCognitivaSimulada,
                     'iadl_revisor_sintetico_id' => $v->revisorSinteticoId, 'iadl_orden' => $i];
@@ -551,12 +541,7 @@ final readonly class AlmacenInstantaneas
 
     /**
      * Recuperación íntegra de DCL; ausencia real se distingue de corrupción.
-     * @param string $id
-     * @param string $residente
-     * @param string $version
-     * @param DateTimeImmutable $corte
-     * @param string $contrato
-     * @return ResultadoClasificacionDcl|null
+     *
      * @throws DomainException
      * @throws RuntimeException
      */
@@ -588,7 +573,8 @@ final readonly class AlmacenInstantaneas
             $porPk[$h->cod_hecho_instantanea] = $m->hechos[$h->id_hecho_dominio];
         }
         $iadl = [];
-        $filasIadl = $this->db()->table('hechos_instantanea_experta')->where('iadl_cod_funcionalidad_instantanea', $f->cod_funcionalidad_instantanea)->orderBy('iadl_orden')->get()->all();
+        $filasIadl = ContextoIadl::consulta($this->db())->where('cod_evaluacion_experta', $e)
+            ->whereNotNull('cod_evidencia_iadl_instantanea')->orderBy('iadl_orden')->get()->all();
         $this->validarOrden($filasIadl, 'iadl_orden');
         foreach (array_map(fn ($h) => (object) $this->bloque((array) $h, ProyeccionReduccionExperta::IAD), $filasIadl) as $v) {
             $iadl[] = new EvidenciaIadl($porPk[$v->cod_hecho_instantanea] ?? throw new DomainException('IADL sin hecho propio.'),

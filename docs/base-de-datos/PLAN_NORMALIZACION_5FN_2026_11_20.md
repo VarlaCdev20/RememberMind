@@ -26,7 +26,7 @@ conservados del experto.
 | Selección semanal | Sustituir listas de días por patrón y miembros ISO relacionados | Implementado en checkout; 6 pruebas / 43 comprobaciones aprobadas en PostgreSQL; regresión de agenda en curso |
 | Contexto clínico opcional | Separar la asociación directa al residente de los registros cuyo sujeto se deriva de la atención | Diseño y mapa de consumidores en revisión; no implementado |
 | Declaraciones semánticas | Separar la definición de variable/criterio del nodo versionado para retirar dependencias dominio/versión y propietario/versión | Diseño en revisión; no implementado |
-| Conservación IADL | Derivar funcionalidad desde la evaluación únicamente cuando exista caracterización IADL | Pendiente de implementación y prueba del resultado conservado |
+| Conservación IADL | Derivar funcionalidad desde la evaluación únicamente cuando exista caracterización IADL | Implementado y verificado en checkout; [resultados y límites](VERIFICACION_5FN_IADL_2026_11_20.md) |
 | Respuestas y administración | Conservar preguntas libres y dosis sin horario; derivar pregunta desde opción y prescripción desde horario en los otros casos | Pendiente de implementación |
 | Ocupación | Derivar residente desde admisión manteniendo la unicidad de ocupación activa por residente y cama | Pendiente de implementación y prueba concurrente |
 | Revisión integral | Contratos FD/MVD/JD, consumidores, autorizaciones, migración poblada, reversión e inventario | Pendiente; no se declara 5FN global |

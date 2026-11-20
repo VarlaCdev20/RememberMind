@@ -18,19 +18,14 @@ final class GuardasReduccionConservacion
         return $this->vinculosUnificados ? 'vinculos_evidencia_experta' : ProyeccionReduccionExperta::VINCULOS;
     }
 
-    public function instalar(): void
+    public function instalar(bool $funcionalidadDerivada = false): void
     {
+        $this->instalarHechos($funcionalidadDerivada);
         $formato = IdentificadoresHistoricos::CONSERVACION;
         $h = ProyeccionReduccionExperta::HECHOS;
         $v = $this->tablaVinculos();
         $criterioNuevo = $this->vinculosUnificados ? "NEW.tipo_evento = 'CRITERIO'" : 'TRUE';
         $clave = $this->vinculosUnificados ? 'cod_vinculo_evidencia' : 'cod_evidencia_criterio';
-        $iad = array_values(ProyeccionReduccionExperta::IAD);
-        $base = array_diff(Schema::getColumnListing($h), $iad);
-        $igual = implode(' AND ', array_map(fn ($c) => DB::getDriverName() === 'pgsql' ? "NEW.{$c} IS NOT DISTINCT FROM OLD.{$c}" : "NEW.{$c} IS OLD.{$c}", $base));
-        $vacia = implode(' AND ', array_map(fn ($c) => "OLD.{$c} IS NULL", $iad));
-        $anexo = "($vacia) AND NEW.cod_evidencia_iadl_instantanea IS NOT NULL AND ($igual)";
-        $duplicado = "EXISTS (SELECT 1 FROM {$h} h JOIN {$v} s ON s.cod_evidencia_evaluacion=h.cod_evidencia_evaluacion JOIN evaluacion_criterios c ON c.cod_evaluacion_criterio=s.cod_evaluacion_criterio WHERE c.version_conservacion='{$formato}' AND h.cod_hecho_instantanea<>NEW.cod_hecho_instantanea AND h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion)";
         $contexto = "NOT EXISTS (SELECT 1 FROM evaluacion_criterios c WHERE c.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio AND
             ((NEW.cod_evidencia_evaluacion IS NOT NULL AND EXISTS (SELECT 1 FROM evidencias_evaluacion e WHERE e.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion AND e.cod_evaluacion_experta=c.cod_evaluacion_experta))
             OR (NEW.cod_hecho_instantanea IS NOT NULL AND c.version_conservacion='{$formato}' AND EXISTS (SELECT 1 FROM {$h} h WHERE h.cod_hecho_instantanea=NEW.cod_hecho_instantanea AND h.cod_evaluacion_experta=c.cod_evaluacion_experta))))";
@@ -40,15 +35,6 @@ final class GuardasReduccionConservacion
         $hechoNuevo = "COALESCE(NEW.cod_hecho_instantanea,(SELECT h.cod_hecho_instantanea FROM {$h} h WHERE h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion AND h.cod_evaluacion_experta={$propietario}))";
         $repetido = "EXISTS (SELECT 1 FROM {$v} s WHERE s.cod_evaluacion_criterio=NEW.cod_evaluacion_criterio AND s.{$clave}<>NEW.{$clave} AND (s.orden_conservacion=NEW.orden_conservacion OR COALESCE(s.cod_hecho_instantanea,(SELECT h.cod_hecho_instantanea FROM {$h} h WHERE h.cod_evidencia_evaluacion=s.cod_evidencia_evaluacion AND h.cod_evaluacion_experta={$propietario}))={$hechoNuevo}))";
         if (DB::getDriverName() === 'pgsql') {
-            DB::unprepared("CREATE FUNCTION red_hecho_guard() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN
-                IF TG_OP='DELETE' THEN RAISE EXCEPTION 'red_hecho_inmutable'; END IF;
-                IF current_setting('transaction_isolation') <> 'read committed' THEN RAISE EXCEPTION 'red_hecho_requiere_read_committed'; END IF;
-                PERFORM 1 FROM evidencias_evaluacion WHERE cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion FOR UPDATE;
-                PERFORM 1 FROM evaluaciones_expertas WHERE cod_evaluacion_experta=NEW.cod_evaluacion_experta FOR UPDATE;
-                IF TG_OP='UPDATE' AND NOT ($anexo) THEN RAISE EXCEPTION 'red_hecho_anexo_unico'; END IF;
-                IF NEW.cod_evidencia_evaluacion IS NOT NULL AND ($duplicado) THEN RAISE EXCEPTION 'red_soporte_ambiguo'; END IF;
-                RETURN NEW; END \$\$");
-            DB::unprepared("CREATE TRIGGER red_hecho_guard BEFORE INSERT OR UPDATE OR DELETE ON {$h} FOR EACH ROW EXECUTE FUNCTION red_hecho_guard()");
             DB::unprepared("CREATE FUNCTION red_vinculo_guard() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN
                 IF NOT ($criterioNuevo) THEN RETURN NEW; END IF;
                 IF current_setting('transaction_isolation') <> 'read committed' THEN RAISE EXCEPTION 'red_vinculo_requiere_read_committed'; END IF;
@@ -60,14 +46,44 @@ final class GuardasReduccionConservacion
                 RETURN NEW; END \$\$");
             DB::unprepared("CREATE TRIGGER red_vinculo_guard BEFORE INSERT OR UPDATE ON {$v} FOR EACH ROW EXECUTE FUNCTION red_vinculo_guard()");
         } else {
-            DB::unprepared("CREATE TRIGGER red_hecho_delete BEFORE DELETE ON {$h} BEGIN SELECT RAISE(ABORT,'red_hecho_inmutable'); END");
-            DB::unprepared("CREATE TRIGGER red_hecho_update BEFORE UPDATE ON {$h} WHEN NOT ($anexo) BEGIN SELECT RAISE(ABORT,'red_hecho_anexo_unico'); END");
             foreach (['INSERT', 'UPDATE'] as $evento) {
-                DB::unprepared('CREATE TRIGGER red_hecho_'.strtolower($evento)."_origen BEFORE {$evento} ON {$h} WHEN NEW.cod_evidencia_evaluacion IS NOT NULL AND ($duplicado) BEGIN SELECT RAISE(ABORT,'red_soporte_ambiguo'); END");
                 DB::unprepared('CREATE TRIGGER red_vinculo_'.strtolower($evento)." BEFORE {$evento} ON {$v} WHEN ($criterioNuevo) AND (($contexto) OR (($snap) AND (($incompleto) OR ($repetido)))) BEGIN SELECT RAISE(ABORT,'red_vinculo_contexto_coleccion'); END");
             }
         }
         $this->protegerContextoPadres();
+    }
+
+    public function instalarHechos(bool $funcionalidadDerivada = false): void
+    {
+        $formato = IdentificadoresHistoricos::CONSERVACION;
+        $h = ProyeccionReduccionExperta::HECHOS;
+        $v = $this->tablaVinculos();
+        $iad = array_values(ProyeccionReduccionExperta::IAD);
+        if ($funcionalidadDerivada) {
+            $iad = array_diff($iad, ['iadl_cod_funcionalidad_instantanea']);
+        }
+        $base = array_diff(Schema::getColumnListing($h), $iad);
+        $igual = implode(' AND ', array_map(fn ($c) => DB::getDriverName() === 'pgsql' ? "NEW.{$c} IS NOT DISTINCT FROM OLD.{$c}" : "NEW.{$c} IS OLD.{$c}", $base));
+        $vacia = implode(' AND ', array_map(fn ($c) => "OLD.{$c} IS NULL", $iad));
+        $anexo = "($vacia) AND NEW.cod_evidencia_iadl_instantanea IS NOT NULL AND ($igual)";
+        $duplicado = "EXISTS (SELECT 1 FROM {$h} h JOIN {$v} s ON s.cod_evidencia_evaluacion=h.cod_evidencia_evaluacion JOIN evaluacion_criterios c ON c.cod_evaluacion_criterio=s.cod_evaluacion_criterio WHERE c.version_conservacion='{$formato}' AND h.cod_hecho_instantanea<>NEW.cod_hecho_instantanea AND h.cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion)";
+        if (DB::getDriverName() === 'pgsql') {
+            DB::unprepared("CREATE FUNCTION red_hecho_guard() RETURNS trigger LANGUAGE plpgsql AS \$\$ BEGIN
+                IF TG_OP='DELETE' THEN RAISE EXCEPTION 'red_hecho_inmutable'; END IF;
+                IF current_setting('transaction_isolation') <> 'read committed' THEN RAISE EXCEPTION 'red_hecho_requiere_read_committed'; END IF;
+                PERFORM 1 FROM evidencias_evaluacion WHERE cod_evidencia_evaluacion=NEW.cod_evidencia_evaluacion FOR UPDATE;
+                PERFORM 1 FROM evaluaciones_expertas WHERE cod_evaluacion_experta=NEW.cod_evaluacion_experta FOR UPDATE;
+                IF TG_OP='UPDATE' AND NOT ($anexo) THEN RAISE EXCEPTION 'red_hecho_anexo_unico'; END IF;
+                IF NEW.cod_evidencia_evaluacion IS NOT NULL AND ($duplicado) THEN RAISE EXCEPTION 'red_soporte_ambiguo'; END IF;
+                RETURN NEW; END \$\$");
+            DB::unprepared("CREATE TRIGGER red_hecho_guard BEFORE INSERT OR UPDATE OR DELETE ON {$h} FOR EACH ROW EXECUTE FUNCTION red_hecho_guard()");
+        } else {
+            DB::unprepared("CREATE TRIGGER red_hecho_delete BEFORE DELETE ON {$h} BEGIN SELECT RAISE(ABORT,'red_hecho_inmutable'); END");
+            DB::unprepared("CREATE TRIGGER red_hecho_update BEFORE UPDATE ON {$h} WHEN NOT ($anexo) BEGIN SELECT RAISE(ABORT,'red_hecho_anexo_unico'); END");
+            foreach (['INSERT', 'UPDATE'] as $evento) {
+                DB::unprepared('CREATE TRIGGER red_hecho_'.strtolower($evento)."_origen BEFORE {$evento} ON {$h} WHEN NEW.cod_evidencia_evaluacion IS NOT NULL AND ($duplicado) BEGIN SELECT RAISE(ABORT,'red_soporte_ambiguo'); END");
+            }
+        }
     }
 
     /** Un cambio en el padre tampoco puede invalidar el contexto ya vinculado. */
@@ -105,13 +121,24 @@ final class GuardasReduccionConservacion
                 DB::unprepared('DROP FUNCTION IF EXISTS red_padre_'.$nombre.'_guard()');
             }
         }
+        $this->retirarHechos();
         if (DB::getDriverName() === 'pgsql') {
-            DB::unprepared('DROP TRIGGER red_hecho_guard ON '.ProyeccionReduccionExperta::HECHOS);
             DB::unprepared('DROP TRIGGER red_vinculo_guard ON '.$this->tablaVinculos());
-            DB::unprepared('DROP FUNCTION red_hecho_guard()');
             DB::unprepared('DROP FUNCTION red_vinculo_guard()');
         } else {
-            foreach (['red_hecho_delete', 'red_hecho_update', 'red_hecho_insert_origen', 'red_hecho_update_origen', 'red_vinculo_insert', 'red_vinculo_update'] as $n) {
+            foreach (['red_vinculo_insert', 'red_vinculo_update'] as $n) {
+                DB::unprepared("DROP TRIGGER IF EXISTS {$n}");
+            }
+        }
+    }
+
+    public function retirarHechos(): void
+    {
+        if (DB::getDriverName() === 'pgsql') {
+            DB::unprepared('DROP TRIGGER red_hecho_guard ON '.ProyeccionReduccionExperta::HECHOS);
+            DB::unprepared('DROP FUNCTION red_hecho_guard()');
+        } else {
+            foreach (['red_hecho_delete', 'red_hecho_update', 'red_hecho_insert_origen', 'red_hecho_update_origen'] as $n) {
                 DB::unprepared("DROP TRIGGER IF EXISTS {$n}");
             }
         }

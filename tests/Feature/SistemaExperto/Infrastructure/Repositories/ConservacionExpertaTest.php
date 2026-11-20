@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 
-use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
-
 use App\Models\EvaluacionExperta;
 use App\Models\HechoInstantaneaExperta;
+use App\Models\ReglaAplicadaDclInstantanea;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta as Catalogo;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Mapeadores\MapeadorResultados;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Repositorios\EvaluacionExpertaEloquentRepository;
+use App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo;
 use DateTimeImmutable;
 use DateTimeZone;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use LogicException;
+use MotorExperto\conservacion\CodecInstantanea as Codec;
 use MotorExperto\dominio\Entities\Cognicion\ResultadoDominio;
 use MotorExperto\dominio\Entities\Cognicion\ResultadoSubcomponente;
 use MotorExperto\dominio\Entities\Cognicion\VectorCognitivo;
@@ -35,9 +38,9 @@ use MotorExperto\dominio\ValueObjects\Cognicion\EvaluabilidadEnum as V;
 use MotorExperto\dominio\ValueObjects\Cognicion\HallazgoInstrumentalEnum as H;
 use MotorExperto\dominio\ValueObjects\Cognicion\SubcomponenteCognitivoEnum as Sub;
 use MotorExperto\dominio\ValueObjects\Conocimiento\OperadorCondicionEnum as Op;
-use MotorExperto\conservacion\CodecInstantanea as Codec;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\CorromperConservacionParaPrueba;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
 use Tests\Unit\SistemaExperto\Domain\Services\Inferencia\EscenarioInferencia;
 use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
@@ -45,7 +48,8 @@ use Tests\Unit\SistemaExperto\Infrastructure\Mappers\EscenarioMapeadores;
 /** Demuestra recuperación durable, atomicidad e inmutabilidad. */
 final class ConservacionExpertaTest extends RepositoriosTestCase
 {
-    use \Tests\Support\CorromperConservacionParaPrueba;
+    use CorromperConservacionParaPrueba;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -175,13 +179,13 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         self::assertSame(Codec::huella($r), Codec::huella($nuevo));
         self::assertCount(1, $nuevo->reglasAplicadas);
 
-        $fila = \App\Models\ReglaAplicadaDclInstantanea::query()->with('condiciones')->sole();
+        $fila = ReglaAplicadaDclInstantanea::query()->with('condiciones')->sole();
         self::assertCount(6, $fila->condiciones);
         $raiz = $fila->condiciones->firstWhere('cod_condicion_padre', null);
         self::assertSame('Y', $raiz->operador);
         self::assertSame($fila->getKey(), $raiz->regla->getKey());
         self::assertCount(3, $raiz->hijas);
-        self::assertNull(\App\Models\ReglaAplicadaDclInstantanea::find($raiz->getKey()));
+        self::assertNull(ReglaAplicadaDclInstantanea::find($raiz->getKey()));
         self::assertArrayNotHasKey('operador', $fila->toArray());
 
         $migracion = require database_path('migrations/2026_11_17_000004_consolidate_instantaneas_reglas.php');
@@ -237,12 +241,14 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         [$modelo] = EscenarioMapeadores::resultados(['U', 'U', 'U', 'U', 'U']);
         EscenarioRepositorios::guardarGrafo($modelo);
+        (require database_path('migrations/2026_11_20_000003_derive_iadl_functional_context.php'))->down();
+        (require database_path('migrations/2026_11_18_000002_remove_derived_context_columns.php'))->down();
         (require database_path('migrations/2026_11_17_000004_consolidate_instantaneas_reglas.php'))->down();
         (require database_path('migrations/2026_11_17_000003_consolidate_evaluaciones_reglas.php'))->down();
         foreach (['000013_consolidate_componentes_regla', '000010_consolidate_vinculos_evidencia', '000005_consolidate_criterios_dominio_nodos'] as $posterior) {
             (require database_path('migrations/2026_11_14_'.$posterior.'.php'))->down();
         }
-        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
+        (new TransicionBloquesExpertos)->bajar();
         $antes = DB::table('resultados_criterio')->orderBy('cod_resultado_criterio')->get()->all();
         $migracion = require base_path('database/migrations/2026_10_17_200000_incorporate_conservacion_experta_v2.php');
         (new TransicionReduccionConservacion)->bajar();
@@ -313,9 +319,9 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             self::assertSame('Fallo DCL simulado.', $e->getMessage());
         }
         self::assertTrue($disparado);
-        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+        self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('hechos_instantanea_experta')->whereNotNull('cod_evidencia_iadl_instantanea')->count());
-        self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+        self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
         self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         self::assertNotNull($this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha()));
     }
@@ -399,8 +405,8 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
             $this->repo()->guardarClasificacion(new ResultadoClasificacionDcl($perfil, $base->patronCandidato, [], $base->justificacion, [$regla]));
             self::fail('Una PK real no acredita contenido inventado.');
         } catch (DomainException) {
-            self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
-            self::assertSame(0, \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+            self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
+            self::assertSame(0, BloquesExpertos::consulta('clasificaciones_dcl_instantanea')->count());
             self::assertSame(0, DB::table('evaluacion_criterios')->where('tipo_registro', 'DCL')->count());
         }
     }

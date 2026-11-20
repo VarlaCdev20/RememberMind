@@ -17,6 +17,8 @@ runtime_verified: false
 
 **Normalización autorizada, 20/11/2026.** La [decisión vigente](DECISION_NORMALIZACION_5FN_2026_11_20.md) prioriza la 5FN y permite hasta **100 tablas de negocio, excluidas las 16 técnicas**. El [plan de implementación](PLAN_NORMALIZACION_5FN_2026_11_20.md) separa los bloques pendientes de los comprobados. Los [dos primeros cambios verificados](VERIFICACION_5FN_PRIMER_BLOQUE_2026_11_20.md) siguen en el checkout aislado; no se deduce su instalación en la base operativa ni una certificación global.
 
+**Conservación IADL, mismo alcance.** La [tercera migración verificada](VERIFICACION_5FN_IADL_2026_11_20.md) deriva su referencia funcional desde la evaluación y conserva las ausencias, DTO y huellas del experto. No añade tablas; el checkout sigue en 86 de negocio y 16 técnicas. La base de uso todavía no recibió estas migraciones.
+
 **Auditoría de 5FN, 20/11/2026.** La [revisión de las 84 tablas de negocio](AUDITORIA_5FN_NEGOCIO_2026_11_20.md) confirma el inventario y documenta dependencias no clave en subconjuntos poblados, contratos condicionales y límites de la comprobación. **No certifica 5FN global ni modifica el esquema.** Incluye la matriz completa por relación y pruebas SQL de solo lectura.
 
 **Residente derivado en valoraciones funcionales y nutricionales, 18/11/2026.** La [decisión autorizada](DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md) reduce `valoraciones_profesionales` a 29 atributos. Se conserva el inventario de 100 tablas físicas. El reparto de 30 atributos por tabla corresponde al corte anterior.

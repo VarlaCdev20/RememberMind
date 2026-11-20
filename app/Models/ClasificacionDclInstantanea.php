@@ -52,7 +52,7 @@ final class ClasificacionDclInstantanea extends ModeloBloqueExperto
 
     public function evidenciasIadl(): HasMany
     {
-        return $this->hasMany(HechoInstantaneaExperta::class, 'iadl_cod_funcionalidad_instantanea', 'cod_funcionalidad_instantanea')->whereNotNull('cod_evidencia_iadl_instantanea');
+        return $this->hasMany(HechoInstantaneaExperta::class, 'cod_evaluacion_experta', 'cod_evaluacion_experta')->whereNotNull('cod_evidencia_iadl_instantanea');
     }
 
     /** Sin parámetros: devuelve la relación Eloquent del contrato aprobado; la consulta diferida puede propagar errores SQL. */

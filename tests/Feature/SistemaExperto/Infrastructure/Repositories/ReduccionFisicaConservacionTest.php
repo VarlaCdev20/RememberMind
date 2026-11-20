@@ -7,13 +7,14 @@ namespace Tests\Feature\SistemaExperto\Infrastructure\Repositories;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\AlmacenInstantaneas;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\CatalogoConservacionExperta;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\ProyeccionReduccionExperta as P;
+use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionReduccionConservacion as T;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use MotorExperto\conservacion\CodecInstantanea as Codec;
+use MotorExperto\dominio\Services\Dcl\ClasificadorPetersenService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CorromperConservacionParaPrueba;
 use Tests\Unit\SistemaExperto\Domain\Entities\EscenarioEntidades as E;
@@ -35,9 +36,19 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
         $r = (new ClasificadorPetersenService)->clasificar($perfil);
         $this->almacen()->guardar($perfil->cognicion);
         $this->almacen()->guardarClasificacion($r);
+        // Cada transición histórica recibe su esquema real, no un corte posterior.
+        foreach ([
+            '2026_11_20_000003_derive_iadl_functional_context.php',
+            '2026_11_18_000002_remove_derived_context_columns.php',
+            '2026_11_17_000004_consolidate_instantaneas_reglas.php',
+            '2026_11_17_000003_consolidate_evaluaciones_reglas.php',
+            '2026_11_14_000013_consolidate_componentes_regla.php',
+        ] as $archivo) {
+            (require database_path('migrations/'.$archivo))->down();
+        }
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->down();
         // Este contrato prueba la migración histórica del 20/10 sobre su esquema de entrada de 104.
-        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->bajar();
+        (new TransicionBloquesExpertos)->bajar();
 
         return $r;
     }
@@ -69,8 +80,17 @@ final class ReduccionFisicaConservacionTest extends RepositoriosTestCase
             self::assertFalse(Schema::hasTable($tabla));
         }
         self::assertSame($p->canonizar($antes), $p->canonizar($p->restaurar($this->filas([P::HECHOS, P::CLASIFICACIONES, P::VINCULOS]))));
-        (new \App\Modulos\ApoyoDecision\Infraestructura\Persistencia\Conservacion\TransicionBloquesExpertos)->subir();
+        (new TransicionBloquesExpertos)->subir();
         (require database_path('migrations/2026_11_14_000010_consolidate_vinculos_evidencia.php'))->up();
+        foreach ([
+            '2026_11_14_000013_consolidate_componentes_regla.php',
+            '2026_11_17_000003_consolidate_evaluaciones_reglas.php',
+            '2026_11_17_000004_consolidate_instantaneas_reglas.php',
+            '2026_11_18_000002_remove_derived_context_columns.php',
+            '2026_11_20_000003_derive_iadl_functional_context.php',
+        ] as $archivo) {
+            (require database_path('migrations/'.$archivo))->up();
+        }
         $consultas = [];
         DB::listen(static function ($q) use (&$consultas) {
             $consultas[] = $q->sql;
