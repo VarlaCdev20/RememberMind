@@ -85,7 +85,7 @@ final class AdquisicionPerfilExperimentalTest extends RepositoriosTestCase
         $this->app->bind(AlmacenEjecucionesExperimentales::class, ArchivoEjecucionesExperimentales::class);
         $archivo = app(GestionarEjecucionesExperimentales::class);
         $conservado = $archivo->ejecutar($autor, $caso);
-        RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', $selecciones['controles_cognitivos'][0])
+        DB::table('controles_cognitivos')->where('cod_control_cognitivo', $selecciones['controles_cognitivos'][0])
             ->update(['repite_preguntas' => true]);
         $historico = $archivo->consultar($autor, 'SINTETICO-RES', 'SIM-INTEGRAL-01');
         self::assertSame($conservado, $historico);

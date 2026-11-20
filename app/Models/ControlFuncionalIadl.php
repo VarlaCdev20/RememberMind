@@ -19,6 +19,8 @@ use LogicException;
  */
 class ControlFuncionalIadl extends ModeloOperativo
 {
+    use \App\Compartido\Infraestructura\Persistencia\ConservaContextoResidente;
+
     protected $table = 'controles_funcionales_iadl';
 
     protected $primaryKey = 'cod_control_iadl';

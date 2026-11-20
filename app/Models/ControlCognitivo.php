@@ -4,6 +4,8 @@ namespace App\Models;
 
 class ControlCognitivo extends ModeloOperativo
 {
+    use \App\Compartido\Infraestructura\Persistencia\ConservaContextoResidente;
+
     protected $table = 'controles_cognitivos';
 
     protected $primaryKey = 'cod_control_cognitivo';

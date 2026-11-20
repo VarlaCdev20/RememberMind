@@ -4,21 +4,88 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Compartido\Infraestructura\Persistencia\ContextosResidente;
 use App\Modulos\ApoyoDecision\Aplicacion\Servicios\ContratoFuentesPetersen;
 use App\Modulos\ApoyoDecision\Infraestructura\Persistencia\InventarioExperto;
 use DomainException;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Process\Process;
 use Tests\TestCase;
 
 final class ContratoEntradasSinResidentesTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_sqlite_rechaza_alias_o_guardas_que_solo_conservan_el_nombre(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            self::markTestSkipped('La falsificación de este DDL se comprueba en SQLite.');
+        }
+        $tabla = 'controles_cognitivos';
+        $prefijo = 'ctx20_'.substr(sha1($tabla), 0, 12);
+        foreach (['alias_incorrecto', 'guarda_vacia'] as $caso) {
+            config(['database.connections.fn5_contrato_ajeno' => ['driver' => 'sqlite', 'database' => ':memory:', 'foreign_key_constraints' => true]]);
+            $db = DB::connection('fn5_contrato_ajeno');
+            try {
+                foreach (['residentes', 'atenciones', $tabla, 'residentes_controles_cognitivos'] as $origen) {
+                    $sql = DB::table('sqlite_master')->where('type', 'table')->where('name', $origen)->value('sql');
+                    if ($caso === 'alias_incorrecto' && $origen === $tabla) {
+                        $sql = str_replace('CASE WHEN cod_atencion IS NULL THEN cod_control_cognitivo ELSE NULL END', 'cod_control_cognitivo', $sql, $cambios);
+                        self::assertSame(1, $cambios);
+                    }
+                    $db->statement($sql);
+                }
+                foreach (DB::table('sqlite_master')->where('type', 'trigger')->where('name', 'like', $prefijo.'%')->get(['name', 'sql']) as $trigger) {
+                    $sql = $caso === 'guarda_vacia' && $trigger->name === $prefijo.'_insert'
+                        ? 'CREATE TRIGGER '.$trigger->name.' BEFORE INSERT ON '.$tabla.' BEGIN SELECT 1; END' : $trigger->sql;
+                    $db->unprepared($sql);
+                }
+                self::assertFalse(ContextosResidente::estructuraDisponible($db, $tabla), $caso);
+            } finally {
+                DB::purge('fn5_contrato_ajeno');
+            }
+        }
+    }
+
+    public function test_postgres_rechaza_guardas_deshabilitadas_o_con_otra_funcion(): void
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            self::markTestSkipped('La habilitación de triggers se comprueba en PostgreSQL.');
+        }
+        $tabla = 'controles_cognitivos';
+        $nombre = 'ctx20_'.substr(sha1($tabla), 0, 12);
+        self::assertTrue(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+        $enlace = DB::selectOne('SELECT pg_get_triggerdef(oid) AS definicion FROM pg_trigger WHERE tgname=? AND tgrelid=to_regclass(?)', [$nombre, 'public.'.$tabla])->definicion;
+        DB::statement('DROP TRIGGER '.$nombre.' ON '.$tabla);
+        DB::statement('CREATE TRIGGER '.$nombre.' BEFORE INSERT OR UPDATE OF cod_atencion ON '.$tabla.' FOR EACH ROW EXECUTE FUNCTION '.$nombre.'()');
+        try {
+            self::assertFalse(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+        } finally {
+            DB::statement('DROP TRIGGER '.$nombre.' ON '.$tabla);
+            DB::unprepared($enlace);
+        }
+        self::assertTrue(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+        DB::statement('ALTER TABLE '.$tabla.' DISABLE TRIGGER '.$nombre);
+        try {
+            self::assertFalse(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+        } finally {
+            DB::statement('ALTER TABLE '.$tabla.' ENABLE TRIGGER '.$nombre);
+        }
+        $definicion = DB::selectOne('SELECT pg_get_functiondef(tgfoid) AS definicion FROM pg_trigger WHERE tgname=? AND tgrelid=to_regclass(?)', [$nombre, 'public.'.$tabla])->definicion;
+        DB::unprepared('CREATE OR REPLACE FUNCTION '.$nombre.'() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END; $$');
+        try {
+            self::assertFalse(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+        } finally {
+            DB::unprepared($definicion);
+        }
+        self::assertTrue(ContextosResidente::estructuraDisponible(DB::connection(), $tabla));
+    }
+
     public function test_comando_integra_preparacion_del_circuito_en_base_sqlite_vacia_y_solo_lectura(): void
     {
-        $proceso = new \Symfony\Component\Process\Process([PHP_BINARY, base_path('scripts/inventariar-experto.php')], base_path(), [
+        $proceso = new Process([PHP_BINARY, base_path('scripts/inventariar-experto.php')], base_path(), [
             'APP_ENV' => 'testing', 'APP_DEBUG' => 'false',
             'APP_CONFIG_CACHE' => sys_get_temp_dir().'/remembermind-config-no-existente-'.bin2hex(random_bytes(8)).'.php',
             'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => ':memory:', 'DB_URL' => '', 'DATABASE_URL' => '',

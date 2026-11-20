@@ -1095,14 +1095,14 @@ class HistoriaResidencialSeeder extends Seeder
             ->select('cod_cama')->groupBy('cod_cama')->havingRaw('count(*) > 1')->exists()) {
             throw new RuntimeException('Una cama tiene dos ocupaciones activas.');
         }
-        if (DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
+        if (DB::table('respuestas_instrumento as r')->joinSub(RegistrosConsumo::consulta('aplicaciones_instrumento'), 'a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
             ->join('preguntas_instrumento as p', 'p.cod_pregunta', '=', 'r.cod_pregunta')->join('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')
             ->whereIn('a.cod_residente', $ids)->where(function ($q) {
                 $q->whereColumn('a.cod_instrumento', '<>', 'p.cod_instrumento')->orWhereColumn('o.cod_pregunta', '<>', 'p.cod_pregunta');
             })->exists()) {
             throw new RuntimeException('Respuesta de instrumento incoherente.');
         }
-        foreach (DB::table('aplicaciones_instrumento')->whereIn('cod_residente', $ids)->get() as $application) {
+        foreach (RegistrosConsumo::consulta('aplicaciones_instrumento')->whereIn('cod_residente', $ids)->get() as $application) {
             $answers = DB::table('respuestas_instrumento')->where('cod_aplicacion', $application->cod_aplicacion);
             if ($answers->count() !== 10 || (float) $answers->sum('puntaje') !== (float) $application->puntaje_total || (float) $application->puntaje_maximo !== 100.0) {
                 throw new RuntimeException('Aplicación Barthel incompleta o puntuación incoherente.');

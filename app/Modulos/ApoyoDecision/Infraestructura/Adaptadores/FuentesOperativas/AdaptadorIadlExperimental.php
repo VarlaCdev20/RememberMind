@@ -44,11 +44,13 @@ final readonly class AdaptadorIadlExperimental
      */
     public function disponibilidad(string $conexion): array
     {
-        $esquema = ExtractorVariableMapeada::conexionSegura($conexion)->getSchemaBuilder();
-        $columnas = [self::PK, 'cod_residente', 'cod_personal', 'cod_usuario_registro', self::EPISODIO,
+        $db = ExtractorVariableMapeada::conexionSegura($conexion);
+        $esquema = $db->getSchemaBuilder();
+        $columnas = [self::PK, 'cod_personal', 'cod_usuario_registro', self::EPISODIO,
             'cod_control_anterior', 'fecha_hora', 'estado', 'registrado_en', ...array_keys(self::CAMPOS)];
         $tabla = (new ControlFuncionalIadl)->getTable();
-        $disponible = $esquema->hasTable($tabla) && $esquema->hasColumns($tabla, $columnas);
+        $disponible = $esquema->hasTable($tabla) && $esquema->hasColumns($tabla, $columnas)
+            && \App\Compartido\Infraestructura\Persistencia\ContextosResidente::estructuraDisponible($db, $tabla);
 
         return ['disponible' => $disponible, 'motivo' => $disponible
             ? 'Fuente IADL descriptiva disponible; no acredita C03.'

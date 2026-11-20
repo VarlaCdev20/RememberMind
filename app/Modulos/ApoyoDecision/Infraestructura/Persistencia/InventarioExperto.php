@@ -2,6 +2,8 @@
 
 namespace App\Modulos\ApoyoDecision\Infraestructura\Persistencia;
 
+use App\Compartido\Infraestructura\Persistencia\ContextosResidente;
+
 use App\Models\AplicacionInstrumento;
 use App\Models\Atencion;
 use App\Models\Instrumento;
@@ -143,7 +145,10 @@ final class InventarioExperto
         $presente = $esquema->hasTable($tabla);
         $columnas = $presente ? $esquema->getColumnListing($tabla) : [];
         sort($columnas, SORT_STRING);
-        $faltantes = array_values(array_diff([$modelo->getKeyName(), ...$campos], $columnas));
+        $contextualizado = isset(ContextosResidente::CONTRATOS[$tabla]);
+        $contextoDisponible = $contextualizado && ContextosResidente::estructuraDisponible($esquema->getConnection(), $tabla);
+        $derivados = $contextoDisponible ? ['cod_residente'] : [];
+        $faltantes = array_values(array_diff([$modelo->getKeyName(), ...$campos], [...$columnas, ...$derivados]));
         $pk = $presente && collect($esquema->getIndexes($tabla))->contains(
             fn ($indice) => $indice['primary'] && $indice['columns'] === [$modelo->getKeyName()]);
         $fks = $presente ? $esquema->getForeignKeys($tabla) : [];
@@ -152,11 +157,13 @@ final class InventarioExperto
             $verificada = collect($fks)->contains(static fn ($fk) => $fk['columns'] === [$campo]
                 && $fk['foreign_table'] === $destino && $fk['foreign_columns'] === [$clave]
                 && in_array($fk['foreign_schema'] ?? null, [null, 'main', 'public'], true));
-            $enlaces[] = ['campo' => $campo, 'tabla_destino' => $destino, 'clave_destino' => $clave, 'verificada' => $verificada];
+            if ($contextualizado && $campo === 'cod_residente') $verificada = $contextoDisponible;
+            $enlaces[] = ['campo' => $campo, 'tabla_destino' => $destino, 'clave_destino' => $clave, 'verificada' => $verificada]
+                + ($contextualizado && $campo === 'cod_residente' ? ['tipo_vinculo' => 'DERIVADO_DE_ATENCION_O_ASOCIACION_DIRECTA', 'fk_directa_en_tabla' => false] : []);
         }
 
         return ['tabla' => $tabla, 'clave_primaria' => $modelo->getKeyName(), 'tabla_presente' => $presente,
-            'clave_primaria_verificada' => $pk, 'campos_existentes' => $columnas, 'campos_base_faltantes' => $faltantes,
+            'clave_primaria_verificada' => $pk, 'campos_existentes' => $columnas, 'campos_derivados_disponibles' => $derivados, 'campos_base_faltantes' => $faltantes,
             'relaciones' => $enlaces, 'estructura_verificada' => $presente && $pk && $faltantes === []
                 && ! in_array(false, array_column($enlaces, 'verificada'), true)];
     }

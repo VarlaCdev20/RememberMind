@@ -162,7 +162,7 @@ final class EscenariosCognitivosDesarrolloTest extends TestCase
         $this->preparar();
         app(Carga::class)->ejecutar(...$this->entrada);
         $id = RegistrosConsumo::consulta('controles_cognitivos')->orderBy('cod_control_cognitivo')->value('cod_control_cognitivo');
-        RegistrosConsumo::consulta('controles_cognitivos')->where('cod_control_cognitivo', $id)->update(['memoria_reciente' => 'MODIFICADO']);
+        DB::table('controles_cognitivos')->where('cod_control_cognitivo', $id)->update(['memoria_reciente' => 'MODIFICADO']);
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('no se sobrescribirá');
         try {

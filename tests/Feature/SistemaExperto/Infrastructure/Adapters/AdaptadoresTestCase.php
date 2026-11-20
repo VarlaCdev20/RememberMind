@@ -108,9 +108,9 @@ abstract class AdaptadoresTestCase extends RepositoriosTestCase
             'orden' => 1, 'estado' => 'ACTIVO', 'dominio' => 'NO-USAR-COMO-MAPEO']);
         DB::table('opciones_pregunta')->insert(['cod_opcion' => 'SIM-OPC', 'cod_pregunta' => 'SIM-PREG',
             'nombre' => 'Opción artificial', 'valor' => null, 'puntaje' => null, 'orden' => 1, 'estado' => 'ACTIVO']);
-        DB::table('aplicaciones_instrumento')->insert(['cod_aplicacion' => 'SIM-APL', 'cod_instrumento' => 'SIM-INST',
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::insertar('aplicaciones_instrumento', [['cod_aplicacion' => 'SIM-APL', 'cod_instrumento' => 'SIM-INST',
             'cod_residente' => 'SINTETICO-RES', 'cod_personal' => 'SIM-PER', 'cod_atencion' => 'SIM-AT',
-            'fecha_hora' => '2026-10-17 12:00:00', 'puntaje_total' => '0.00', 'estado' => 'COMPLETA']);
+            'fecha_hora' => '2026-10-17 12:00:00', 'puntaje_total' => '0.00', 'estado' => 'COMPLETA']]);
         DB::table('respuestas_instrumento')->insert(array_replace(['cod_respuesta' => 'SIM-RESP', 'cod_aplicacion' => 'SIM-APL',
             'cod_pregunta' => 'SIM-PREG', 'cod_opcion' => null, 'valor_texto' => null, 'valor_numero' => null, 'valor_logico' => null], $datos));
     }

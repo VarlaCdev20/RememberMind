@@ -15,7 +15,38 @@ final class ContextosResidente
     public const CONTRATOS = [
         'mediciones_clinicas' => ['cod_registro_medicion', 'residentes_mediciones_clinicas'],
         'registros_observaciones_cuidado' => ['cod_observacion_cuidado', 'residentes_observaciones_cuidado'],
+        'aplicaciones_instrumento' => ['cod_aplicacion', 'residentes_aplicaciones_instrumento'],
+        'controles_cognitivos' => ['cod_control_cognitivo', 'residentes_controles_cognitivos'],
+        'controles_funcionales_iadl' => ['cod_control_iadl', 'residentes_controles_funcionales_iadl'],
     ];
+
+    /** Inspección de las dos rutas físicas, sin consultar residentes ni atribuir disponibilidad clínica. */
+    public static function estructuraDisponible(Connection $db, string $tabla): bool
+    {
+        if (! isset(self::CONTRATOS[$tabla])) {
+            return false;
+        }
+        [$pk,$directa] = self::CONTRATOS[$tabla];
+        $schema = $db->getSchemaBuilder();
+        if (! $schema->hasTable($tabla) || ! $schema->hasColumns($tabla, [$pk, 'cod_atencion', 'cod_contexto_directo'])
+            || ! $schema->hasTable($directa) || ! $schema->hasColumns($directa, [$pk, 'cod_residente'])
+            || ! $schema->hasTable('atenciones') || ! $schema->hasColumns('atenciones', ['cod_atencion', 'cod_residente'])) {
+            return false;
+        }
+        $enlace = static fn (string $origen, string $campo, string $destino, string $clave): bool => collect($schema->getForeignKeys($origen))
+            ->contains(fn ($f) => $f['columns'] === [$campo] && $f['foreign_table'] === $destino && $f['foreign_columns'] === [$clave]
+                && in_array($f['foreign_schema'] ?? null, [null, 'main', 'public'], true));
+        $generada = collect($schema->getColumns($tabla))->firstWhere('name', 'cod_contexto_directo');
+        $identidad = collect($schema->getIndexes($directa))->contains(fn ($i) => $i['primary'] && $i['columns'] === [$pk]);
+        $unica = collect($schema->getIndexes($tabla))->contains(fn ($i) => $i['unique'] && $i['columns'] === ['cod_contexto_directo']);
+
+        return $identidad && $unica && ContratosContextoResidente20261120::aliasCanonico($generada['generation'] ?? null, $pk)
+            && ContratosContextoResidente20261120::guardasInstaladas($db, $tabla)
+            && $enlace($tabla, 'cod_atencion', 'atenciones', 'cod_atencion')
+            && $enlace('atenciones', 'cod_residente', 'residentes', 'cod_residente')
+            && $enlace($directa, $pk, $tabla, 'cod_contexto_directo')
+            && $enlace($directa, 'cod_residente', 'residentes', 'cod_residente');
+    }
 
     public static function origen(Connection $db, string $tabla): Builder
     {
@@ -55,6 +86,8 @@ final class ContextosResidente
 
         return $registro->getConnection()->transaction(function () use ($registro, $persistir, $tabla): bool {
             $db = $registro->getConnection();
+            // Alias técnico calculado por SQL: nunca se copia como dato al rectificar o replicar.
+            unset($registro['cod_contexto_directo']);
             if (! $registro->exists && ! $registro->getKey()) {
                 $registro->setAttribute($registro->getKeyName(), app(GeneradorCodigo::class)
                     ->siguiente($registro->entidadCodigo(), $registro->getConnectionName()));
@@ -89,7 +122,7 @@ final class ContextosResidente
             $preparadas = [];
             foreach ($filas as $fila) {
                 self::prepararRelacion($db, $tabla, $fila);
-                unset($fila['cod_residente']);
+                unset($fila['cod_residente'], $fila['cod_contexto_directo']);
                 $preparadas[] = $fila;
             }
             if ($preparadas !== []) {

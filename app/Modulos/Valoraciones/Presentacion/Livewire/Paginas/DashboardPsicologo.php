@@ -37,7 +37,7 @@ class DashboardPsicologo extends Component
         if (! $sinPersonalActivo) {
             $codigo = $personal->getKey();
             $atenciones = DB::table('atenciones')->where('cod_personal', $codigo);
-            $aplicaciones = DB::table('aplicaciones_instrumento')->where('cod_personal', $codigo);
+            $aplicaciones = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento')->where('cod_personal', $codigo);
             $aplicacionesValidas = (clone $aplicaciones)->whereIn('aplicaciones_instrumento.estado', ['COMPLETA', 'COMPLETADA', 'VIGENTE']);
             $alertas = app(BandejaAlertas::class)->pendientes($usuario)->where('cod_personal_responsable', $codigo);
             $alertasAbiertas = (clone $alertas)->count();

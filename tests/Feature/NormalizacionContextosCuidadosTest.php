@@ -28,6 +28,11 @@ final class NormalizacionContextosCuidadosTest extends TestCase
 {
     use EsquemaSinTransaccion;
 
+    private const TABLAS = [
+        'mediciones_clinicas' => ['cod_registro_medicion', 'residentes_mediciones_clinicas'],
+        'registros_observaciones_cuidado' => ['cod_observacion_cuidado', 'residentes_observaciones_cuidado'],
+    ];
+
     private function escenario(): array
     {
         $u = User::factory()->create();
@@ -53,7 +58,7 @@ final class NormalizacionContextosCuidadosTest extends TestCase
     public function test_ambas_formas_de_contexto_y_los_seis_tipos_conservan_su_residente(): void
     {
         $d = $this->escenario();
-        foreach (ContextosResidente::CONTRATOS as $tabla => [$pk,$directa]) {
+        foreach (self::TABLAS as $tabla => [$pk,$directa]) {
             self::assertFalse(Schema::hasColumn($tabla, 'cod_residente'));
         }
         foreach ($d['registros'] as $registro) {
@@ -115,19 +120,19 @@ final class NormalizacionContextosCuidadosTest extends TestCase
         $dolor = $d['registros'][3];
         $reevaluacion = ValoracionDolor::create($d['base'] + ['cod_atencion' => $d['at']->getKey(), 'cod_valoracion_origen' => $dolor->getKey(), 'intensidad' => 1]);
         $antes = [];
-        foreach (ContextosResidente::CONTRATOS as $tabla => [$pk]) {
+        foreach (self::TABLAS as $tabla => [$pk]) {
             $antes[$tabla] = ColumnasRelacionadas::consulta(DB::connection(), $tabla)->orderBy($pk)->get()->all();
         }
         $tablas = count(Schema::getTables());
         $m = require database_path('migrations/2026_11_20_000004_separate_optional_care_residents.php');
         $m->down();
-        foreach (ContextosResidente::CONTRATOS as $tabla => [$pk,$directa]) {
+        foreach (self::TABLAS as $tabla => [$pk,$directa]) {
             self::assertTrue(Schema::hasColumn($tabla, 'cod_residente'));
             self::assertFalse(Schema::hasTable($directa));
             self::assertSame(0, DB::table($tabla)->where('cod_residente', '<>', $d['r']->getKey())->count());
         }
         $m->up();
-        foreach (ContextosResidente::CONTRATOS as $tabla => [$pk]) {
+        foreach (self::TABLAS as $tabla => [$pk]) {
             self::assertEquals($antes[$tabla], ColumnasRelacionadas::consulta(DB::connection(), $tabla)->orderBy($pk)->get()->all());
         }
         self::assertSame($tablas, count(Schema::getTables()));

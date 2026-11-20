@@ -248,12 +248,12 @@ class FrontendRestauradoV2Test extends TestCase
             ->call('guardar')
             ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('aplicaciones_instrumento', [
+        $this->assertTrue(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento')->where([
             'cod_residente' => $residente->cod_residente,
             'cod_instrumento' => 'INS_EVAL_V2',
             'cod_personal' => 'PER_EVAL_V2',
             'puntaje_total' => null,
-        ]);
+        ])->exists());
         $this->assertDatabaseHas('respuestas_instrumento', ['cod_pregunta' => $pregunta->getKey(), 'valor_numero' => 24]);
     }
 

@@ -20,6 +20,9 @@ final class ColumnasRelacionadas
         'mapeos_variables_fuente' => ['cod_version_modelo', 'cod_variable_experta'],
         'mediciones_clinicas' => ['cod_residente', 'cod_registro_medicion'],
         'registros_observaciones_cuidado' => ['cod_residente', 'cod_observacion_cuidado'],
+        'aplicaciones_instrumento' => ['cod_residente', 'cod_aplicacion'],
+        'controles_cognitivos' => ['cod_residente', 'cod_control_cognitivo'],
+        'controles_funcionales_iadl' => ['cod_residente', 'cod_control_iadl'],
     ];
 
     public static function origen(Connection $db, string $tabla): Builder

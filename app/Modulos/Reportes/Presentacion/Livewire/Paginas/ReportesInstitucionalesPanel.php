@@ -118,7 +118,7 @@ class ReportesInstitucionalesPanel extends Component
         $totalEvaluaciones = AplicacionInstrumento::whereIn('cod_residente', $adultosIds)->count();
 
         // Evaluaciones por área
-        $evaluacionesPorArea = DB::table('aplicaciones_instrumento')
+        $evaluacionesPorArea = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento')
             ->join('instrumentos', 'aplicaciones_instrumento.cod_instrumento', '=', 'instrumentos.cod_instrumento')
             ->whereIn('aplicaciones_instrumento.cod_residente', $adultosIds)
             ->select('instrumentos.tipo as area_nombre', DB::raw('count(*) as total'))

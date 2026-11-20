@@ -31,7 +31,8 @@ try {
     foreach ($tablas as $tabla) {
         $q = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::consulta($tabla)->where('cod_residente', $residente);
         $conteos[$tabla] = $q->count();
-        $columnas = Schema::getColumnListing($q->from);
+        $fisica = \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::ORIGENES[$tabla][0] ?? $tabla;
+        $columnas = Schema::getColumnListing($fisica);
         if (in_array('estado', $columnas, true)) {
             $estados[$tabla] = (clone $q)->select('estado')->selectRaw('count(*) as cantidad')->groupBy('estado')->orderBy('estado')->get()->all();
         }
@@ -57,10 +58,10 @@ try {
             ];
         }
     }
-    $aplicaciones = DB::table('aplicaciones_instrumento as a')->leftJoin('instrumentos as i', 'i.cod_instrumento', '=', 'a.cod_instrumento')
+    $aplicaciones = \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento', 'a')->leftJoin('instrumentos as i', 'i.cod_instrumento', '=', 'a.cod_instrumento')
         ->where('a.cod_residente', $residente);
     $tipos = (clone $aplicaciones)->select('i.tipo')->selectRaw('count(*) as cantidad')->groupBy('i.tipo')->orderBy('i.tipo')->get()->all();
-    $respuestas = DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
+    $respuestas = DB::table('respuestas_instrumento as r')->joinSub(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento'), 'a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
         ->where('a.cod_residente', $residente);
     $incompatibles = (clone $respuestas)->leftJoin('preguntas_instrumento as p', 'p.cod_pregunta', '=', 'r.cod_pregunta')
         ->leftJoin('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')
@@ -79,7 +80,7 @@ try {
         'usuario_inexistente' => 0, 'sin_vinculo_documental' => 0, 'pareja_documental_incompleta' => 0,
         'documento_ajeno_o_inexistente' => 0, 'documento_no_verificable' => 0, 'documento_bytes_verificados' => 0];
     $archivos = app(ArchivosAplicacion::class);
-    foreach (DB::table('aplicaciones_instrumento')->where('cod_residente', $residente)
+    foreach (\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento')->where('cod_residente', $residente)
         ->get(['cod_usuario_registro', 'registrado_en', 'cod_documento_clinico', 'localizador_fuente']) as $a) {
         $usuario = $a->cod_usuario_registro !== null;
         $tecnica = $a->registrado_en !== null;

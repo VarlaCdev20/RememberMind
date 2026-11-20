@@ -415,7 +415,7 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
     private function datosRectificacion(array $original): array
     {
         $id = $original['cod_control_cognitivo'];
-        unset($original['cod_control_cognitivo']);
+        unset($original['cod_control_cognitivo'], $original['cod_contexto_directo']);
         $original['fecha_hora'] = substr($original['fecha_hora'], 0, 10).' 09:45:00';
         $original['estado'] = 'VIGENTE';
         $original['observacion'] = '[COR-'.self::VERSION.':'.$id.'] SIMULACIÓN. Rectifica la hora ficticia del original '.$id
@@ -431,7 +431,7 @@ final class EscenariosCognitivosDesarrolloSeeder extends Seeder
             $original = $fila->$campo;
             if ($tabla === 'controles_cognitivos' && $campo === 'estado' && $valor === 'VIGENTE' && $original === 'RECTIFICADO') {
                 $datos = $this->datosRectificacion((array) $fila);
-                $sucesores = DB::table($tabla)->where('observacion', $datos['observacion'])->get();
+                $sucesores = RegistrosConsumo::consulta($tabla)->where('observacion', $datos['observacion'])->get();
                 if ($sucesores->count() !== 1) {
                     throw new RuntimeException('Rectificación del lote incompleta o duplicada.');
                 }

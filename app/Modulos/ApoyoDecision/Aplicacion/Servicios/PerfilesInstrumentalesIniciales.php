@@ -93,6 +93,8 @@ final class PerfilesInstrumentalesIniciales
     /** Inventario de catálogo, sin aplicaciones, residentes ni configuración privada. */
     public function estado(): array
     {
+        // El inventario también opera antes de instalar el esquema; no crea catálogos.
+        if (! (new Instrumento)->getConnection()->getSchemaBuilder()->hasTable('instrumentos')) return [];
         $codigos = array_column((new CircuitoInstrumentalInicial)->definiciones(), 'codigo');
         $estado = [];
         foreach (Instrumento::query()->whereIn('codigo', $codigos)->where('estado', 'ACTIVO')->with('preguntas.opciones')->get() as $i) {

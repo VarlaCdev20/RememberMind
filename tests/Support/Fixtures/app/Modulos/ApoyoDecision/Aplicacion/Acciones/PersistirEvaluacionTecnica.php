@@ -144,7 +144,8 @@ final class PersistirEvaluacionTecnica
                 || $fuente['campo_temporal'] !== 'fecha_hora' || $fuente['campo_personal'] !== 'cod_personal') {
                 throw new DomainException('Metadatos de fuente no autorizados.');
             }
-            $registro = DB::table($raiz)->where($pk, $e->fuente->registro)->lockForUpdate()->first();
+            $modelo = $raiz === 'controles_cognitivos' ? ControlCognitivo::class : AplicacionInstrumento::class;
+            $registro = $modelo::query()->whereKey($e->fuente->registro)->lockForUpdate()->toBase()->first();
             if ($registro === null || $registro->cod_residente !== $m->contexto->residente || $registro->cod_personal !== $e->fuente->personal) {
                 throw new DomainException('Registro fuente inexistente o ajeno a esta ejecución.');
             }

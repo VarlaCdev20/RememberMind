@@ -38,9 +38,9 @@ final class ConservarResultadoInstitucional
         $apps = array_column($i['capturas']['capturas'], 'cod_aplicacion');
         $respuestas = array_merge(...array_map(fn ($a) => array_column($a['respuestas_originales'], 'cod_respuesta'), $i['capturas']['capturas']));
         $juicios = array_map(fn ($v) => $v['origen']['registro'], $p['valoraciones']);
-        foreach (DB::table('aplicaciones_instrumento')->whereIn('cod_aplicacion', $apps)->pluck('cod_residente', 'cod_aplicacion') as $pk => $r) { $this->origenes['aplicaciones_instrumento:'.$pk] = $r; }
+        foreach (\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento')->whereIn('cod_aplicacion', $apps)->pluck('cod_residente', 'cod_aplicacion') as $pk => $r) { $this->origenes['aplicaciones_instrumento:'.$pk] = $r; }
         foreach (DB::table('valoraciones_petersen_originales')->whereIn('cod_valoracion_petersen', $juicios)->pluck('cod_residente', 'cod_valoracion_petersen') as $pk => $r) { $this->origenes['valoraciones_petersen_originales:'.$pk] = $r; }
-        foreach (DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')->whereIn('r.cod_respuesta', $respuestas)->pluck('a.cod_residente', 'r.cod_respuesta') as $pk => $r) { $this->origenes['respuestas_instrumento:'.$pk] = $r; }
+        foreach (DB::table('respuestas_instrumento as r')->joinSub(\App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento'), 'a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')->whereIn('r.cod_respuesta', $respuestas)->pluck('a.cod_residente', 'r.cod_respuesta') as $pk => $r) { $this->origenes['respuestas_instrumento:'.$pk] = $r; }
         $s = $p['salida'];
         $versionPetersen = $p['gobierno']['conocimiento']['version'] ?? null;
         if ($versionPetersen === null) { throw new DomainException('No hay una versión Petersen identificada para conservar el resultado.'); }

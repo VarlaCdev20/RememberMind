@@ -218,7 +218,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
         $m = $this->evidencias()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
         $vector = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
         $this->repo()->guardar($vector);
-        RegistrosConsumo::consulta('controles_cognitivos')->update(['memoria_reciente' => 'FUENTE_MODIFICADA_DESPUES']);
+        DB::table('controles_cognitivos')->update(['memoria_reciente' => 'FUENTE_MODIFICADA_DESPUES']);
         $r = $this->repo()->obtener('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
         self::assertSame(Codec::huella($vector), Codec::huella($r));
         self::assertNotSame('FUENTE_MODIFICADA_DESPUES', $r->memoria->hechos['SIM-EVID']->valor);
@@ -358,7 +358,7 @@ final class ConservacionExpertaTest extends RepositoriosTestCase
     {
         EscenarioRepositorios::evidencia();
         $m = $this->evidencias()->paraEvaluacion('SIM-EVAL', 'SINTETICO-RES', 'SIM-V1', E::fecha());
-        RegistrosConsumo::consulta('controles_cognitivos')->update(['memoria_reciente' => 'CAMBIO_ANTES_DE_GUARDAR']);
+        DB::table('controles_cognitivos')->update(['memoria_reciente' => 'CAMBIO_ANTES_DE_GUARDAR']);
         $vector = new VectorCognitivo(array_map(fn ($d) => new ResultadoDominio($d, S::DESCONOCIDO, V::NO_EVALUABLE, $m, [], [], 'Sin conclusión.'), D::cases()));
         try {
             $this->repo()->guardar($vector);

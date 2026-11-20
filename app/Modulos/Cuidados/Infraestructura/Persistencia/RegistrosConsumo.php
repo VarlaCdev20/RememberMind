@@ -90,6 +90,11 @@ final class RegistrosConsumo
             return;
         }
 
+        if (isset(ContextosResidente::CONTRATOS[$entidad])) {
+            ContextosResidente::insertar(DB::connection(), $entidad, $filas);
+            return;
+        }
+
         DB::transaction(function () use ($entidad, $filas): void {
             ColumnasRelacionadas::bloquearEntrada(DB::connection(), $entidad, $filas);
             DB::table($entidad)->insert(array_map(fn ($fila) => ColumnasRelacionadas::preparar(DB::connection(), $entidad, $fila), $filas));

@@ -42,6 +42,10 @@ class ConsolidacionControlesObservacionesTest extends TestCase
 
     private int $tablasSeparadas;
 
+    private $contextoCognitivo;
+
+    private array $columnasCaptura = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,6 +61,8 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $base = ['cod_residente' => $residente->getKey(), 'cod_personal' => $personal->getKey(), 'cod_atencion' => $atencion->getKey(),
             'fecha_hora' => now()->toDateTimeString(), 'observacion' => 'Observación sintética original'];
         RegistroMovilidad::create($base + ['marcha' => 'ASISTIDA', 'estado' => 'VIGENTE']);
+        $this->contextoCognitivo = require database_path('migrations/2026_11_20_000005_separate_optional_cognitive_residents.php');
+        $this->contextoCognitivo->down();
         $this->cognitivo = $base + ['cod_control_cognitivo' => 'COG-ORIGINAL-60', 'cod_jornada' => null,
             'orientacion_persona' => 'CONSERVADA', 'orientacion_lugar' => 'CONSERVADA', 'orientacion_tiempo' => 'VARIABLE',
             'memoria_reciente' => 'CAMBIO', 'memoria_remota' => 'CONSERVADA', 'atencion' => 'VARIABLE', 'comprension' => 'CONSERVADA',
@@ -91,7 +97,10 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $r = [];
         foreach (['registros_observaciones_cuidado' => 'cod_observacion_cuidado', 'controles_cognitivos' => 'cod_control_cognitivo',
             'controles_funcionales_iadl' => 'cod_control_iadl'] as $t => $pk) {
-            $r[$t] = DB::table($t)->orderBy($pk)->get()->toJson();
+            $this->columnasCaptura[$t] ??= Schema::getColumnListing($t);
+            $q = Schema::hasColumn($t, 'cod_residente') ? DB::table($t)
+                : \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), $t);
+            $r[$t] = $q->select($this->columnasCaptura[$t])->orderBy($pk)->get()->toJson();
         }
 
         return $r;
@@ -103,6 +112,10 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $this->migracion->up();
         $this->assertCount($this->tablasSeparadas, Schema::getTableListing());
         $this->assertCount(44, Schema::getColumnListing('registros_observaciones_cuidado'));
+        if ($this->triggersOriginales !== null) {
+            $this->assertSame($this->triggersOriginales, DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson());
+        }
+        $this->contextoCognitivo->up();
         $this->assertSame(1, ControlCognitivo::count());
         $this->assertSame(2, ControlFuncionalIadl::count());
         $this->assertSame(1, DB::table('registros_observaciones_cuidado')->where('tipo_evento', 'MOVILIDAD')->count());
@@ -118,9 +131,6 @@ class ConsolidacionControlesObservacionesTest extends TestCase
         $this->assertFalse(array_key_exists('marcha', $control->toArray()));
         $this->assertNull(ControlCognitivo::find($correccion->getKey()));
         $this->assertSame($this->originales, $this->capturar());
-        if ($this->triggersOriginales !== null) {
-            $this->assertSame($this->triggersOriginales, DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get(['name', 'sql'])->toJson());
-        }
         $this->assertSame('IAD-ORIGINAL-60', DB::table('qa_referencias_control')->value('cod_control_iadl'));
         $this->assertTrue(Schema::hasTable('controles_cognitivos'));
         $this->assertTrue(Schema::hasTable('controles_funcionales_iadl'));
@@ -142,8 +152,9 @@ class ConsolidacionControlesObservacionesTest extends TestCase
             }
         }
         $this->migracion->up();
+        $this->contextoCognitivo->up();
         $otroResidente = Residente::factory()->create(['estado' => 'ADMITIDO']);
-        $this->rechazar(fn () => DB::table('controles_funcionales_iadl')->where('cod_control_iadl', 'IAD-ORIGINAL-60')
+        $this->rechazar(fn () => DB::table('atenciones')->where('cod_atencion', $this->iadl['cod_atencion'])
             ->update(['cod_residente' => $otroResidente->getKey()]));
         try {
             ControlFuncionalIadl::findOrFail('IAD-ORIGINAL-60')->update(['observacion' => 'Sobrescritura indebida']);
@@ -185,6 +196,7 @@ class ConsolidacionControlesObservacionesTest extends TestCase
     public function test_resultado_institucional_conserva_lectura_de_ambos_tipos_sin_cambiar_su_identidad(): void
     {
         $this->migracion->up();
+        $this->contextoCognitivo->up();
         (require base_path('database/propuestas/experto/2026_11_04_000001_conservar_resultado_institucional.php'))->up();
         $this->seed([RolesAndPermissionsSeeder::class, PermisoEjecucionInstitucionalSeeder::class]);
         $actor = Personal::where('numero_documento', 'CONTROL-SINTETICO')->sole()->usuario;

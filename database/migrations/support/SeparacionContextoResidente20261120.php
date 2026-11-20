@@ -13,6 +13,7 @@ final class SeparacionContextoResidente20261120
             'columnas' => Schema::getColumns($tabla),
             'restricciones' => DB::select('SELECT conname, contype, convalidated, pg_get_constraintdef(oid) AS definicion FROM pg_constraint WHERE conrelid = to_regclass(?) ORDER BY conname', ['public.'.$tabla]),
             'indices_sql' => DB::select('SELECT x.relname AS nombre, i.indisunique AS unico, i.indisprimary AS primario, i.indisvalid AS valido, pg_get_expr(i.indpred, i.indrelid) AS predicado, pg_get_expr(i.indexprs, i.indrelid) AS expresiones, pg_get_indexdef(i.indexrelid) AS definicion FROM pg_index i JOIN pg_class x ON x.oid = i.indexrelid WHERE i.indrelid = to_regclass(?) ORDER BY x.relname', ['public.'.$tabla]),
+            'triggers' => DB::select('SELECT tgname, pg_get_triggerdef(oid) AS definicion, pg_get_functiondef(tgfoid) AS funcion FROM pg_trigger WHERE tgrelid = to_regclass(?) AND NOT tgisinternal ORDER BY tgname', ['public.'.$tabla]),
         ];
         foreach ($actuales as $tipo => $valor) {
             $actual = json_decode(json_encode($valor), true);

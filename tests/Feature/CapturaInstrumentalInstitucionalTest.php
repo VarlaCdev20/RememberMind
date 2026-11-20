@@ -1024,6 +1024,8 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
     public function test_migracion_revierte_solo_sin_metadatos_y_conserva_historia_y_referencias(): void
     {
         $a = $this->aplicar();
+        $contextoCognitivo = require database_path('migrations/2026_11_20_000005_separate_optional_cognitive_residents.php');
+        $contextoCognitivo->down();
         $unionDocumental = require database_path('migrations/2026_11_16_000002_consolidate_documentos.php');
         $unionDocumental->down();
         $m = require database_path('migrations/2026_10_19_010000_add_procedencia_aplicaciones_instrumento.php');
@@ -1041,6 +1043,7 @@ final class CapturaInstrumentalInstitucionalTest extends TestCase
         self::assertSame($respuestas, DB::table('respuestas_instrumento')->orderBy('cod_respuesta')->get()->map(fn ($fila) => (array) $fila)->all());
         $m->up();
         $unionDocumental->up();
+        $contextoCognitivo->up();
         self::assertNull(AplicacionInstrumento::query()->findOrFail($a->getKey())->cod_usuario_registro);
         self::assertDatabaseCount('aplicaciones_instrumento', 1);
         self::assertDatabaseCount('respuestas_instrumento', 11);

@@ -247,7 +247,7 @@ class ReporteDataService
 
     public function valoracionesLista(int $limite = 50): Collection
     {
-        return DB::table('aplicaciones_instrumento as ai')
+        return \App\Compartido\Infraestructura\Persistencia\ColumnasRelacionadas::consulta(DB::connection(), 'aplicaciones_instrumento', 'ai')
             ->join('residentes as r', 'ai.cod_residente', '=', 'r.cod_residente')
             ->leftJoin('instrumentos as i', 'ai.cod_instrumento', '=', 'i.cod_instrumento')
             ->select(

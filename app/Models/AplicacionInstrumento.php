@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 
 class AplicacionInstrumento extends ModeloOperativo
 {
+    use \App\Compartido\Infraestructura\Persistencia\ConservaContextoResidente;
+
     protected $table = 'aplicaciones_instrumento';
 
     protected $primaryKey = 'cod_aplicacion';

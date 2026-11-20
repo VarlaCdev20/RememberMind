@@ -46,7 +46,7 @@ class PsychologyDashboardDataTest extends TestCase
         DB::table('instrumentos')->insert([
             'cod_instrumento' => 'INS_PSI_1', 'codigo' => 'PSI-DEMO-1', 'nombre' => 'Instrumento sintético', 'tipo' => 'CUANTITATIVO', 'estado' => 'ACTIVO',
         ]);
-        DB::table('aplicaciones_instrumento')->insert([
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::insertar('aplicaciones_instrumento', [
             ['cod_aplicacion' => 'APL_PSI_1', 'cod_instrumento' => 'INS_PSI_1', 'cod_residente' => $propio->cod_residente, 'cod_personal' => 'PER_PSI_1', 'fecha_hora' => now(), 'estado' => 'COMPLETADA'],
             ['cod_aplicacion' => 'APL_PSI_2', 'cod_instrumento' => 'INS_PSI_1', 'cod_residente' => $ajeno->cod_residente, 'cod_personal' => 'PER_PSI_2', 'fecha_hora' => now(), 'estado' => 'COMPLETADA'],
         ]);
@@ -88,7 +88,7 @@ class PsychologyDashboardDataTest extends TestCase
         DB::table('instrumentos')->insert([
             'cod_instrumento' => 'INS_PSI_GRAF', 'codigo' => 'PSI-GRAF', 'nombre' => 'Escala de prueba', 'tipo' => 'CUANTITATIVO', 'estado' => 'ACTIVO',
         ]);
-        DB::table('aplicaciones_instrumento')->insert([
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::insertar('aplicaciones_instrumento', [
             ['cod_aplicacion' => 'APL_PSI_GRAF_1', 'cod_instrumento' => 'INS_PSI_GRAF', 'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF', 'fecha_hora' => now(), 'estado' => 'ANULADA'],
             ['cod_aplicacion' => 'APL_PSI_GRAF_2', 'cod_instrumento' => 'INS_PSI_GRAF', 'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF', 'fecha_hora' => now()->subMonths(7), 'estado' => 'COMPLETA'],
         ]);
@@ -103,11 +103,11 @@ class PsychologyDashboardDataTest extends TestCase
         $this->assertSame(['Escala de prueba'], $vista->viewData('chartInstrumentos')['labels']);
         $this->assertSame([1], $vista->viewData('chartInstrumentos')['data']);
 
-        DB::table('aplicaciones_instrumento')->insert([
+        \App\Modulos\Cuidados\Infraestructura\Persistencia\RegistrosConsumo::insertar('aplicaciones_instrumento', [[
             'cod_aplicacion' => 'APL_PSI_GRAF_3', 'cod_instrumento' => 'INS_PSI_GRAF',
             'cod_residente' => $residente->cod_residente, 'cod_personal' => 'PER_PSI_GRAF',
             'fecha_hora' => now(), 'estado' => 'COMPLETA',
-        ]);
+        ]]);
         $vista = Livewire::test(DashboardPsicologo::class);
         $this->assertSame(2, $vista->viewData('chartInstrumentos')['total']);
         $this->assertSame(2, array_sum($vista->viewData('chartEvolucion')['aplicaciones']));

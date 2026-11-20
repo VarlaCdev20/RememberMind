@@ -208,7 +208,7 @@ class Historical2026Seeder extends Seeder
     private function put(string $table, string $id, array $data, bool $buffer = false): void
     {
         // Solo resuelve la PK del esquema aprobado; los atributos se mapean explícitamente debajo.
-        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::ORIGENES[$table]) ? CatalogoCodigos::clave($table) : DB::getSchemaBuilder()->getColumnListing($table)[0]);
+        $pk = $this->keys[$table] ??= (isset(RegistrosConsumo::ORIGENES[$table]) ? CatalogoCodigos::clave($table) : collect(DB::getSchemaBuilder()->getIndexes($table))->firstWhere('primary', true)['columns'][0]);
         $row = [$pk => $id] + $data;
         if (strlen($id) > 20) {
             throw new RuntimeException('Código mayor de 20 caracteres: '.$id);
@@ -1071,14 +1071,14 @@ class Historical2026Seeder extends Seeder
             || RegistrosConsumo::consulta('asignaciones_residente_jornada')->whereIn('cod_residente', $ids)->where('cod_jornada', DB::table('jornadas as j')->join('turnos as t', 't.cod_turno', '=', 'j.cod_turno')->join('usuarios as u', 'u.cod_usuario', '=', 'j.cod_usuario_apertura')->where('j.fecha_jornada', self::REFERENCE_DATE)->where('t.hora_inicio', '00:00:00')->where('t.hora_cierre', '12:00:00')->where('u.correo', 'admisiones'.self::DOMINIO_CORREO)->sole(['j.cod_jornada'])->cod_jornada)->where('estado', 'ACTIVA')->count() !== 30) {
             throw new RuntimeException('Fechas de nacimiento o asignación actual incompletas.');
         }
-        if (DB::table('respuestas_instrumento as r')->join('aplicaciones_instrumento as a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
+        if (DB::table('respuestas_instrumento as r')->joinSub(RegistrosConsumo::consulta('aplicaciones_instrumento'), 'a', 'a.cod_aplicacion', '=', 'r.cod_aplicacion')
             ->join('preguntas_instrumento as p', 'p.cod_pregunta', '=', 'r.cod_pregunta')->join('opciones_pregunta as o', 'o.cod_opcion', '=', 'r.cod_opcion')
             ->whereIn('a.cod_residente', $admissions->pluck('cod_residente'))->where(function ($q) {
                 $q->whereColumn('a.cod_instrumento', '<>', 'p.cod_instrumento')->orWhereColumn('o.cod_pregunta', '<>', 'p.cod_pregunta');
             })->exists()) {
             throw new RuntimeException('Respuesta de instrumento incoherente.');
         }
-        foreach (DB::table('aplicaciones_instrumento')->whereIn('cod_residente', $ids)->get() as $application) {
+        foreach (RegistrosConsumo::consulta('aplicaciones_instrumento')->whereIn('cod_residente', $ids)->get() as $application) {
             $answers = DB::table('respuestas_instrumento')->where('cod_aplicacion', $application->cod_aplicacion);
             if ($answers->count() !== 10 || (float) $answers->sum('puntaje') !== (float) $application->puntaje_total || (float) $application->puntaje_maximo !== 100.0) {
                 throw new RuntimeException('Aplicación Barthel incompleta o puntuación incoherente.');
