@@ -15,6 +15,8 @@ runtime_verified: false
 
 ## Estado vigente
 
+**Auditoría de 5FN, 20/11/2026.** La [revisión de las 84 tablas de negocio](AUDITORIA_5FN_NEGOCIO_2026_11_20.md) confirma el inventario y documenta dependencias no clave en subconjuntos poblados, contratos condicionales y límites de la comprobación. **No certifica 5FN global ni modifica el esquema.** Incluye la matriz completa por relación y pruebas SQL de solo lectura.
+
 **Residente derivado en valoraciones funcionales y nutricionales, 18/11/2026.** La [decisión autorizada](DECISION_RESIDENTE_VALORACIONES_PROFESIONALES_2026_11_18.md) reduce `valoraciones_profesionales` a 29 atributos. Se conserva el inventario de 100 tablas físicas. El reparto de 30 atributos por tabla corresponde al corte anterior.
 
 **Corte posterior del 18/11/2026 — reparto de valoraciones.** La [división adicional expresamente autorizada](DECISION_REPARTO_VALORACIONES_2026_11_18.md) distribuye las 51 columnas de valoraciones en dos relaciones de 30: Funcional/Nutrición y Psicología/Pedagogía. El inventario final es **64 operativas + 20 expertas + 16 técnicas = 100 tablas físicas**. El corte de 99 que sigue es anterior a este reparto.
