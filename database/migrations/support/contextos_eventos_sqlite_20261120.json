@@ -1,0 +1,33 @@
+{
+  "ocupaciones_cama": {
+    "triggers": [
+      "CREATE TRIGGER trg_ck_ocupacion_fechas_ins BEFORE INSERT ON ocupaciones_cama FOR EACH ROW WHEN NOT ((NEW.fecha_hora_liberacion IS NULL OR NEW.fecha_hora_liberacion >= NEW.fecha_hora_asignacion)) BEGIN SELECT RAISE(ABORT, 'Restricción de integridad ck_ocupacion_fechas incumplida.'); END",
+      "CREATE TRIGGER trg_ck_ocupacion_fechas_upd BEFORE UPDATE ON ocupaciones_cama FOR EACH ROW WHEN NOT ((NEW.fecha_hora_liberacion IS NULL OR NEW.fecha_hora_liberacion >= NEW.fecha_hora_asignacion)) BEGIN SELECT RAISE(ABORT, 'Restricción de integridad ck_ocupacion_fechas incumplida.'); END"
+    ],
+    "crear": "CREATE TABLE \"ocupaciones_cama\" (\"cod_ocupacion\" varchar not null, \"cod_residente\" varchar not null, \"cod_cama\" varchar not null, \"cod_admision\" varchar not null, \"cod_usuario_registro\" varchar not null, \"fecha_hora_asignacion\" datetime not null, \"fecha_hora_liberacion\" datetime, \"motivo_liberacion\" text, \"estado\" varchar not null, foreign key(\"cod_residente\") references \"residentes\"(\"cod_residente\") on delete restrict, foreign key(\"cod_cama\") references \"camas\"(\"cod_cama\") on delete restrict, foreign key(\"cod_admision\") references \"admisiones\"(\"cod_admision\") on delete restrict, foreign key(\"cod_usuario_registro\") references \"usuarios\"(\"cod_usuario\") on delete restrict, primary key (\"cod_ocupacion\"))",
+    "indices": [
+      "CREATE INDEX \"ocupaciones_cama_cod_cama_estado_index\" on \"ocupaciones_cama\" (\"cod_cama\", \"estado\")",
+      "CREATE INDEX \"ocupaciones_cama_cod_residente_estado_index\" on \"ocupaciones_cama\" (\"cod_residente\", \"estado\")",
+      "CREATE UNIQUE INDEX uq_ocupacion_cama_activa ON ocupaciones_cama (cod_cama) WHERE estado IN ('ACTIVA', 'ACTIVO')",
+      "CREATE UNIQUE INDEX uq_ocupacion_residente_activa ON ocupaciones_cama (cod_residente) WHERE estado IN ('ACTIVA', 'ACTIVO')"
+    ]
+  },
+  "respuestas_instrumento": {
+    "triggers": [],
+    "crear": "CREATE TABLE \"respuestas_instrumento\" (\"cod_respuesta\" varchar not null, \"cod_aplicacion\" varchar not null, \"cod_pregunta\" varchar not null, \"cod_opcion\" varchar, \"valor_numero\" numeric, \"valor_texto\" text, \"valor_logico\" tinyint(1), \"puntaje\" numeric, \"observacion\" text, foreign key(\"cod_aplicacion\") references \"aplicaciones_instrumento\"(\"cod_aplicacion\") on delete restrict, foreign key(\"cod_pregunta\") references \"preguntas_instrumento\"(\"cod_pregunta\") on delete restrict, foreign key(\"cod_opcion\") references \"opciones_pregunta\"(\"cod_opcion\") on delete restrict, primary key (\"cod_respuesta\"))",
+    "indices": [
+      "CREATE UNIQUE INDEX \"respuestas_instrumento_cod_aplicacion_cod_pregunta_unique\" on \"respuestas_instrumento\" (\"cod_aplicacion\", \"cod_pregunta\")"
+    ]
+  },
+  "administraciones_medicacion": {
+    "triggers": [
+      "CREATE TRIGGER norm18_administracion_update BEFORE UPDATE ON administraciones_medicacion FOR EACH ROW WHEN (SELECT a.cod_residente FROM prescripciones p JOIN atenciones a ON a.cod_atencion=p.cod_atencion WHERE p.cod_prescripcion=OLD.cod_prescripcion) <> (SELECT a.cod_residente FROM prescripciones p JOIN atenciones a ON a.cod_atencion=p.cod_atencion WHERE p.cod_prescripcion=NEW.cod_prescripcion) BEGIN SELECT RAISE(ABORT, 'El vínculo no puede cambiar el residente o la versión histórica'); END",
+      "CREATE TRIGGER trg_ck_administracion_dosis_ins BEFORE INSERT ON administraciones_medicacion FOR EACH ROW WHEN NOT ((NEW.dosis_administrada IS NULL OR NEW.dosis_administrada > 0)) BEGIN SELECT RAISE(ABORT, 'Restricción de integridad ck_administracion_dosis incumplida.'); END",
+      "CREATE TRIGGER trg_ck_administracion_dosis_upd BEFORE UPDATE ON administraciones_medicacion FOR EACH ROW WHEN NOT ((NEW.dosis_administrada IS NULL OR NEW.dosis_administrada > 0)) BEGIN SELECT RAISE(ABORT, 'Restricción de integridad ck_administracion_dosis incumplida.'); END"
+    ],
+    "crear": "CREATE TABLE \"administraciones_medicacion\" (\"cod_administracion\" varchar not null, \"cod_prescripcion\" varchar not null, \"cod_horario_prescripcion\" varchar, \"cod_jornada\" varchar not null, \"cod_personal\" varchar not null, \"fecha_hora_programada\" datetime, \"fecha_hora_administracion\" datetime, \"resultado\" varchar not null, \"dosis_administrada\" numeric, \"motivo_omision\" text, \"efecto_observado\" text, \"reaccion_adversa\" text, \"observacion\" text, \"estado\" varchar not null, foreign key(\"cod_personal\") references personal(\"cod_personal\") on delete restrict on update no action, foreign key(\"cod_jornada\") references jornadas(\"cod_jornada\") on delete restrict on update no action, foreign key(\"cod_horario_prescripcion\") references horarios_prescripcion(\"cod_horario_prescripcion\") on delete restrict on update no action, foreign key(\"cod_prescripcion\") references prescripciones(\"cod_prescripcion\") on delete restrict on update no action, primary key (\"cod_administracion\"))",
+    "indices": [
+      "CREATE UNIQUE INDEX \"uq_administracion_programada_dia\" on \"administraciones_medicacion\" (\"cod_prescripcion\", \"cod_horario_prescripcion\")"
+    ]
+  }
+}

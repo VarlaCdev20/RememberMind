@@ -57,7 +57,8 @@ class BddOperativaV2Test extends TestCase
 
     public function test_existen_las_70_tablas_base_y_la_extension_clinica_aprobada(): void
     {
-        $esperadas = $this->tablasOperativas();
+        $fisicas = ['ocupaciones_cama'=>'estancias_cama', 'respuestas_instrumento'=>'capturas_instrumento', 'administraciones_medicacion'=>'dosis_registradas'];
+        $esperadas = array_map(fn ($nombre) => $fisicas[$nombre] ?? $nombre, $this->tablasOperativas());
         $tecnicas = [
             'migrations', 'password_reset_tokens', 'sessions', 'cache', 'cache_locks', 'jobs', 'job_batches',
             'failed_jobs', 'personal_access_tokens', 'activity_log', 'permissions', 'roles',
@@ -178,6 +179,46 @@ class BddOperativaV2Test extends TestCase
 
         $this->expectException(ValidationException::class);
         RespuestaInstrumento::query()->create(['cod_respuesta' => 'RSP_1', 'cod_aplicacion' => $aplicacion->cod_aplicacion, 'cod_pregunta' => $pregunta->cod_pregunta, 'valor_texto' => 'X']);
+    }
+
+    public function test_contextos_de_eventos_reconstruyen_datos_al_revertir_y_reaplicar(): void
+    {
+        [$base, $residente] = $this->escenarioClinico();
+        $orden = $this->crearPrescripcion($base, $residente);
+        $db = \Illuminate\Support\Facades\DB::connection();
+        $db->table('horarios_prescripcion')->insert([
+            'cod_horario_prescripcion'=>'HOR_EVT', 'cod_prescripcion'=>$orden->getKey(),
+            'hora_programada'=>'09:00', 'estado'=>'ACTIVO',
+        ]);
+        $dosis = ['cod_prescripcion'=>$orden->getKey(), 'cod_jornada'=>$base['jornada']->getKey(),
+            'cod_personal'=>$base['personal']->getKey(), 'resultado'=>'OMITIDA', 'estado'=>'FINALIZADO'];
+        $db->table('administraciones_medicacion')->insert($dosis + ['cod_administracion'=>'DOS_DIRECTA']);
+        $db->table('administraciones_medicacion')->insert($dosis + ['cod_administracion'=>'DOS_HORA',
+            'cod_horario_prescripcion'=>'HOR_EVT', 'fecha_hora_programada'=>'2026-11-01 09:00']);
+        $db->table('administraciones_medicacion')->insert($dosis + ['cod_administracion'=>'DOS_DIA_DOS',
+            'cod_horario_prescripcion'=>'HOR_EVT', 'fecha_hora_programada'=>'2026-11-02 09:00']);
+        $instrumento = Instrumento::create(['cod_instrumento'=>'INS_EVT','codigo'=>'EVT','nombre'=>'Instrumento','tipo'=>'COGNITIVO','estado'=>'ACTIVO']);
+        $aplicacion = AplicacionInstrumento::create(['cod_aplicacion'=>'APL_EVT','cod_instrumento'=>$instrumento->getKey(),
+            'cod_residente'=>$residente->getKey(),'cod_personal'=>$base['personal']->getKey(),'fecha_hora'=>now(),'estado'=>'COMPLETA']);
+        foreach (['LIBRE','OPCION'] as $i => $tipo) {
+            PreguntaInstrumento::create(['cod_pregunta'=>'PRE_'.$tipo,'cod_instrumento'=>$instrumento->getKey(),
+                'codigo'=>$tipo,'enunciado'=>$tipo,'tipo_respuesta'=>$tipo,'orden'=>$i+1,'estado'=>'ACTIVA']);
+        }
+        $db->table('opciones_pregunta')->insert(['cod_opcion'=>'OP_EVT','cod_pregunta'=>'PRE_OPCION','nombre'=>'Opción','orden'=>1,'estado'=>'ACTIVO']);
+        $db->table('respuestas_instrumento')->insert(['cod_respuesta'=>'R_LIBRE','cod_aplicacion'=>$aplicacion->getKey(),'cod_pregunta'=>'PRE_LIBRE','valor_texto'=>'Respuesta']);
+        $db->table('respuestas_instrumento')->insert(['cod_respuesta'=>'R_OPCION','cod_aplicacion'=>$aplicacion->getKey(),'cod_pregunta'=>'PRE_OPCION','cod_opcion'=>'OP_EVT']);
+        $migracion = require database_path('migrations/2026_11_20_000008_normalize_event_contexts.php');
+        $migracion->down();
+        $this->assertDatabaseHas('administraciones_medicacion',['cod_administracion'=>'DOS_HORA','cod_prescripcion'=>$orden->getKey()]);
+        $this->assertDatabaseHas('respuestas_instrumento',['cod_respuesta'=>'R_OPCION','cod_pregunta'=>'PRE_OPCION']);
+        $migracion->up();
+        $this->assertDatabaseHas('dosis_registradas',['cod_administracion'=>'DOS_DIRECTA','cod_prescripcion_directa'=>$orden->getKey()]);
+        $this->assertDatabaseHas('dosis_registradas',['cod_administracion'=>'DOS_HORA','cod_prescripcion_directa'=>null]);
+        $this->assertDatabaseHas('capturas_instrumento',['cod_respuesta'=>'R_OPCION','cod_pregunta_libre'=>null]);
+        $this->assertDatabaseHas('capturas_instrumento',['cod_respuesta'=>'R_LIBRE','cod_pregunta_libre'=>'PRE_LIBRE']);
+        $this->assertDatabaseHas('ocupaciones_cama',['cod_residente'=>$residente->getKey()]);
+        $this->expectException(QueryException::class);
+        $db->table('respuestas_instrumento')->insert(['cod_respuesta'=>'R_REPETIDA','cod_aplicacion'=>$aplicacion->getKey(),'cod_pregunta'=>'PRE_OPCION']);
     }
 
     public function test_roles_competencias_y_acceso_familiar_estan_separados(): void

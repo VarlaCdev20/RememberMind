@@ -83,6 +83,23 @@ try {
         'dias_horario' => "SELECT COUNT(*)::int AS filas, COUNT(*) FILTER (WHERE dias_semana IS NOT NULL AND BTRIM(dias_semana)<>'')::int AS con_seleccion FROM horarios_prescripcion",
         'dias_cuidado' => "SELECT COUNT(*)::int AS filas, COUNT(*) FILTER (WHERE dias_semana IS NOT NULL AND BTRIM(dias_semana)<>'')::int AS con_seleccion FROM programaciones_cuidado",
     ] as $id => $sql) {
+        $eventos = [
+            'ocupacion_admision' => ['estancias_cama','cod_residente',null],
+            'respuesta_opcion' => ['capturas_instrumento','cod_pregunta','cod_opcion'],
+            'administracion_horario' => ['dosis_registradas','cod_prescripcion','cod_horario_prescripcion'],
+        ];
+        if (isset($eventos[$id])) {
+            [$fisica,$campo,$vinculo] = $eventos[$id];
+            if (isset($tablas[$fisica]) && !in_array($campo, array_column($tablas[$fisica]['columnas'], 'name'), true)) {
+                $filas = $c->table($fisica);
+                $comprobaciones[$id] = [
+                    'estado'=>'CONTEXTO_DERIVADO', 'tabla_fisica'=>$fisica,
+                    'filas'=>$tablas[$fisica]['filas'],
+                    'con_vinculo'=>$vinculo ? $filas->whereNotNull($vinculo)->count() : $tablas[$fisica]['filas'],
+                ];
+                continue;
+            }
+        }
         $derivados = ['consentimiento_admision' => 'consentimientos', 'ejecucion_plan' => 'ejecuciones_cuidado'];
         if (isset($derivados[$id]) && ! $s->hasColumn($derivados[$id], 'cod_residente')) {
             $comprobaciones[$id] = [
